@@ -1,0 +1,91 @@
+import '@/styles/globals.css'
+import { Metadata, Viewport } from 'next'
+
+import { siteConfig } from '@/config/site'
+import { fontSans, fontMono } from '@/lib/fonts'
+import { cn } from '@/lib/utils'
+
+import { ThemeProvider } from '@/components/theme-provider'
+import Header from '@/components/test/Header'
+import Footer from '@/components/test/Footer'
+import { Inter } from 'next/font/google'
+import { SiteHeader } from '@/components/site-header'
+import { SiteFooter } from '@/components/site-footer'
+
+export const metadata: Metadata = {
+  title: {
+    default: siteConfig.name,
+    template: `%s - ${siteConfig.name}`,
+  },
+  metadataBase: new URL(siteConfig.url),
+  description: siteConfig.description,
+  keywords: ['Wealth Farming Fund', 'Capital Fund', 'Digital Asset'],
+  authors: [
+    {
+      name: 'Wealth Farming Fund',
+      url: 'https://wealthfarmingcap.net',
+    },
+  ],
+  creator: 'wealthFarming',
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: siteConfig.url,
+    title: siteConfig.name,
+    description: siteConfig.description,
+    siteName: siteConfig.name,
+    images: [
+      {
+        url: siteConfig.ogImage,
+        width: 1200,
+        height: 630,
+        alt: siteConfig.name,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: siteConfig.name,
+    description: siteConfig.description,
+    images: [siteConfig.ogImage],
+    creator: '@shadcn',
+  },
+  manifest: `${siteConfig.url}/site.webmanifest`,
+}
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: 'white' },
+    { media: '(prefers-color-scheme: dark)', color: 'black' },
+  ],
+}
+const inter = Inter({ subsets: ['latin'] })
+interface RootLayoutProps {
+  children: React.ReactNode
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
+  return (
+    <>
+      <html lang="en" suppressHydrationWarning>
+        <head />
+        <body className={cn('min-h-screen bg-background font-mono antialiased', fontMono.variable)}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <div vaul-drawer-wrapper="">
+              <div className="relative flex min-h-screen flex-col bg-background">
+                <SiteHeader />
+                {children}
+                <SiteFooter />
+              </div>
+            </div>
+          </ThemeProvider>
+        </body>
+      </html>
+    </>
+  )
+}

@@ -13,6 +13,10 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    'individual-investors': IndividualInvestor;
+    companies: Company;
+    'investment-funds': InvestmentFund;
+    investments: Investment;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -20,6 +24,10 @@ export interface Config {
   collectionsSelect?: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    'individual-investors': IndividualInvestorsSelect<false> | IndividualInvestorsSelect<true>;
+    companies: CompaniesSelect<false> | CompaniesSelect<true>;
+    'investment-funds': InvestmentFundsSelect<false> | InvestmentFundsSelect<true>;
+    investments: InvestmentsSelect<false> | InvestmentsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -62,6 +70,12 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: number;
+  role: 'admin' | 'individual' | 'company';
+  firstName?: string | null;
+  lastName?: string | null;
+  companyName?: string | null;
+  registrationNumber?: string | null;
+  phone?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -94,6 +108,91 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "individual-investors".
+ */
+export interface IndividualInvestor {
+  id: number;
+  fullName: string;
+  firstName: string;
+  lastName: string;
+  userAccount: number | User;
+  phone?: string | null;
+  address?: string | null;
+  dateOfBirth?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "companies".
+ */
+export interface Company {
+  id: number;
+  name: string;
+  registrationNumber?: string | null;
+  address?: string | null;
+  contactPerson: number | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "investment-funds".
+ */
+export interface InvestmentFund {
+  id: number;
+  name: string;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  category: 'equity' | 'fixed-income' | 'real-estate' | 'alternative';
+  startDate: string;
+  endDate?: string | null;
+  interestRate: number;
+  minInvestment: number;
+  maxInvestment?: number | null;
+  fundManager: number | User;
+  status?: ('open' | 'closed' | 'upcoming') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "investments".
+ */
+export interface Investment {
+  id: number;
+  investor:
+    | {
+        relationTo: 'individual-investors';
+        value: number | IndividualInvestor;
+      }
+    | {
+        relationTo: 'companies';
+        value: number | Company;
+      };
+  investmentFund: number | InvestmentFund;
+  amount: number;
+  investmentDate: string;
+  status?: ('active' | 'completed' | 'cancelled') | null;
+  expectedReturn?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -106,6 +205,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'individual-investors';
+        value: number | IndividualInvestor;
+      } | null)
+    | ({
+        relationTo: 'companies';
+        value: number | Company;
+      } | null)
+    | ({
+        relationTo: 'investment-funds';
+        value: number | InvestmentFund;
+      } | null)
+    | ({
+        relationTo: 'investments';
+        value: number | Investment;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -154,6 +269,12 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  role?: T;
+  firstName?: T;
+  lastName?: T;
+  companyName?: T;
+  registrationNumber?: T;
+  phone?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -181,6 +302,65 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "individual-investors_select".
+ */
+export interface IndividualInvestorsSelect<T extends boolean = true> {
+  fullName?: T;
+  firstName?: T;
+  lastName?: T;
+  userAccount?: T;
+  phone?: T;
+  address?: T;
+  dateOfBirth?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "companies_select".
+ */
+export interface CompaniesSelect<T extends boolean = true> {
+  name?: T;
+  registrationNumber?: T;
+  address?: T;
+  contactPerson?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "investment-funds_select".
+ */
+export interface InvestmentFundsSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  category?: T;
+  startDate?: T;
+  endDate?: T;
+  interestRate?: T;
+  minInvestment?: T;
+  maxInvestment?: T;
+  fundManager?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "investments_select".
+ */
+export interface InvestmentsSelect<T extends boolean = true> {
+  investor?: T;
+  investmentFund?: T;
+  amount?: T;
+  investmentDate?: T;
+  status?: T;
+  expectedReturn?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
