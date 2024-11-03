@@ -17,6 +17,10 @@ npm run dev
 ```
 
 Tạo File .env và updatee
+Logo WF Gold
+
+- Color Gold #e9b560
+- Color Blue #042e45
 
 ```sh
 # DATABASE_URI=postgres://{dbUserName}:{dbPassword}@localhost:{dbPort}/{dbName}

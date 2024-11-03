@@ -17,6 +17,8 @@ export interface Config {
     companies: Company;
     'investment-funds': InvestmentFund;
     investments: Investment;
+    transactions: Transaction;
+    reports: Report;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -28,6 +30,8 @@ export interface Config {
     companies: CompaniesSelect<false> | CompaniesSelect<true>;
     'investment-funds': InvestmentFundsSelect<false> | InvestmentFundsSelect<true>;
     investments: InvestmentsSelect<false> | InvestmentsSelect<true>;
+    transactions: TransactionsSelect<false> | TransactionsSelect<true>;
+    reports: ReportsSelect<false> | ReportsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -193,6 +197,50 @@ export interface Investment {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "transactions".
+ */
+export interface Transaction {
+  id: number;
+  transactionId: string;
+  investment: number | Investment;
+  amount: number;
+  transactionDate: string;
+  transactionType: 'deposit' | 'withdrawal' | 'dividend';
+  status?: ('pending' | 'completed' | 'failed') | null;
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reports".
+ */
+export interface Report {
+  id: number;
+  title: string;
+  reportDate: string;
+  investmentFund: number | InvestmentFund;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  attachments?: (number | null) | Media;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -221,6 +269,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'investments';
         value: number | Investment;
+      } | null)
+    | ({
+        relationTo: 'transactions';
+        value: number | Transaction;
+      } | null)
+    | ({
+        relationTo: 'reports';
+        value: number | Report;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -359,6 +415,34 @@ export interface InvestmentsSelect<T extends boolean = true> {
   investmentDate?: T;
   status?: T;
   expectedReturn?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "transactions_select".
+ */
+export interface TransactionsSelect<T extends boolean = true> {
+  transactionId?: T;
+  investment?: T;
+  amount?: T;
+  transactionDate?: T;
+  transactionType?: T;
+  status?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reports_select".
+ */
+export interface ReportsSelect<T extends boolean = true> {
+  title?: T;
+  reportDate?: T;
+  investmentFund?: T;
+  content?: T;
+  attachments?: T;
   updatedAt?: T;
   createdAt?: T;
 }

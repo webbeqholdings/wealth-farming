@@ -1,13 +1,12 @@
 import '@/styles/globals.css'
 import { Metadata, Viewport } from 'next'
+import { Open_Sans } from 'next/font/google'
 
 import { siteConfig } from '@/config/site'
 import { fontSans, fontMono } from '@/lib/fonts'
 import { cn } from '@/lib/utils'
 
 import { ThemeProvider } from '@/components/theme-provider'
-import Header from '@/components/test/Header'
-import Footer from '@/components/test/Footer'
 import { Inter } from 'next/font/google'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
@@ -60,6 +59,11 @@ export const viewport: Viewport = {
   ],
 }
 const inter = Inter({ subsets: ['latin'] })
+
+const openSans = Open_Sans({
+  subsets: ['latin'],
+  display: 'swap',
+})
 interface RootLayoutProps {
   children: React.ReactNode
 }
@@ -69,7 +73,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <>
       <html lang="en" suppressHydrationWarning>
         <head />
-        <body className={cn('min-h-screen bg-background font-mono antialiased', fontMono.variable)}>
+        <body className={cn('min-h-screen bg-background', openSans.className)}>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -78,7 +82,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
           >
             <div vaul-drawer-wrapper="">
               <div className="relative flex min-h-screen flex-col bg-background">
-                <SiteHeader />
                 {children}
                 <SiteFooter />
               </div>

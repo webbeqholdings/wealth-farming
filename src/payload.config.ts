@@ -12,6 +12,8 @@ import IndividualInvestors from './collections/IndividualInvestors'
 import Companies from './collections/Companies'
 import InvestmentFunds from './collections/InvestmentFunds'
 import Investments from './collections/Investments'
+import Transactions from './collections/Transactions'
+import Reports from './collections/Reports'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -23,7 +25,16 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, IndividualInvestors, Companies, InvestmentFunds, Investments],
+  collections: [
+    Users,
+    Media,
+    IndividualInvestors,
+    Companies,
+    InvestmentFunds,
+    Investments,
+    Transactions,
+    Reports,
+  ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

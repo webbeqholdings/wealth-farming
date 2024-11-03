@@ -20,27 +20,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import Hero2 from '@/components/test/hero-2'
 
 export default function IndexPage() {
   return (
     <div className="container relative">
-      <PageHeader>
-        <Announcement />
-        <PageHeaderHeading>Build your component library</PageHeaderHeading>
-        <PageHeaderDescription>
-          Beautifully designed components that you can copy and paste into your apps.
-        </PageHeaderDescription>
-        <PageActions>
-          <Button asChild size="sm">
-            <Link href="/docs">Get Started</Link>
-          </Button>
-          <Button asChild size="sm" variant="ghost">
-            <Link target="_blank" rel="noreferrer" href={siteConfig.links.github}>
-              GitHub
-            </Link>
-          </Button>
-        </PageActions>
-      </PageHeader>
+      <Hero2 />
       <ExamplesNav className="[&>a:first-child]:text-primary" />
       <section className="overflow-hidden rounded-lg border bg-background shadow-md md:hidden md:shadow-xl">
         <Image
