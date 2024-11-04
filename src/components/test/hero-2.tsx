@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { Announcement } from '../announcement'
 import { PageActions, PageHeader, PageHeaderDescription, PageHeaderHeading } from '../page-header'
 import { Button } from '../ui/button'
+import { AnimatedListTest } from '../AnimateListTest'
+import { AnimateBeamMultipleInputTest } from '../AnimateBeamMultipleInputTest'
 
 const Hero2 = () => {
   return (
@@ -14,7 +16,10 @@ const Hero2 = () => {
       </PageHeaderDescription>
       <PageActions>
         <Button asChild size="sm">
-          <Link href="/login">Get Started</Link>
+          <Link href="/join">Create Account</Link>
+        </Button>
+        <Button asChild size="sm">
+          <Link href="/book-schedule">Book Schedule</Link>
         </Button>
       </PageActions>
     </PageHeader>

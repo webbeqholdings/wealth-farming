@@ -21,11 +21,23 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import Hero2 from '@/components/test/hero-2'
+import { BackgroundBeams } from '@/components/ui/background-beams'
+import { AnimatedListTest } from '@/components/AnimateListTest'
+import { AnimateBeamMultipleInputTest } from '@/components/AnimateBeamMultipleInputTest'
 
 export default function IndexPage() {
   return (
     <div className="container relative">
       <Hero2 />
+      <div className="md:grids-col-2 grid md:gap-4 lg:grid-cols-10 xl:grid-cols-11 xl:gap-4 mb-4">
+        <div className="space-y-4 lg:col-span-6 xl:col-span-5 xl:space-y-4">
+          <AnimateBeamMultipleInputTest />
+        </div>
+
+        <div className="space-y-4 lg:col-span-4 xl:col-span-6 xl:space-y-4">
+          <AnimatedListTest />
+        </div>
+      </div>
       <ExamplesNav className="[&>a:first-child]:text-primary" />
       <section className="overflow-hidden rounded-lg border bg-background shadow-md md:hidden md:shadow-xl">
         <Image

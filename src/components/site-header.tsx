@@ -8,6 +8,7 @@ import { MainNav } from '@/components/main-nav'
 import { MobileNav } from '@/components/mobile-nav'
 import { ModeToggle } from '@/components/mode-toggle'
 import { buttonVariants } from '@/components/ui/button'
+import { Facebook, Youtube, Instagram } from 'lucide-react'
 
 export function SiteHeader() {
   return (
@@ -26,8 +27,9 @@ export function SiteHeader() {
                   'h-8 w-8 px-0',
                 )}
               >
-                <Icons.gitHub className="h-4 w-4" />
-                <span className="sr-only">GitHub</span>
+                <Facebook className="h-4 w-4" />
+
+                <span className="sr-only">Facebook</span>
               </div>
             </Link>
             <Link href={siteConfig.links.twitter} target="_blank" rel="noreferrer">
@@ -39,8 +41,22 @@ export function SiteHeader() {
                   'h-8 w-8 px-0',
                 )}
               >
-                <Icons.twitter className="h-3 w-3 fill-current" />
-                <span className="sr-only">Twitter</span>
+                <Youtube className="h-4 w-4" />
+                <span className="sr-only">Youtube</span>
+              </div>
+            </Link>
+
+            <Link href={siteConfig.links.twitter} target="_blank" rel="noreferrer">
+              <div
+                className={cn(
+                  buttonVariants({
+                    variant: 'ghost',
+                  }),
+                  'h-8 w-8 px-0',
+                )}
+              >
+                <Instagram className="h-4 w-4" />
+                <span className="sr-only">Youtube</span>
               </div>
             </Link>
             <ModeToggle />
