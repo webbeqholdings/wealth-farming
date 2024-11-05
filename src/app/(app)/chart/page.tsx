@@ -16,8 +16,6 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart'
 
-export const description = 'A linear line chart'
-
 // Dữ liệu mở rộng từ T1 2015 đến T1 2024, với năm điểm mỗi năm và giá trị trong khoảng từ 10,000 đến 30,000
 const chartData = [
   { year: '2015', month: 'T1', data: 12000, index: 10500 },
