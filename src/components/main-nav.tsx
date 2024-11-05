@@ -13,28 +13,28 @@ export function MainNav() {
 
   const menuItems = [
     {
-      href: '#',
+      href: '/products',
       text: 'Products',
     },
     {
-      href: '#',
+      href: '/about-us',
       text: 'About Us',
     },
     {
-      href: '#',
+      href: '/blog',
       text: 'Blog',
     },
 
     {
-      href: '#',
+      href: 'events',
       text: 'Events',
     },
     {
-      href: '#',
+      href: '/contact-us',
       text: 'Contact Us',
     },
     {
-      href: '#',
+      href: '/join',
       text: 'Login / Register',
     },
   ]
