@@ -1,5 +1,5 @@
 'use client'
-
+// @ts-ignore
 import * as React from 'react'
 import { CaretSortIcon, ChevronDownIcon, DotsHorizontalIcon } from '@radix-ui/react-icons'
 import {
@@ -76,14 +76,15 @@ export type Payment = {
   status: 'pending' | 'processing' | 'success' | 'failed'
   email: string
 }
-
+type CheckedState = boolean | 'indeterminate'
 export const columns: ColumnDef<Payment>[] = [
   {
     id: 'select',
     header: ({ table }) => (
       <Checkbox
         checked={
-          table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')
+          (table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && 'indeterminate')) as CheckedState
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
