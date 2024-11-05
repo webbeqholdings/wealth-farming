@@ -1,3 +1,5 @@
+'use client'
+
 import { TrendingUp } from 'lucide-react'
 import { CartesianGrid, Line, LineChart, XAxis, YAxis, Tooltip } from 'recharts'
 
