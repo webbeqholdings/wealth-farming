@@ -85,7 +85,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export default function IndexPage() {
+export default function Page() {
   return (
     <div className="container relative">
       <Card>
