@@ -1,5 +1,3 @@
-'use client'
-
 import { TrendingUp } from 'lucide-react'
 import { CartesianGrid, Line, LineChart, XAxis, YAxis, Tooltip } from 'recharts'
 
@@ -18,7 +16,7 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart'
 
-export const description = 'A linear line chart'
+// export const description = 'A linear line chart'
 
 // Dữ liệu mở rộng từ T1 2015 đến T1 2024, với năm điểm mỗi năm và giá trị trong khoảng từ 10,000 đến 30,000
 const chartData = [
