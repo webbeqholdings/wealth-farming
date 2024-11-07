@@ -13,7 +13,7 @@ const Companies: CollectionConfig = {
       label: 'Company Name',
     },
     {
-      name: 'registrationNumber',
+      name: 'registration_number',
       type: 'text',
       label: 'Registration Number',
     },
@@ -23,7 +23,7 @@ const Companies: CollectionConfig = {
       label: 'Company Address',
     },
     {
-      name: 'contactPerson',
+      name: 'contact_person',
       type: 'relationship',
       relationTo: 'users',
       label: 'Contact Person',

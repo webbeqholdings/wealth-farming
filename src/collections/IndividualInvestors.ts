@@ -1,20 +1,20 @@
 import type { CollectionConfig } from 'payload'
 
 const IndividualInvestors: CollectionConfig = {
-  slug: 'individual-investors',
+  slug: 'individual_investors',
   admin: {
-    useAsTitle: 'fullName',
+    useAsTitle: 'full_name',
   },
   fields: [
     {
-      name: 'fullName',
+      name: 'full_name',
       type: 'text',
       required: true,
       hooks: {
         beforeChange: [
           ({ data }) => {
-            if (data?.firstName && data?.lastName) {
-              data.fullName = `${data.firstName} ${data.lastName}`
+            if (data?.first_name && data?.last_name) {
+              data.full_name = `${data.first_name} ${data.last_name}`
             }
             return data
           },
@@ -23,17 +23,17 @@ const IndividualInvestors: CollectionConfig = {
       hidden: true,
     },
     {
-      name: 'firstName',
+      name: 'first_name',
       type: 'text',
       required: true,
     },
     {
-      name: 'lastName',
+      name: 'last_name',
       type: 'text',
       required: true,
     },
     {
-      name: 'userAccount',
+      name: 'user_account',
       type: 'relationship',
       relationTo: 'users',
       required: true,
@@ -48,7 +48,7 @@ const IndividualInvestors: CollectionConfig = {
       type: 'text',
     },
     {
-      name: 'dateOfBirth',
+      name: 'date_of_birth',
       type: 'date',
     },
   ],

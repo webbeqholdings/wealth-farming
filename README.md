@@ -23,9 +23,9 @@ Logo WF Gold
 - Color Blue #042e45
 
 ```sh
-# DATABASE_URI=postgres://{dbUserName}:{dbPassword}@localhost:{dbPort}/{dbName}
+# DATABASE_URL=postgres://{dbUserName}:{dbPassword}@localhost:{dbPort}/{dbName}
 # Ví dụ
-# DATABASE_URI=postgres://postgres:1122334455@localhost:5433/payload_blank_wf
+# DATABASE_URL=postgres://postgres:1122334455@localhost:5433/payload_blank_wf
 ```
 
 Đợi Compile vào link localhost trong terminal , truy cập route '/admin' để tạo account CMS

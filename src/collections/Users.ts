@@ -1,4 +1,7 @@
 import type { CollectionConfig } from 'payload'
+import { isIndividual } from '../access/isIndividual';
+import { isIndividualOrAdmin } from '../access/isIndividualOrAdmin';
+import { isAdmin } from '../access/isAdmin';
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -6,6 +9,12 @@ export const Users: CollectionConfig = {
     useAsTitle: 'email',
   },
   auth: true,
+  access: {
+    read: isIndividualOrAdmin,
+    create: isAdmin,
+    update: isIndividualOrAdmin,
+    delete: isAdmin,
+  },
   fields: [
     {
       name: 'role',
@@ -28,7 +37,15 @@ export const Users: CollectionConfig = {
       defaultValue: 'individual',
     },
     {
-      name: 'firstName',
+      name: 'first_name',
+      type: 'text',
+      required: false,
+      admin: {
+        condition: (data) => data.role !== 'company',
+      },
+    },
+    {
+      name: 'last_name',
       type: 'text',
       required: true,
       admin: {
@@ -36,16 +53,7 @@ export const Users: CollectionConfig = {
       },
     },
     {
-      name: 'lastName',
-      type: 'text',
-      required: true,
-      admin: {
-        condition: (data) => data.role !== 'company',
-      },
-    },
-
-    {
-      name: 'companyName',
+      name: 'company_name',
       type: 'text',
       required: true,
       admin: {
@@ -53,16 +61,47 @@ export const Users: CollectionConfig = {
       },
     },
     {
-      name: 'registrationNumber',
+      name: 'registration_number',
       type: 'text',
       admin: {
         condition: (data) => data.role === 'company',
       },
     },
-    // Contact Information
     {
       name: 'phone',
+      type: 'number',
+      admin: {
+        step: 1,
+      },
+    },
+    {
+      name: 'gender',
+      type: 'select',
+      admin: {
+        condition: (data) => data.role !== 'company',
+      },
+      options: [
+        {
+          label: 'Male',
+          value: 'male',
+        },
+        {
+          label: 'Female',
+          value: 'female',
+        },
+      ],
+    },
+    {
+      name: 'birth_date',
+      type: 'date',
+      admin: {
+        condition: (data) => data.role !== 'company',
+      },
+      defaultValue: () => new Date(),
+    },
+    {
+      name: 'nationality',
       type: 'text',
     },
-  ],
+  ]
 }

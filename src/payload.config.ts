@@ -7,6 +7,8 @@ import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
 import { Users } from './collections/Users'
+import { Banks } from './collections/Banks'
+import { Address } from './collections/Address'
 import { Media } from './collections/Media'
 import IndividualInvestors from './collections/IndividualInvestors'
 import Companies from './collections/Companies'
@@ -28,12 +30,14 @@ export default buildConfig({
   collections: [
     Users,
     Media,
+    Banks,
     IndividualInvestors,
     Companies,
     InvestmentFunds,
     Investments,
     Transactions,
     Reports,
+    Address,
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
@@ -42,7 +46,7 @@ export default buildConfig({
   },
   db: postgresAdapter({
     pool: {
-      connectionString: process.env.DATABASE_URI || '',
+      connectionString: process.env.DATABASE_URL || '',
     },
   }),
   sharp,

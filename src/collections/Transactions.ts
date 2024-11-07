@@ -3,11 +3,11 @@ import type { CollectionConfig } from 'payload'
 const Transactions: CollectionConfig = {
   slug: 'transactions',
   admin: {
-    useAsTitle: 'transactionId',
+    useAsTitle: 'transaction_id',
   },
   fields: [
     {
-      name: 'transactionId',
+      name: 'transaction_id',
       type: 'text',
       required: true,
       unique: true,
@@ -26,13 +26,13 @@ const Transactions: CollectionConfig = {
       label: 'Transaction Amount (VND)',
     },
     {
-      name: 'transactionDate',
+      name: 'transaction_date',
       type: 'date',
       required: true,
       defaultValue: () => new Date(),
     },
     {
-      name: 'transactionType',
+      name: 'transaction_type',
       type: 'select',
       options: [
         {

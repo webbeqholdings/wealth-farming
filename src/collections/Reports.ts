@@ -12,17 +12,17 @@ const Reports: CollectionConfig = {
       required: true,
     },
     {
-      name: 'reportDate',
+      name: 'report_date',
       type: 'date',
       required: true,
       defaultValue: () => new Date(),
     },
-    {
-      name: 'investmentFund',
-      type: 'relationship',
-      relationTo: 'investment-funds',
-      required: true,
-    },
+    // {
+    //   name: 'investment_fund',
+    //   type: 'relationship',
+    //   relationTo: 'investment_funds',
+    //   required: true,
+    // },
     {
       name: 'content',
       type: 'richText',

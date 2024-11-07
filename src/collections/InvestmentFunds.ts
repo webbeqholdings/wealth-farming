@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 const InvestmentFunds: CollectionConfig = {
-  slug: 'investment-funds',
+  slug: 'investment_funds',
   admin: {
     useAsTitle: 'name',
   },
@@ -31,11 +31,11 @@ const InvestmentFunds: CollectionConfig = {
         },
         {
           label: 'Fixed Income',
-          value: 'fixed-income',
+          value: 'fixed_income',
         },
         {
           label: 'Real Estate',
-          value: 'real-estate',
+          value: 'real_estate',
         },
         {
           label: 'Alternative Investments',
@@ -44,33 +44,33 @@ const InvestmentFunds: CollectionConfig = {
       ],
     },
     {
-      name: 'startDate',
+      name: 'start_date',
       type: 'date',
       required: true,
     },
     {
-      name: 'endDate',
+      name: 'end_date',
       type: 'date',
     },
     {
-      name: 'interestRate',
+      name: 'interest_rate',
       type: 'number',
       required: true,
       label: 'Interest Rate (%)',
     },
     {
-      name: 'minInvestment',
+      name: 'min_investment',
       type: 'number',
       required: true,
       label: 'Minimum Investment Amount (VND)',
     },
     {
-      name: 'maxInvestment',
+      name: 'max_investment',
       type: 'number',
       label: 'Maximum Investment Amount (VND)',
     },
     {
-      name: 'fundManager',
+      name: 'fund_manager',
       type: 'relationship',
       relationTo: 'users',
       required: true,

@@ -9,13 +9,13 @@ const Investments: CollectionConfig = {
     {
       name: 'investor',
       type: 'relationship',
-      relationTo: ['individual-investors', 'companies'],
+      relationTo: ['individual_investors', 'companies'],
       required: true,
     },
     {
-      name: 'investmentFund',
+      name: 'investment_fund',
       type: 'relationship',
-      relationTo: 'investment-funds',
+      relationTo: 'investment_funds',
       required: true,
     },
     {
@@ -25,7 +25,7 @@ const Investments: CollectionConfig = {
       label: 'Investment Amount (VND)',
     },
     {
-      name: 'investmentDate',
+      name: 'investment_date',
       type: 'date',
       required: true,
       defaultValue: () => new Date(),
@@ -50,7 +50,7 @@ const Investments: CollectionConfig = {
       defaultValue: 'active',
     },
     {
-      name: 'expectedReturn',
+      name: 'expected_return',
       type: 'number',
       label: 'Expected Return (VND)',
       admin: {
