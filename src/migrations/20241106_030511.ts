@@ -13,6 +13,7 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
   	"role" "enum_users_role" DEFAULT 'individual' NOT NULL,
   	"first_name" varchar,
   	"last_name" varchar,
+    "gender" varchar,
   	"company_name" varchar,
   	"registration_number" varchar,
   	"phone" varchar,
