@@ -2,21 +2,17 @@ import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
 export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
   await payload.db.drizzle.execute(sql`
-   CREATE TYPE "public"."enum_users_role" AS ENUM('admin', 'individual', 'company');
-  CREATE TYPE "public"."enum_investment_funds_category" AS ENUM('equity', 'fixed-income', 'real-estate', 'alternative');
-  CREATE TYPE "public"."enum_investment_funds_status" AS ENUM('open', 'closed', 'upcoming');
-  CREATE TYPE "public"."enum_investments_status" AS ENUM('active', 'completed', 'cancelled');
-  CREATE TYPE "public"."enum_transactions_transaction_type" AS ENUM('deposit', 'withdrawal', 'dividend');
-  CREATE TYPE "public"."enum_transactions_status" AS ENUM('pending', 'completed', 'failed');
   CREATE TABLE IF NOT EXISTS "users" (
   	"id" serial PRIMARY KEY NOT NULL,
   	"role" "enum_users_role" DEFAULT 'individual' NOT NULL,
   	"first_name" varchar,
   	"last_name" varchar,
-    "gender" varchar,
   	"company_name" varchar,
   	"registration_number" varchar,
-  	"phone" varchar,
+  	"phone" numeric,
+  	"gender" "enum_users_gender",
+  	"birth_date" timestamp(3) with time zone,
+  	"nationality" varchar,
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
   	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
   	"email" varchar NOT NULL,
@@ -42,6 +38,17 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
   	"height" numeric,
   	"focal_x" numeric,
   	"focal_y" numeric
+  );
+  
+  CREATE TABLE IF NOT EXISTS "banks" (
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"user_id" integer,
+  	"name" varchar,
+  	"account_number" varchar,
+  	"bank_name" varchar,
+  	"branch" varchar,
+  	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
+  	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
   );
   
   CREATE TABLE IF NOT EXISTS "individual_investors" (
@@ -120,9 +127,20 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
   	"id" serial PRIMARY KEY NOT NULL,
   	"title" varchar NOT NULL,
   	"report_date" timestamp(3) with time zone NOT NULL,
-  	"investment_fund_id" integer NOT NULL,
   	"content" jsonb NOT NULL,
   	"attachments_id" integer,
+  	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
+  	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
+  );
+  
+  CREATE TABLE IF NOT EXISTS "address" (
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"user_id" integer NOT NULL,
+  	"street" varchar,
+  	"city" varchar,
+  	"state" varchar,
+  	"zip_code" varchar,
+  	"country" varchar,
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
   	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
   );
@@ -141,12 +159,14 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
   	"path" varchar NOT NULL,
   	"users_id" integer,
   	"media_id" integer,
+  	"banks_id" integer,
   	"individual_investors_id" integer,
   	"companies_id" integer,
   	"investment_funds_id" integer,
   	"investments_id" integer,
   	"transactions_id" integer,
-  	"reports_id" integer
+  	"reports_id" integer,
+  	"address_id" integer
   );
   
   CREATE TABLE IF NOT EXISTS "payload_preferences" (
@@ -172,6 +192,12 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
   	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
   );
+  
+  DO $$ BEGIN
+   ALTER TABLE "banks" ADD CONSTRAINT "banks_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;
+  EXCEPTION
+   WHEN duplicate_object THEN null;
+  END $$;
   
   DO $$ BEGIN
    ALTER TABLE "individual_investors" ADD CONSTRAINT "individual_investors_user_account_id_users_id_fk" FOREIGN KEY ("user_account_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;
@@ -222,13 +248,13 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
   END $$;
   
   DO $$ BEGIN
-   ALTER TABLE "reports" ADD CONSTRAINT "reports_investment_fund_id_investment_funds_id_fk" FOREIGN KEY ("investment_fund_id") REFERENCES "public"."investment_funds"("id") ON DELETE set null ON UPDATE no action;
+   ALTER TABLE "reports" ADD CONSTRAINT "reports_attachments_id_media_id_fk" FOREIGN KEY ("attachments_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   EXCEPTION
    WHEN duplicate_object THEN null;
   END $$;
   
   DO $$ BEGIN
-   ALTER TABLE "reports" ADD CONSTRAINT "reports_attachments_id_media_id_fk" FOREIGN KEY ("attachments_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+   ALTER TABLE "address" ADD CONSTRAINT "address_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;
   EXCEPTION
    WHEN duplicate_object THEN null;
   END $$;
@@ -247,6 +273,12 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
   
   DO $$ BEGIN
    ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_media_fk" FOREIGN KEY ("media_id") REFERENCES "public"."media"("id") ON DELETE cascade ON UPDATE no action;
+  EXCEPTION
+   WHEN duplicate_object THEN null;
+  END $$;
+  
+  DO $$ BEGIN
+   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_banks_fk" FOREIGN KEY ("banks_id") REFERENCES "public"."banks"("id") ON DELETE cascade ON UPDATE no action;
   EXCEPTION
    WHEN duplicate_object THEN null;
   END $$;
@@ -288,6 +320,12 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
   END $$;
   
   DO $$ BEGIN
+   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_address_fk" FOREIGN KEY ("address_id") REFERENCES "public"."address"("id") ON DELETE cascade ON UPDATE no action;
+  EXCEPTION
+   WHEN duplicate_object THEN null;
+  END $$;
+  
+  DO $$ BEGIN
    ALTER TABLE "payload_preferences_rels" ADD CONSTRAINT "payload_preferences_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."payload_preferences"("id") ON DELETE cascade ON UPDATE no action;
   EXCEPTION
    WHEN duplicate_object THEN null;
@@ -305,6 +343,9 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX IF NOT EXISTS "media_updated_at_idx" ON "media" USING btree ("updated_at");
   CREATE INDEX IF NOT EXISTS "media_created_at_idx" ON "media" USING btree ("created_at");
   CREATE UNIQUE INDEX IF NOT EXISTS "media_filename_idx" ON "media" USING btree ("filename");
+  CREATE INDEX IF NOT EXISTS "banks_user_idx" ON "banks" USING btree ("user_id");
+  CREATE INDEX IF NOT EXISTS "banks_updated_at_idx" ON "banks" USING btree ("updated_at");
+  CREATE INDEX IF NOT EXISTS "banks_created_at_idx" ON "banks" USING btree ("created_at");
   CREATE UNIQUE INDEX IF NOT EXISTS "individual_investors_user_account_idx" ON "individual_investors" USING btree ("user_account_id");
   CREATE INDEX IF NOT EXISTS "individual_investors_updated_at_idx" ON "individual_investors" USING btree ("updated_at");
   CREATE INDEX IF NOT EXISTS "individual_investors_created_at_idx" ON "individual_investors" USING btree ("created_at");
@@ -326,10 +367,12 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX IF NOT EXISTS "transactions_investment_idx" ON "transactions" USING btree ("investment_id");
   CREATE INDEX IF NOT EXISTS "transactions_updated_at_idx" ON "transactions" USING btree ("updated_at");
   CREATE INDEX IF NOT EXISTS "transactions_created_at_idx" ON "transactions" USING btree ("created_at");
-  CREATE INDEX IF NOT EXISTS "reports_investment_fund_idx" ON "reports" USING btree ("investment_fund_id");
   CREATE INDEX IF NOT EXISTS "reports_attachments_idx" ON "reports" USING btree ("attachments_id");
   CREATE INDEX IF NOT EXISTS "reports_updated_at_idx" ON "reports" USING btree ("updated_at");
   CREATE INDEX IF NOT EXISTS "reports_created_at_idx" ON "reports" USING btree ("created_at");
+  CREATE INDEX IF NOT EXISTS "address_user_idx" ON "address" USING btree ("user_id");
+  CREATE INDEX IF NOT EXISTS "address_updated_at_idx" ON "address" USING btree ("updated_at");
+  CREATE INDEX IF NOT EXISTS "address_created_at_idx" ON "address" USING btree ("created_at");
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_global_slug_idx" ON "payload_locked_documents" USING btree ("global_slug");
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_updated_at_idx" ON "payload_locked_documents" USING btree ("updated_at");
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_created_at_idx" ON "payload_locked_documents" USING btree ("created_at");
@@ -338,12 +381,14 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_path_idx" ON "payload_locked_documents_rels" USING btree ("path");
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_users_id_idx" ON "payload_locked_documents_rels" USING btree ("users_id");
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_media_id_idx" ON "payload_locked_documents_rels" USING btree ("media_id");
+  CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_banks_id_idx" ON "payload_locked_documents_rels" USING btree ("banks_id");
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_individual_investors_id_idx" ON "payload_locked_documents_rels" USING btree ("individual_investors_id");
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_companies_id_idx" ON "payload_locked_documents_rels" USING btree ("companies_id");
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_investment_funds_id_idx" ON "payload_locked_documents_rels" USING btree ("investment_funds_id");
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_investments_id_idx" ON "payload_locked_documents_rels" USING btree ("investments_id");
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_transactions_id_idx" ON "payload_locked_documents_rels" USING btree ("transactions_id");
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_reports_id_idx" ON "payload_locked_documents_rels" USING btree ("reports_id");
+  CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_address_id_idx" ON "payload_locked_documents_rels" USING btree ("address_id");
   CREATE INDEX IF NOT EXISTS "payload_preferences_key_idx" ON "payload_preferences" USING btree ("key");
   CREATE INDEX IF NOT EXISTS "payload_preferences_updated_at_idx" ON "payload_preferences" USING btree ("updated_at");
   CREATE INDEX IF NOT EXISTS "payload_preferences_created_at_idx" ON "payload_preferences" USING btree ("created_at");
@@ -357,8 +402,8 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
 
 export async function down({ payload, req }: MigrateDownArgs): Promise<void> {
   await payload.db.drizzle.execute(sql`
-   DROP TABLE "users";
   DROP TABLE "media";
+  DROP TABLE "banks";
   DROP TABLE "individual_investors";
   DROP TABLE "companies";
   DROP TABLE "investment_funds";
@@ -366,12 +411,15 @@ export async function down({ payload, req }: MigrateDownArgs): Promise<void> {
   DROP TABLE "investments_rels";
   DROP TABLE "transactions";
   DROP TABLE "reports";
+  DROP TABLE "address";
   DROP TABLE "payload_locked_documents";
   DROP TABLE "payload_locked_documents_rels";
   DROP TABLE "payload_preferences";
   DROP TABLE "payload_preferences_rels";
   DROP TABLE "payload_migrations";
+  DROP TABLE "users";
   DROP TYPE "public"."enum_users_role";
+  DROP TYPE "public"."enum_users_gender";
   DROP TYPE "public"."enum_investment_funds_category";
   DROP TYPE "public"."enum_investment_funds_status";
   DROP TYPE "public"."enum_investments_status";

@@ -1,5 +1,5 @@
 {
-  "id": "b3dc28b1-fc14-459f-936c-09720a4793f9",
+  "id": "7e9955b3-8a0b-46d8-a697-6d65713d9049",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -48,6 +48,25 @@
         },
         "phone": {
           "name": "phone",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gender": {
+          "name": "gender",
+          "type": "enum_users_gender",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "birth_date": {
+          "name": "birth_date",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nationality": {
+          "name": "nationality",
           "type": "varchar",
           "primaryKey": false,
           "notNull": false
@@ -295,6 +314,127 @@
         }
       },
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "public.banks": {
+      "name": "banks",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "account_number": {
+          "name": "account_number",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bank_name": {
+          "name": "bank_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "branch": {
+          "name": "branch",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "banks_user_idx": {
+          "name": "banks_user_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "banks_updated_at_idx": {
+          "name": "banks_updated_at_idx",
+          "columns": [
+            {
+              "expression": "updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "banks_created_at_idx": {
+          "name": "banks_created_at_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "banks_user_id_users_id_fk": {
+          "name": "banks_user_id_users_id_fk",
+          "tableFrom": "banks",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -1160,12 +1300,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "investment_fund_id": {
-          "name": "investment_fund_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
         "content": {
           "name": "content",
           "type": "jsonb",
@@ -1194,21 +1328,6 @@
         }
       },
       "indexes": {
-        "reports_investment_fund_idx": {
-          "name": "reports_investment_fund_idx",
-          "columns": [
-            {
-              "expression": "investment_fund_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
         "reports_attachments_idx": {
           "name": "reports_attachments_idx",
           "columns": [
@@ -1256,25 +1375,139 @@
         }
       },
       "foreignKeys": {
-        "reports_investment_fund_id_investment_funds_id_fk": {
-          "name": "reports_investment_fund_id_investment_funds_id_fk",
-          "tableFrom": "reports",
-          "tableTo": "investment_funds",
-          "columnsFrom": [
-            "investment_fund_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        },
         "reports_attachments_id_media_id_fk": {
           "name": "reports_attachments_id_media_id_fk",
           "tableFrom": "reports",
           "tableTo": "media",
           "columnsFrom": [
             "attachments_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "public.address": {
+      "name": "address",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "street": {
+          "name": "street",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "city": {
+          "name": "city",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "state": {
+          "name": "state",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zip_code": {
+          "name": "zip_code",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "country": {
+          "name": "country",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "address_user_idx": {
+          "name": "address_user_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "address_updated_at_idx": {
+          "name": "address_updated_at_idx",
+          "columns": [
+            {
+              "expression": "updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "address_created_at_idx": {
+          "name": "address_created_at_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "address_user_id_users_id_fk": {
+          "name": "address_user_id_users_id_fk",
+          "tableFrom": "address",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
           ],
           "columnsTo": [
             "id"
@@ -1410,6 +1643,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "banks_id": {
+          "name": "banks_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "individual_investors_id": {
           "name": "individual_investors_id",
           "type": "integer",
@@ -1442,6 +1681,12 @@
         },
         "reports_id": {
           "name": "reports_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "address_id": {
+          "name": "address_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": false
@@ -1513,6 +1758,21 @@
           "columns": [
             {
               "expression": "media_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "payload_locked_documents_rels_banks_id_idx": {
+          "name": "payload_locked_documents_rels_banks_id_idx",
+          "columns": [
+            {
+              "expression": "banks_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -1612,6 +1872,21 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "payload_locked_documents_rels_address_id_idx": {
+          "name": "payload_locked_documents_rels_address_id_idx",
+          "columns": [
+            {
+              "expression": "address_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
@@ -1647,6 +1922,19 @@
           "tableTo": "media",
           "columnsFrom": [
             "media_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "payload_locked_documents_rels_banks_fk": {
+          "name": "payload_locked_documents_rels_banks_fk",
+          "tableFrom": "payload_locked_documents_rels",
+          "tableTo": "banks",
+          "columnsFrom": [
+            "banks_id"
           ],
           "columnsTo": [
             "id"
@@ -1725,6 +2013,19 @@
           "tableTo": "reports",
           "columnsFrom": [
             "reports_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "payload_locked_documents_rels_address_fk": {
+          "name": "payload_locked_documents_rels_address_fk",
+          "tableFrom": "payload_locked_documents_rels",
+          "tableTo": "address",
+          "columnsFrom": [
+            "address_id"
           ],
           "columnsTo": [
             "id"
@@ -2040,13 +2341,21 @@
         "company"
       ]
     },
+    "public.enum_users_gender": {
+      "name": "enum_users_gender",
+      "schema": "public",
+      "values": [
+        "male",
+        "female"
+      ]
+    },
     "public.enum_investment_funds_category": {
       "name": "enum_investment_funds_category",
       "schema": "public",
       "values": [
         "equity",
-        "fixed-income",
-        "real-estate",
+        "fixed_income",
+        "real_estate",
         "alternative"
       ]
     },
