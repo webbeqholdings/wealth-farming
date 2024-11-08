@@ -2,6 +2,13 @@ import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
 export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
   await payload.db.drizzle.execute(sql`
+  CREATE TYPE "public"."enum_users_role" AS ENUM('admin', 'individual', 'company');
+  CREATE TYPE "public"."enum_users_gender" AS ENUM('male', 'female');
+  CREATE TYPE "public"."enum_investment_funds_category" AS ENUM('equity', 'fixed_income', 'real_estate', 'alternative');
+  CREATE TYPE "public"."enum_investment_funds_status" AS ENUM('open', 'closed', 'upcoming');
+  CREATE TYPE "public"."enum_investments_status" AS ENUM('active', 'completed', 'cancelled');
+  CREATE TYPE "public"."enum_transactions_transaction_type" AS ENUM('deposit', 'withdrawal', 'dividend');
+  CREATE TYPE "public"."enum_transactions_status" AS ENUM('pending', 'completed', 'failed');
   CREATE TABLE IF NOT EXISTS "users" (
   	"id" serial PRIMARY KEY NOT NULL,
   	"role" "enum_users_role" DEFAULT 'individual' NOT NULL,
@@ -402,6 +409,7 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
 
 export async function down({ payload, req }: MigrateDownArgs): Promise<void> {
   await payload.db.drizzle.execute(sql`
+   DROP TABLE "users";
   DROP TABLE "media";
   DROP TABLE "banks";
   DROP TABLE "individual_investors";
@@ -417,7 +425,6 @@ export async function down({ payload, req }: MigrateDownArgs): Promise<void> {
   DROP TABLE "payload_preferences";
   DROP TABLE "payload_preferences_rels";
   DROP TABLE "payload_migrations";
-  DROP TABLE "users";
   DROP TYPE "public"."enum_users_role";
   DROP TYPE "public"."enum_users_gender";
   DROP TYPE "public"."enum_investment_funds_category";
