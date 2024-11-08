@@ -11,7 +11,7 @@ export const Users: CollectionConfig = {
   auth: true,
   access: {
     read: isIndividualOrAdmin,
-    create: isAdmin,
+    create: () => true,
     update: isIndividualOrAdmin,
     delete: isAdmin,
   },
