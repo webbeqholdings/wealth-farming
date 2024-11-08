@@ -84,7 +84,7 @@ export async function down({ payload, req }: MigrateDownArgs): Promise<void> {
   
   DROP INDEX IF EXISTS "payload_locked_documents_rels_banks_id_idx";
   DROP INDEX IF EXISTS "payload_locked_documents_rels_address_id_idx";
-  ALTER TABLE "users" ALTER COLUMN "phone" SET DATA TYPE numeric;
+  ALTER TABLE "users" ALTER COLUMN "phone" SET DATA TYPE numeric USING phone::numeric;
   ALTER TABLE "reports" ADD COLUMN "investment_fund_id" integer NOT NULL;
   DO $$ BEGIN
    ALTER TABLE "reports" ADD CONSTRAINT "reports_investment_fund_id_investment_funds_id_fk" FOREIGN KEY ("investment_fund_id") REFERENCES "public"."investment_funds"("id") ON DELETE set null ON UPDATE no action;
