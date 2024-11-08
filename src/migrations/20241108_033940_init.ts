@@ -2,6 +2,7 @@ import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
 export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
   await payload.db.drizzle.execute(sql`
+   CREATE TYPE "public"."enum_users_role" AS ENUM('admin', 'individual', 'company');
   CREATE TYPE "public"."enum_users_gender" AS ENUM('male', 'female');
   CREATE TYPE "public"."enum_investment_funds_category" AS ENUM('equity', 'fixed_income', 'real_estate', 'alternative');
   CREATE TYPE "public"."enum_investment_funds_status" AS ENUM('open', 'closed', 'upcoming');
