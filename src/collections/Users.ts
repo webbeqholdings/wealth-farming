@@ -21,14 +21,14 @@ export const Users: CollectionConfig = {
           value: 'individual',
         },
         {
-          label: 'Company',
+          label: 'Company Investor',
           value: 'company',
         },
       ],
       defaultValue: 'individual',
     },
     {
-      name: 'firstName',
+      name: 'first_name',
       type: 'text',
       required: true,
       admin: {
@@ -36,7 +36,7 @@ export const Users: CollectionConfig = {
       },
     },
     {
-      name: 'lastName',
+      name: 'last_name',
       type: 'text',
       required: true,
       admin: {
@@ -45,7 +45,7 @@ export const Users: CollectionConfig = {
     },
 
     {
-      name: 'companyName',
+      name: 'company_name',
       type: 'text',
       required: true,
       admin: {
@@ -53,16 +53,19 @@ export const Users: CollectionConfig = {
       },
     },
     {
-      name: 'registrationNumber',
+      name: 'registration_number',
       type: 'text',
       admin: {
         condition: (data) => data.role === 'company',
       },
     },
-    // Contact Information
     {
-      name: 'phone',
+      name: 'phone_contact',
       type: 'text',
+    },
+    {
+      name: 'date_of_birth',
+      type: 'date',
     },
   ],
 }

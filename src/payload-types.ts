@@ -12,26 +12,26 @@ export interface Config {
   };
   collections: {
     users: User;
-    media: Media;
-    'individual-investors': IndividualInvestor;
+    accounts: Account;
     companies: Company;
     'investment-funds': InvestmentFund;
-    investments: Investment;
+    'investment-products': InvestmentProduct;
+    contracts: Contract;
     transactions: Transaction;
-    reports: Report;
+    media: Media;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
   collectionsSelect?: {
     users: UsersSelect<false> | UsersSelect<true>;
-    media: MediaSelect<false> | MediaSelect<true>;
-    'individual-investors': IndividualInvestorsSelect<false> | IndividualInvestorsSelect<true>;
+    accounts: AccountsSelect<false> | AccountsSelect<true>;
     companies: CompaniesSelect<false> | CompaniesSelect<true>;
     'investment-funds': InvestmentFundsSelect<false> | InvestmentFundsSelect<true>;
-    investments: InvestmentsSelect<false> | InvestmentsSelect<true>;
+    'investment-products': InvestmentProductsSelect<false> | InvestmentProductsSelect<true>;
+    contracts: ContractsSelect<false> | ContractsSelect<true>;
     transactions: TransactionsSelect<false> | TransactionsSelect<true>;
-    reports: ReportsSelect<false> | ReportsSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -39,8 +39,12 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
-  globals: {};
-  globalsSelect?: {};
+  globals: {
+    'site-settings': SiteSetting;
+  };
+  globalsSelect?: {
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+  };
   locale: null;
   user: User & {
     collection: 'users';
@@ -75,11 +79,12 @@ export interface UserAuthOperations {
 export interface User {
   id: number;
   role: 'admin' | 'individual' | 'company';
-  firstName?: string | null;
-  lastName?: string | null;
-  companyName?: string | null;
-  registrationNumber?: string | null;
-  phone?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
+  company_name?: string | null;
+  registration_number?: string | null;
+  phone_contact?: string | null;
+  date_of_birth?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -93,36 +98,13 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
+ * via the `definition` "accounts".
  */
-export interface Media {
+export interface Account {
   id: number;
-  alt: string;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "individual-investors".
- */
-export interface IndividualInvestor {
-  id: number;
-  fullName: string;
-  firstName: string;
-  lastName: string;
-  userAccount: number | User;
-  phone?: string | null;
-  address?: string | null;
-  dateOfBirth?: string | null;
+  user: number | User;
+  account_name: string;
+  account_number: number;
   updatedAt: string;
   createdAt: string;
 }
@@ -146,52 +128,48 @@ export interface Company {
 export interface InvestmentFund {
   id: number;
   name: string;
-  description?: {
-    root: {
-      type: string;
-      children: {
-        type: string;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  category: 'equity' | 'fixed-income' | 'real-estate' | 'alternative';
-  startDate: string;
-  endDate?: string | null;
-  interestRate: number;
-  minInvestment: number;
-  maxInvestment?: number | null;
-  fundManager: number | User;
-  status?: ('open' | 'closed' | 'upcoming') | null;
+  description?: string | null;
+  category?: string | null;
+  start_date: string;
+  end_date: string;
+  interest_rate: number;
+  min_investment: number;
+  max_investment?: number | null;
+  fund_manager: number | User;
+  status: 'active' | 'closed';
   updatedAt: string;
   createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "investments".
+ * via the `definition` "investment-products".
  */
-export interface Investment {
+export interface InvestmentProduct {
   id: number;
-  investor:
-    | {
-        relationTo: 'individual-investors';
-        value: number | IndividualInvestor;
-      }
-    | {
-        relationTo: 'companies';
-        value: number | Company;
-      };
-  investmentFund: number | InvestmentFund;
+  fund: number | InvestmentFund;
+  product_name: string;
+  description?: string | null;
+  min_investment: number;
+  max_investment?: number | null;
+  interest_rate_from: number;
+  interest_rate_to: number;
+  profit_period: 'monthly' | 'quarterly' | 'semi_annually' | 'annually';
+  status: 'available' | 'unavailable';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contracts".
+ */
+export interface Contract {
+  id: number;
+  product_id: number | InvestmentProduct;
+  account_id: number | Account;
+  status: 'active' | 'inactive' | 'pending' | 'closed';
   amount: number;
-  investmentDate: string;
-  status?: ('active' | 'completed' | 'cancelled') | null;
-  expectedReturn?: number | null;
+  created_at?: string | null;
+  updated_at?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -201,43 +179,35 @@ export interface Investment {
  */
 export interface Transaction {
   id: number;
-  transactionId: string;
-  investment: number | Investment;
+  contract_id: number | Contract;
   amount: number;
-  transactionDate: string;
-  transactionType: 'deposit' | 'withdrawal' | 'dividend';
-  status?: ('pending' | 'completed' | 'failed') | null;
-  notes?: string | null;
+  status: 'pending' | 'completed' | 'failed';
+  from_account?: (number | null) | Account;
+  to_account?: (number | null) | Account;
+  type: 'deposit' | 'withdraw' | 'bonus' | 'manage_fee';
+  created_at?: string | null;
+  updated_at?: string | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "reports".
+ * via the `definition` "media".
  */
-export interface Report {
+export interface Media {
   id: number;
-  title: string;
-  reportDate: string;
-  investmentFund: number | InvestmentFund;
-  content: {
-    root: {
-      type: string;
-      children: {
-        type: string;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
-  attachments?: (number | null) | Media;
+  alt: string;
   updatedAt: string;
   createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -251,12 +221,8 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
-        relationTo: 'media';
-        value: number | Media;
-      } | null)
-    | ({
-        relationTo: 'individual-investors';
-        value: number | IndividualInvestor;
+        relationTo: 'accounts';
+        value: number | Account;
       } | null)
     | ({
         relationTo: 'companies';
@@ -267,16 +233,20 @@ export interface PayloadLockedDocument {
         value: number | InvestmentFund;
       } | null)
     | ({
-        relationTo: 'investments';
-        value: number | Investment;
+        relationTo: 'investment-products';
+        value: number | InvestmentProduct;
+      } | null)
+    | ({
+        relationTo: 'contracts';
+        value: number | Contract;
       } | null)
     | ({
         relationTo: 'transactions';
         value: number | Transaction;
       } | null)
     | ({
-        relationTo: 'reports';
-        value: number | Report;
+        relationTo: 'media';
+        value: number | Media;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -326,11 +296,12 @@ export interface PayloadMigration {
  */
 export interface UsersSelect<T extends boolean = true> {
   role?: T;
-  firstName?: T;
-  lastName?: T;
-  companyName?: T;
-  registrationNumber?: T;
-  phone?: T;
+  first_name?: T;
+  last_name?: T;
+  company_name?: T;
+  registration_number?: T;
+  phone_contact?: T;
+  date_of_birth?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -343,34 +314,12 @@ export interface UsersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media_select".
+ * via the `definition` "accounts_select".
  */
-export interface MediaSelect<T extends boolean = true> {
-  alt?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "individual-investors_select".
- */
-export interface IndividualInvestorsSelect<T extends boolean = true> {
-  fullName?: T;
-  firstName?: T;
-  lastName?: T;
-  userAccount?: T;
-  phone?: T;
-  address?: T;
-  dateOfBirth?: T;
+export interface AccountsSelect<T extends boolean = true> {
+  user?: T;
+  account_name?: T;
+  account_number?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -394,27 +343,44 @@ export interface InvestmentFundsSelect<T extends boolean = true> {
   name?: T;
   description?: T;
   category?: T;
-  startDate?: T;
-  endDate?: T;
-  interestRate?: T;
-  minInvestment?: T;
-  maxInvestment?: T;
-  fundManager?: T;
+  start_date?: T;
+  end_date?: T;
+  interest_rate?: T;
+  min_investment?: T;
+  max_investment?: T;
+  fund_manager?: T;
   status?: T;
   updatedAt?: T;
   createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "investments_select".
+ * via the `definition` "investment-products_select".
  */
-export interface InvestmentsSelect<T extends boolean = true> {
-  investor?: T;
-  investmentFund?: T;
-  amount?: T;
-  investmentDate?: T;
+export interface InvestmentProductsSelect<T extends boolean = true> {
+  fund?: T;
+  product_name?: T;
+  description?: T;
+  min_investment?: T;
+  max_investment?: T;
+  interest_rate_from?: T;
+  interest_rate_to?: T;
+  profit_period?: T;
   status?: T;
-  expectedReturn?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contracts_select".
+ */
+export interface ContractsSelect<T extends boolean = true> {
+  product_id?: T;
+  account_id?: T;
+  status?: T;
+  amount?: T;
+  created_at?: T;
+  updated_at?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -423,28 +389,34 @@ export interface InvestmentsSelect<T extends boolean = true> {
  * via the `definition` "transactions_select".
  */
 export interface TransactionsSelect<T extends boolean = true> {
-  transactionId?: T;
-  investment?: T;
+  contract_id?: T;
   amount?: T;
-  transactionDate?: T;
-  transactionType?: T;
   status?: T;
-  notes?: T;
+  from_account?: T;
+  to_account?: T;
+  type?: T;
+  created_at?: T;
+  updated_at?: T;
   updatedAt?: T;
   createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "reports_select".
+ * via the `definition` "media_select".
  */
-export interface ReportsSelect<T extends boolean = true> {
-  title?: T;
-  reportDate?: T;
-  investmentFund?: T;
-  content?: T;
-  attachments?: T;
+export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
   updatedAt?: T;
   createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -477,6 +449,48 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: number;
+  site_name: string;
+  support_email: string;
+  support_phone?: string | null;
+  contact_address?: string | null;
+  social_links?:
+    | {
+        platform: string;
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  business_hours?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  site_name?: T;
+  support_email?: T;
+  support_phone?: T;
+  contact_address?: T;
+  social_links?:
+    | T
+    | {
+        platform?: T;
+        url?: T;
+        id?: T;
+      };
+  business_hours?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

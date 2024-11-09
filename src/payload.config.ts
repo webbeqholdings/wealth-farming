@@ -8,12 +8,14 @@ import sharp from 'sharp'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
-import IndividualInvestors from './collections/IndividualInvestors'
 import Companies from './collections/Companies'
-import InvestmentFunds from './collections/InvestmentFunds'
-import Investments from './collections/Investments'
+
 import Transactions from './collections/Transactions'
-import Reports from './collections/Reports'
+import Accounts from './collections/Accounts'
+import Contracts from './collections/Contracts'
+import InvestmentFunds from './collections/InvestmentFunds'
+import InvestmentProducts from './collections/InvestmentProducts'
+import SiteSettings from './global-configs/site-settings'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -27,14 +29,15 @@ export default buildConfig({
   },
   collections: [
     Users,
-    Media,
-    IndividualInvestors,
+    Accounts,
     Companies,
     InvestmentFunds,
-    Investments,
+    InvestmentProducts,
+    Contracts,
     Transactions,
-    Reports,
+    Media,
   ],
+  globals: [SiteSettings],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

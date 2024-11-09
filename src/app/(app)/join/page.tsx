@@ -14,8 +14,10 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { SiteHeader } from '@/components/site-header'
+import { SiteFooter } from '@/components/site-footer'
 
-export default function AuthPage() {
+const AuthPage = () => {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
@@ -53,67 +55,72 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="container flex items-center justify-center min-h-screen">
-      <Tabs defaultValue="login" className="w-[400px]">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="login">Login</TabsTrigger>
-          <TabsTrigger value="register">Register</TabsTrigger>
-        </TabsList>
-        <TabsContent value="login">
-          <Card>
-            <CardHeader>
-              <CardTitle>Login</CardTitle>
-              <CardDescription>Enter your credentials to access your account.</CardDescription>
-            </CardHeader>
-            <form onSubmit={(e) => handleSubmit(e, 'login')}>
-              <CardContent className="space-y-2">
-                <div className="space-y-1">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" name="email" type="email" required />
-                </div>
-                <div className="space-y-1">
-                  <Label htmlFor="password">Password</Label>
-                  <Input id="password" name="password" type="password" required />
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? 'Loading...' : 'Login'}
-                </Button>
-              </CardFooter>
-            </form>
-          </Card>
-        </TabsContent>
-        <TabsContent value="register">
-          <Card>
-            <CardHeader>
-              <CardTitle>Register</CardTitle>
-              <CardDescription>Create a new account to get started.</CardDescription>
-            </CardHeader>
-            <form onSubmit={(e) => handleSubmit(e, 'register')}>
-              <CardContent className="space-y-2">
-                <div className="space-y-1">
-                  <Label htmlFor="name">Name</Label>
-                  <Input id="name" name="name" required />
-                </div>
-                <div className="space-y-1">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" name="email" type="email" required />
-                </div>
-                <div className="space-y-1">
-                  <Label htmlFor="password">Password</Label>
-                  <Input id="password" name="password" type="password" required />
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? 'Loading...' : 'Register'}
-                </Button>
-              </CardFooter>
-            </form>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
+    <>
+      <SiteHeader />
+      <div className="container flex items-center justify-center min-h-screen">
+        <Tabs defaultValue="login" className="w-[400px]">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="login">Login</TabsTrigger>
+            <TabsTrigger value="register">Register</TabsTrigger>
+          </TabsList>
+          <TabsContent value="login">
+            <Card>
+              <CardHeader>
+                <CardTitle>Login</CardTitle>
+                <CardDescription>Enter your credentials to access your account.</CardDescription>
+              </CardHeader>
+              <form onSubmit={(e) => handleSubmit(e, 'login')}>
+                <CardContent className="space-y-2">
+                  <div className="space-y-1">
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" name="email" type="email" required />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="password">Password</Label>
+                    <Input id="password" name="password" type="password" required />
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button type="submit" disabled={isLoading}>
+                    {isLoading ? 'Loading...' : 'Login'}
+                  </Button>
+                </CardFooter>
+              </form>
+            </Card>
+          </TabsContent>
+          <TabsContent value="register">
+            <Card>
+              <CardHeader>
+                <CardTitle>Register</CardTitle>
+                <CardDescription>Create a new account to get started.</CardDescription>
+              </CardHeader>
+              <form onSubmit={(e) => handleSubmit(e, 'register')}>
+                <CardContent className="space-y-2">
+                  <div className="space-y-1">
+                    <Label htmlFor="name">Name</Label>
+                    <Input id="name" name="name" required />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" name="email" type="email" required />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="password">Password</Label>
+                    <Input id="password" name="password" type="password" required />
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button type="submit" disabled={isLoading}>
+                    {isLoading ? 'Loading...' : 'Register'}
+                  </Button>
+                </CardFooter>
+              </form>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+      <SiteFooter />
+    </>
   )
 }
+export default AuthPage

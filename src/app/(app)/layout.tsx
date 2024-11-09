@@ -50,6 +50,9 @@ export const metadata: Metadata = {
     creator: '@shadcn',
   },
   manifest: `${siteConfig.url}/site.webmanifest`,
+  icons: {
+    icon: 'https://i.postimg.cc/0NV32J1w/favicon-32x32.png',
+  },
 }
 
 export const viewport: Viewport = {
@@ -58,7 +61,6 @@ export const viewport: Viewport = {
     { media: '(prefers-color-scheme: dark)', color: 'black' },
   ],
 }
-const inter = Inter({ subsets: ['latin'] })
 
 const openSans = Open_Sans({
   subsets: ['latin'],
@@ -83,9 +85,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             <div vaul-drawer-wrapper="">
               <div className="relative flex min-h-screen flex-col bg-background">
                 {/* <AuthProvider> */}
-                <SiteHeader />
                 {children}
-                <SiteFooter />
                 {/* </AuthProvider> */}
               </div>
             </div>
