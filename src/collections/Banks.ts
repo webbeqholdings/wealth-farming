@@ -2,10 +2,12 @@ import type { CollectionConfig, CollectionAfterChangeHook } from 'payload';
 import { isIndividualOrAdmin } from '../access/isIndividualOrAdmin';
 import { Users } from './Users';
 import payload from 'payload';
+import { isAdmin } from '@/access/isAdmin';
 
 export const Banks: CollectionConfig = {
   slug: 'banks',
   access: {
+    read: isIndividualOrAdmin,
     update: isIndividualOrAdmin,
   },
   fields: [

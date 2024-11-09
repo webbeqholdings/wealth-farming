@@ -3,6 +3,10 @@ import { isIndividualOrAdmin } from '../access/isIndividualOrAdmin';
 
 export const Address: CollectionConfig = {
   slug: 'address',
+  access: {
+    read: isIndividualOrAdmin,
+    update: isIndividualOrAdmin,
+  },
   fields: [
     {
       name: 'user',

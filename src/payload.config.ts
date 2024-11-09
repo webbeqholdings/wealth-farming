@@ -7,6 +7,8 @@ import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
 import { Users } from './collections/Users'
+import { News } from './collections/News'
+import { NewsCategories } from './collections/NewsCategories'
 import { Banks } from './collections/Banks'
 import { Address } from './collections/Address'
 import { Media } from './collections/Media'
@@ -29,6 +31,8 @@ export default buildConfig({
   },
   collections: [
     Users,
+    News,
+    NewsCategories,
     Media,
     Banks,
     IndividualInvestors,
