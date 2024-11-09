@@ -14,43 +14,88 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { z } from 'zod'
+
+// Define Zod schemas
+const loginSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+})
+
+const registerSchema = z.object({
+  first_name: z.string().min(1, "First Name is required"),
+  last_name: z.string().min(1, "Last Name is required"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+})
 
 export default function AuthPage() {
   const [isLoading, setIsLoading] = useState(false)
+  const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const router = useRouter()
 
   const handleSubmit = async (
     event: React.FormEvent<HTMLFormElement>,
-    type: 'login' | 'register',
+    type: '/login' | '',
   ) => {
-    event.preventDefault()
-    setIsLoading(true)
+    event.preventDefault();
+    setIsLoading(true);
+    setErrors({});
 
-    const formData = new FormData(event.currentTarget)
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
-    const name = formData.get('name') as string
+    const formData = new FormData(event.currentTarget);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    const first_name = formData.get('first_name') as string;
+    const last_name = formData.get('last_name') as string;
+
+    // Select schema based on form type
+    const schema = type === '/login' ? loginSchema : registerSchema;
+
+    // Parse and validate data with Zod
+    const result = schema.safeParse({ email, password, first_name, last_name });
+
+    if (!result.success) {
+      const errorMessages = result.error.errors.reduce((acc, error) => {
+        acc[error.path[0]] = error.message;
+        return acc;
+      }, {} as { [key: string]: string });
+      setErrors(errorMessages);
+      setIsLoading(false);
+      return;
+    }
 
     try {
-      const response = await fetch(`/api/auth/${type}`, {
+      const response = await fetch(`/api/users${type}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, name }),
-      })
+      });
 
       if (response.ok) {
-        router.push('/')
+        if (type == '/login') {
+          router.replace('/');
+          setTimeout(() => {
+            window.location.reload();
+          }, 100);
+        } else {
+          router.replace('/join');
+          setTimeout(() => {
+            window.location.reload();
+          }, 100);
+        }
+
       } else {
-        const error = await response.text()
-        alert(error)
+        const error = await response.text();
+        alert(error);
       }
     } catch (error) {
-      console.error('An error occurred:', error)
-      alert('An error occurred. Please try again.')
+      console.error('An error occurred:', error);
+      alert('An error occurred. Please try again.');
     }
 
-    setIsLoading(false)
-  }
+    setIsLoading(false);
+  };
+
 
   return (
     <div className="container flex items-center justify-center min-h-screen">
@@ -65,15 +110,17 @@ export default function AuthPage() {
               <CardTitle>Login</CardTitle>
               <CardDescription>Enter your credentials to access your account.</CardDescription>
             </CardHeader>
-            <form onSubmit={(e) => handleSubmit(e, 'login')}>
+            <form onSubmit={(e) => handleSubmit(e, '/login')}>
               <CardContent className="space-y-2">
                 <div className="space-y-1">
                   <Label htmlFor="email">Email</Label>
                   <Input id="email" name="email" type="email" required />
+                  {errors.email && <p className="text-red-500">{errors.email}</p>}
                 </div>
                 <div className="space-y-1">
                   <Label htmlFor="password">Password</Label>
                   <Input id="password" name="password" type="password" required />
+                  {errors.password && <p className="text-red-500">{errors.password}</p>}
                 </div>
               </CardContent>
               <CardFooter>
@@ -90,19 +137,29 @@ export default function AuthPage() {
               <CardTitle>Register</CardTitle>
               <CardDescription>Create a new account to get started.</CardDescription>
             </CardHeader>
-            <form onSubmit={(e) => handleSubmit(e, 'register')}>
+            <form onSubmit={(e) => handleSubmit(e, '')}>
               <CardContent className="space-y-2">
-                <div className="space-y-1">
-                  <Label htmlFor="name">Name</Label>
-                  <Input id="name" name="name" required />
+                <div className="flex space-x-4">
+                  <div className="flex-1 space-y-1">
+                    <Label htmlFor="first_name">First Name</Label>
+                    <Input id="first_name" name="first_name" required />
+                    {errors.first_name && <p className="text-red-500">{errors.first_name}</p>}
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <Label htmlFor="last_name">Last Name</Label>
+                    <Input id="last_name" name="last_name" required />
+                    {errors.last_name && <p className="text-red-500">{errors.last_name}</p>}
+                  </div>
                 </div>
                 <div className="space-y-1">
                   <Label htmlFor="email">Email</Label>
                   <Input id="email" name="email" type="email" required />
+                  {errors.email && <p className="text-red-500">{errors.email}</p>}
                 </div>
                 <div className="space-y-1">
                   <Label htmlFor="password">Password</Label>
                   <Input id="password" name="password" type="password" required />
+                  {errors.password && <p className="text-red-500">{errors.password}</p>}
                 </div>
               </CardContent>
               <CardFooter>

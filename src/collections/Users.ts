@@ -39,7 +39,7 @@ export const Users: CollectionConfig = {
     {
       name: 'first_name',
       type: 'text',
-      required: false,
+      required: true,
       admin: {
         condition: (data) => data.role !== 'company',
       },
