@@ -12,7 +12,7 @@ export function MainNav() {
 
   const menuItems = [
     {
-      href: '/products',
+      href: '/invesment-products',
       text: 'Products',
     },
     {
