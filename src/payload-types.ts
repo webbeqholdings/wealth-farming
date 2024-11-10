@@ -11,6 +11,10 @@ export interface Config {
     users: UserAuthOperations;
   };
   collections: {
+    'news-categories': NewsCategory;
+    news: News;
+    address: Address;
+    banks: Bank;
     users: User;
     accounts: Account;
     companies: Company;
@@ -24,6 +28,10 @@ export interface Config {
     'payload-migrations': PayloadMigration;
   };
   collectionsSelect?: {
+    'news-categories': NewsCategoriesSelect<false> | NewsCategoriesSelect<true>;
+    news: NewsSelect<false> | NewsSelect<true>;
+    address: AddressSelect<false> | AddressSelect<true>;
+    banks: BanksSelect<false> | BanksSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     accounts: AccountsSelect<false> | AccountsSelect<true>;
     companies: CompaniesSelect<false> | CompaniesSelect<true>;
@@ -74,6 +82,31 @@ export interface UserAuthOperations {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news-categories".
+ */
+export interface NewsCategory {
+  id: number;
+  name: string;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news".
+ */
+export interface News {
+  id: number;
+  category?: (number | null) | NewsCategory;
+  user?: (number | null) | User;
+  title?: string | null;
+  content?: string | null;
+  published_date?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
 export interface User {
@@ -98,6 +131,35 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "address".
+ */
+export interface Address {
+  id: number;
+  user: number | User;
+  street?: string | null;
+  city?: string | null;
+  state?: string | null;
+  zip_code?: string | null;
+  country?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "banks".
+ */
+export interface Bank {
+  id: number;
+  user?: (number | null) | User;
+  name?: string | null;
+  account_number?: string | null;
+  bank_name?: string | null;
+  branch?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "accounts".
  */
 export interface Account {
@@ -115,9 +177,9 @@ export interface Account {
 export interface Company {
   id: number;
   name: string;
-  registrationNumber?: string | null;
+  registration_number?: string | null;
   address?: string | null;
-  contactPerson: number | User;
+  contact_person: number | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -217,6 +279,22 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
+        relationTo: 'news-categories';
+        value: number | NewsCategory;
+      } | null)
+    | ({
+        relationTo: 'news';
+        value: number | News;
+      } | null)
+    | ({
+        relationTo: 'address';
+        value: number | Address;
+      } | null)
+    | ({
+        relationTo: 'banks';
+        value: number | Bank;
+      } | null)
+    | ({
         relationTo: 'users';
         value: number | User;
       } | null)
@@ -292,6 +370,56 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news-categories_select".
+ */
+export interface NewsCategoriesSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news_select".
+ */
+export interface NewsSelect<T extends boolean = true> {
+  category?: T;
+  user?: T;
+  title?: T;
+  content?: T;
+  published_date?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "address_select".
+ */
+export interface AddressSelect<T extends boolean = true> {
+  user?: T;
+  street?: T;
+  city?: T;
+  state?: T;
+  zip_code?: T;
+  country?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "banks_select".
+ */
+export interface BanksSelect<T extends boolean = true> {
+  user?: T;
+  name?: T;
+  account_number?: T;
+  bank_name?: T;
+  branch?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
@@ -329,9 +457,9 @@ export interface AccountsSelect<T extends boolean = true> {
  */
 export interface CompaniesSelect<T extends boolean = true> {
   name?: T;
-  registrationNumber?: T;
+  registration_number?: T;
   address?: T;
-  contactPerson?: T;
+  contact_person?: T;
   updatedAt?: T;
   createdAt?: T;
 }

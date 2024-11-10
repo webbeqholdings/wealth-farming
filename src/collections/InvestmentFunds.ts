@@ -3,6 +3,12 @@ import { CollectionConfig } from 'payload'
 
 const InvestmentFunds: CollectionConfig = {
   slug: 'investment-funds',
+  admin: {
+    useAsTitle: 'name',
+  },
+  access: {
+    read: () => true, // Publicly readable
+  },
   fields: [
     {
       name: 'name',

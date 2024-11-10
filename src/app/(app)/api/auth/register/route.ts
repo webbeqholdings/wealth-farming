@@ -3,7 +3,7 @@ import config from '@payload-config'
 import { getPayloadHMR } from '@payloadcms/next/utilities'
 export async function POST(req: Request) {
   try {
-    const { email, password, firstName, lastName, role } = await req.json()
+    const { email, password, first_name, last_name, role } = await req.json()
     const payload = await getPayloadHMR({
       config,
     })
@@ -12,8 +12,8 @@ export async function POST(req: Request) {
       data: {
         email: email,
         password: password,
-        firstName: firstName,
-        lastName: lastName,
+        first_name: first_name,
+        last_name: last_name,
         role: role,
       },
     })

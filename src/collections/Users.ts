@@ -1,4 +1,6 @@
 import type { CollectionConfig } from 'payload'
+import { isIndividualOrAdmin } from '../access/isIndividualOrAdmin';
+import { isAdmin } from '../access/isAdmin';
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -6,6 +8,12 @@ export const Users: CollectionConfig = {
     useAsTitle: 'email',
   },
   auth: true,
+  access: {
+    read: isIndividualOrAdmin,
+    create: () => true,
+    update: isIndividualOrAdmin,
+    delete: isAdmin,
+  },
   fields: [
     {
       name: 'role',
