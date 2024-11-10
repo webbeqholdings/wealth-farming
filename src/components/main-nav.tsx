@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation'
 
 import { siteConfig } from '@/config/site'
 import { cn } from '@/lib/utils'
-import { Icons } from '@/components/icons'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 
 export function MainNav() {
@@ -13,7 +12,7 @@ export function MainNav() {
 
   const menuItems = [
     {
-      href: '/products',
+      href: '/invesment-products',
       text: 'Products',
     },
     {
@@ -26,7 +25,7 @@ export function MainNav() {
     },
 
     {
-      href: 'events',
+      href: '/events',
       text: 'Events',
     },
     {
@@ -53,21 +52,19 @@ export function MainNav() {
       </Link>
 
       {/* MAIN MENU */}
-      <nav className="flex items-center gap-4 text-sm lg:gap-6">
+      <nav className="flex items-center gap-4 text-sm lg:gap-6" key="desktop-nav">
         {menuItems.map((item) => {
           return (
-            <>
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  'transition-colors hover:text-foreground/80',
-                  pathname === item.href ? 'text-foreground' : 'text-foreground/60',
-                )}
-              >
-                {item.text}
-              </Link>
-            </>
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                'transition-colors hover:text-foreground/80',
+                pathname === item.href ? 'text-foreground' : 'text-foreground/60',
+              )}
+            >
+              {item.text}
+            </Link>
           )
         })}
       </nav>

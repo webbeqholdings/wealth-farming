@@ -12,12 +12,14 @@ import { NewsCategories } from './collections/NewsCategories'
 import { Banks } from './collections/Banks'
 import { Address } from './collections/Address'
 import { Media } from './collections/Media'
-import IndividualInvestors from './collections/IndividualInvestors'
 import Companies from './collections/Companies'
-import InvestmentFunds from './collections/InvestmentFunds'
-import Investments from './collections/Investments'
+
 import Transactions from './collections/Transactions'
-import Reports from './collections/Reports'
+import Accounts from './collections/Accounts'
+import Contracts from './collections/Contracts'
+import InvestmentFunds from './collections/InvestmentFunds'
+import InvestmentProducts from './collections/InvestmentProducts'
+import SiteSettings from './global-configs/site-settings'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -30,19 +32,20 @@ export default buildConfig({
     },
   },
   collections: [
-    Users,
-    News,
+    Accounts,
     NewsCategories,
-    Media,
+    News,
+    Address,
     Banks,
-    IndividualInvestors,
+    Users,
+    Media,
     Companies,
     InvestmentFunds,
-    Investments,
+    InvestmentProducts,
+    Contracts,
     Transactions,
-    Reports,
-    Address,
   ],
+  globals: [SiteSettings],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

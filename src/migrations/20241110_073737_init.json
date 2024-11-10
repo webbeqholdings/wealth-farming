@@ -1,9 +1,590 @@
 {
-  "id": "7e9955b3-8a0b-46d8-a697-6d65713d9049",
+  "id": "e61d715a-9408-4a5f-95d6-1e5654d28cfb",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "public.accounts": {
+      "name": "accounts",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "account_name": {
+          "name": "account_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "account_number": {
+          "name": "account_number",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "accounts_user_idx": {
+          "name": "accounts_user_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "accounts_updated_at_idx": {
+          "name": "accounts_updated_at_idx",
+          "columns": [
+            {
+              "expression": "updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "accounts_created_at_idx": {
+          "name": "accounts_created_at_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "accounts_user_id_users_id_fk": {
+          "name": "accounts_user_id_users_id_fk",
+          "tableFrom": "accounts",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "public.news_categories": {
+      "name": "news_categories",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "news_categories_updated_at_idx": {
+          "name": "news_categories_updated_at_idx",
+          "columns": [
+            {
+              "expression": "updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "news_categories_created_at_idx": {
+          "name": "news_categories_created_at_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "public.news": {
+      "name": "news",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "category_id": {
+          "name": "category_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "content": {
+          "name": "content",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "published_date": {
+          "name": "published_date",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "news_category_idx": {
+          "name": "news_category_idx",
+          "columns": [
+            {
+              "expression": "category_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "news_user_idx": {
+          "name": "news_user_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "news_updated_at_idx": {
+          "name": "news_updated_at_idx",
+          "columns": [
+            {
+              "expression": "updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "news_created_at_idx": {
+          "name": "news_created_at_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "news_category_id_news_categories_id_fk": {
+          "name": "news_category_id_news_categories_id_fk",
+          "tableFrom": "news",
+          "tableTo": "news_categories",
+          "columnsFrom": [
+            "category_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "news_user_id_users_id_fk": {
+          "name": "news_user_id_users_id_fk",
+          "tableFrom": "news",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "public.address": {
+      "name": "address",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "street": {
+          "name": "street",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "city": {
+          "name": "city",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "state": {
+          "name": "state",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zip_code": {
+          "name": "zip_code",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "country": {
+          "name": "country",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "address_user_idx": {
+          "name": "address_user_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "address_updated_at_idx": {
+          "name": "address_updated_at_idx",
+          "columns": [
+            {
+              "expression": "updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "address_created_at_idx": {
+          "name": "address_created_at_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "address_user_id_users_id_fk": {
+          "name": "address_user_id_users_id_fk",
+          "tableFrom": "address",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "public.banks": {
+      "name": "banks",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "account_number": {
+          "name": "account_number",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bank_name": {
+          "name": "bank_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "branch": {
+          "name": "branch",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "banks_user_idx": {
+          "name": "banks_user_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "banks_updated_at_idx": {
+          "name": "banks_updated_at_idx",
+          "columns": [
+            {
+              "expression": "updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "banks_created_at_idx": {
+          "name": "banks_created_at_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "banks_user_id_users_id_fk": {
+          "name": "banks_user_id_users_id_fk",
+          "tableFrom": "banks",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
     "public.users": {
       "name": "users",
       "schema": "",
@@ -46,28 +627,15 @@
           "primaryKey": false,
           "notNull": false
         },
-        "phone": {
-          "name": "phone",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "gender": {
-          "name": "gender",
-          "type": "enum_users_gender",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "birth_date": {
-          "name": "birth_date",
-          "type": "timestamp(3) with time zone",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "nationality": {
-          "name": "nationality",
+        "phone_contact": {
+          "name": "phone_contact",
           "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date_of_birth": {
+          "name": "date_of_birth",
+          "type": "timestamp(3) with time zone",
           "primaryKey": false,
           "notNull": false
         },
@@ -318,260 +886,6 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "public.banks": {
-      "name": "banks",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "account_number": {
-          "name": "account_number",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "bank_name": {
-          "name": "bank_name",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "branch": {
-          "name": "branch",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp(3) with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp(3) with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "banks_user_idx": {
-          "name": "banks_user_idx",
-          "columns": [
-            {
-              "expression": "user_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "banks_updated_at_idx": {
-          "name": "banks_updated_at_idx",
-          "columns": [
-            {
-              "expression": "updated_at",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "banks_created_at_idx": {
-          "name": "banks_created_at_idx",
-          "columns": [
-            {
-              "expression": "created_at",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "banks_user_id_users_id_fk": {
-          "name": "banks_user_id_users_id_fk",
-          "tableFrom": "banks",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "public.individual_investors": {
-      "name": "individual_investors",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "full_name": {
-          "name": "full_name",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "first_name": {
-          "name": "first_name",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "last_name": {
-          "name": "last_name",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "user_account_id": {
-          "name": "user_account_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "phone": {
-          "name": "phone",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "address": {
-          "name": "address",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "date_of_birth": {
-          "name": "date_of_birth",
-          "type": "timestamp(3) with time zone",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp(3) with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp(3) with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "individual_investors_user_account_idx": {
-          "name": "individual_investors_user_account_idx",
-          "columns": [
-            {
-              "expression": "user_account_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "individual_investors_updated_at_idx": {
-          "name": "individual_investors_updated_at_idx",
-          "columns": [
-            {
-              "expression": "updated_at",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "individual_investors_created_at_idx": {
-          "name": "individual_investors_created_at_idx",
-          "columns": [
-            {
-              "expression": "created_at",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "individual_investors_user_account_id_users_id_fk": {
-          "name": "individual_investors_user_account_id_users_id_fk",
-          "tableFrom": "individual_investors",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_account_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
     "public.companies": {
       "name": "companies",
       "schema": "",
@@ -705,16 +1019,15 @@
         },
         "description": {
           "name": "description",
-          "type": "jsonb",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": false
         },
         "category": {
           "name": "category",
-          "type": "enum_investment_funds_category",
-          "typeSchema": "public",
+          "type": "varchar",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "start_date": {
           "name": "start_date",
@@ -726,7 +1039,7 @@
           "name": "end_date",
           "type": "timestamp(3) with time zone",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "interest_rate": {
           "name": "interest_rate",
@@ -757,8 +1070,7 @@
           "type": "enum_investment_funds_status",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": false,
-          "default": "'open'"
+          "notNull": true
         },
         "updated_at": {
           "name": "updated_at",
@@ -841,8 +1153,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "public.investments": {
-      "name": "investments",
+    "public.investment_products": {
+      "name": "investment_products",
       "schema": "",
       "columns": {
         "id": {
@@ -851,37 +1163,61 @@
           "primaryKey": true,
           "notNull": true
         },
-        "investment_fund_id": {
-          "name": "investment_fund_id",
+        "fund_id": {
+          "name": "fund_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "amount": {
-          "name": "amount",
+        "product_name": {
+          "name": "product_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "min_investment": {
+          "name": "min_investment",
           "type": "numeric",
           "primaryKey": false,
           "notNull": true
         },
-        "investment_date": {
-          "name": "investment_date",
-          "type": "timestamp(3) with time zone",
+        "max_investment": {
+          "name": "max_investment",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "interest_rate_from": {
+          "name": "interest_rate_from",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "interest_rate_to": {
+          "name": "interest_rate_to",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "profit_period": {
+          "name": "profit_period",
+          "type": "enum_investment_products_profit_period",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
         },
         "status": {
           "name": "status",
-          "type": "enum_investments_status",
+          "type": "enum_investment_products_status",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": false,
-          "default": "'active'"
-        },
-        "expected_return": {
-          "name": "expected_return",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "updated_at": {
           "name": "updated_at",
@@ -899,11 +1235,11 @@
         }
       },
       "indexes": {
-        "investments_investment_fund_idx": {
-          "name": "investments_investment_fund_idx",
+        "investment_products_fund_idx": {
+          "name": "investment_products_fund_idx",
           "columns": [
             {
-              "expression": "investment_fund_id",
+              "expression": "fund_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -914,8 +1250,8 @@
           "method": "btree",
           "with": {}
         },
-        "investments_updated_at_idx": {
-          "name": "investments_updated_at_idx",
+        "investment_products_updated_at_idx": {
+          "name": "investment_products_updated_at_idx",
           "columns": [
             {
               "expression": "updated_at",
@@ -929,8 +1265,8 @@
           "method": "btree",
           "with": {}
         },
-        "investments_created_at_idx": {
-          "name": "investments_created_at_idx",
+        "investment_products_created_at_idx": {
+          "name": "investment_products_created_at_idx",
           "columns": [
             {
               "expression": "created_at",
@@ -946,12 +1282,12 @@
         }
       },
       "foreignKeys": {
-        "investments_investment_fund_id_investment_funds_id_fk": {
-          "name": "investments_investment_fund_id_investment_funds_id_fk",
-          "tableFrom": "investments",
+        "investment_products_fund_id_investment_funds_id_fk": {
+          "name": "investment_products_fund_id_investment_funds_id_fk",
+          "tableFrom": "investment_products",
           "tableTo": "investment_funds",
           "columnsFrom": [
-            "investment_fund_id"
+            "fund_id"
           ],
           "columnsTo": [
             "id"
@@ -964,8 +1300,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "public.investments_rels": {
-      "name": "investments_rels",
+    "public.contracts": {
+      "name": "contracts",
       "schema": "",
       "columns": {
         "id": {
@@ -974,43 +1310,52 @@
           "primaryKey": true,
           "notNull": true
         },
-        "order": {
-          "name": "order",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "parent_id": {
-          "name": "parent_id",
+        "product_id_id": {
+          "name": "product_id_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "path": {
-          "name": "path",
-          "type": "varchar",
+        "account_id_id": {
+          "name": "account_id_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "individual_investors_id": {
-          "name": "individual_investors_id",
-          "type": "integer",
+        "status": {
+          "name": "status",
+          "type": "enum_contracts_status",
+          "typeSchema": "public",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
-        "companies_id": {
-          "name": "companies_id",
-          "type": "integer",
+        "amount": {
+          "name": "amount",
+          "type": "numeric",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {
-        "investments_rels_order_idx": {
-          "name": "investments_rels_order_idx",
+        "contracts_product_id_idx": {
+          "name": "contracts_product_id_idx",
           "columns": [
             {
-              "expression": "order",
+              "expression": "product_id_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -1021,11 +1366,11 @@
           "method": "btree",
           "with": {}
         },
-        "investments_rels_parent_idx": {
-          "name": "investments_rels_parent_idx",
+        "contracts_account_id_idx": {
+          "name": "contracts_account_id_idx",
           "columns": [
             {
-              "expression": "parent_id",
+              "expression": "account_id_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -1036,11 +1381,11 @@
           "method": "btree",
           "with": {}
         },
-        "investments_rels_path_idx": {
-          "name": "investments_rels_path_idx",
+        "contracts_updated_at_idx": {
+          "name": "contracts_updated_at_idx",
           "columns": [
             {
-              "expression": "path",
+              "expression": "updated_at",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -1051,26 +1396,11 @@
           "method": "btree",
           "with": {}
         },
-        "investments_rels_individual_investors_id_idx": {
-          "name": "investments_rels_individual_investors_id_idx",
+        "contracts_created_at_idx": {
+          "name": "contracts_created_at_idx",
           "columns": [
             {
-              "expression": "individual_investors_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "investments_rels_companies_id_idx": {
-          "name": "investments_rels_companies_id_idx",
-          "columns": [
-            {
-              "expression": "companies_id",
+              "expression": "created_at",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -1083,43 +1413,30 @@
         }
       },
       "foreignKeys": {
-        "investments_rels_parent_fk": {
-          "name": "investments_rels_parent_fk",
-          "tableFrom": "investments_rels",
-          "tableTo": "investments",
+        "contracts_product_id_id_investment_products_id_fk": {
+          "name": "contracts_product_id_id_investment_products_id_fk",
+          "tableFrom": "contracts",
+          "tableTo": "investment_products",
           "columnsFrom": [
-            "parent_id"
+            "product_id_id"
           ],
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
+          "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "investments_rels_individual_investors_fk": {
-          "name": "investments_rels_individual_investors_fk",
-          "tableFrom": "investments_rels",
-          "tableTo": "individual_investors",
+        "contracts_account_id_id_accounts_id_fk": {
+          "name": "contracts_account_id_id_accounts_id_fk",
+          "tableFrom": "contracts",
+          "tableTo": "accounts",
           "columnsFrom": [
-            "individual_investors_id"
+            "account_id_id"
           ],
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "investments_rels_companies_fk": {
-          "name": "investments_rels_companies_fk",
-          "tableFrom": "investments_rels",
-          "tableTo": "companies",
-          "columnsFrom": [
-            "companies_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },
@@ -1137,14 +1454,8 @@
           "primaryKey": true,
           "notNull": true
         },
-        "transaction_id": {
-          "name": "transaction_id",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "investment_id": {
-          "name": "investment_id",
+        "contract_id_id": {
+          "name": "contract_id_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -1155,39 +1466,31 @@
           "primaryKey": false,
           "notNull": true
         },
-        "transaction_date": {
-          "name": "transaction_date",
-          "type": "timestamp(3) with time zone",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "transaction_type": {
-          "name": "transaction_type",
-          "type": "enum_transactions_transaction_type",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
         "status": {
           "name": "status",
           "type": "enum_transactions_status",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": false,
-          "default": "'completed'"
+          "notNull": true
         },
-        "notes": {
-          "name": "notes",
-          "type": "varchar",
+        "from_account_id": {
+          "name": "from_account_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp(3) with time zone",
+        "to_account_id": {
+          "name": "to_account_id",
+          "type": "integer",
           "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
+          "notNull": false
+        },
+        "type": {
+          "name": "type",
+          "type": "enum_transactions_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
         },
         "created_at": {
           "name": "created_at",
@@ -1195,29 +1498,51 @@
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {
-        "transactions_transaction_id_idx": {
-          "name": "transactions_transaction_id_idx",
+        "transactions_contract_id_idx": {
+          "name": "transactions_contract_id_idx",
           "columns": [
             {
-              "expression": "transaction_id",
+              "expression": "contract_id_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
             }
           ],
-          "isUnique": true,
+          "isUnique": false,
           "concurrently": false,
           "method": "btree",
           "with": {}
         },
-        "transactions_investment_idx": {
-          "name": "transactions_investment_idx",
+        "transactions_from_account_idx": {
+          "name": "transactions_from_account_idx",
           "columns": [
             {
-              "expression": "investment_id",
+              "expression": "from_account_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "transactions_to_account_idx": {
+          "name": "transactions_to_account_idx",
+          "columns": [
+            {
+              "expression": "to_account_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -1260,254 +1585,38 @@
         }
       },
       "foreignKeys": {
-        "transactions_investment_id_investments_id_fk": {
-          "name": "transactions_investment_id_investments_id_fk",
+        "transactions_contract_id_id_contracts_id_fk": {
+          "name": "transactions_contract_id_id_contracts_id_fk",
           "tableFrom": "transactions",
-          "tableTo": "investments",
+          "tableTo": "contracts",
           "columnsFrom": [
-            "investment_id"
+            "contract_id_id"
           ],
           "columnsTo": [
             "id"
           ],
           "onDelete": "set null",
           "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "public.reports": {
-      "name": "reports",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
         },
-        "title": {
-          "name": "title",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "report_date": {
-          "name": "report_date",
-          "type": "timestamp(3) with time zone",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "content": {
-          "name": "content",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "attachments_id": {
-          "name": "attachments_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp(3) with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp(3) with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "reports_attachments_idx": {
-          "name": "reports_attachments_idx",
-          "columns": [
-            {
-              "expression": "attachments_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "reports_updated_at_idx": {
-          "name": "reports_updated_at_idx",
-          "columns": [
-            {
-              "expression": "updated_at",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "reports_created_at_idx": {
-          "name": "reports_created_at_idx",
-          "columns": [
-            {
-              "expression": "created_at",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "reports_attachments_id_media_id_fk": {
-          "name": "reports_attachments_id_media_id_fk",
-          "tableFrom": "reports",
-          "tableTo": "media",
+        "transactions_from_account_id_accounts_id_fk": {
+          "name": "transactions_from_account_id_accounts_id_fk",
+          "tableFrom": "transactions",
+          "tableTo": "accounts",
           "columnsFrom": [
-            "attachments_id"
+            "from_account_id"
           ],
           "columnsTo": [
             "id"
           ],
           "onDelete": "set null",
           "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "public.address": {
-      "name": "address",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "street": {
-          "name": "street",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "city": {
-          "name": "city",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "state": {
-          "name": "state",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "zip_code": {
-          "name": "zip_code",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "country": {
-          "name": "country",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp(3) with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp(3) with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "address_user_idx": {
-          "name": "address_user_idx",
-          "columns": [
-            {
-              "expression": "user_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "address_updated_at_idx": {
-          "name": "address_updated_at_idx",
-          "columns": [
-            {
-              "expression": "updated_at",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "address_created_at_idx": {
-          "name": "address_created_at_idx",
-          "columns": [
-            {
-              "expression": "created_at",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "address_user_id_users_id_fk": {
-          "name": "address_user_id_users_id_fk",
-          "tableFrom": "address",
-          "tableTo": "users",
+        "transactions_to_account_id_accounts_id_fk": {
+          "name": "transactions_to_account_id_accounts_id_fk",
+          "tableFrom": "transactions",
+          "tableTo": "accounts",
           "columnsFrom": [
-            "user_id"
+            "to_account_id"
           ],
           "columnsTo": [
             "id"
@@ -1631,14 +1740,26 @@
           "primaryKey": false,
           "notNull": true
         },
-        "users_id": {
-          "name": "users_id",
+        "accounts_id": {
+          "name": "accounts_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
-        "media_id": {
-          "name": "media_id",
+        "news_categories_id": {
+          "name": "news_categories_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "news_id": {
+          "name": "news_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "address_id": {
+          "name": "address_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": false
@@ -1649,8 +1770,14 @@
           "primaryKey": false,
           "notNull": false
         },
-        "individual_investors_id": {
-          "name": "individual_investors_id",
+        "users_id": {
+          "name": "users_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "media_id": {
+          "name": "media_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": false
@@ -1667,26 +1794,20 @@
           "primaryKey": false,
           "notNull": false
         },
-        "investments_id": {
-          "name": "investments_id",
+        "investment_products_id": {
+          "name": "investment_products_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contracts_id": {
+          "name": "contracts_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
         "transactions_id": {
           "name": "transactions_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "reports_id": {
-          "name": "reports_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "address_id": {
-          "name": "address_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": false
@@ -1738,11 +1859,11 @@
           "method": "btree",
           "with": {}
         },
-        "payload_locked_documents_rels_users_id_idx": {
-          "name": "payload_locked_documents_rels_users_id_idx",
+        "payload_locked_documents_rels_accounts_id_idx": {
+          "name": "payload_locked_documents_rels_accounts_id_idx",
           "columns": [
             {
-              "expression": "users_id",
+              "expression": "accounts_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -1753,11 +1874,41 @@
           "method": "btree",
           "with": {}
         },
-        "payload_locked_documents_rels_media_id_idx": {
-          "name": "payload_locked_documents_rels_media_id_idx",
+        "payload_locked_documents_rels_news_categories_id_idx": {
+          "name": "payload_locked_documents_rels_news_categories_id_idx",
           "columns": [
             {
-              "expression": "media_id",
+              "expression": "news_categories_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "payload_locked_documents_rels_news_id_idx": {
+          "name": "payload_locked_documents_rels_news_id_idx",
+          "columns": [
+            {
+              "expression": "news_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "payload_locked_documents_rels_address_id_idx": {
+          "name": "payload_locked_documents_rels_address_id_idx",
+          "columns": [
+            {
+              "expression": "address_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -1783,11 +1934,26 @@
           "method": "btree",
           "with": {}
         },
-        "payload_locked_documents_rels_individual_investors_id_idx": {
-          "name": "payload_locked_documents_rels_individual_investors_id_idx",
+        "payload_locked_documents_rels_users_id_idx": {
+          "name": "payload_locked_documents_rels_users_id_idx",
           "columns": [
             {
-              "expression": "individual_investors_id",
+              "expression": "users_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "payload_locked_documents_rels_media_id_idx": {
+          "name": "payload_locked_documents_rels_media_id_idx",
+          "columns": [
+            {
+              "expression": "media_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -1828,11 +1994,26 @@
           "method": "btree",
           "with": {}
         },
-        "payload_locked_documents_rels_investments_id_idx": {
-          "name": "payload_locked_documents_rels_investments_id_idx",
+        "payload_locked_documents_rels_investment_products_id_idx": {
+          "name": "payload_locked_documents_rels_investment_products_id_idx",
           "columns": [
             {
-              "expression": "investments_id",
+              "expression": "investment_products_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "payload_locked_documents_rels_contracts_id_idx": {
+          "name": "payload_locked_documents_rels_contracts_id_idx",
+          "columns": [
+            {
+              "expression": "contracts_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -1857,36 +2038,6 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
-        },
-        "payload_locked_documents_rels_reports_id_idx": {
-          "name": "payload_locked_documents_rels_reports_id_idx",
-          "columns": [
-            {
-              "expression": "reports_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "payload_locked_documents_rels_address_id_idx": {
-          "name": "payload_locked_documents_rels_address_id_idx",
-          "columns": [
-            {
-              "expression": "address_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
         }
       },
       "foreignKeys": {
@@ -1896,6 +2047,71 @@
           "tableTo": "payload_locked_documents",
           "columnsFrom": [
             "parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "payload_locked_documents_rels_accounts_fk": {
+          "name": "payload_locked_documents_rels_accounts_fk",
+          "tableFrom": "payload_locked_documents_rels",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "accounts_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "payload_locked_documents_rels_news_categories_fk": {
+          "name": "payload_locked_documents_rels_news_categories_fk",
+          "tableFrom": "payload_locked_documents_rels",
+          "tableTo": "news_categories",
+          "columnsFrom": [
+            "news_categories_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "payload_locked_documents_rels_news_fk": {
+          "name": "payload_locked_documents_rels_news_fk",
+          "tableFrom": "payload_locked_documents_rels",
+          "tableTo": "news",
+          "columnsFrom": [
+            "news_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "payload_locked_documents_rels_address_fk": {
+          "name": "payload_locked_documents_rels_address_fk",
+          "tableFrom": "payload_locked_documents_rels",
+          "tableTo": "address",
+          "columnsFrom": [
+            "address_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "payload_locked_documents_rels_banks_fk": {
+          "name": "payload_locked_documents_rels_banks_fk",
+          "tableFrom": "payload_locked_documents_rels",
+          "tableTo": "banks",
+          "columnsFrom": [
+            "banks_id"
           ],
           "columnsTo": [
             "id"
@@ -1929,32 +2145,6 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "payload_locked_documents_rels_banks_fk": {
-          "name": "payload_locked_documents_rels_banks_fk",
-          "tableFrom": "payload_locked_documents_rels",
-          "tableTo": "banks",
-          "columnsFrom": [
-            "banks_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "payload_locked_documents_rels_individual_investors_fk": {
-          "name": "payload_locked_documents_rels_individual_investors_fk",
-          "tableFrom": "payload_locked_documents_rels",
-          "tableTo": "individual_investors",
-          "columnsFrom": [
-            "individual_investors_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
         "payload_locked_documents_rels_companies_fk": {
           "name": "payload_locked_documents_rels_companies_fk",
           "tableFrom": "payload_locked_documents_rels",
@@ -1981,12 +2171,25 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "payload_locked_documents_rels_investments_fk": {
-          "name": "payload_locked_documents_rels_investments_fk",
+        "payload_locked_documents_rels_investment_products_fk": {
+          "name": "payload_locked_documents_rels_investment_products_fk",
           "tableFrom": "payload_locked_documents_rels",
-          "tableTo": "investments",
+          "tableTo": "investment_products",
           "columnsFrom": [
-            "investments_id"
+            "investment_products_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "payload_locked_documents_rels_contracts_fk": {
+          "name": "payload_locked_documents_rels_contracts_fk",
+          "tableFrom": "payload_locked_documents_rels",
+          "tableTo": "contracts",
+          "columnsFrom": [
+            "contracts_id"
           ],
           "columnsTo": [
             "id"
@@ -2000,32 +2203,6 @@
           "tableTo": "transactions",
           "columnsFrom": [
             "transactions_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "payload_locked_documents_rels_reports_fk": {
-          "name": "payload_locked_documents_rels_reports_fk",
-          "tableFrom": "payload_locked_documents_rels",
-          "tableTo": "reports",
-          "columnsFrom": [
-            "reports_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "payload_locked_documents_rels_address_fk": {
-          "name": "payload_locked_documents_rels_address_fk",
-          "tableFrom": "payload_locked_documents_rels",
-          "tableTo": "address",
-          "columnsFrom": [
-            "address_id"
           ],
           "columnsTo": [
             "id"
@@ -2329,6 +2506,151 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
+    },
+    "public.site_settings_social_links": {
+      "name": "site_settings_social_links",
+      "schema": "",
+      "columns": {
+        "_order": {
+          "name": "_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "_parent_id": {
+          "name": "_parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "platform": {
+          "name": "platform",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "url": {
+          "name": "url",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "site_settings_social_links_order_idx": {
+          "name": "site_settings_social_links_order_idx",
+          "columns": [
+            {
+              "expression": "_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "site_settings_social_links_parent_id_idx": {
+          "name": "site_settings_social_links_parent_id_idx",
+          "columns": [
+            {
+              "expression": "_parent_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "site_settings_social_links_parent_id_fk": {
+          "name": "site_settings_social_links_parent_id_fk",
+          "tableFrom": "site_settings_social_links",
+          "tableTo": "site_settings",
+          "columnsFrom": [
+            "_parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "public.site_settings": {
+      "name": "site_settings",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "site_name": {
+          "name": "site_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "support_email": {
+          "name": "support_email",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "support_phone": {
+          "name": "support_phone",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contact_address": {
+          "name": "contact_address",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "business_hours": {
+          "name": "business_hours",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     }
   },
   "enums": {
@@ -2341,49 +2663,40 @@
         "company"
       ]
     },
-    "public.enum_users_gender": {
-      "name": "enum_users_gender",
-      "schema": "public",
-      "values": [
-        "male",
-        "female"
-      ]
-    },
-    "public.enum_investment_funds_category": {
-      "name": "enum_investment_funds_category",
-      "schema": "public",
-      "values": [
-        "equity",
-        "fixed_income",
-        "real_estate",
-        "alternative"
-      ]
-    },
     "public.enum_investment_funds_status": {
       "name": "enum_investment_funds_status",
       "schema": "public",
       "values": [
-        "open",
-        "closed",
-        "upcoming"
+        "active",
+        "closed"
       ]
     },
-    "public.enum_investments_status": {
-      "name": "enum_investments_status",
+    "public.enum_investment_products_profit_period": {
+      "name": "enum_investment_products_profit_period",
+      "schema": "public",
+      "values": [
+        "monthly",
+        "quarterly",
+        "semi_annually",
+        "annually"
+      ]
+    },
+    "public.enum_investment_products_status": {
+      "name": "enum_investment_products_status",
+      "schema": "public",
+      "values": [
+        "available",
+        "unavailable"
+      ]
+    },
+    "public.enum_contracts_status": {
+      "name": "enum_contracts_status",
       "schema": "public",
       "values": [
         "active",
-        "completed",
-        "cancelled"
-      ]
-    },
-    "public.enum_transactions_transaction_type": {
-      "name": "enum_transactions_transaction_type",
-      "schema": "public",
-      "values": [
-        "deposit",
-        "withdrawal",
-        "dividend"
+        "inactive",
+        "pending",
+        "closed"
       ]
     },
     "public.enum_transactions_status": {
@@ -2393,6 +2706,16 @@
         "pending",
         "completed",
         "failed"
+      ]
+    },
+    "public.enum_transactions_type": {
+      "name": "enum_transactions_type",
+      "schema": "public",
+      "values": [
+        "deposit",
+        "withdraw",
+        "bonus",
+        "manage_fee"
       ]
     }
   },

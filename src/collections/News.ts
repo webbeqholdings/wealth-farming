@@ -6,7 +6,7 @@ export const News: CollectionConfig = {
         {
             name: 'category',
             type: 'relationship',
-            relationTo: 'news_categories',
+            relationTo: 'news-categories',
             required: false,
           },
           {

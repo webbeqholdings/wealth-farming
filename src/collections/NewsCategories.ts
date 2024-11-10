@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 export const NewsCategories: CollectionConfig = {
-    slug: 'news_categories',
+    slug: 'news-categories',
     fields: [
         {
             name: 'name',

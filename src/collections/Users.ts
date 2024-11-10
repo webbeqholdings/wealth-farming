@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload'
-import { isIndividual } from '../access/isIndividual';
 import { isIndividualOrAdmin } from '../access/isIndividualOrAdmin';
 import { isAdmin } from '../access/isAdmin';
 
@@ -30,7 +29,7 @@ export const Users: CollectionConfig = {
           value: 'individual',
         },
         {
-          label: 'Company',
+          label: 'Company Investor',
           value: 'company',
         },
       ],
@@ -68,40 +67,12 @@ export const Users: CollectionConfig = {
       },
     },
     {
-      name: 'phone',
-      type: 'number',
-      admin: {
-        step: 1,
-      },
-    },
-    {
-      name: 'gender',
-      type: 'select',
-      admin: {
-        condition: (data) => data.role !== 'company',
-      },
-      options: [
-        {
-          label: 'Male',
-          value: 'male',
-        },
-        {
-          label: 'Female',
-          value: 'female',
-        },
-      ],
-    },
-    {
-      name: 'birth_date',
-      type: 'date',
-      admin: {
-        condition: (data) => data.role !== 'company',
-      },
-      defaultValue: () => new Date(),
-    },
-    {
-      name: 'nationality',
+      name: 'phone_contact',
       type: 'text',
     },
-  ]
+    {
+      name: 'date_of_birth',
+      type: 'date',
+    },
+  ],
 }
