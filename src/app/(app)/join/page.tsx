@@ -38,7 +38,7 @@ const AuthPage = () => {
 
   const handleSubmit = async (
     event: React.FormEvent<HTMLFormElement>,
-    type: '/login' | '',
+    type: '/login' | '' | '/reset' | '/register',
   ) => {
     event.preventDefault();
     setIsLoading(true);
@@ -98,15 +98,15 @@ const AuthPage = () => {
     setIsLoading(false);
   };
 
-
   return (
     <>
       <SiteHeader />
       <div className="container flex items-center justify-center min-h-screen">
         <Tabs defaultValue="login" className="w-[400px]">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="login">Login</TabsTrigger>
             <TabsTrigger value="register">Register</TabsTrigger>
+            <TabsTrigger value="reset">Reset Password</TabsTrigger>
           </TabsList>
           <TabsContent value="login">
             <Card>
@@ -124,6 +124,11 @@ const AuthPage = () => {
                     <Label htmlFor="password">Password</Label>
                     <Input id="password" name="password" type="password" required />
                   </div>
+                  <div className="text-right">
+                    <a href="#reset" className="text-sm text-blue-600 hover:underline">
+                      Forgot password?
+                    </a>
+                  </div>
                 </CardContent>
                 <CardFooter>
                   <Button type="submit" disabled={isLoading}>
@@ -139,20 +144,20 @@ const AuthPage = () => {
                 <CardTitle>Register</CardTitle>
                 <CardDescription>Create a new account to get started.</CardDescription>
               </CardHeader>
-              <form onSubmit={(e) => handleSubmit(e, '')}>
+              <form onSubmit={(e) => handleSubmit(e, '/register')}>
                 <CardContent className="space-y-2">
-                <div className="flex space-x-4">
-                  <div className="flex-1 space-y-1">
-                    <Label htmlFor="first_name">First Name</Label>
-                    <Input id="first_name" name="first_name" required />
-                    {errors.first_name && <p className="text-red-500">{errors.first_name}</p>}
+                  <div className="flex space-x-4">
+                    <div className="flex-1 space-y-1">
+                      <Label htmlFor="first_name">First Name</Label>
+                      <Input id="first_name" name="first_name" required />
+                      {errors.first_name && <p className="text-red-500">{errors.first_name}</p>}
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <Label htmlFor="last_name">Last Name</Label>
+                      <Input id="last_name" name="last_name" required />
+                      {errors.last_name && <p className="text-red-500">{errors.last_name}</p>}
+                    </div>
                   </div>
-                  <div className="flex-1 space-y-1">
-                    <Label htmlFor="last_name">Last Name</Label>
-                    <Input id="last_name" name="last_name" required />
-                    {errors.last_name && <p className="text-red-500">{errors.last_name}</p>}
-                  </div>
-                </div>
                   <div className="space-y-1">
                     <Label htmlFor="email">Email</Label>
                     <Input id="email" name="email" type="email" required />
@@ -165,6 +170,27 @@ const AuthPage = () => {
                 <CardFooter>
                   <Button type="submit" disabled={isLoading}>
                     {isLoading ? 'Loading...' : 'Register'}
+                  </Button>
+                </CardFooter>
+              </form>
+            </Card>
+          </TabsContent>
+          <TabsContent value="reset">
+            <Card>
+              <CardHeader>
+                <CardTitle>Reset Password</CardTitle>
+                <CardDescription>Enter your email to receive reset instructions.</CardDescription>
+              </CardHeader>
+              <form onSubmit={(e) => handleSubmit(e, '/reset')}>
+                <CardContent className="space-y-2">
+                  <div className="space-y-1">
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" name="email" type="email" required />
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button type="submit" disabled={isLoading}>
+                    {isLoading ? 'Sending...' : 'Send Reset Instructions'}
                   </Button>
                 </CardFooter>
               </form>
