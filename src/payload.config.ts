@@ -22,6 +22,7 @@ import InvestmentProducts from './collections/InvestmentProducts'
 import SiteSettings from './global-configs/site-settings'
 import { Header } from './global-configs/header'
 import { Footer } from './global-configs/footer'
+import verifyEmailRoute from './routers/verifyEmail';
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -47,6 +48,7 @@ export default buildConfig({
     Contracts,
     Transactions,
   ],
+  endpoints: [verifyEmailRoute],
   globals: [SiteSettings, Header, Footer],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

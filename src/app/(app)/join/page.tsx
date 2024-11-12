@@ -79,6 +79,8 @@ const AuthPage = () => {
           setTimeout(() => {
             window.location.reload();
           }, 100);
+        } else if(type == ''){
+          router.replace('/register-successfully');
         } else {
           router.replace('/join');
           setTimeout(() => {
@@ -144,7 +146,7 @@ const AuthPage = () => {
                 <CardTitle>Register</CardTitle>
                 <CardDescription>Create a new account to get started.</CardDescription>
               </CardHeader>
-              <form onSubmit={(e) => handleSubmit(e, '/register')}>
+              <form onSubmit={(e) => handleSubmit(e, '')}>
                 <CardContent className="space-y-2">
                   <div className="flex space-x-4">
                     <div className="flex-1 space-y-1">
