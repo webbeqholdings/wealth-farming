@@ -3,6 +3,7 @@ import { isIndividualOrAdmin } from '../access/isIndividualOrAdmin';
 import { isAdmin } from '../access/isAdmin';
 import { sendEmail } from '@/utilities/emailSender';
 import crypto from 'crypto';
+import { authenticator } from 'otplib';
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -82,25 +83,29 @@ export const Users: CollectionConfig = {
       defaultValue: false,
     },
     {
-      name: 'verification_token',
+      name: 'otp', // Store OTP here
       type: 'text',
     },
+    {
+      name: 'otp_expires_at', // Store OTP expiration time
+      type: 'date',
+    }
   ],
-   hooks: {
+  hooks: {
     beforeLogin: [
       async ({ user }) => {
         // Check if verify_email is null or undefined
-        if (!user.email_verified && !user.verification_token) {
-          throw new Error('Email verification is required to log in.');
-        }
+        // if (!user.email_verified) {
+        //   throw new Error('Email verification is required to log in.');
+        // }
       },
     ],
     beforeChange: [
       async ({ data, operation }) => {
         if (operation === 'create') {
-          // Generate a unique token
-          data.verification_token = crypto.randomBytes(32).toString('hex');
           data.email_verified = false;
+          data.otp = authenticator.generate(process.env.OTP_SECRET);
+          data.otp_expires_at = new Date();
         }
         return data;
       },
@@ -108,11 +113,9 @@ export const Users: CollectionConfig = {
     afterChange: [
       async ({ doc, operation }) => {
         if (operation === 'create') {
-          const verificationUrl = `${process.env.BASE_URL}/api/verify-email?token=${doc.verification_token}&id=${doc.id}`;
-          const text = `Please verify your email by clicking the following link: ${verificationUrl}`
-          const html = `<a href="${verificationUrl}">Verify Email</a>`
+          const otp = doc.otp
           try {
-            await sendEmail(doc.email, 'Email Verification', text, html);
+            await sendEmail(doc.email, 'Your OTP Code', otp);
           } catch (error) {
             console.error('Error sending welcome email:', error);
           }
@@ -120,5 +123,15 @@ export const Users: CollectionConfig = {
         return doc;
       },
     ],
+    afterForgotPassword: [
+      async ({ args }) => {
+        const data = args.data;
+          try {
+            await sendEmail(data.email, 'Your OTP Code', otp);
+          } catch (error) {
+            console.error('Error sending welcome email:', error);
+          }
+      },
+    ]
   }
 }

@@ -110,7 +110,8 @@ export interface User {
   phone_contact?: string | null;
   date_of_birth?: string | null;
   email_verified?: boolean | null;
-  verification_token?: string | null;
+  otp?: string | null;
+  otp_expires_at?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -448,7 +449,8 @@ export interface UsersSelect<T extends boolean = true> {
   phone_contact?: T;
   date_of_birth?: T;
   email_verified?: T;
-  verification_token?: T;
+  otp?: T;
+  otp_expires_at?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;

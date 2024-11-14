@@ -31,9 +31,10 @@ const registerSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
 })
 
-const AuthPage = () => {
+export default function Page() {
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
+  const [activeTab, setActiveTab] = useState('login') // State to track the active tab
   const router = useRouter()
 
   const handleSubmit = async (
@@ -70,24 +71,19 @@ const AuthPage = () => {
       const response = await fetch(`/api/users${type}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, name }),
+        body: JSON.stringify({ first_name, last_name, email, password }),
       });
 
       if (response.ok) {
+        const data = await response.json();
         if (type == '/login') {
           router.replace('/');
-          setTimeout(() => {
-            window.location.reload();
-          }, 100);
-        } else if(type == ''){
-          router.replace('/register-successfully');
+        } else if(type == '') {
+          localStorage.setItem('user_id', data.doc.id);
+          router.replace('/verify-otp');
         } else {
           router.replace('/join');
-          setTimeout(() => {
-            window.location.reload();
-          }, 100);
         }
-
       } else {
         const error = await response.text();
         alert(error);
@@ -96,7 +92,6 @@ const AuthPage = () => {
       console.error('An error occurred:', error);
       alert('An error occurred. Please try again.');
     }
-
     setIsLoading(false);
   };
 
@@ -104,11 +99,10 @@ const AuthPage = () => {
     <>
       <SiteHeader />
       <div className="container flex items-center justify-center min-h-screen">
-        <Tabs defaultValue="login" className="w-[400px]">
-          <TabsList className="grid w-full grid-cols-3">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-[400px]">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="login">Login</TabsTrigger>
             <TabsTrigger value="register">Register</TabsTrigger>
-            <TabsTrigger value="reset">Reset Password</TabsTrigger>
           </TabsList>
           <TabsContent value="login">
             <Card>
@@ -127,7 +121,14 @@ const AuthPage = () => {
                     <Input id="password" name="password" type="password" required />
                   </div>
                   <div className="text-right">
-                    <a href="#reset" className="text-sm text-blue-600 hover:underline">
+                    <a
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        router.push('/reset-password');
+                      }}
+                      className="text-sm text-blue-600 hover:underline"
+                    >
                       Forgot password?
                     </a>
                   </div>
@@ -177,31 +178,9 @@ const AuthPage = () => {
               </form>
             </Card>
           </TabsContent>
-          <TabsContent value="reset">
-            <Card>
-              <CardHeader>
-                <CardTitle>Reset Password</CardTitle>
-                <CardDescription>Enter your email to receive reset instructions.</CardDescription>
-              </CardHeader>
-              <form onSubmit={(e) => handleSubmit(e, '/reset')}>
-                <CardContent className="space-y-2">
-                  <div className="space-y-1">
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" name="email" type="email" required />
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button type="submit" disabled={isLoading}>
-                    {isLoading ? 'Sending...' : 'Send Reset Instructions'}
-                  </Button>
-                </CardFooter>
-              </form>
-            </Card>
-          </TabsContent>
         </Tabs>
       </div>
       <SiteFooter />
     </>
   )
 }
-export default AuthPage

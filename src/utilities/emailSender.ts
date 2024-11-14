@@ -11,13 +11,105 @@ const transporter = nodemailer.createTransport({
     }
   });
 
-export const sendEmail = async (to: string, subject: string, text: string, html: string) => {
+export const sendEmail = async (to: string, subject: string, otp: string) => {
+  const htmlContent = `
+  <!doctype html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Your OTP for Account Verification</title>
+    </head>
+    <body
+      style="
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        color: #333333;
+      "
+    >
+      <table role="presentation" style="width: 100%; border-collapse: collapse">
+        <tr>
+          <td align="center" style="padding: 40px 0">
+            <table
+              role="presentation"
+              style="
+                width: 600px;
+                border-collapse: collapse;
+                background-color: #ffffff;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+              "
+            >
+              <!-- Header -->
+              <tr>
+                <td
+                  style="
+                    padding: 40px 30px;
+                    text-align: center;
+                    background-color: #4f46e5;
+                    border-radius: 8px 8px 0 0;
+                  "
+                >
+                  <h1 style="color: #ffffff; font-size: 28px; margin: 0">Verify Your Account</h1>
+                </td>
+              </tr>
+              <!-- Content -->
+              <tr>
+                <td style="padding: 40px 30px">
+                  <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.5">Hello,</p>
+                  <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.5">
+                    Your One-Time Password (OTP) for account verification is:
+                  </p>
+                  <p
+                    style="
+                      margin: 0 0 20px 0;
+                      font-size: 36px;
+                      font-weight: bold;
+                      text-align: center;
+                      color: #4f46e5;
+                      letter-spacing: 5px;
+                    "
+                  >
+                    ${otp}
+                  </p>
+                  <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.5">
+                    This OTP will expire in 10 minutes. Please do not share this code with anyone.
+                  </p>
+                  <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.5">
+                    If you didn't request this code, please ignore this email or contact our support
+                    team if you have any concerns.
+                  </p>
+                </td>
+              </tr>
+              <!-- Footer -->
+              <tr>
+                <td
+                  style="
+                    padding: 30px;
+                    text-align: center;
+                    font-size: 14px;
+                    background-color: #f8f8f8;
+                    border-radius: 0 0 8px 8px;
+                  "
+                >
+                  <p style="margin: 0 0 10px 0">This is an automated message, please do not reply.</p>
+                  <p style="margin: 0">© 2024 Your Company Name. All rights reserved.</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+  </html>
+`;
   const mailOptions = {
     from: `"BEQ Holdings" <${process.env.SMTP_USER}>`, 
     to: to, 
     subject: subject,
-    text: text,
-    html: html,
+    html: htmlContent,
   };
 
   try {
