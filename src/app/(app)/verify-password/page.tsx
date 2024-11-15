@@ -17,7 +17,7 @@ export default function Page() {
   const user_id = localStorage.getItem('user_id');
 
   // Function to verify OTP
-  const verifyOTP = async (otp) => {
+  const verifyOTP = async (otp: string) => {
     const formData = {
       id: user_id,
       otp: otp,
@@ -65,14 +65,14 @@ export default function Page() {
   }, [timer]);
 
   // Handle OTP change and trigger verification when max length is reached
-  const handleOTPChange = (newOTP) => {
+  const handleOTPChange = (newOTP: string) => {
     if (newOTP.length === 6) {
       verifyOTP(newOTP);
     }
   };
 
   // Function to handle password reset after OTP verification
-  const handlePasswordReset = async (e) => {
+  const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
       setError("Passwords do not match");
