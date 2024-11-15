@@ -1,5 +1,5 @@
 {
-  "id": "1b200e39-5125-430e-b34e-345e1d9f71cd",
+  "id": "011ea4a0-2c9c-4fde-a1f8-4c78b189ce83",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -635,6 +635,25 @@
         },
         "date_of_birth": {
           "name": "date_of_birth",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "email_verified": {
+          "name": "email_verified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "otp": {
+          "name": "otp",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "otp_expires_at": {
+          "name": "otp_expires_at",
           "type": "timestamp(3) with time zone",
           "primaryKey": false,
           "notNull": false
