@@ -17,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { z } from 'zod'
+import { useToast } from "@/hooks/use-toast";
 
 // Define Zod schemas
 const loginSchema = z.object({
@@ -32,6 +33,7 @@ const registerSchema = z.object({
 })
 
 export default function Page() {
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [activeTab, setActiveTab] = useState('login') // State to track the active tab
@@ -39,7 +41,7 @@ export default function Page() {
 
   const handleSubmit = async (
     event: React.FormEvent<HTMLFormElement>,
-    type: '/login' | '' | '/reset' | '/register',
+    type: '/login' | '',
   ) => {
     event.preventDefault();
     setIsLoading(true);
@@ -85,12 +87,18 @@ export default function Page() {
           router.replace('/join');
         }
       } else {
-        const error = await response.text();
-        alert(error);
+        const error = await response.json();
+        toast({
+          title: "Error",
+          description: error.errors[0].message,
+        });
       }
     } catch (error) {
       console.error('An error occurred:', error);
-      alert('An error occurred. Please try again.');
+      toast({
+        title: "Error",
+        description: "An error occurred. Please try again!",
+      });
     }
     setIsLoading(false);
   };

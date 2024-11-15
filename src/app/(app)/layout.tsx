@@ -6,10 +6,7 @@ import { siteConfig } from '@/config/site'
 import { cn } from '@/lib/utils'
 
 import { ThemeProvider } from '@/components/theme-provider'
-import { Inter } from 'next/font/google'
-import { SiteHeader } from '@/components/site-header'
-import { SiteFooter } from '@/components/site-footer'
-import { AuthProvider } from '@/components/auth/AuthProvider'
+import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
   title: {
@@ -86,6 +83,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
               <div className="relative flex min-h-screen flex-col bg-background">
                 {/* <AuthProvider> */}
                 {children}
+                <Toaster/>
                 {/* </AuthProvider> */}
               </div>
             </div>

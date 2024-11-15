@@ -15,8 +15,10 @@ import {
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { useRouter } from 'next/navigation'
+import { useToast } from "@/hooks/use-toast";
 
 const Page = () => {
+    const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(false)
     const [errors, setErrors] = useState<{ [key: string]: string }>({})
     const router = useRouter()
@@ -25,10 +27,8 @@ const Page = () => {
         event.preventDefault()
         setIsLoading(true)
         setErrors({})
-        console.log('check event: ', event.currentTarget)
         const formData = new FormData(event.currentTarget);
         const email = formData.get('email') as string;
-        console.log('chekc email: ', email);
         try {
             const response = await fetch('/api/forgot-password', {
                 method: 'POST',
@@ -40,11 +40,13 @@ const Page = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                console.log('check data: ', data);
                 localStorage.setItem('user_id', data.user.id);
                 router.replace('/verify-password');
                 // Handle success (e.g., display a success message or redirect)
-                alert('Reset instructions have been sent to your email.')
+                toast({
+                    title: "Success",
+                    description: "Please enter your email to reset your password!",
+                  });
             } else {
                 // Handle error response
                 const errorData = await response.json()

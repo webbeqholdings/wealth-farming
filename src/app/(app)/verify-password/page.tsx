@@ -4,10 +4,11 @@ import { useRouter } from 'next/navigation';
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
+import { useToast } from "@/hooks/use-toast";
 
 export function Page() {
   const [otpVerified, setOtpVerified] = useState(false); // Track OTP verification state
-  const [otp, setOTP] = useState('');
+  const { toast } = useToast();
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [timer, setTimer] = useState(60); // Initial timer set to 60 seconds
@@ -65,7 +66,6 @@ export function Page() {
 
   // Handle OTP change and trigger verification when max length is reached
   const handleOTPChange = (newOTP) => {
-    setOTP(newOTP);
     if (newOTP.length === 6) {
       verifyOTP(newOTP);
     }
@@ -94,7 +94,10 @@ export function Page() {
       });
 
       if (response.ok) {
-        alert("Password reset successfully");
+        toast({
+          title: "Success",
+          description: "Reset Password Successfully!",
+        });
         router.replace("/join");
       } else {
         const data = await response.json();

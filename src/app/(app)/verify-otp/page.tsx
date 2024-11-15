@@ -4,11 +4,13 @@ import { useRouter } from 'next/navigation';
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
+import { useToast } from "@/hooks/use-toast";
 
 export function Page() {
   // const [otp, setOTP] = useState('');
   const [timer, setTimer] = useState(60); // Initial timer set to 60 seconds
   const router = useRouter();
+  const { toast } = useToast();
   const user_id = localStorage.getItem('user_id');
 
   // Function to verify OTP
@@ -28,13 +30,20 @@ export function Page() {
 
       const data = await response.json();
       if (response.ok) {
+        toast({
+          title: "Success",
+          description: "Register successfully!",
+        });
         router.replace("/join"); // Redirect on successful verification
       } else {
         alert(data.response.message || "Failed to verify OTP");
       }
     } catch (error) {
       console.error("Network error:", error);
-      alert("Failed to connect to the server");
+      toast({
+        title: "Error",
+        description: "Failed to connect to the server!",
+      });
     }
   };
 
