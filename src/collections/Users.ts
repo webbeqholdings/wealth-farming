@@ -113,24 +113,13 @@ export const Users: CollectionConfig = {
     afterChange: [
       async ({ doc, operation }) => {
         if (operation === 'create') {
-          const otp = doc.otp
           try {
-            await sendEmail(doc.email, 'Your OTP Code', otp);
+            await sendEmail(doc.email, 'Your OTP Code', doc.otp);
           } catch (error) {
             console.error('Error sending welcome email:', error);
           }
         }
         return doc;
-      },
-    ],
-    afterForgotPassword: [
-      async ({ args }) => {
-        const data = args.data;
-          try {
-            await sendEmail(data.email, 'Your OTP Code', otp);
-          } catch (error) {
-            console.error('Error sending welcome email:', error);
-          }
       },
     ]
   }
