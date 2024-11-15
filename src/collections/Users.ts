@@ -21,7 +21,6 @@ export const Users: CollectionConfig = {
     {
       name: 'first_name',
       type: 'text',
-      required: true,
       admin: {
         condition: (data) => data.role !== 'company',
       },
@@ -29,7 +28,6 @@ export const Users: CollectionConfig = {
     {
       name: 'last_name',
       type: 'text',
-      required: true,
       admin: {
         condition: (data) => data.role !== 'company',
       },
