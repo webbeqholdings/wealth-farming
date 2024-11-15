@@ -2,8 +2,9 @@ import { getPayloadHMR } from '@payloadcms/next/utilities';
 import config from '@payload-config';
 import { authenticator } from 'otplib';
 import { sendEmail } from '@/utilities/emailSender';
+import { PayloadRequest } from 'payload';
 
-const forgotPasword = async (req) => {
+const forgotPasword = async (req: PayloadRequest) => {
     try {
         const request = await req.json();
         const payload = await getPayloadHMR({
