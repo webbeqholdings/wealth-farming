@@ -3,7 +3,7 @@ import config from '@payload-config';
 import { authenticator } from 'otplib';
 import { sendEmail } from '@/utilities/emailSender';
 
-const resendOTP = async (req = { query: {} }) => {
+const resendOTP = async (req: {json(): ''}) => {
     try {
         const request = await req.json();
         const payload = await getPayloadHMR({

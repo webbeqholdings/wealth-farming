@@ -1,7 +1,7 @@
 import { getPayloadHMR } from '@payloadcms/next/utilities';
 import config from '@payload-config';
 
-const updatePasword = async (req = {}) => {
+const updatePasword = async (req: {json(): ''}) => {
   try {
     const payload = await getPayloadHMR({
       config,

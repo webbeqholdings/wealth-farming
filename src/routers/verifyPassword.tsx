@@ -1,7 +1,7 @@
 import { getPayloadHMR } from '@payloadcms/next/utilities';
 import config from '@payload-config';
 
-const verifyPasword = async (req = {}) => {
+const verifyPasword = async (req: {json(): ''}) => {
   try {
     const payload = await getPayloadHMR({
       config,
@@ -12,7 +12,7 @@ const verifyPasword = async (req = {}) => {
       collection: 'users',
       where: {
         id: {
-          equals: request.id, // Compare with request ID from body
+          equals: request?.id, // Compare with request ID from body
         }
       },
     });

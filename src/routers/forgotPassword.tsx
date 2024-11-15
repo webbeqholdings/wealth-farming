@@ -3,7 +3,7 @@ import config from '@payload-config';
 import { authenticator } from 'otplib';
 import { sendEmail } from '@/utilities/emailSender';
 
-const forgotPasword = async (req = { query: {} }) => {
+const forgotPasword = async (req: {json(): ''}) => {
     try {
         const request = await req.json();
         const payload = await getPayloadHMR({
