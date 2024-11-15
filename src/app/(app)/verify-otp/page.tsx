@@ -6,7 +6,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { useToast } from "@/hooks/use-toast";
 
-export function Page() {
+export default function Page() {
   // const [otp, setOTP] = useState('');
   const [timer, setTimer] = useState(60); // Initial timer set to 60 seconds
   const router = useRouter();
@@ -107,5 +107,3 @@ export function Page() {
     </div>
   );
 }
-
-export default Page;
