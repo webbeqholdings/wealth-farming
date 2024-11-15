@@ -19,6 +19,22 @@ export const Users: CollectionConfig = {
   },
   fields: [
     {
+      name: 'first_name',
+      type: 'text',
+      required: true,
+      admin: {
+        condition: (data) => data.role !== 'company',
+      },
+    },
+    {
+      name: 'last_name',
+      type: 'text',
+      required: true,
+      admin: {
+        condition: (data) => data.role !== 'company',
+      },
+    },
+    {
       name: 'role',
       type: 'select',
       required: true,
@@ -37,22 +53,6 @@ export const Users: CollectionConfig = {
         },
       ],
       defaultValue: 'individual',
-    },
-    {
-      name: 'first_name',
-      type: 'text',
-      required: true,
-      admin: {
-        condition: (data) => data.role !== 'company',
-      },
-    },
-    {
-      name: 'last_name',
-      type: 'text',
-      required: true,
-      admin: {
-        condition: (data) => data.role !== 'company',
-      },
     },
     {
       name: 'company_name',
