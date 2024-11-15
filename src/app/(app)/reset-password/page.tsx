@@ -15,10 +15,8 @@ import {
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { useRouter } from 'next/navigation'
-import { useToast } from "@/hooks/use-toast";
 
 const Page = () => {
-    const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(false)
     const [errors, setErrors] = useState<{ [key: string]: string }>({})
     const router = useRouter()
@@ -42,11 +40,6 @@ const Page = () => {
                 const data = await response.json();
                 localStorage.setItem('user_id', data.user.id);
                 router.replace('/verify-password');
-                // Handle success (e.g., display a success message or redirect)
-                toast({
-                    title: "Success",
-                    description: "Please enter your email to reset your password!",
-                  });
             } else {
                 // Handle error response
                 const errorData = await response.json()

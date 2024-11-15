@@ -13,7 +13,10 @@ const verifyPasword = async (req: PayloadRequest) => {
       collection: 'users',
       where: {
         id: {
-          equals: request?.id, // Compare with request ID from body
+          equals: request.id, // Compare with request ID from body
+        },
+        otp: {
+          equals: request.otp
         }
       },
     });
@@ -22,7 +25,7 @@ const verifyPasword = async (req: PayloadRequest) => {
       // No user found with the given ID
       return new Response(
         JSON.stringify({
-          response: 'User not found',
+          response: 'Otp is invalid',
         }),
         {
           status: 404,
