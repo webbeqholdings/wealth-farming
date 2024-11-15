@@ -6,7 +6,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { useToast } from "@/hooks/use-toast";
 
-export function Page() {
+export default function Page() {
   const [otpVerified, setOtpVerified] = useState(false); // Track OTP verification state
   const { toast } = useToast();
   const [newPassword, setNewPassword] = useState('');
@@ -183,5 +183,3 @@ export function Page() {
     </div>
   );
 }
-
-export default Page;
