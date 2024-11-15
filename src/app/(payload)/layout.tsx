@@ -1,5 +1,7 @@
 /* THIS FILE WAS GENERATED AUTOMATICALLY BY PAYLOAD. */
 /* DO NOT MODIFY IT BECAUSE IT COULD BE REWRITTEN AT ANY TIME. */
+"use server";
+
 import configPromise from '@payload-config'
 import '@payloadcms/next/css'
 import { RootLayout } from '@payloadcms/next/layouts'
@@ -14,7 +16,7 @@ type Args = {
 }
 
 const Layout = ({ children }: Args) => (
-  <RootLayout importMap={importMap} config={configPromise} serverFunction={serverFunction}>
+  <RootLayout importMap={importMap} config={configPromise}>
     {children}
   </RootLayout>
 )
