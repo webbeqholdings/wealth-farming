@@ -37,7 +37,7 @@ const resendOTP = async (req: PayloadRequest) => {
             id: request.id,
             data: {
                 otp: authenticator.generate(process.env.OTP_SECRET),
-                otp_expires_at: new Date()
+                otp_expires_at: new Date().toISOString(),
             },
         });
 

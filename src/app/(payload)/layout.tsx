@@ -7,14 +7,13 @@ import React from 'react'
 
 import './custom.scss'
 import { importMap } from './admin/importMap'
-import { serverFunction } from './admin/serverFunction' // Import serverFunction
 
 type Args = {
   children: React.ReactNode
 }
 
 const Layout = ({ children }: Args) => (
-  <RootLayout importMap={importMap} config={configPromise} serverFunction={serverFunction}>
+  <RootLayout importMap={importMap} config={configPromise}>
     {children}
   </RootLayout>
 )

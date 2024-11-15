@@ -37,7 +37,7 @@ const forgotPasword = async (req: PayloadRequest) => {
             id: userQuery.docs[0].id,
             data: {
                 otp: authenticator.generate(process.env.OTP_SECRET),
-                otp_expires_at: new Date()
+                otp_expires_at: new Date().toISOString(),
             },
         });
         try {
