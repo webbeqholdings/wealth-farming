@@ -81,14 +81,26 @@ export const Users: CollectionConfig = {
       name: 'email_verified',
       type: 'checkbox',
       defaultValue: false,
+      admin: {
+        readOnly: true, // Optional: Prevent editing
+        hidden: true, // Completely hide the field in the admin panel
+      },
     },
     {
       name: 'otp', // Store OTP here
       type: 'text',
+      admin: {
+        readOnly: true, // Optional: Prevent editing
+        hidden: true, // Completely hide the field in the admin panel
+      },
     },
     {
       name: 'otp_expires_at', // Store OTP expiration time
       type: 'date',
+      admin: {
+        readOnly: true, // Optional: Prevent editing
+        hidden: true, // Completely hide the field in the admin panel
+      },
     }
   ],
   hooks: {

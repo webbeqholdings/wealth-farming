@@ -102,9 +102,9 @@ export interface Account {
  */
 export interface User {
   id: number;
-  role: 'admin' | 'individual' | 'company';
   first_name?: string | null;
   last_name?: string | null;
+  role: 'admin' | 'individual' | 'company';
   company_name?: string | null;
   registration_number?: string | null;
   phone_contact?: string | null;
@@ -441,9 +441,9 @@ export interface BanksSelect<T extends boolean = true> {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
-  role?: T;
   first_name?: T;
   last_name?: T;
+  role?: T;
   company_name?: T;
   registration_number?: T;
   phone_contact?: T;
