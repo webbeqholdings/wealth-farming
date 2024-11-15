@@ -77,7 +77,7 @@ const Page = () => {
                         </CardContent>
                         <CardFooter>
                             <Button type="submit" disabled={isLoading}>
-                                {isLoading ? 'Sending...' : 'Send Reset Password'}
+                                {isLoading ? 'Sending...' : 'Reset password'}
                             </Button>
                         </CardFooter>
                     </form>

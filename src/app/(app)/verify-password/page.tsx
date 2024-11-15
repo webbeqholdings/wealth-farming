@@ -129,7 +129,7 @@ export default function Page() {
     <div>
       <SiteHeader />
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500">
-        <div className="flex flex-col items-center space-y-6 p-10 bg-white rounded-xl shadow-2xl w-100 h-auto">
+        <div className="flex flex-col items-center space-y-6 p-10 bg-white rounded-xl shadow-2xl w-100 h-auto w-[400px]">
           {!otpVerified ? (
             <>
               <h2 className="text-2xl font-semibold text-gray-800">OTP Verification</h2>
@@ -159,7 +159,7 @@ export default function Page() {
           ) : (
             <>
               <h3 className="text-lg font-medium text-gray-800">Reset Password</h3>
-              <form onSubmit={handlePasswordReset} className="space-y-4">
+              <form onSubmit={handlePasswordReset} className="space-y-6">
                 <div>
                   <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">New Password</label>
                   <div className="relative mt-1">
@@ -169,7 +169,7 @@ export default function Page() {
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       required
-                      className="block w-full border border-gray-300 rounded-md shadow-sm p-1 text-lg pr-10"
+                      className="flex h-10 w-[360px] rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                     />
                     <button
                       type="button"
@@ -198,7 +198,7 @@ export default function Page() {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
-                      className="block w-full border border-gray-300 rounded-md shadow-sm p-1 text-lg pr-10"
+                      className="flex h-10 w-[360px] rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                     />
                     <button
                       type="button"
@@ -218,26 +218,14 @@ export default function Page() {
                     </button>
                   </div>
                 </div>
-                {/* <div>
-                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm Password</label>
-                  <input
-                    type="password"
-                    id="confirmPassword"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-1 text-lg"
-                  />
-                </div> */}
                 {error && <p className="text-red-500">{error}</p>}
                 <button
                   type="submit"
-                  className="mt-4 px-6 py-3 rounded-lg text-white font-medium bg-blue-600 hover:bg-blue-700"
+                  className="mt-4 px-4 py-2 rounded-lg text-sm text-white font-medium bg-blue-600 hover:bg-blue-700"
                 >
                   Reset Password
                 </button>
               </form>
-
             </>
           )}
         </div>

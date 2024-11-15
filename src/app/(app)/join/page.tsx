@@ -38,6 +38,7 @@ export default function Page() {
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [activeTab, setActiveTab] = useState('login') // State to track the active tab
   const router = useRouter()
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (
     event: React.FormEvent<HTMLFormElement>,
@@ -103,6 +104,10 @@ export default function Page() {
     setIsLoading(false);
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
+
   return (
     <>
       <SiteHeader />
@@ -126,7 +131,31 @@ export default function Page() {
                   </div>
                   <div className="space-y-1">
                     <Label htmlFor="password">Password</Label>
-                    <Input id="password" name="password" type="password" required />
+                    <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      id="password" 
+                      name="password"
+                      required
+                      className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                    />
+                    <button
+                      type="button"
+                      onClick={togglePasswordVisibility}
+                      className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"
+                    >
+                      {showPassword ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600 hover:text-blue-800 transition-all" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-.71 2.257-2.104 4.066-3.958 5.196M15.464 15.464A5.048 5.048 0 0112 17a5.048 5.048 0 01-3.464-1.464M8.536 8.536A5.048 5.048 0 0112 7c1.36 0 2.605.538 3.464 1.464" />
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600 hover:text-blue-800 transition-all" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7 .882-2.804 3.01-5.013 5.602-6.146M15 12a3 3 0 11-6 0 3 3 0 016 0zm3.709-1.291a9.992 9.992 0 00-.869-1.119m.869 1.119l3.291 3.291M21 21l-3.291-3.291" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
                   </div>
                   <div className="text-right">
                     <a
@@ -174,8 +203,31 @@ export default function Page() {
                     <Input id="email" name="email" type="email" required />
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="password">Password</Label>
-                    <Input id="password" name="password" type="password" required />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      id="password" 
+                      name="password"
+                      required
+                      className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                    />
+                    <button
+                      type="button"
+                      onClick={togglePasswordVisibility}
+                      className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"
+                    >
+                      {showPassword ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600 hover:text-blue-800 transition-all" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-.71 2.257-2.104 4.066-3.958 5.196M15.464 15.464A5.048 5.048 0 0112 17a5.048 5.048 0 01-3.464-1.464M8.536 8.536A5.048 5.048 0 0112 7c1.36 0 2.605.538 3.464 1.464" />
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600 hover:text-blue-800 transition-all" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7 .882-2.804 3.01-5.013 5.602-6.146M15 12a3 3 0 11-6 0 3 3 0 016 0zm3.709-1.291a9.992 9.992 0 00-.869-1.119m.869 1.119l3.291 3.291M21 21l-3.291-3.291" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
                   </div>
                 </CardContent>
                 <CardFooter>
