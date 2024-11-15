@@ -1,7 +1,7 @@
 import { getPayloadHMR } from '@payloadcms/next/utilities';
 import config from '@payload-config';
 
-const verifyOTP = async (req: {json(): ''}) => {
+const verifyOTP = async (req) => {
   try {
     const payload = await getPayloadHMR({
       config,
