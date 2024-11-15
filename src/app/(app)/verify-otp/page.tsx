@@ -7,16 +7,21 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp
 import { useToast } from "@/hooks/use-toast";
 
 export default function Page() {
-  // const [otp, setOTP] = useState('');
+  const [userId, setUserId] = useState<string | null>(null);
   const [timer, setTimer] = useState(60); // Initial timer set to 60 seconds
   const router = useRouter();
   const { toast } = useToast();
-  const user_id = localStorage.getItem('user_id');
+
+  useEffect(() => {
+    // Access localStorage only on the client side
+    const storedUserId = localStorage.getItem('user_id');
+    setUserId(storedUserId);
+  }, []);
 
   // Function to verify OTP
   const verifyOTP = async (otp: string) => {
     const formData = {
-      id: user_id, // Replace with the actual ID value if needed
+      id: userId, // Replace with the actual ID value if needed
       otp: otp,
     };
     try {
@@ -55,7 +60,7 @@ export default function Page() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ id: user_id }),
+      body: JSON.stringify({ id: userId }),
     });
   };
 

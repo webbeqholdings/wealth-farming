@@ -9,17 +9,23 @@ import { useToast } from "@/hooks/use-toast";
 export default function Page() {
   const [otpVerified, setOtpVerified] = useState(false); // Track OTP verification state
   const { toast } = useToast();
+  const [userId, setUserId] = useState<string | null>(null);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [timer, setTimer] = useState(60); // Initial timer set to 60 seconds
   const [error, setError] = useState('');
   const router = useRouter();
-  const user_id = localStorage.getItem('user_id');
+
+  useEffect(() => {
+    // Access localStorage only on the client side
+    const storedUserId = localStorage.getItem('user_id');
+    setUserId(storedUserId);
+  }, []);
 
   // Function to verify OTP
   const verifyOTP = async (otp: string) => {
     const formData = {
-      id: user_id,
+      id: userId,
       otp: otp,
     };
     try {
@@ -52,7 +58,7 @@ export default function Page() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ id: user_id }),
+      body: JSON.stringify({ id: userId }),
     });
   };
 
@@ -80,7 +86,7 @@ export default function Page() {
     }
 
     const formData = {
-      id: user_id,
+      id: userId,
       password: newPassword,
     };
 
