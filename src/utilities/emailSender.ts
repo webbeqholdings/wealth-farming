@@ -1,8 +1,8 @@
-import { getPayloadHMR } from '@payloadcms/next/utilities';
+import { getPayload } from 'payload'
 import config from '@payload-config';
 
 export const sendEmail = async (to: string, subject: string, otp: string) => {
-  const payload = await getPayloadHMR({
+  const payload = await getPayload({
       config
   });
 

@@ -1,4 +1,4 @@
-import { getPayloadHMR } from '@payloadcms/next/utilities';
+import { getPayload } from 'payload'
 import config from '@payload-config';
 import { authenticator } from 'otplib';
 import { sendEmail } from '@/utilities/emailSender';
@@ -7,7 +7,7 @@ import { PayloadRequest } from 'payload';
 const resendOTP = async (req: PayloadRequest) => {
     try {
         const request = await req.json();
-        const payload = await getPayloadHMR({
+        const payload = await getPayload({
             config,
         });
 

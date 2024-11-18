@@ -1,10 +1,10 @@
-import { getPayloadHMR } from '@payloadcms/next/utilities';
+import { getPayload } from 'payload'
 import config from '@payload-config';
 import { PayloadRequest } from 'payload';
 
 const verifyPasword = async (req: PayloadRequest) => {
   try {
-    const payload = await getPayloadHMR({
+    const payload = await getPayload({
       config,
     });
     // Access request body data
