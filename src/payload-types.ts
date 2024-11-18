@@ -12,8 +12,6 @@ export interface Config {
   };
   collections: {
     accounts: Account;
-    'news-categories': NewsCategory;
-    news: News;
     address: Address;
     banks: Bank;
     users: User;
@@ -23,14 +21,15 @@ export interface Config {
     'investment-products': InvestmentProduct;
     contracts: Contract;
     transactions: Transaction;
+    'post-categories': PostCategory;
+    posts: Post;
+    'post-tags': PostTag;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
   collectionsSelect?: {
     accounts: AccountsSelect<false> | AccountsSelect<true>;
-    'news-categories': NewsCategoriesSelect<false> | NewsCategoriesSelect<true>;
-    news: NewsSelect<false> | NewsSelect<true>;
     address: AddressSelect<false> | AddressSelect<true>;
     banks: BanksSelect<false> | BanksSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
@@ -40,6 +39,9 @@ export interface Config {
     'investment-products': InvestmentProductsSelect<false> | InvestmentProductsSelect<true>;
     contracts: ContractsSelect<false> | ContractsSelect<true>;
     transactions: TransactionsSelect<false> | TransactionsSelect<true>;
+    'post-categories': PostCategoriesSelect<false> | PostCategoriesSelect<true>;
+    posts: PostsSelect<false> | PostsSelect<true>;
+    'post-tags': PostTagsSelect<false> | PostTagsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -122,31 +124,6 @@ export interface User {
   loginAttempts?: number | null;
   lockUntil?: string | null;
   password?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "news-categories".
- */
-export interface NewsCategory {
-  id: number;
-  name: string;
-  description?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "news".
- */
-export interface News {
-  id: number;
-  category?: (number | null) | NewsCategory;
-  user?: (number | null) | User;
-  title?: string | null;
-  content?: string | null;
-  published_date?: string | null;
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -280,6 +257,49 @@ export interface Transaction {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "post-categories".
+ */
+export interface PostCategory {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts".
+ */
+export interface Post {
+  id: number;
+  title: string;
+  author: number | User;
+  published_date?: string | null;
+  category?: (number | null) | PostCategory;
+  tags?: (number | null) | PostTag;
+  content: string;
+  status?: ('draft' | 'published') | null;
+  featured_image?: (number | null) | Media;
+  slug?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "post-tags".
+ */
+export interface PostTag {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -288,14 +308,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'accounts';
         value: number | Account;
-      } | null)
-    | ({
-        relationTo: 'news-categories';
-        value: number | NewsCategory;
-      } | null)
-    | ({
-        relationTo: 'news';
-        value: number | News;
       } | null)
     | ({
         relationTo: 'address';
@@ -332,6 +344,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'transactions';
         value: number | Transaction;
+      } | null)
+    | ({
+        relationTo: 'post-categories';
+        value: number | PostCategory;
+      } | null)
+    | ({
+        relationTo: 'posts';
+        value: number | Post;
+      } | null)
+    | ({
+        relationTo: 'post-tags';
+        value: number | PostTag;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -383,29 +407,6 @@ export interface AccountsSelect<T extends boolean = true> {
   user?: T;
   account_name?: T;
   account_number?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "news-categories_select".
- */
-export interface NewsCategoriesSelect<T extends boolean = true> {
-  name?: T;
-  description?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "news_select".
- */
-export interface NewsSelect<T extends boolean = true> {
-  category?: T;
-  user?: T;
-  title?: T;
-  content?: T;
-  published_date?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -553,6 +554,46 @@ export interface TransactionsSelect<T extends boolean = true> {
   type?: T;
   created_at?: T;
   updated_at?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "post-categories_select".
+ */
+export interface PostCategoriesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts_select".
+ */
+export interface PostsSelect<T extends boolean = true> {
+  title?: T;
+  author?: T;
+  published_date?: T;
+  category?: T;
+  tags?: T;
+  content?: T;
+  status?: T;
+  featured_image?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "post-tags_select".
+ */
+export interface PostTagsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
   updatedAt?: T;
   createdAt?: T;
 }

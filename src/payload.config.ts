@@ -5,10 +5,9 @@ import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
+import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 
 import { Users } from './collections/Users'
-import { News } from './collections/News'
-import { NewsCategories } from './collections/NewsCategories'
 import { Banks } from './collections/Banks'
 import { Address } from './collections/Address'
 import { Media } from './collections/Media'
@@ -27,6 +26,9 @@ import resendOTPRoute from './routers/resendOTP'
 import forgotPasword from './routers/forgotPassword'
 import verifyPassword from './routers/verifyPassword'
 import updatePassword from './routers/updatePassword'
+import PostCategories from './collections/PostCategories'
+import Posts from './collections/Posts'
+import PostTags from './collections/PostTags'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -38,10 +40,20 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
+  email: nodemailerAdapter({
+    defaultFromAddress: 'beq@beqholdings.com',
+    defaultFromName: 'Beq Holdings',
+    transportOptions: {
+      host: process.env.SMTP_HOST,
+      port: 587,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    },
+  }),
   collections: [
     Accounts,
-    NewsCategories,
-    News,
     Address,
     Banks,
     Users,
@@ -51,6 +63,9 @@ export default buildConfig({
     InvestmentProducts,
     Contracts,
     Transactions,
+    PostCategories,
+    Posts,
+    PostTags
   ],
   endpoints: [verifyOTPRoute, resendOTPRoute, forgotPasword, verifyPassword, updatePassword],
   globals: [SiteSettings, Header, Footer],

@@ -1,17 +1,11 @@
-import nodemailer from 'nodemailer';
-
-// Set up transporter
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: 465,
-    secure: true,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    }
-  });
+import { getPayloadHMR } from '@payloadcms/next/utilities';
+import config from '@payload-config';
 
 export const sendEmail = async (to: string, subject: string, otp: string) => {
+  const payload = await getPayloadHMR({
+      config
+  });
+
   const htmlContent = `
   <!doctype html>
   <html lang="en">
@@ -105,16 +99,12 @@ export const sendEmail = async (to: string, subject: string, otp: string) => {
     </body>
   </html>
 `;
-  const mailOptions = {
-    from: `"BEQ Holdings" <${process.env.SMTP_USER}>`, 
-    to: to, 
-    subject: subject,
-    html: htmlContent,
-  };
-
   try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Message sent: %s', info.messageId);
+    const email = await payload.email.sendEmail({
+      to: to,
+      subject: subject,
+      html: htmlContent,
+    });
   } catch (error) {
     console.error('Failed to send email:', error);
   }

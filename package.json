@@ -65,13 +65,13 @@
     "react-dom": "19.0.0-rc-65a56d0e-20241020",
     "recharts": "^2.13.3",
     "sharp": "0.32.6",
+    "slugify": "^1.6.6",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^22.5.4",
-    "@types/nodemailer": "^6.4.16",
     "@types/react": "npm:types-react@19.0.0-rc.1",
     "@types/react-dom": "npm:types-react-dom@19.0.0-rc.1",
     "eslint": "^8",
