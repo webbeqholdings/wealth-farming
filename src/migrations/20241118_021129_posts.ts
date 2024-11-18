@@ -165,10 +165,10 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
 export async function down({ payload, req }: MigrateDownArgs): Promise<void> {
   await payload.db.drizzle.execute(sql`
   
-  DROP TABLE "post_categories";
-  DROP TABLE "posts";
-  DROP TABLE "_posts_v";
-  DROP TABLE "post_tags";
+  DROP TABLE "post_categories" CASCADE;
+  DROP TABLE "posts" CASCADE;
+  DROP TABLE "_posts_v" CASCADE;
+  DROP TABLE "post_tags" CASCADE;
   ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_post_categories_fk";
   
   ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_posts_fk";

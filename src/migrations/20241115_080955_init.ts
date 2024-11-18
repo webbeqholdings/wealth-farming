@@ -565,35 +565,35 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
 
 export async function down({ payload, req }: MigrateDownArgs): Promise<void> {
   await payload.db.drizzle.execute(sql`
-   DROP TABLE "accounts";
-  DROP TABLE "news_categories";
-  DROP TABLE "news";
-  DROP TABLE "address";
-  DROP TABLE "banks";
-  DROP TABLE "users";
-  DROP TABLE "media";
-  DROP TABLE "companies";
-  DROP TABLE "investment_funds";
-  DROP TABLE "investment_products";
-  DROP TABLE "contracts";
-  DROP TABLE "transactions";
-  DROP TABLE "payload_locked_documents";
-  DROP TABLE "payload_locked_documents_rels";
-  DROP TABLE "payload_preferences";
-  DROP TABLE "payload_preferences_rels";
-  DROP TABLE "payload_migrations";
-  DROP TABLE "site_settings_social_links";
-  DROP TABLE "site_settings";
-  DROP TABLE "header_navigation_links";
-  DROP TABLE "header_social_media_links";
-  DROP TABLE "header";
-  DROP TABLE "footer_social_media_links";
-  DROP TABLE "footer";
-  DROP TYPE "public"."enum_users_role";
-  DROP TYPE "public"."enum_investment_funds_status";
-  DROP TYPE "public"."enum_investment_products_profit_period";
-  DROP TYPE "public"."enum_investment_products_status";
-  DROP TYPE "public"."enum_contracts_status";
-  DROP TYPE "public"."enum_transactions_status";
-  DROP TYPE "public"."enum_transactions_type";`)
+   DROP TABLE "accounts" CASCADE;
+  DROP TABLE "news_categories" CASCADE;
+  DROP TABLE "news" CASCADE;
+  DROP TABLE "address" CASCADE;
+  DROP TABLE "banks" CASCADE;
+  DROP TABLE "users" CASCADE;
+  DROP TABLE "media" CASCADE;
+  DROP TABLE "companies" CASCADE;
+  DROP TABLE "investment_funds" CASCADE;
+  DROP TABLE "investment_products" CASCADE;
+  DROP TABLE "contracts" CASCADE;
+  DROP TABLE "transactions" CASCADE;
+  DROP TABLE "payload_locked_documents" CASCADE;
+  DROP TABLE "payload_locked_documents_rels" CASCADE;
+  DROP TABLE "payload_preferences" CASCADE;
+  DROP TABLE "payload_preferences_rels" CASCADE;
+  DROP TABLE "payload_migrations" CASCADE;
+  DROP TABLE "site_settings_social_links" CASCADE;
+  DROP TABLE "site_settings" CASCADE;
+  DROP TABLE "header_navigation_links" CASCADE;
+  DROP TABLE "header_social_media_links" CASCADE;
+  DROP TABLE "header" CASCADE;
+  DROP TABLE "footer_social_media_links" CASCADE;
+  DROP TABLE "footer" CASCADE;
+  DROP TYPE "public"."enum_users_role" CASCADE;
+  DROP TYPE "public"."enum_investment_funds_status" CASCADE;
+  DROP TYPE "public"."enum_investment_products_profit_period" CASCADE;
+  DROP TYPE "public"."enum_investment_products_status" CASCADE;
+  DROP TYPE "public"."enum_contracts_status" CASCADE;
+  DROP TYPE "public"."enum_transactions_status" CASCADE;
+  DROP TYPE "public"."enum_transactions_type" CASCADE;`)
 }
