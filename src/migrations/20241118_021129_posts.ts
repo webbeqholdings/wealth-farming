@@ -58,14 +58,6 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
   	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
   );
   
-  DROP TABLE "news_categories";
-  DROP TABLE "news";
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_news_categories_fk";
-  
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_news_fk";
-  
-  DROP INDEX IF EXISTS "payload_locked_documents_rels_news_categories_id_idx";
-  DROP INDEX IF EXISTS "payload_locked_documents_rels_news_id_idx";
   ALTER TABLE "payload_locked_documents_rels" ADD COLUMN "post_categories_id" integer;
   ALTER TABLE "payload_locked_documents_rels" ADD COLUMN "posts_id" integer;
   ALTER TABLE "payload_locked_documents_rels" ADD COLUMN "post_tags_id" integer;
@@ -167,31 +159,11 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
   
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_post_categories_id_idx" ON "payload_locked_documents_rels" USING btree ("post_categories_id");
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_posts_id_idx" ON "payload_locked_documents_rels" USING btree ("posts_id");
-  CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_post_tags_id_idx" ON "payload_locked_documents_rels" USING btree ("post_tags_id");
-  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN IF EXISTS "news_categories_id";
-  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN IF EXISTS "news_id";`)
+  CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_post_tags_id_idx" ON "payload_locked_documents_rels" USING btree ("post_tags_id");`)
 }
 
 export async function down({ payload, req }: MigrateDownArgs): Promise<void> {
   await payload.db.drizzle.execute(sql`
-   CREATE TABLE IF NOT EXISTS "news_categories" (
-  	"id" serial PRIMARY KEY NOT NULL,
-  	"name" varchar NOT NULL,
-  	"description" varchar,
-  	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
-  	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
-  );
-  
-  CREATE TABLE IF NOT EXISTS "news" (
-  	"id" serial PRIMARY KEY NOT NULL,
-  	"category_id" integer,
-  	"user_id" integer,
-  	"title" varchar,
-  	"content" varchar,
-  	"published_date" timestamp(3) with time zone,
-  	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
-  	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
-  );
   
   DROP TABLE "post_categories";
   DROP TABLE "posts";
@@ -206,40 +178,7 @@ export async function down({ payload, req }: MigrateDownArgs): Promise<void> {
   DROP INDEX IF EXISTS "payload_locked_documents_rels_post_categories_id_idx";
   DROP INDEX IF EXISTS "payload_locked_documents_rels_posts_id_idx";
   DROP INDEX IF EXISTS "payload_locked_documents_rels_post_tags_id_idx";
-  ALTER TABLE "payload_locked_documents_rels" ADD COLUMN "news_categories_id" integer;
-  ALTER TABLE "payload_locked_documents_rels" ADD COLUMN "news_id" integer;
-  DO $$ BEGIN
-   ALTER TABLE "news" ADD CONSTRAINT "news_category_id_news_categories_id_fk" FOREIGN KEY ("category_id") REFERENCES "public"."news_categories"("id") ON DELETE set null ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
   
-  DO $$ BEGIN
-   ALTER TABLE "news" ADD CONSTRAINT "news_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  CREATE INDEX IF NOT EXISTS "news_categories_updated_at_idx" ON "news_categories" USING btree ("updated_at");
-  CREATE INDEX IF NOT EXISTS "news_categories_created_at_idx" ON "news_categories" USING btree ("created_at");
-  CREATE INDEX IF NOT EXISTS "news_category_idx" ON "news" USING btree ("category_id");
-  CREATE INDEX IF NOT EXISTS "news_user_idx" ON "news" USING btree ("user_id");
-  CREATE INDEX IF NOT EXISTS "news_updated_at_idx" ON "news" USING btree ("updated_at");
-  CREATE INDEX IF NOT EXISTS "news_created_at_idx" ON "news" USING btree ("created_at");
-  DO $$ BEGIN
-   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_news_categories_fk" FOREIGN KEY ("news_categories_id") REFERENCES "public"."news_categories"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_news_fk" FOREIGN KEY ("news_id") REFERENCES "public"."news"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_news_categories_id_idx" ON "payload_locked_documents_rels" USING btree ("news_categories_id");
-  CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_news_id_idx" ON "payload_locked_documents_rels" USING btree ("news_id");
   ALTER TABLE "payload_locked_documents_rels" DROP COLUMN IF EXISTS "post_categories_id";
   ALTER TABLE "payload_locked_documents_rels" DROP COLUMN IF EXISTS "posts_id";
   ALTER TABLE "payload_locked_documents_rels" DROP COLUMN IF EXISTS "post_tags_id";
