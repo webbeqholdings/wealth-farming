@@ -169,19 +169,7 @@ export async function down({ payload, req }: MigrateDownArgs): Promise<void> {
   DROP TABLE "posts" CASCADE;
   DROP TABLE "_posts_v" CASCADE;
   DROP TABLE "post_tags" CASCADE;
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_post_categories_fk";
   
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_posts_fk";
-  
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_post_tags_fk";
-  
-  DROP INDEX IF EXISTS "payload_locked_documents_rels_post_categories_id_idx";
-  DROP INDEX IF EXISTS "payload_locked_documents_rels_posts_id_idx";
-  DROP INDEX IF EXISTS "payload_locked_documents_rels_post_tags_id_idx";
-  
-  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN IF EXISTS "post_categories_id";
-  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN IF EXISTS "posts_id";
-  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN IF EXISTS "post_tags_id";
   DROP TYPE "public"."enum_posts_status";
   DROP TYPE "public"."enum__posts_v_version_status";`)
 }
