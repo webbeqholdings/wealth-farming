@@ -24,6 +24,7 @@ export interface Config {
     'post-categories': PostCategory;
     posts: Post;
     'post-tags': PostTag;
+    'transfer-cash-requests': TransferCashRequest;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -42,6 +43,7 @@ export interface Config {
     'post-categories': PostCategoriesSelect<false> | PostCategoriesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     'post-tags': PostTagsSelect<false> | PostTagsSelect<true>;
+    'transfer-cash-requests': TransferCashRequestsSelect<false> | TransferCashRequestsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -300,6 +302,52 @@ export interface PostTag {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "transfer-cash-requests".
+ */
+export interface TransferCashRequest {
+  id: number;
+  type: 'deposit' | 'withdrawal' | 'bonus';
+  amount: number;
+  currency: 'usd' | 'vnd';
+  status: 'pending' | 'approved' | 'rejected' | 'completed' | 'cancelled';
+  account: number | Account;
+  payment_method: 'bank_transfer' | 'credit_card' | 'paypal' | 'crypto';
+  transaction_details?: {
+    transaction_id?: string | null;
+    payment_proof?: (number | null) | Media;
+    processing_date?: string | null;
+  };
+  notes?: string | null;
+  admin_notes?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  extra_data?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -356,6 +404,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'post-tags';
         value: number | PostTag;
+      } | null)
+    | ({
+        relationTo: 'transfer-cash-requests';
+        value: number | TransferCashRequest;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -596,6 +648,31 @@ export interface PostTagsSelect<T extends boolean = true> {
   description?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "transfer-cash-requests_select".
+ */
+export interface TransferCashRequestsSelect<T extends boolean = true> {
+  type?: T;
+  amount?: T;
+  currency?: T;
+  status?: T;
+  account?: T;
+  payment_method?: T;
+  transaction_details?:
+    | T
+    | {
+        transaction_id?: T;
+        payment_proof?: T;
+        processing_date?: T;
+      };
+  notes?: T;
+  admin_notes?: T;
+  extra_data?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

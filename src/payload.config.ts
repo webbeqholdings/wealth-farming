@@ -31,6 +31,7 @@ import signUp from './routers/signUp'
 import PostCategories from './collections/PostCategories'
 import Posts from './collections/Posts'
 import PostTags from './collections/PostTags'
+import TransferCashRequests from './collections/TransferCashRequests'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -67,7 +68,8 @@ export default buildConfig({
     Transactions,
     PostCategories,
     Posts,
-    PostTags
+    PostTags,
+    TransferCashRequests
   ],
   endpoints: [signUp, getBalance, verifyOTPRoute, resendOTPRoute, forgotPasword, verifyPassword, updatePassword],
   globals: [SiteSettings, Header, Footer],

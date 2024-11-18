@@ -1,5 +1,6 @@
 import * as migration_20241115_080955_init from './20241115_080955_init';
 import * as migration_20241118_021129_posts from './20241118_021129_posts';
+import * as migration_20241118_114724_TransferCashRequests from './20241118_114724_TransferCashRequests';
 
 export const migrations = [
   {
@@ -10,6 +11,11 @@ export const migrations = [
   {
     up: migration_20241118_021129_posts.up,
     down: migration_20241118_021129_posts.down,
-    name: '20241118_021129_posts'
+    name: '20241118_021129_posts',
+  },
+  {
+    up: migration_20241118_114724_TransferCashRequests.up,
+    down: migration_20241118_114724_TransferCashRequests.down,
+    name: '20241118_114724_TransferCashRequests'
   },
 ];
