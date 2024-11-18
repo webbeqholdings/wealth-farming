@@ -2,7 +2,6 @@ import type { CollectionConfig } from 'payload'
 import { isIndividualOrAdmin } from '../access/isIndividualOrAdmin';
 import { isAdmin } from '../access/isAdmin';
 import { sendEmail } from '@/utilities/emailSender';
-import crypto from 'crypto';
 import { authenticator } from 'otplib';
 
 export const Users: CollectionConfig = {

@@ -23,9 +23,11 @@ import { Header } from './global-configs/header'
 import { Footer } from './global-configs/footer'
 import verifyOTPRoute from './routers/verifyOTP'
 import resendOTPRoute from './routers/resendOTP'
+import getBalance from './routers/getBalance'
 import forgotPasword from './routers/forgotPassword'
 import verifyPassword from './routers/verifyPassword'
 import updatePassword from './routers/updatePassword'
+import signUp from './routers/signUp'
 import PostCategories from './collections/PostCategories'
 import Posts from './collections/Posts'
 import PostTags from './collections/PostTags'
@@ -67,7 +69,7 @@ export default buildConfig({
     Posts,
     PostTags
   ],
-  endpoints: [verifyOTPRoute, resendOTPRoute, forgotPasword, verifyPassword, updatePassword],
+  endpoints: [signUp, getBalance, verifyOTPRoute, resendOTPRoute, forgotPasword, verifyPassword, updatePassword],
   globals: [SiteSettings, Header, Footer],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
