@@ -97,6 +97,7 @@ export interface Account {
   user: number | User;
   account_name: string;
   account_number: number;
+  amount: number;
   updatedAt: string;
   createdAt: string;
 }
@@ -459,6 +460,7 @@ export interface AccountsSelect<T extends boolean = true> {
   user?: T;
   account_name?: T;
   account_number?: T;
+  amount?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -716,6 +718,7 @@ export interface SiteSetting {
   support_email: string;
   support_phone?: string | null;
   contact_address?: string | null;
+  'qr-codes'?: (number | null) | Media;
   social_links?:
     | {
         platform: string;
@@ -782,6 +785,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   support_email?: T;
   support_phone?: T;
   contact_address?: T;
+  'qr-codes'?: T;
   social_links?:
     | T
     | {

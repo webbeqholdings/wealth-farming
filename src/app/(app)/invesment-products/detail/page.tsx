@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import {
   Card,
   CardContent,
@@ -67,14 +67,47 @@ const product = {
 }
 
 export default function ProductDetailPage() {
+  const [financialProducts, setFinancialProducts] = useState(null)
   const [investmentAmount, setInvestmentAmount] = useState(product.minInvestment)
   const [simulatedReturns, setSimulatedReturns] = useState<{ year: number; balance: number }[]>([])
   const router = useRouter()
+  const searchParams = useSearchParams();
+  const id = searchParams.get('id');
+  const product_id = id ? JSON.parse(id) : null;
 
   const handleInvest = () => {
     // In a real application, this would initiate the investment process
-    alert(`Investment of $${investmentAmount} initiated for ${product.name}`)
+    alert(`Investment of ${investmentAmount} initiated for ${product.name}`)
   }
+
+  // Fetch and format data from the API
+  useEffect(() => {
+    async function fetchInvestmentProducts() {
+      try {
+        const response = await fetch(`/api/investment-products/${product_id}`)
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`)
+        }
+        const data = await response.json() // Assuming API response contains `docs` array
+        const formattedProducts = {
+          id: data.id,
+          name: data.product_name,
+          description: data.description || 'No description available.',
+          type: data?.fund.name, // Default type for all products
+          interestRate: `${data.interest_rate_from}% - ${data.interest_rate_to}%`,
+          minInvestment: `${data.min_investment}`,
+          term: data.profit_period
+            ? data.profit_period.replace('_', ' ').toUpperCase()
+            : 'N/A',
+          status: data.status,
+        }
+        setFinancialProducts(formattedProducts)
+      } catch (error) {
+        console.error('Failed to fetch investment products:', error)
+      }
+    }
+    fetchInvestmentProducts()
+  }, [])
 
   useEffect(() => {
     const simulateReturns = () => {
@@ -112,13 +145,13 @@ export default function ProductDetailPage() {
         <Card className="mb-8">
           <CardHeader>
             <div className="flex justify-between items-start">
-              <Badge>{product.type}</Badge>
+              <Badge>{financialProducts?.type}</Badge>
               <Badge variant={product.risk === 'Low' ? 'secondary' : 'destructive'}>
                 {product.risk} Risk
               </Badge>
             </div>
-            <CardTitle className="text-3xl">{product.name}</CardTitle>
-            <CardDescription className="text-lg">{product.description}</CardDescription>
+            <CardTitle className="text-3xl">{financialProducts?.name}</CardTitle>
+            <CardDescription className="text-lg">{financialProducts?.description}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -128,7 +161,7 @@ export default function ProductDetailPage() {
               </div>
               <div className="flex items-center">
                 <DollarSignIcon className="mr-2 h-5 w-5" />
-                <span>Min Investment: ${product.minInvestment}</span>
+                <span>Min Investment: ${product?.minInvestment}</span>
               </div>
             </div>
           </CardContent>
@@ -149,7 +182,7 @@ export default function ProductDetailPage() {
               </CardHeader>
               <CardContent>
                 <p>
-                  The {product.name} offers investors exposure to a carefully selected portfolio of
+                  The {financialProducts?.name} offers investors exposure to a carefully selected portfolio of
                   growth stocks. This ETF aims to provide long-term capital appreciation by
                   investing in companies with above-average growth potential.
                 </p>
@@ -320,7 +353,7 @@ export default function ProductDetailPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Invest in {product.name}</CardTitle>
+            <CardTitle>Invest in {financialProducts?.name}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">

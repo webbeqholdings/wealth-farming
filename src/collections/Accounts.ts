@@ -22,6 +22,13 @@ const Accounts: CollectionConfig = {
       defaultValue: 0,
       required: true,
     },
+    {
+      name: 'amount',
+      type: 'number',
+      label: 'Amount',
+      defaultValue: 0,
+      required: true,
+    },
   ],
 }
 export default Accounts

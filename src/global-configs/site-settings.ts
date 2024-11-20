@@ -1,9 +1,13 @@
-// siteSettings.global.js
+import { isAdmin } from '@/access/isAdmin'
 import { GlobalConfig } from 'payload'
 
 const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
   label: 'Site Settings',
+  access: {
+    read: () => true,
+    update: isAdmin,  // Only admin can update
+  },
   fields: [
     {
       name: 'site_name',
@@ -26,6 +30,11 @@ const SiteSettings: GlobalConfig = {
       name: 'contact_address',
       type: 'textarea',
       label: 'Contact Address',
+    },
+    {
+      name: 'qr-codes',
+      type: 'upload',
+      relationTo: 'media', // Assuming you have a media collection set up for uploads
     },
     {
       name: 'social_links',
