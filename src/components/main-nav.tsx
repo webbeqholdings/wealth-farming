@@ -32,10 +32,6 @@ export function MainNav() {
       href: '/contact-us',
       text: 'Contact Us',
     },
-    {
-      href: '/join',
-      text: 'Login / Register',
-    },
   ]
 
   // #e9b560
