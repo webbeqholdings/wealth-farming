@@ -1,19 +1,11 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { Button } from '@/components/ui/button'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
 import {
   Select,
   SelectContent,
@@ -22,12 +14,23 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { toast } from '@/hooks/use-toast'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { TabMenu } from '@/components/w88/TabMenu'
 import { accountConfig } from '@/config/accounts'
+import { Label } from '@/components/ui/label'
+import { ArrowDownIcon, ArrowRightIcon } from 'lucide-react'
+import { ReCaptcha } from '@/components/ReCaptcha'
+import { ReCaptchaV3 } from '@/components/ReCaptchaV3'
 
 const formSchema = z.object({
   fromAccount: z.string().min(1, { message: 'Please select the source account' }),
@@ -38,9 +41,21 @@ const formSchema = z.object({
 })
 
 type FormData = z.infer<typeof formSchema>
+const accountBalances = {
+  account1: 5000,
+  account2: 3000,
+  account3: 7000,
+}
 
 export default function TransferPage() {
   const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
+  const [fromBalance, setFromBalance] = useState(0)
+  const [toBalance, setToBalance] = useState(0)
+  const [fromAccount, setFromAccount] = useState('')
+  const [toAccount, setToAccount] = useState('')
+  const [amount, setAmount] = useState('')
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null)
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -51,35 +66,37 @@ export default function TransferPage() {
     },
   })
 
-  const onSubmit = async (values: FormData) => {
-    if (values.fromAccount === values.toAccount) {
+  const handleFromAccountChange = (value: string) => {
+    console.log('from account change')
+    setFromAccount(value)
+    setFromBalance(accountBalances[value as keyof typeof accountBalances] || 0)
+  }
+
+  const handleToAccountChange = (value: string) => {
+    console.log('to account change')
+    setToAccount(value)
+    setToBalance(accountBalances[value as keyof typeof accountBalances] || 0)
+  }
+
+  const handleTransfer = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!recaptchaToken) {
       toast({
+        title: 'reCAPTCHA Required',
+        description: 'Please complete the reCAPTCHA verification.',
         variant: 'destructive',
-        title: 'Transfer failed',
-        description: 'Source and destination accounts must be different',
       })
       return
     }
 
-    setIsLoading(true)
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    setIsLoading(false)
-
     toast({
       title: 'Transfer successful',
-      description: `Transferred $${values.amount} from ${values.fromAccount} to ${values.toAccount}`,
     })
 
     form.reset()
   }
-
-  const accounts = [
-    { id: 'main', name: 'Main Account' },
-    { id: 'savings', name: 'Savings Account' },
-    { id: 'investment', name: 'Investment Account' },
-  ]
-
+  console.log(process.env.NEXT_PUBLIC_GOOGLE_RECAPTCHA_V2_KEY)
   return (
     <>
       <SiteHeader />
@@ -92,76 +109,71 @@ export default function TransferPage() {
             <CardDescription>Move money between your accounts</CardDescription>
           </CardHeader>
           <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                <FormField
-                  control={form.control}
-                  name="fromAccount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>From Account</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select source account" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {accounts.map((account) => (
-                            <SelectItem key={account.id} value={account.id}>
-                              {account.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
+            <form onSubmit={handleTransfer}>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="fromAccount">From Account</Label>
+                  <Select value={fromAccount} onValueChange={handleFromAccountChange}>
+                    <SelectTrigger id="fromAccount">
+                      <SelectValue placeholder="Select account" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="account1">Main Account</SelectItem>
+                      <SelectItem value="account2">Savings Account</SelectItem>
+                      <SelectItem value="account3">Investment Account</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {fromBalance > 0 && (
+                    <p className="text-sm text-muted-foreground">
+                      Balance: ${fromBalance.toLocaleString()}
+                    </p>
                   )}
-                />
-                <FormField
-                  control={form.control}
-                  name="toAccount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>To Account</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select destination account" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {accounts.map((account) => (
-                            <SelectItem key={account.id} value={account.id}>
-                              {account.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
+                </div>
+
+                <div className="flex justify-center">
+                  <ArrowDownIcon className="h-6 w-6" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="toAccount">To Account</Label>
+                  <Select value={toAccount} onValueChange={handleToAccountChange}>
+                    <SelectTrigger id="toAccount">
+                      <SelectValue placeholder="Select account" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="account1">Main Account</SelectItem>
+                      <SelectItem value="account2">Savings Account</SelectItem>
+                      <SelectItem value="account3">Investment Account</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {toBalance > 0 && (
+                    <p className="text-sm text-muted-foreground">
+                      Balance: ${toBalance.toLocaleString()}
+                    </p>
                   )}
-                />
-                <FormField
-                  control={form.control}
-                  name="amount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Amount</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter amount" {...field} />
-                      </FormControl>
-                      <FormDescription>Enter the amount you want to transfer</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? 'Processing...' : 'Transfer'}
-                </Button>
-              </form>
-            </Form>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="amount">Amount</Label>
+                  <Input
+                    id="amount"
+                    placeholder="Enter amount"
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <ReCaptchaV3 sitekey={process.env.NEXT_PUBLIC_GOOGLE_RECAPTCHA_V3_KEY} />
+                </div>
+              </div>
+            </form>
           </CardContent>
+          <CardFooter>
+            <Button className="w-full" onClick={handleTransfer}>
+              Transfer
+            </Button>
+          </CardFooter>
         </Card>
       </div>
       <SiteFooter />
