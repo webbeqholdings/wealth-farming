@@ -33,6 +33,8 @@ import {
 } from 'lucide-react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
+import BankAccountsPage from '../account/bank-account/page'
+import UserBankAccount from '@/components/UserBankAccount'
 
 export default function UserProfile() {
   const [user, setUser] = useState({
@@ -221,6 +223,10 @@ export default function UserProfile() {
               </Button>
             </CardFooter>
           </Card>
+        </div>
+
+        <div className="mt-6">
+          <UserBankAccount />
         </div>
 
         <Card className="mt-6">
