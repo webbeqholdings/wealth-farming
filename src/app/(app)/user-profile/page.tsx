@@ -33,7 +33,6 @@ import {
 } from 'lucide-react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
-import BankAccountsPage from '../account/bank-account/page'
 import UserBankAccount from '@/components/UserBankAccount'
 
 export default function UserProfile() {
