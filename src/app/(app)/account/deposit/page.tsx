@@ -105,8 +105,8 @@ export default function DepositPage() {
     setSelectedBalance(selectedAccount?.amount || 0);
   };
 
-  const handleBankChange = (bankId: number) => {
-    setSelectBank(bankId);
+  const handleBankChange = (bankId: string) => {
+    setSelectBank(Number(bankId)); // Convert the string to a number
   };
 
   useEffect(() => {
