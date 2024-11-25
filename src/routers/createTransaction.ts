@@ -47,7 +47,7 @@ const createTransaction = async (req: PayloadRequest) => {
             }
 
             const updatedAmount = fromAccount.amount + Number(request.amount);
-            updateAmountUser = await payload.update({
+            await payload.update({
                 collection: 'accounts',
                 id: from_account,
                 data: {
