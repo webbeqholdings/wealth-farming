@@ -98,9 +98,10 @@ export default function DepositPage() {
     if (step > 1) setStep(step - 1)
   }
 
-  const handleFromAccountChange = (accountId: number) => {
-    const selectedAccount = accounts.find((account) => account.id === Number(accountId));
-    setFromAccount(accountId);
+  const handleFromAccountChange = (accountId: string) => {
+    const numericAccountId = Number(accountId); // Convert the string to a number
+    const selectedAccount = accounts.find((account) => account.id === numericAccountId);
+    setFromAccount(numericAccountId); // Store the numeric ID in state
     setSelectedBalance(selectedAccount?.amount || 0);
   };
 
