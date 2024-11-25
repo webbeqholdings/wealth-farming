@@ -11,10 +11,10 @@ import {
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { CalendarIcon, TrendingUpIcon, DollarSignIcon, PercentIcon } from 'lucide-react'
+import { CalendarIcon, DollarSignIcon, PercentIcon } from 'lucide-react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { useRouter } from 'next/navigation';
@@ -63,7 +63,6 @@ export default function FinancialProductsPage() {
             : 'N/A',
           status: product.status,
         }))
-        console.log('check docs: ', docs);
         setFinancialProducts(formattedProducts)
       } catch (error) {
         console.error('Failed to fetch investment products:', error)
@@ -156,7 +155,7 @@ export default function FinancialProductsPage() {
                   <Button
                     className="w-full"
                     onClick={() =>
-                      router.push(`/invesment-products/detail?id=${product.id}`)
+                      router.push(`/investment-products/detail?id=${product.id}`)
                     }
                   >
                     Learn More & Invest

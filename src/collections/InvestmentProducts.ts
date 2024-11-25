@@ -6,6 +6,9 @@ const InvestmentProducts: CollectionConfig = {
   access: {
     read: () => true, // Publicly readable
   },
+  admin: {
+    useAsTitle: 'product_name',
+  },
   fields: [
     {
       name: 'fund',

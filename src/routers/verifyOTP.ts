@@ -54,7 +54,7 @@ const verifyOTP = async (req: PayloadRequest) => {
       },
     });
 
-    const accountTypes = ['personal investment', 'business investment', 'capital'];
+    const accountTypes = ['Main Account', 'Saving Account', 'Investment Account'];
     //Create accounts associated with this user
     await Promise.all(accountTypes.map(type =>
       req.payload.create({

@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
+import clsx from 'clsx';
 import {
   Table,
   TableBody,
@@ -13,20 +14,12 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts'
-import { ArrowUpRight, ArrowDownRight, DollarSign } from 'lucide-react'
+import { DollarSign } from 'lucide-react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { TabMenu } from '@/components/w88/TabMenu'
 import { accountConfig } from '@/config/accounts'
-
-// Mock data for transactions
-const transactions = [
-  { id: 1, type: 'Deposit', amount: 1000, date: '2023-06-01', account: 'Main' },
-  { id: 2, type: 'Withdrawal', amount: -500, date: '2023-06-05', account: 'Savings' },
-  { id: 3, type: 'Transfer', amount: 200, date: '2023-06-10', account: 'Investment' },
-  { id: 4, type: 'Deposit', amount: 1500, date: '2023-06-15', account: 'Main' },
-  { id: 5, type: 'Withdrawal', amount: -200, date: '2023-06-20', account: 'Investment' },
-]
+import { formatDateTime } from '@/utilities/formatDateTime'
 
 // Mock data for chart
 const chartData = [
@@ -38,15 +31,67 @@ const chartData = [
   { name: 'Jun', deposits: 3490, withdrawals: 1500 },
 ]
 
-// Mock data for accounts
-const accounts = [
-  { name: 'Main Account', balance: 5000, currency: 'USD' },
-  { name: 'Savings Account', balance: 10000, currency: 'USD' },
-  { name: 'Investment Account', balance: 15000, currency: 'USD' },
-]
-
 export default function HistoryPage() {
   const [activeTab, setActiveTab] = useState('all')
+  const [transactions, setTransactions] = useState([]);
+  const [accounts, setAccounts] = useState([]);
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const userId = localStorage.getItem('user_id');
+        const response = await fetch(`/api/accounts?where[user][equals]=${userId}`); // Replace with dynamic user ID if necessary
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+
+        // Transform API response into desired format
+        const transformedAccounts = data.docs.map((account: { account_name: string, amount: number }) => ({
+          name: account.account_name,
+          balance: account.amount, // Assuming you want to divide the amount to convert to another unit
+          currency: 'USD', // Hardcoded as 'USD', replace with dynamic value if available in the API
+        }));
+
+        setAccounts(transformedAccounts); // Store the transformed accounts in state
+      } catch (error) {
+        console.error('Failed to fetch accounts:', error);
+      }
+    };
+
+    fetchTransactions()
+  }, [])
+
+  useEffect(() => {
+    const fetchAccounts = async () => {
+      try {
+        const userId = localStorage.getItem('user_id');
+        const response = await fetch(`/api/transactions?where[user][equals]=${userId}`); // Replace with dynamic user ID if necessary
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        // Transform API response into desired format
+        const transformedTransactions = data.docs.map((transaction: { id: number, type: string, amount: number, createdAt: string, updatedAt: string, status: string, profit_or_loss: string, unit: { unit_name: string, unit_code: string }, investment_product: { product_name: string }, from_account: { account_name: string }, to_account: { account_name: string } }) => ({
+          id: transaction.id,
+          type: transaction.type,
+          amount: transaction.amount,
+          date: formatDateTime(transaction.updatedAt),
+          account: transaction.from_account?.account_name,
+          to_account: transaction.to_account?.account_name,
+          profit_or_loss: transaction?.profit_or_loss,
+          unit_code: transaction?.unit?.unit_code,
+          product_name: transaction?.investment_product?.product_name,
+          status: transaction?.status
+        }));
+        setTransactions(transformedTransactions); // Store the accounts in state
+      } catch (error) {
+        console.error('Failed to fetch accounts:', error);
+      }
+    };
+
+    fetchAccounts();
+  }, []);
 
   return (
     <>
@@ -64,10 +109,7 @@ export default function HistoryPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {account.balance.toLocaleString('en-US', {
-                    style: 'currency',
-                    currency: account.currency,
-                  })}
+                  {account.balance}
                 </div>
                 <p className="text-xs text-muted-foreground">Balance</p>
               </CardContent>
@@ -101,14 +143,31 @@ export default function HistoryPage() {
               >
                 Withdrawals
               </Button>
+              <Button
+                variant={activeTab === 'transfers' ? 'default' : 'outline'}
+                onClick={() => setActiveTab('transfers')}
+              >
+                Transfers
+              </Button>
+              <Button
+                variant={activeTab === 'investments' ? 'default' : 'outline'}
+                onClick={() => setActiveTab('investments')}
+              >
+                Investments
+              </Button>
             </div>
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Date</TableHead>
                   <TableHead>Type</TableHead>
+                  {activeTab === 'all' || activeTab === 'investments' ? <TableHead>Product</TableHead> : ''}
                   <TableHead>Amount</TableHead>
-                  <TableHead>Account</TableHead>
+                  {activeTab === 'all' || activeTab === 'investments' ? <TableHead>Profit</TableHead> : ''}
+                  {activeTab !== 'transfers' ? <TableHead>Account</TableHead> : ''}
+                  {activeTab === 'transfers' ? <TableHead>From Account</TableHead> : ''}
+                  {activeTab === 'transfers' ? <TableHead>To Account</TableHead> : ''}
+                  {activeTab === 'all' || activeTab === 'deposits' || activeTab === 'withdrawals' ? <TableHead>Status</TableHead> : ''}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -116,16 +175,19 @@ export default function HistoryPage() {
                   .filter(
                     (t) =>
                       activeTab === 'all' ||
-                      (activeTab === 'deposits' && t.amount > 0) ||
-                      (activeTab === 'withdrawals' && t.amount < 0),
+                      (activeTab === 'deposits' && t.type == 'deposit') ||
+                      (activeTab === 'withdrawals' && t.type == 'withdraw') ||
+                      (activeTab === 'transfers' && t.type == 'transfer') ||
+                      (activeTab === 'investments' && t.type == 'investment')
                   )
                   .map((transaction) => (
                     <TableRow key={transaction.id}>
                       <TableCell>{transaction.date}</TableCell>
-                      <TableCell>{transaction.type}</TableCell>
+                      <TableCell>{transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1).toLowerCase()}</TableCell>
+                      {activeTab === 'all' || activeTab === 'investments' ? <TableHead>{transaction.product_name}</TableHead> : ''}
                       <TableCell>
                         <span
-                          className={transaction.amount > 0 ? 'text-green-600' : 'text-red-600'}
+                          className={transaction.amount >= 0 && transaction.profit_or_loss >= 0 ? 'text-green-600' : 'text-red-600'}
                         >
                           {transaction.amount > 0 ? '+' : ''}
                           {transaction.amount.toLocaleString('en-US', {
@@ -134,7 +196,24 @@ export default function HistoryPage() {
                           })}
                         </span>
                       </TableCell>
+                      {activeTab === 'all' || activeTab === 'investments' ? <TableCell><span
+                        className={transaction.amount >= 0 && transaction.profit_or_loss >= 0 ? 'text-green-600' : 'text-red-600'}
+                      >{transaction.profit_or_loss > 0 ? '+' : ''}{transaction.profit_or_loss}{transaction.unit_code}</span></TableCell> : ''}
                       <TableCell>{transaction.account}</TableCell>
+                      {activeTab === 'transfers' ? <TableCell>{transaction.to_account}</TableCell> : ''}
+                      {activeTab === 'all' || activeTab === 'deposits' || activeTab === 'withdrawals' ? (
+                        <TableCell
+                          className={clsx({
+                            'text-yellow-500': transaction.status === 'pending',  // Yellow font
+                            'text-green-500': transaction.status === 'completed', // Green font
+                            'text-red-500': transaction.status === 'failed',      // Red font
+                          })}
+                        >
+                          {transaction.status}
+                        </TableCell>
+                      ) : (
+                        ''
+                      )}
                     </TableRow>
                   ))}
               </TableBody>

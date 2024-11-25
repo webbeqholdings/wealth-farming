@@ -2,6 +2,12 @@ import type { CollectionConfig } from 'payload'
 
 const Accounts: CollectionConfig = {
   slug: 'accounts',
+  admin: {
+    useAsTitle: 'account_name',
+  },
+  access: {
+    read: () => true
+  },
   fields: [
     {
       name: 'user',

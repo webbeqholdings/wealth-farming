@@ -17,12 +17,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
 import {
-  CalendarIcon,
-  TrendingUpIcon,
   DollarSignIcon,
   PercentIcon,
   AlertTriangleIcon,
-  BookOpenIcon,
   BarChartIcon,
 } from 'lucide-react'
 import {
@@ -31,13 +28,13 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
   Legend,
   ResponsiveContainer,
 } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
+import { toast } from '@/hooks/use-toast'
 
 // Mock data for a single financial product
 const product = {
@@ -75,9 +72,39 @@ export default function ProductDetailPage() {
   const id = searchParams.get('id');
   const product_id = id ? JSON.parse(id) : null;
 
-  const handleInvest = () => {
-    // In a real application, this would initiate the investment process
-    alert(`Investment of ${investmentAmount} initiated for ${product.name}`)
+  const handleInvest = async() => {
+    try {
+      const userId = localStorage.getItem('user_id');
+      const response = await fetch('/api/transaction/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json', // Specify JSON content type
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          product_id: product_id,
+          amount: investmentAmount,
+          status: "pending",
+          type: "investment"
+        }), // Convert the request body to JSON
+      });
+
+      if (!response.ok) {
+        // Parse the error response to retrieve the error message
+        const errorResponse = await response.json();
+        const errorMessage = errorResponse.response?.error || 'An unknown error occurred';
+        throw new Error(errorMessage);
+    }
+      router.push('/account/history')
+      toast({
+        title: 'Investment Successfully',
+      })
+    } catch (error) {
+      console.log('Error creating transaction:', error);
+      toast({
+        title: `${error}`
+    });
+    }
   }
 
   // Fetch and format data from the API
@@ -96,6 +123,7 @@ export default function ProductDetailPage() {
           type: data?.fund.name, // Default type for all products
           interestRate: `${data.interest_rate_from}% - ${data.interest_rate_to}%`,
           minInvestment: `${data.min_investment}`,
+          maxInvestment: `${data.max_investment}`,
           term: data.profit_period
             ? data.profit_period.replace('_', ' ').toUpperCase()
             : 'N/A',
@@ -161,7 +189,7 @@ export default function ProductDetailPage() {
               </div>
               <div className="flex items-center">
                 <DollarSignIcon className="mr-2 h-5 w-5" />
-                <span>Min Investment: ${product?.minInvestment}</span>
+                <span>Min Investment: ${financialProducts?.minInvestment}</span>
               </div>
             </div>
           </CardContent>
