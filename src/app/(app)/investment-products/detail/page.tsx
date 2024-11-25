@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
   Card,
@@ -72,7 +72,7 @@ export default function ProductDetailPage() {
   const id = searchParams.get('id');
   const product_id = id ? JSON.parse(id) : null;
 
-  const handleInvest = async() => {
+  const handleInvest = async () => {
     try {
       const userId = localStorage.getItem('user_id');
       const response = await fetch('/api/transaction/create', {
@@ -94,7 +94,7 @@ export default function ProductDetailPage() {
         const errorResponse = await response.json();
         const errorMessage = errorResponse.response?.error || 'An unknown error occurred';
         throw new Error(errorMessage);
-    }
+      }
       router.push('/account/history')
       toast({
         title: 'Investment Successfully',
@@ -103,7 +103,7 @@ export default function ProductDetailPage() {
       console.log('Error creating transaction:', error);
       toast({
         title: `${error}`
-    });
+      });
     }
   }
 
@@ -163,7 +163,7 @@ export default function ProductDetailPage() {
   }
 
   return (
-    <>
+    <Suspense fallback={<div>Loading...</div>}>
       <SiteHeader />
       <div className="container mx-auto px-4 py-8">
         <Button variant="outline" className="mb-4" onClick={() => router.back()}>
@@ -418,6 +418,6 @@ export default function ProductDetailPage() {
         </Card>
       </div>
       <SiteFooter />
-    </>
+    </Suspense>
   )
 }
