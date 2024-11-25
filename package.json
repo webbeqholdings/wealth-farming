@@ -21,7 +21,7 @@
     "@payloadcms/db-postgres": "beta",
     "@payloadcms/next": "beta",
     "@payloadcms/payload-cloud": "beta",
-    "@payloadcms/richtext-lexical": "^3.1.0",
+    "@payloadcms/richtext-lexical": "beta",
     "@radix-ui/react-avatar": "^1.1.1",
     "@radix-ui/react-checkbox": "^1.1.2",
     "@radix-ui/react-dialog": "^1.1.2",
