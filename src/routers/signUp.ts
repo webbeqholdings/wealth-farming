@@ -28,6 +28,7 @@ const signUp = async (req: PayloadRequest) => {
                         user: user.id,
                         account_name: type,
                         account_number: Math.floor(Math.random() * 1000000),
+                        amount: 0
                     }
                 })
             ));
