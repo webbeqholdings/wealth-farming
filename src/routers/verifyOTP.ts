@@ -53,6 +53,20 @@ const verifyOTP = async (req: PayloadRequest) => {
         otp_expires_at: null,
       },
     });
+
+    const accountTypes = ['Main Account', 'Saving Account', 'Investment Account'];
+    //Create accounts associated with this user
+    await Promise.all(accountTypes.map(type =>
+      req.payload.create({
+        collection: 'accounts',
+        data: {
+          user: user.id,
+          account_name: type,
+          account_number: Math.floor(Math.random() * 1000000),
+        }
+      })
+    ));
+
     return new Response(
       JSON.stringify({
         user: updatedUser,

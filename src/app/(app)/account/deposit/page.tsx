@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import {
@@ -29,6 +29,7 @@ import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { TabMenu } from '@/components/w88/TabMenu'
 import { accountConfig } from '@/config/accounts'
+import { toast } from '@/hooks/use-toast'
 
 // Steps component definition
 interface StepProps {
@@ -83,7 +84,11 @@ export default function DepositPage() {
   const [currency, setCurrency] = useState('USD')
   const [method, setMethod] = useState('bank')
   const [accountNumber, setAccountNumber] = useState('')
-  const [routingNumber, setRoutingNumber] = useState('')
+  const [accounts, setAccounts] = useState([]);
+  const [banks, setBanks] = useState([]);
+  const [selectBank, setSelectBank] = useState(null);
+  const [fromAccount, setFromAccount] = useState(null);
+  const [selectedBalance, setSelectedBalance] = useState(0)
 
   const handleNextStep = () => {
     if (step < 3) setStep(step + 1)
@@ -93,10 +98,87 @@ export default function DepositPage() {
     if (step > 1) setStep(step - 1)
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleFromAccountChange = (accountId: number) => {
+    const selectedAccount = accounts.find((account) => account.id === Number(accountId));
+    setFromAccount(accountId);
+    setSelectedBalance(selectedAccount?.amount || 0);
+  };
+
+  const handleBankChange = (bankId: number) => {
+    setSelectBank(bankId);
+  };
+
+  useEffect(() => {
+    const fetchAccounts = async () => {
+      try {
+        const userId = localStorage.getItem('user_id');
+        const response = await fetch(`/api/accounts?where[user][equals]=${userId}`); // Replace with dynamic user ID if necessary
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        setAccounts(data.docs); // Store the accounts in state
+      } catch (error) {
+        console.error('Failed to fetch accounts:', error);
+      }
+    };
+
+    fetchAccounts();
+  }, []);
+
+  useEffect(() => {
+    const fetchBanks = async () => {
+      try {
+        const userId = localStorage.getItem('user_id');
+        const response = await fetch(`/api/banks?where[user][equals]=${userId}`); // Replace with dynamic user ID if necessary
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        setBanks(data.docs); // Store the accounts in state
+      } catch (error) {
+        console.error('Failed to fetch accounts:', error);
+      }
+    };
+
+    fetchBanks();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     // In a real application, this would process the deposit
-    alert('Deposit processed successfully!')
+    try {
+      const userId = localStorage.getItem('user_id');
+      const response = await fetch('/api/transaction/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json', // Specify JSON content type
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          bank_id: selectBank,
+          amount: amount,
+          status: "pending",
+          from_account: fromAccount,
+          type: "deposit"
+        }), // Convert the request body to JSON
+      });
+
+      if (!response.ok) {
+        // Parse the error response to retrieve the error message
+        const errorResponse = await response.json();
+        const errorMessage = errorResponse.response?.error || 'An unknown error occurred';
+        throw new Error(errorMessage);
+    }
+      toast({
+        title: 'Transaction created successfully',
+      })
+    } catch (error) {
+      console.error('Error creating transaction:', error);
+      toast({
+        title: `${error}`,
+      })
+    }
     router.push('/account/history') // Assuming there's a dashboard page to redirect to
   }
 
@@ -115,7 +197,6 @@ export default function DepositPage() {
   return (
     <>
       <SiteHeader />
-
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">My Deposit</h1>
         <TabMenu items={accountConfig.tabList} defaultValue="deposit" />
@@ -133,6 +214,22 @@ export default function DepositPage() {
             <form onSubmit={handleSubmit}>
               {step === 1 && (
                 <div className="space-y-4">
+                 <div className="space-y-2">
+                  <Label htmlFor="fromAccount">From Account</Label>
+                  <Select value={fromAccount} onValueChange={handleFromAccountChange}>
+                    <SelectTrigger id="fromAccount">
+                      <SelectValue placeholder="Select account" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {accounts.map((account) => (
+                        <SelectItem key={account.id} value={account.id.toString()}>
+                          {account.account_name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-sm text-muted-foreground">Balance: ${selectedBalance}</p>
+                </div>
                   <div className="space-y-2">
                     <Label htmlFor="amount">Deposit Amount</Label>
                     <div className="flex space-x-2">
@@ -171,6 +268,21 @@ export default function DepositPage() {
                       ))}
                     </div>
                   </div>
+                  <div className="space-y-2">
+                  <Label htmlFor="fromAccount">Your Bank Account</Label>
+                  <Select value={selectBank} onValueChange={handleBankChange}>
+                    <SelectTrigger id="bank">
+                      <SelectValue placeholder="Select bank" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {banks.map((bank) => (
+                        <SelectItem key={bank.id} value={bank.id.toString()}>
+                          {bank.bank_name} - {bank.account_number}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
                 </div>
               )}
 
@@ -224,31 +336,10 @@ export default function DepositPage() {
                           Scan this QR code with your banking app to make the transfer
                         </p>
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="accountNumber">Account Number</Label>
-                        <Input
-                          id="accountNumber"
-                          type="text"
-                          placeholder="Your bank account number"
-                          value={accountNumber}
-                          onChange={(e) => setAccountNumber(e.target.value)}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="routingNumber">Routing Number</Label>
-                        <Input
-                          id="routingNumber"
-                          type="text"
-                          placeholder="Your bank routing number"
-                          value={routingNumber}
-                          onChange={(e) => setRoutingNumber(e.target.value)}
-                        />
-                      </div>
                     </div>
                   )}
                 </div>
               )}
-
               {step === 3 && (
                 <div className="space-y-4">
                   <Alert>

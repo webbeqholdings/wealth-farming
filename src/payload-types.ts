@@ -19,12 +19,14 @@ export interface Config {
     companies: Company;
     'investment-funds': InvestmentFund;
     'investment-products': InvestmentProduct;
+    'investment-profit-loss': InvestmentProfitLoss;
     contracts: Contract;
     transactions: Transaction;
     'post-categories': PostCategory;
     posts: Post;
     'post-tags': PostTag;
     'transfer-cash-requests': TransferCashRequest;
+    units: Unit;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -38,12 +40,14 @@ export interface Config {
     companies: CompaniesSelect<false> | CompaniesSelect<true>;
     'investment-funds': InvestmentFundsSelect<false> | InvestmentFundsSelect<true>;
     'investment-products': InvestmentProductsSelect<false> | InvestmentProductsSelect<true>;
+    'investment-profit-loss': InvestmentProfitLossSelect<false> | InvestmentProfitLossSelect<true>;
     contracts: ContractsSelect<false> | ContractsSelect<true>;
     transactions: TransactionsSelect<false> | TransactionsSelect<true>;
     'post-categories': PostCategoriesSelect<false> | PostCategoriesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     'post-tags': PostTagsSelect<false> | PostTagsSelect<true>;
     'transfer-cash-requests': TransferCashRequestsSelect<false> | TransferCashRequestsSelect<true>;
+    units: UnitsSelect<false> | UnitsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -97,6 +101,7 @@ export interface Account {
   user: number | User;
   account_name: string;
   account_number: number;
+  amount: number;
   updatedAt: string;
   createdAt: string;
 }
@@ -227,6 +232,31 @@ export interface InvestmentProduct {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "investment-profit-loss".
+ */
+export interface InvestmentProfitLoss {
+  id: number;
+  investment_product: number | InvestmentProduct;
+  profit_or_loss: number;
+  unit: number | Unit;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "units".
+ */
+export interface Unit {
+  id: number;
+  unit_name: string;
+  unit_code?: string | null;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "contracts".
  */
 export interface Contract {
@@ -246,14 +276,16 @@ export interface Contract {
  */
 export interface Transaction {
   id: number;
-  contract_id: number | Contract;
+  user?: (number | null) | User;
+  investment_product?: (number | null) | InvestmentProduct;
+  profit_or_loss?: number | null;
+  unit?: (number | null) | Unit;
+  bank?: (number | null) | Bank;
   amount: number;
   status: 'pending' | 'completed' | 'failed';
   from_account?: (number | null) | Account;
   to_account?: (number | null) | Account;
-  type: 'deposit' | 'withdraw' | 'bonus' | 'manage_fee';
-  created_at?: string | null;
-  updated_at?: string | null;
+  type: 'deposit' | 'withdraw' | 'bonus' | 'transfer' | 'investment';
   updatedAt: string;
   createdAt: string;
 }
@@ -386,6 +418,10 @@ export interface PayloadLockedDocument {
         value: number | InvestmentProduct;
       } | null)
     | ({
+        relationTo: 'investment-profit-loss';
+        value: number | InvestmentProfitLoss;
+      } | null)
+    | ({
         relationTo: 'contracts';
         value: number | Contract;
       } | null)
@@ -408,6 +444,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'transfer-cash-requests';
         value: number | TransferCashRequest;
+      } | null)
+    | ({
+        relationTo: 'units';
+        value: number | Unit;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -459,6 +499,7 @@ export interface AccountsSelect<T extends boolean = true> {
   user?: T;
   account_name?: T;
   account_number?: T;
+  amount?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -581,6 +622,18 @@ export interface InvestmentProductsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "investment-profit-loss_select".
+ */
+export interface InvestmentProfitLossSelect<T extends boolean = true> {
+  investment_product?: T;
+  profit_or_loss?: T;
+  unit?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "contracts_select".
  */
 export interface ContractsSelect<T extends boolean = true> {
@@ -598,14 +651,16 @@ export interface ContractsSelect<T extends boolean = true> {
  * via the `definition` "transactions_select".
  */
 export interface TransactionsSelect<T extends boolean = true> {
-  contract_id?: T;
+  user?: T;
+  investment_product?: T;
+  profit_or_loss?: T;
+  unit?: T;
+  bank?: T;
   amount?: T;
   status?: T;
   from_account?: T;
   to_account?: T;
   type?: T;
-  created_at?: T;
-  updated_at?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -676,6 +731,17 @@ export interface TransferCashRequestsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "units_select".
+ */
+export interface UnitsSelect<T extends boolean = true> {
+  unit_name?: T;
+  unit_code?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents_select".
  */
 export interface PayloadLockedDocumentsSelect<T extends boolean = true> {
@@ -716,6 +782,7 @@ export interface SiteSetting {
   support_email: string;
   support_phone?: string | null;
   contact_address?: string | null;
+  'qr-codes'?: (number | null) | Media;
   social_links?:
     | {
         platform: string;
@@ -782,6 +849,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   support_email?: T;
   support_phone?: T;
   contact_address?: T;
+  'qr-codes'?: T;
   social_links?:
     | T
     | {

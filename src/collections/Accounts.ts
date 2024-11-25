@@ -2,6 +2,12 @@ import type { CollectionConfig } from 'payload'
 
 const Accounts: CollectionConfig = {
   slug: 'accounts',
+  admin: {
+    useAsTitle: 'account_name',
+  },
+  access: {
+    read: () => true
+  },
   fields: [
     {
       name: 'user',
@@ -19,6 +25,13 @@ const Accounts: CollectionConfig = {
       name: 'account_number',
       type: 'number',
       label: 'Account Number',
+      defaultValue: 0,
+      required: true,
+    },
+    {
+      name: 'amount',
+      type: 'number',
+      label: 'Amount',
       defaultValue: 0,
       required: true,
     },

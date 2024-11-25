@@ -27,11 +27,14 @@ import getBalance from './routers/getBalance'
 import forgotPasword from './routers/forgotPassword'
 import verifyPassword from './routers/verifyPassword'
 import updatePassword from './routers/updatePassword'
+import createTransaction from './routers/createTransaction'
 import signUp from './routers/signUp'
 import PostCategories from './collections/PostCategories'
 import Posts from './collections/Posts'
 import PostTags from './collections/PostTags'
 import TransferCashRequests from './collections/TransferCashRequests'
+import Units from './collections/Units'
+import InvestmentProfitLoss from './collections/InvestmentProfitLoss'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -64,14 +67,16 @@ export default buildConfig({
     Companies,
     InvestmentFunds,
     InvestmentProducts,
+    InvestmentProfitLoss,
     Contracts,
     Transactions,
     PostCategories,
     Posts,
     PostTags,
-    TransferCashRequests
+    TransferCashRequests,
+    Units
   ],
-  endpoints: [signUp, getBalance, verifyOTPRoute, resendOTPRoute, forgotPasword, verifyPassword, updatePassword],
+  endpoints: [createTransaction, signUp, getBalance, verifyOTPRoute, resendOTPRoute, forgotPasword, verifyPassword, updatePassword],
   globals: [SiteSettings, Header, Footer],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

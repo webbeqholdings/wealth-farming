@@ -1,15 +1,50 @@
 // transactions.collection.js
 import type { CollectionConfig } from 'payload'
+import { getPayload } from 'payload'
+import config from '@payload-config';
+import { isAdmin } from '../access/isAdmin'
 
 const Transactions: CollectionConfig = {
   slug: 'transactions',
+  access: {
+    read: () => true,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
+  },
   fields: [
     {
-      name: 'contract_id',
+      name: 'user',
       type: 'relationship',
-      relationTo: 'contracts', // Liên kết đến collection contracts
-      label: 'Contract',
-      required: true,
+      relationTo: 'users', // Tài khoản đích
+      label: 'Users',
+    },
+    {
+      name: 'investment_product',
+      type: 'relationship',
+      relationTo: 'investment-products', // Tài khoản đích
+      label: 'Products',
+    },
+    {
+      name: 'profit_or_loss',
+      type: 'number',
+      label: 'Profit/Loss Amount',
+      defaultValue: 0,
+      admin: {
+        description: 'Enter a positive value for profit or a negative value for loss.',
+      },
+    },
+    {
+        name: 'unit',
+        type: 'relationship',
+        relationTo: 'units',
+        label: 'Unit',
+    },
+    {
+      name: 'bank',
+      type: 'relationship',
+      relationTo: 'banks', // Tài khoản đích
+      label: 'Banks',
     },
     {
       name: 'amount',
@@ -47,42 +82,67 @@ const Transactions: CollectionConfig = {
         { label: 'Deposit', value: 'deposit' },
         { label: 'Withdraw', value: 'withdraw' },
         { label: 'Bonus', value: 'bonus' },
-        { label: 'Management Fee', value: 'manage_fee' },
+        { label: 'Transfer', value: 'transfer' },
+        { label: 'Investment', value: 'investment' },
       ],
       label: 'Transaction Type',
       required: true,
     },
-    {
-      name: 'created_at',
-      type: 'date',
-      label: 'Transaction Date',
-      admin: {
-        disabled: true, // Không cho phép chỉnh sửa trong giao diện quản trị
-      },
-      hooks: {
-        beforeChange: [
-          ({ data }) => {
-            data.created_at = new Date() // Thiết lập ngày hiện tại khi tạo mới
-          },
-        ],
-      },
-    },
-    {
-      name: 'updated_at',
-      type: 'date',
-      label: 'Last Updated',
-      admin: {
-        disabled: true, // Không cho phép chỉnh sửa trong giao diện quản trị
-      },
-      hooks: {
-        beforeChange: [
-          ({ data }) => {
-            data.updated_at = new Date() // Cập nhật ngày khi có chỉnh sửa
-          },
-        ],
-      },
-    },
   ],
+  hooks: {
+    afterChange: [
+      async ({ doc, req, operation }) => {
+        const payload = await getPayload({
+          config,
+        });
+        if (operation === 'update' && doc.type === 'deposit' && doc.status === 'completed') {
+          const fromAccountId = doc.from_account.id;
+          const transactionAmount = doc.amount;
+          // Fetch the existing account details
+          const fromAccount = await payload.findByID({
+            collection: 'accounts',
+            id: fromAccountId,
+          });
+
+          if (fromAccount) {
+            // Update the account amount
+            const updatedAmount = fromAccount.amount + transactionAmount;
+
+            // Save the updated account data
+            await payload.update({
+              collection: 'accounts',
+              id: fromAccountId,
+              data: {
+                amount: updatedAmount,
+              },
+            });
+          }
+        }
+        if (operation === 'update' && doc.type === 'withdraw' && doc.status === 'failed') {
+          const fromAccountId = doc.from_account.id;
+          const transactionAmount = doc.amount;
+          // Fetch the existing account details
+          const fromAccount = await payload.findByID({
+            collection: 'accounts',
+            id: fromAccountId,
+          });
+          if (fromAccount) {
+            // Update the account amount
+            const updatedAmount = fromAccount.amount - transactionAmount;
+
+            // Save the updated account data
+            await payload.update({
+              collection: 'accounts',
+              id: fromAccountId,
+              data: {
+                amount: updatedAmount,
+              },
+            });
+          }
+        }
+      },
+    ],
+  },
 }
 
 export default Transactions
