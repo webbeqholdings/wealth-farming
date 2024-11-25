@@ -63,14 +63,14 @@ export default function TransferPage() {
     },
   })
 
-  const handleFromAccountChange = (accountId: Number) => {
+  const handleFromAccountChange = (accountId: string) => {
     // setFromBalance(accountBalances[value as keyof typeof accountBalances] || 0)
     const selectedAccount = listFromAccounts.find((account) => account.id === Number(accountId));
     setFromAccount(accountId);
     setFromBalance(selectedAccount?.amount || 0);
   }
 
-  const handleToAccountChange = (accountId: Number) => {
+  const handleToAccountChange = (accountId: string) => {
     const selectedAccount = listToAccounts.find((account) => account.id === Number(accountId));
     setToAccount(accountId);
     setToBalance(selectedAccount?.amount || 0);

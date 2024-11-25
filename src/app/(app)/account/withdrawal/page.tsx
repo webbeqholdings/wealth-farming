@@ -94,8 +94,8 @@ export default function WithdrawPage() {
     if (step > 1) setStep(step - 1)
   }
 
-  const handleBankChange = (bankId: number) => {
-    setSelectBank(bankId);
+  const handleBankChange = (bankId: string) => {
+    setSelectBank(Number(bankId));
   };
 
   useEffect(() => {
