@@ -13,7 +13,6 @@ export const Header: GlobalConfig = {
         name: 'logo',
         type: 'upload',
         relationTo: 'media',
-        required: true,
       },
       {
         name: 'navigationLinks',
