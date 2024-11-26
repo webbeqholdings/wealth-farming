@@ -69,12 +69,11 @@ export default function ProductDetailPage() {
   const [simulatedReturns, setSimulatedReturns] = useState<{ year: number; balance: number }[]>([])
   const router = useRouter()
   // const searchParams = useSearchParams();
-  const id = 1;
-  const product_id = id;
 
   const handleInvest = async () => {
     try {
       const userId = localStorage.getItem('user_id');
+      const productId = localStorage.getItem('product_id');
       const response = await fetch('/api/transaction/create', {
         method: 'POST',
         headers: {
@@ -82,7 +81,7 @@ export default function ProductDetailPage() {
         },
         body: JSON.stringify({
           user_id: userId,
-          product_id: product_id,
+          product_id: productId,
           amount: investmentAmount,
           status: "pending",
           type: "investment"
@@ -111,7 +110,8 @@ export default function ProductDetailPage() {
   useEffect(() => {
     async function fetchInvestmentProducts() {
       try {
-        const response = await fetch(`/api/investment-products/${product_id}`)
+        const productId = localStorage.getItem('product_id');
+        const response = await fetch(`/api/investment-products/${productId}`)
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`)
         }

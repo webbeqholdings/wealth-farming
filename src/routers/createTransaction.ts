@@ -198,20 +198,24 @@ const createTransaction = async (req: PayloadRequest) => {
             // Retrieve the last transaction, if available
             const lastTransaction = transactionUser.docs.length > 0 ? transactionUser.docs[0] : null;
             if (lastTransaction) {
-                await payload.update({
+                await payload.create({
                     collection: 'transactions',
-                    id: lastTransaction.id,
                     data: {
-                        amount: lastTransaction.amount + transactionAmount
-                    }
-                })
+                        user: Number(request.user_id),
+                        amount: lastTransaction.amount + transactionAmount,
+                        investment_product: product_id ? Number(product_id) : undefined,
+                        status: 'completed',
+                        from_account: investmentAccount.docs[0].id,
+                        type: request.type
+                    },
+                });
             }else{
                 await payload.create({
                     collection: 'transactions',
                     data: {
                         user: Number(request.user_id),
                         amount: Number(request.amount),
-                        investment_product: product_id,
+                        investment_product: product_id ? Number(product_id) : undefined,
                         status: 'completed',
                         from_account: investmentAccount.docs[0].id,
                         type: request.type

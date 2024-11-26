@@ -154,9 +154,13 @@ export default function FinancialProductsPage() {
                 <CardFooter>
                   <Button
                     className="w-full"
-                    onClick={() =>
-                      router.push(`/investment-products/detail?id=${product.id}`)
-                    }
+                    onClick={() => {
+                      // Store the product id in localStorage
+                      localStorage.setItem('product_id', product.id);
+
+                      // Navigate to the detail page
+                      router.push(`/investment-products/detail`);
+                    }}
                   >
                     Learn More & Invest
                   </Button>
