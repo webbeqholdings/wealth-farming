@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   Card,
   CardContent,
@@ -68,9 +68,9 @@ export default function ProductDetailPage() {
   const [investmentAmount, setInvestmentAmount] = useState(product.minInvestment)
   const [simulatedReturns, setSimulatedReturns] = useState<{ year: number; balance: number }[]>([])
   const router = useRouter()
-  const searchParams = useSearchParams();
-  const id = searchParams.get('id');
-  const product_id = id ? JSON.parse(id) : null;
+  // const searchParams = useSearchParams();
+  const id = 1;
+  const product_id = id;
 
   const handleInvest = async () => {
     try {
@@ -163,7 +163,7 @@ export default function ProductDetailPage() {
   }
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <>
       <SiteHeader />
       <div className="container mx-auto px-4 py-8">
         <Button variant="outline" className="mb-4" onClick={() => router.back()}>
@@ -418,6 +418,6 @@ export default function ProductDetailPage() {
         </Card>
       </div>
       <SiteFooter />
-    </Suspense>
+    </>
   )
 }
