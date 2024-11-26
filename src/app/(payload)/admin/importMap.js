@@ -1,6 +1,6 @@
-// import { RichTextCell as RichTextCell_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
+import { RichTextCell as RichTextCell_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { RichTextField as RichTextField_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
-// import { getGenerateComponentMap as getGenerateComponentMap_ec38dd6bee95fe7974552968355b33ae } from '@payloadcms/richtext-lexical/generateComponentMap'
+import { getGenerateComponentMap as getGenerateComponentMap_ec38dd6bee95fe7974552968355b33ae } from '@payloadcms/richtext-lexical/generateComponentMap'
 import { InlineToolbarFeatureClient as InlineToolbarFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { HorizontalRuleFeatureClient as HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { UploadFeatureClient as UploadFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
@@ -23,9 +23,9 @@ import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 
 export const importMap = {
-  // "@payloadcms/richtext-lexical/client#RichTextCell": RichTextCell_e70f5e05f09f93e00b997edb1ef0c864,
+  "@payloadcms/richtext-lexical/client#RichTextCell": RichTextCell_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#RichTextField": RichTextField_e70f5e05f09f93e00b997edb1ef0c864,
-  // "@payloadcms/richtext-lexical/generateComponentMap#getGenerateComponentMap": getGenerateComponentMap_ec38dd6bee95fe7974552968355b33ae,
+  "@payloadcms/richtext-lexical/generateComponentMap#getGenerateComponentMap": getGenerateComponentMap_ec38dd6bee95fe7974552968355b33ae,
   "@payloadcms/richtext-lexical/client#InlineToolbarFeatureClient": InlineToolbarFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#HorizontalRuleFeatureClient": HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#UploadFeatureClient": UploadFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
