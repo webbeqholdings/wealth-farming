@@ -160,7 +160,7 @@ const createTransaction = async (req: PayloadRequest) => {
                 );
             }
            
-            if (transactionAmount < investmentProduct.min_investment && transactionAmount > investmentProduct.max_investment) {
+            if (transactionAmount < investmentProduct.min_investment || transactionAmount > investmentProduct.max_investment) {
                 const errorBody = { error: 'Amount not allowed investment' };
                 return new Response(
                     JSON.stringify({

@@ -50,7 +50,7 @@ export default function HistoryPage() {
         const transformedAccounts = data.docs.map((account: { account_name: string, amount: number }) => ({
           name: account.account_name,
           balance: account.amount, // Assuming you want to divide the amount to convert to another unit
-          currency: 'USD', // Hardcoded as 'USD', replace with dynamic value if available in the API
+          currency: 'VND', // Hardcoded as 'USD', replace with dynamic value if available in the API
         }));
 
         setAccounts(transformedAccounts); // Store the transformed accounts in state
@@ -191,7 +191,7 @@ export default function HistoryPage() {
                         >
                           {transaction.amount.toLocaleString('en-US', {
                             style: 'currency',
-                            currency: 'USD',
+                            currency: 'VND',
                           })}
                         </span>
                       </TableCell>

@@ -36,7 +36,8 @@ export function SiteHeader() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/accounts?where[user][equals]=2');
+        const userId = localStorage.getItem('user_id');
+        const response = await fetch(`/api/accounts?where[user][equals]=${userId}`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -120,7 +121,7 @@ export function SiteHeader() {
                 <div className="hidden md:flex items-center space-x-2 bg-muted p-2 rounded-md">
                   <DollarSign className="h-4 w-4 text-green-500" />
                   <span className="font-medium">
-                    {balance.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+                    {balance.toLocaleString('en-US', { style: 'currency', currency: 'vnd' })}
                   </span>
                 </div>
                 <Button

@@ -61,7 +61,7 @@ const Header = () => {
                 <div className="flex items-center space-x-2 bg-muted p-2 rounded-md">
                   <DollarSign className="h-4 w-4 text-green-500" />
                   <span className="font-medium">
-                    {balance.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+                    {balance.toLocaleString('en-US', { style: 'currency', currency: 'VND' })}
                   </span>
                 </div>
                 <Button variant="default" className="bg-green-500 hover:bg-green-600 text-white">
@@ -114,7 +114,7 @@ const Header = () => {
                     <DropdownMenuItem>
                       <DollarSign className="mr-2 h-4 w-4 text-green-500" />
                       <span>
-                        {balance.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+                        {balance.toLocaleString('en-US', { style: 'currency', currency: 'VND' })}
                       </span>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
