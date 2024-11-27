@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 import { siteConfig } from '@/config/site';
 import { cn } from '@/lib/utils';
@@ -31,9 +31,28 @@ import {
 export function SiteHeader() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [balance, setBalance] = useState(10000.5);
-  const pathname = usePathname();
   const router = useRouter(); // Use Next.js router for navigation
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/accounts?where[user][equals]=2');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        
+        // Calculate the total amount
+        const totalAmount = data.docs.reduce((sum: number, account: {amount: number} ) => sum + account.amount, 0);
+        
+        setBalance(totalAmount); // Update the balance state
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchData(); // Call the fetch function
+  }, []);
   // Check for user current
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -107,6 +126,7 @@ export function SiteHeader() {
                 <Button
                   variant="default"
                   className="hidden md:inline-flex bg-green-500 hover:bg-green-600 text-white"
+                  onClick={() => router.push('/account/deposit')}
                 >
                   Deposit
                 </Button>

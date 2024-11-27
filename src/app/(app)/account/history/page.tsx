@@ -189,7 +189,6 @@ export default function HistoryPage() {
                         <span
                           className={transaction.amount >= 0 && transaction.profit_or_loss >= 0 ? 'text-green-600' : 'text-red-600'}
                         >
-                          {transaction.amount > 0 ? '+' : ''}
                           {transaction.amount.toLocaleString('en-US', {
                             style: 'currency',
                             currency: 'USD',
@@ -198,7 +197,7 @@ export default function HistoryPage() {
                       </TableCell>
                       {activeTab === 'all' || activeTab === 'investments' ? <TableCell><span
                         className={transaction.amount >= 0 && transaction.profit_or_loss >= 0 ? 'text-green-600' : 'text-red-600'}
-                      >{transaction.profit_or_loss > 0 ? '+' : ''}{transaction.profit_or_loss}{transaction.unit_code}</span></TableCell> : ''}
+                      >{transaction.profit_or_loss}{transaction.unit_code}</span></TableCell> : ''}
                       <TableCell>{transaction.account}</TableCell>
                       {activeTab === 'transfers' ? <TableCell>{transaction.to_account}</TableCell> : ''}
                       {activeTab === 'all' || activeTab === 'deposits' || activeTab === 'withdrawals' ? (

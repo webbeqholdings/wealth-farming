@@ -66,13 +66,13 @@ export default function TransferPage() {
   const handleFromAccountChange = (accountId: string) => {
     // setFromBalance(accountBalances[value as keyof typeof accountBalances] || 0)
     const selectedAccount = listFromAccounts.find((account) => account.id === Number(accountId));
-    setFromAccount(accountId);
+    setFromAccount(accountId.toString());
     setFromBalance(selectedAccount?.amount || 0);
   }
 
   const handleToAccountChange = (accountId: string) => {
     const selectedAccount = listToAccounts.find((account) => account.id === Number(accountId));
-    setToAccount(accountId);
+    setToAccount(accountId.toString());
     setToBalance(selectedAccount?.amount || 0);
   }
 
@@ -156,15 +156,19 @@ export default function TransferPage() {
           <CardContent>
             <form onSubmit={handleTransfer}>
               <div className="space-y-4">
-              <div className="space-y-2">
+                <div className="space-y-2">
                   <Label htmlFor="fromAccount">From Account</Label>
                   <Select value={fromAccount} onValueChange={handleFromAccountChange}>
                     <SelectTrigger id="fromAccount">
                       <SelectValue placeholder="Select account" />
                     </SelectTrigger>
                     <SelectContent>
-                      {listFromAccounts.map((account) => (
-                        <SelectItem key={account.id} value={account.id.toString()}>
+                      {listToAccounts.map((account) => (
+                        <SelectItem
+                          key={account.id}
+                          value={account.id.toString()}
+                          disabled={toAccount === account.id.toString()} // Disable the selected `fromAccount`
+                        >
                           {account.account_name}
                         </SelectItem>
                       ))}
@@ -178,14 +182,18 @@ export default function TransferPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="toAccount">From Account</Label>
+                  <Label htmlFor="toAccount">To Account</Label>
                   <Select value={toAccount} onValueChange={handleToAccountChange}>
                     <SelectTrigger id="toAccount">
                       <SelectValue placeholder="Select account" />
                     </SelectTrigger>
                     <SelectContent>
                       {listToAccounts.map((account) => (
-                        <SelectItem key={account.id} value={account.id.toString()}>
+                        <SelectItem
+                          key={account.id}
+                          value={account.id.toString()}
+                          disabled={fromAccount === account.id.toString()} // Disable the selected `fromAccount`
+                        >
                           {account.account_name}
                         </SelectItem>
                       ))}

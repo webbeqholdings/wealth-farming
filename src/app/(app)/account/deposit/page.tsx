@@ -101,12 +101,12 @@ export default function DepositPage() {
   const handleFromAccountChange = (accountId: string) => {
     const numericAccountId = Number(accountId); // Convert the string to a number
     const selectedAccount = accounts.find((account) => account.id === numericAccountId);
-    setFromAccount(numericAccountId); // Store the numeric ID in state
+    setFromAccount(numericAccountId.toString()); // Store the numeric ID in state
     setSelectedBalance(selectedAccount?.amount || 0);
   };
 
   const handleBankChange = (bankId: string) => {
-    setSelectBank(Number(bankId)); // Convert the string to a number
+    setSelectBank(bankId.toString()); // Convert the string to a number
   };
 
   useEffect(() => {

@@ -80,7 +80,7 @@ export default function WithdrawPage() {
   const [step, setStep] = useState(1)
   const [amount, setAmount] = useState('')
   const [currency, setCurrency] = useState('USD')
-  const [method, setMethod] = useState('')
+  const [method, setMethod] = useState('bank')
   const [cardNumber, setCardNumber] = useState('')
   const [banks, setBanks] = useState([])
   const [accounts, setAccounts] = useState([]);
@@ -234,10 +234,10 @@ export default function WithdrawPage() {
                       <RadioGroupItem value="bank" id="bank" />
                       <Label htmlFor="bank">Bank Transfer</Label>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    {/* <div className="flex items-center space-x-2">
                       <RadioGroupItem value="card" id="card" />
                       <Label htmlFor="card">Credit/Debit Card</Label>
-                    </div>
+                    </div> */}
                   </RadioGroup>
 
                   {method === 'bank' && (

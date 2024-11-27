@@ -29,11 +29,11 @@ const InvestmentProfitLoss: CollectionConfig = {
       },
     },
     {
-        name: 'unit',
-        type: 'relationship',
-        relationTo: 'units',
-        label: 'Unit',
-        required: true,
+      name: 'unit',
+      type: 'relationship',
+      relationTo: 'units',
+      label: 'Unit',
+      required: true,
     },
     {
       name: 'description',
@@ -82,12 +82,12 @@ const InvestmentProfitLoss: CollectionConfig = {
   
           // Group transactions by user and pick the latest one
           const userLastTransactions = [];
-for (const transaction of usersTransactions.docs) {
-  const userId = typeof transaction.user === 'number' ? transaction.user : transaction.user.id;
-  if (!userLastTransactions[userId]) {
-    userLastTransactions[userId] = transaction;
-  }
-}
+          for (const transaction of usersTransactions.docs) {
+            const userId = typeof transaction.user === 'number' ? transaction.user : transaction.user.id;
+            if (!userLastTransactions[userId]) {
+              userLastTransactions[userId] = transaction;
+            }
+          }
           // Create profit/loss transactions for each user's last transaction
           for (const userId in userLastTransactions) {
             const lastTransaction = userLastTransactions[userId];
@@ -98,29 +98,30 @@ for (const transaction of usersTransactions.docs) {
             if (unit.unit_code === '%') {
               calculatedAmount = lastTransactionAmount + (lastTransactionAmount * profitOrLoss) / 100;
             }
-          
-            const bankId = typeof lastTransaction.bank === 'number' 
-              ? lastTransaction.bank 
+
+            const bankId = typeof lastTransaction.bank === 'number'
+              ? lastTransaction.bank
               : lastTransaction.bank?.id;
-          
-            const fromAccountId = typeof lastTransaction.from_account === 'number' 
-              ? lastTransaction.from_account 
+
+            const fromAccountId = typeof lastTransaction.from_account === 'number'
+              ? lastTransaction.from_account
               : lastTransaction.from_account?.id;
-          
-            await payload.create({
-              collection: 'transactions',
-              data: {
-                user: Number(userId),
-                investment_product: investmentProductId,
-                amount: calculatedAmount,
-                profit_or_loss: doc.profit_or_loss,
-                unit: doc.unit,
-                bank: bankId,
-                from_account: fromAccountId,
-                type: 'investment', // Use the new type for profit/loss
-                status: 'completed',
-              },
-            });
+            if (userId != 'random') {
+              await payload.create({
+                collection: 'transactions',
+                data: {
+                  user: Number(userId),
+                  investment_product: investmentProductId,
+                  amount: calculatedAmount,
+                  profit_or_loss: doc.profit_or_loss,
+                  unit: doc.unit,
+                  bank: bankId,
+                  from_account: fromAccountId,
+                  type: 'investment', // Use the new type for profit/loss
+                  status: 'completed',
+                },
+              });
+            }
           }
         }
       },
