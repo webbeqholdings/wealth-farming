@@ -800,7 +800,7 @@ export interface SiteSetting {
  */
 export interface Header {
   id: number;
-  logo: number | Media;
+  logo?: (number | null) | Media;
   navigationLinks?:
     | {
         title: string;
