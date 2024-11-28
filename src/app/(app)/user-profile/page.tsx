@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -17,15 +17,12 @@ import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Switch } from '@/components/ui/switch'
 import { Progress } from '@/components/ui/progress'
+import { toast } from '@/hooks/use-toast'
 import {
-  CalendarIcon,
   CreditCard,
   DollarSign,
   LineChart,
   Lock,
-  Mail,
-  Phone,
-  User,
   UserPlus,
   Copy,
   Share2,
@@ -34,21 +31,30 @@ import {
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import UserBankAccount from '@/components/UserBankAccount'
+import { useRouter } from 'next/navigation'
 
 export default function UserProfile() {
-  const [user, setUser] = useState({
-    name: 'Alice Johnson',
-    email: 'alice.johnson@example.com',
+  const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [userInfo, setUserInfo] = useState({
+    firstName: '',
+    lastName: '',
+    avatar_id: null,
+    email: '',
     phone: '+1 (555) 123-4567',
     avatar: '/placeholder.svg?height=100&width=100',
-    accountNumber: '**** **** **** 1234',
-    balance: 5000,
-    transactions: [
-      { id: 1, description: 'Deposit', amount: 1000, date: '2024-03-01' },
-      { id: 2, description: 'Online Purchase', amount: -50, date: '2024-03-02' },
-      { id: 3, description: 'Transfer', amount: -200, date: '2024-03-03' },
-      { id: 4, description: 'Salary', amount: 3000, date: '2024-03-05' },
-    ],
+    accountNumber: '****',
+    balance: 0,
+  });
+
+  const [transactions, setTransactions] = useState([
+    { id: 1, type: 'Deposit', amount: 0, date: '2024-03-01' },
+    { id: 2, type: 'Withdraw', amount: 0, date: '2024-03-02' },
+    { id: 3, type: 'Transfer', amount: 0, date: '2024-03-03' },
+    { id: 4, type: 'Investment', amount: 0, date: '2024-03-05' },
+  ]);
+
+  const [referralInfo, setReferralInfo] = useState({
     referralCode: 'ALICE2024',
     referrals: [
       { name: 'Bob Smith', status: 'Signed Up' },
@@ -56,26 +62,188 @@ export default function UserProfile() {
       { name: 'David Jones', status: 'Active' },
     ],
     referralProgress: 60,
-    telegramNotifications: {
-      connected: true,
-      username: '@alicejohnson',
-      settings: {
-        transactions: true,
-        balanceUpdates: false,
-        securityAlerts: true,
-        promotions: false,
-      },
-    },
-  })
+  });
 
-  const handleUpdateProfile = (event: React.FormEvent<HTMLFormElement>) => {
+  const [telegramNotifications, setTelegramNotifications] = useState({
+    connected: true,
+    username: '@alicejohnson',
+    settings: {
+      transactions: true,
+      balanceUpdates: false,
+      securityAlerts: true,
+      promotions: false,
+    },
+  });
+
+  useEffect(() => {
+    // Fetch data from your API
+    const fetchData = async () => {
+      try {
+        const userId = localStorage.getItem('user_id');
+        const totalAmount = localStorage.getItem('total_amount');
+        const accountNumber = localStorage.getItem('account_number');
+        const response = await fetch(`/api/users/${userId}`);
+        const data = await response.json();
+
+        // Update the userInfo state based on the response
+        setUserInfo({
+          firstName: data.first_name,
+          lastName: data.last_name,
+          avatar_id: data.avatar?.id || null,
+          email: data.email,
+          phone: data.phone_contact || '', // Set default if phone is null
+          avatar: data.avatar?.url || '/placeholder.svg?height=100&width=100', // Fallback to placeholder if avatar is missing
+          accountNumber: accountNumber, // You can replace this with actual data if available
+          balance: Number(totalAmount), // Replace with actual balance if provided by the API
+        });
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      const userId = localStorage.getItem('user_id');
+      const response = await fetch(`/api/recent-transaction?user_id=${userId}`);
+      const data = await response.json();
+      setTransactions(data.data);
+    };
+
+    fetchTransactions();
+  }, []);
+
+  const handleUpdateProfile = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    // In a real application, this would send the updated data to the server
-    alert('Profile updated successfully!')
+    // Collect form data
+    const formData = new FormData(event.currentTarget);
+    const userId = localStorage.getItem('user_id');
+    const firstName = formData.get('first_name') as string;
+    const lastName = formData.get('last_name') as string;
+    const email = formData.get('email') as string;
+    const phone = formData.get('phone') as string;
+
+    // Create an object to send in the PATCH request
+    const updatedData = {
+      first_name: firstName,
+      last_name: lastName,
+      email: email,
+      phone_contact: phone,
+    };
+
+    try {
+      const response = await fetch(`/api/users/${userId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update profile');
+      }
+
+      // Handle the successful response
+      const updatedUser = await response.json();
+
+      // Optionally, update your local state (e.g., userInfo) with the updated data
+      setUserInfo({
+        ...userInfo,
+        firstName: updatedUser.first_name,
+        lastName: updatedUser.last_name,
+        email: updatedUser.email,
+        phone: updatedUser.phone_contact,
+      });
+
+      toast({
+        title: 'Update profile successfully',
+      })
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast({
+        title: `${error}`,
+      })
+    }
   }
 
+  const uploadAvatar = async (formData: FormData, avatarId?: string) => {
+    try {
+      // Define the appropriate URL for media upload and PATCH request
+      const mediaUrl = avatarId ? `/api/media/${avatarId}` : '/api/media';
+      const response = await fetch(mediaUrl, {
+        method: avatarId ? 'PATCH' : 'POST', // Use PATCH for updating, POST for new uploads
+        body: formData,
+      });
+  
+      if (!response.ok) {
+        throw new Error('Avatar upload failed');
+      }
+  
+      const data = await response.json();
+      return data.doc; // Return the updated avatar URL
+  
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      throw error; // Re-throw to allow further handling in the caller function
+    }
+  };
+
+  const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        let avatarUrl;
+        if (userInfo.avatar === '/placeholder.svg?height=100&width=100') {
+          // Upload a new avatar
+          const userId = localStorage.getItem('user_id');
+          const uploadedAvatar = await uploadAvatar(formData); // Upload new avatar
+    
+          // Update user info with the new avatar
+          const updateUserResponse = await fetch(`/api/users/${userId}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ avatar: uploadedAvatar.id }),
+          });
+    
+          if (!updateUserResponse.ok) {
+            throw new Error('User update failed');
+          }
+    
+          const updatedUserInfo = await updateUserResponse.json();
+          setUserInfo((prev) => ({
+            ...prev,
+            avatar: uploadedAvatar.url,
+          }));
+        } else {
+          // Update existing avatar
+          const uploadedAvatar = await uploadAvatar(formData, userInfo.avatar_id);
+    
+          setUserInfo((prev) => ({
+            ...prev,
+            avatar: uploadedAvatar.url,
+          }));
+        }
+      } catch (error) {
+        console.error('Error during avatar update process:', error);
+      }
+    }
+  };
+
+  // Trigger file input click on button click
+  const handleButtonClick = () => {
+    fileInputRef.current?.click(); // Programmatically click the hidden file input
+  };
+
   const copyReferralCode = () => {
-    navigator.clipboard.writeText(user.referralCode)
+    navigator.clipboard.writeText(referralInfo.referralCode)
     alert('Referral code copied to clipboard!')
   }
 
@@ -85,41 +253,32 @@ export default function UserProfile() {
   }
 
   const toggleTelegramNotification = (
-    setting: keyof typeof user.telegramNotifications.settings,
+    setting: keyof typeof telegramNotifications.settings,
   ) => {
-    setUser((prevUser) => ({
+    setTelegramNotifications((prevUser) => ({
       ...prevUser,
-      telegramNotifications: {
-        ...prevUser.telegramNotifications,
-        settings: {
-          ...prevUser.telegramNotifications.settings,
-          [setting]: !prevUser.telegramNotifications.settings[setting],
-        },
+      settings: {
+        ...prevUser.settings,
+        [setting]: !prevUser.settings[setting],
       },
     }))
   }
 
   const disconnectTelegram = () => {
-    setUser((prevUser) => ({
+    setTelegramNotifications((prevUser) => ({
       ...prevUser,
-      telegramNotifications: {
-        ...prevUser.telegramNotifications,
-        connected: false,
-        username: '',
-      },
+      connected: false,
+      username: '',
     }))
   }
 
   const connectTelegram = () => {
     // In a real application, this would initiate the Telegram bot connection process
     alert('Connecting to Telegram...')
-    setUser((prevUser) => ({
+    setTelegramNotifications((prevUser) => ({
       ...prevUser,
-      telegramNotifications: {
-        ...prevUser.telegramNotifications,
-        connected: true,
-        username: '@alicejohnson',
-      },
+      connected: true,
+      username: '@alicejohnson',
     }))
   }
 
@@ -135,47 +294,74 @@ export default function UserProfile() {
               <CardDescription>Manage your personal details</CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleUpdateProfile} className="space-y-4">
+              <div className="space-y-4">
                 <div className="flex items-center space-x-4">
                   <Avatar className="w-20 h-20">
-                    <AvatarImage src={user.avatar} alt={user.name} />
+                    <AvatarImage src={userInfo.avatar} alt={userInfo.firstName} />
                     <AvatarFallback>
-                      {user.name
-                        .split(' ')
-                        .map((n) => n[0])
-                        .join('')}
+                      {userInfo.firstName + ' ' + userInfo.lastName}
                     </AvatarFallback>
                   </Avatar>
-                  <Button variant="outline">Change Avatar</Button>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
-                  <Input
-                    id="name"
-                    value={user.name}
-                    onChange={(e) => setUser({ ...user, name: e.target.value })}
+                  <Button variant="outline" onClick={handleButtonClick}>
+                    Change Avatar
+                  </Button>
+                  <input
+                    ref={fileInputRef} // Assign the ref to the input
+                    type="file"
+                    onChange={handleAvatarChange}
+                    className="hidden" // Keep the file input hidden
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={user.email}
-                    onChange={(e) => setUser({ ...user, email: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    value={user.phone}
-                    onChange={(e) => setUser({ ...user, phone: e.target.value })}
-                  />
-                </div>
-                <Button type="submit">Update Profile</Button>
-              </form>
+                <form onSubmit={handleUpdateProfile} className="space-y-4">
+                  <div className="flex space-x-4">
+                    <div className="space-y-2 flex-1">
+                      <Label htmlFor="first_name">First Name</Label>
+                      <Input
+                        id="first_name"
+                        name="first_name"
+                        value={userInfo.firstName}
+                        onChange={(e) =>
+                          setUserInfo({ ...userInfo, firstName: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2 flex-1">
+                      <Label htmlFor="last_name">Last Name</Label>
+                      <Input
+                        id="last_name"
+                        name="last_name"
+                        value={userInfo.lastName}
+                        onChange={(e) =>
+                          setUserInfo({ ...userInfo, lastName: e.target.value })
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      value={userInfo.email}
+                      onChange={(e) => setUserInfo({ ...userInfo, email: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Phone</Label>
+                    <Input
+                      id="phone"
+                      name="phone"
+                      type="tel"
+                      value={userInfo.phone}
+                      onChange={(e) => setUserInfo({ ...userInfo, phone: e.target.value })}
+                    />
+                  </div>
+                  <Button type="submit" className='mt-5'>Update Profile</Button>
+                </form>
+              </div>
+
             </CardContent>
           </Card>
 
@@ -193,22 +379,25 @@ export default function UserProfile() {
                 <TabsContent value="details" className="space-y-4">
                   <div className="flex items-center space-x-4">
                     <CreditCard className="h-5 w-5 text-muted-foreground" />
-                    <span>Account Number: {user.accountNumber}</span>
+                    <span>Account Number: {userInfo.accountNumber}</span>
                   </div>
                   <div className="flex items-center space-x-4">
                     <DollarSign className="h-5 w-5 text-muted-foreground" />
-                    <span>Current Balance: ${user.balance.toFixed(2)}</span>
+                    <span>Current Balance: {userInfo.balance.toLocaleString('en-US', { style: 'currency', currency: 'vnd' })}</span>
                   </div>
                 </TabsContent>
                 <TabsContent value="transactions">
                   <ul className="space-y-2">
-                    {user.transactions.map((transaction) => (
+                    {transactions.map((transaction) => (
                       <li key={transaction.id} className="flex justify-between items-center">
-                        <span>{transaction.description}</span>
+                        <span>{transaction.type}</span>
                         <span
                           className={transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'}
                         >
-                          ${Math.abs(transaction.amount).toFixed(2)}
+                          {transaction.amount.toLocaleString('en-US', {
+                            style: 'currency',
+                            currency: 'VND',
+                          })}
                         </span>
                       </li>
                     ))}
@@ -217,7 +406,7 @@ export default function UserProfile() {
               </Tabs>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" className="w-full">
+              <Button onClick={() => router.push('/account/history')} variant="outline" className="w-full">
                 View Full Statement
               </Button>
             </CardFooter>
@@ -260,7 +449,7 @@ export default function UserProfile() {
             <div className="space-y-2">
               <Label htmlFor="referral-code">Your Referral Code</Label>
               <div className="flex space-x-2">
-                <Input id="referral-code" value={user.referralCode} readOnly />
+                <Input id="referral-code" value={referralInfo.referralCode} readOnly />
                 <Button variant="outline" size="icon" onClick={copyReferralCode}>
                   <Copy className="h-4 w-4" />
                   <span className="sr-only">Copy referral code</span>
@@ -274,14 +463,14 @@ export default function UserProfile() {
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <span>Referral Progress</span>
-                <span>{user.referralProgress}%</span>
+                <span>{referralInfo.referralProgress}%</span>
               </div>
-              <Progress value={user.referralProgress} className="w-full" />
+              <Progress value={referralInfo.referralProgress} className="w-full" />
             </div>
             <div className="space-y-2">
               <h4 className="font-semibold">Your Referrals</h4>
               <ul className="space-y-2">
-                {user.referrals.map((referral, index) => (
+                {referralInfo.referrals.map((referral, index) => (
                   <li key={index} className="flex justify-between items-center">
                     <span>{referral.name}</span>
                     <Badge variant={referral.status === 'Active' ? 'default' : 'secondary'}>
@@ -306,21 +495,21 @@ export default function UserProfile() {
             <CardDescription>Manage your Telegram notification settings</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {user.telegramNotifications.connected ? (
+            {telegramNotifications.connected ? (
               <>
                 <div className="flex justify-between items-center">
                   <div className="flex items-center space-x-4">
                     <Bell className="h-5 w-5 text-muted-foreground" />
                     <span>Connected to Telegram</span>
                   </div>
-                  <Badge>{user.telegramNotifications.username}</Badge>
+                  <Badge>{telegramNotifications.username}</Badge>
                 </div>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between space-x-2">
                     <Label htmlFor="transactions">Transaction Notifications</Label>
                     <Switch
                       id="transactions"
-                      checked={user.telegramNotifications.settings.transactions}
+                      checked={telegramNotifications.settings.transactions}
                       onCheckedChange={() => toggleTelegramNotification('transactions')}
                     />
                   </div>
@@ -328,7 +517,7 @@ export default function UserProfile() {
                     <Label htmlFor="balanceUpdates">Balance Updates</Label>
                     <Switch
                       id="balanceUpdates"
-                      checked={user.telegramNotifications.settings.balanceUpdates}
+                      checked={telegramNotifications.settings.balanceUpdates}
                       onCheckedChange={() => toggleTelegramNotification('balanceUpdates')}
                     />
                   </div>
@@ -336,7 +525,7 @@ export default function UserProfile() {
                     <Label htmlFor="securityAlerts">Security Alerts</Label>
                     <Switch
                       id="securityAlerts"
-                      checked={user.telegramNotifications.settings.securityAlerts}
+                      checked={telegramNotifications.settings.securityAlerts}
                       onCheckedChange={() => toggleTelegramNotification('securityAlerts')}
                     />
                   </div>
@@ -344,7 +533,7 @@ export default function UserProfile() {
                     <Label htmlFor="promotions">Promotions and Offers</Label>
                     <Switch
                       id="promotions"
-                      checked={user.telegramNotifications.settings.promotions}
+                      checked={telegramNotifications.settings.promotions}
                       onCheckedChange={() => toggleTelegramNotification('promotions')}
                     />
                   </div>
@@ -357,7 +546,7 @@ export default function UserProfile() {
               </div>
             )}
           </CardContent>
-          {user.telegramNotifications.connected && (
+          {telegramNotifications.connected && (
             <CardFooter>
               <Button variant="outline" className="w-full" onClick={disconnectTelegram}>
                 Disconnect Telegram

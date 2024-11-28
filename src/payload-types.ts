@@ -111,6 +111,7 @@ export interface Account {
  */
 export interface User {
   id: number;
+  avatar?: (number | null) | Media;
   first_name?: string | null;
   last_name?: string | null;
   role: 'admin' | 'individual' | 'company';
@@ -118,6 +119,8 @@ export interface User {
   registration_number?: string | null;
   phone_contact?: string | null;
   date_of_birth?: string | null;
+  nation?: string | null;
+  gender?: ('Male' | 'Female' | 'Other') | null;
   email_verified?: boolean | null;
   otp?: string | null;
   otp_expires_at?: string | null;
@@ -134,12 +137,32 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: number;
+  alt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "address".
  */
 export interface Address {
   id: number;
   user: number | User;
   street?: string | null;
+  district?: string | null;
   city?: string | null;
   state?: string | null;
   zip_code?: string | null;
@@ -160,25 +183,6 @@ export interface Bank {
   branch?: string | null;
   updatedAt: string;
   createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
- */
-export interface Media {
-  id: number;
-  alt: string;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -510,6 +514,7 @@ export interface AccountsSelect<T extends boolean = true> {
 export interface AddressSelect<T extends boolean = true> {
   user?: T;
   street?: T;
+  district?: T;
   city?: T;
   state?: T;
   zip_code?: T;
@@ -535,6 +540,7 @@ export interface BanksSelect<T extends boolean = true> {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  avatar?: T;
   first_name?: T;
   last_name?: T;
   role?: T;
@@ -542,6 +548,8 @@ export interface UsersSelect<T extends boolean = true> {
   registration_number?: T;
   phone_contact?: T;
   date_of_birth?: T;
+  nation?: T;
+  gender?: T;
   email_verified?: T;
   otp?: T;
   otp_expires_at?: T;

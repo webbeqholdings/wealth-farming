@@ -20,6 +20,11 @@ export const Address: CollectionConfig = {
       required: false,
     },
     {
+      name: 'district',
+      type: 'text',
+      required: false,
+    },
+    {
       name: 'city',
       type: 'text',
       required: false,

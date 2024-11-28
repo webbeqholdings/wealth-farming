@@ -18,6 +18,11 @@ export const Users: CollectionConfig = {
   },
   fields: [
     {
+      name: 'avatar',
+      type: 'upload',
+      relationTo: 'media',
+    },
+    {
       name: 'first_name',
       type: 'text',
       admin: {
@@ -73,6 +78,19 @@ export const Users: CollectionConfig = {
     {
       name: 'date_of_birth',
       type: 'date',
+    },
+    {
+      name: 'nation',
+      type: 'text',
+    },
+    {
+      name: 'gender',
+      type: 'select',
+      options: [
+        { label: 'Male', value: 'Male' },
+        { label: 'Female', value: 'Female' },
+        { label: 'Other', value: 'Other' },
+      ],
     },
     {
       name: 'email_verified',

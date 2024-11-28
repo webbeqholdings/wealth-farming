@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -43,20 +43,6 @@ import { useToast } from '@/hooks/use-toast'
 import { Trash2 } from 'lucide-react'
 import { Separator } from './ui/separator'
 
-// List of Vietnamese banks
-const vietnameseBanks = [
-  { code: 'VCB', name: 'Vietcombank' },
-  { code: 'TCB', name: 'Techcombank' },
-  { code: 'VTB', name: 'VietinBank' },
-  { code: 'BIDV', name: 'BIDV' },
-  { code: 'ACB', name: 'Asia Commercial Bank' },
-  { code: 'MBB', name: 'MB Bank' },
-  { code: 'VPB', name: 'VPBank' },
-  { code: 'STB', name: 'Sacombank' },
-  { code: 'HDB', name: 'HDBank' },
-  { code: 'TPB', name: 'TPBank' },
-]
-
 // Form schema
 const formSchema = z.object({
   accountName: z.string().min(2, {
@@ -65,42 +51,19 @@ const formSchema = z.object({
   accountNumber: z.string().min(10, {
     message: 'Account number must be at least 10 characters.',
   }),
-  bankCode: z.string().min(2, {
-    message: 'Please select a bank.',
+  bankName: z.string().min(2, {
+    message: 'Please input a bank.',
+  }),
+  branch: z.string().min(2, {
+    message: 'Please input a bank.',
   }),
 })
 
-// Bank account type
-type BankAccount = z.infer<typeof formSchema> & { bankName: string }
-
-// Example bank accounts
-const exampleAccounts: BankAccount[] = [
-  {
-    accountName: 'Nguyen Van A',
-    accountNumber: '1234567890',
-    bankCode: 'VCB',
-    bankName: 'Vietcombank',
-  },
-  { accountName: 'Tran Thi B', accountNumber: '2345678901', bankCode: 'BIDV', bankName: 'BIDV' },
-  {
-    accountName: 'Le Van C',
-    accountNumber: '3456789012',
-    bankCode: 'ACB',
-    bankName: 'Asia Commercial Bank',
-  },
-  {
-    accountName: 'Pham Thi D',
-    accountNumber: '4567890123',
-    bankCode: 'TCB',
-    bankName: 'Techcombank',
-  },
-  { accountName: 'Hoang Van E', accountNumber: '5678901234', bankCode: 'VPB', bankName: 'VPBank' },
-]
 
 export default function UserBankAccount() {
-  const [accounts, setAccounts] = useState<BankAccount[]>(exampleAccounts)
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
-  const [accountToDelete, setAccountToDelete] = useState<BankAccount | null>(null)
+  const [accounts, setAccounts] = useState([])
+  const [bankId, setBankId] = useState('')
+  const [isDialogOpen, setIsDialogOpen] = useState(false); // Manage dialog visibility
   const { toast } = useToast()
 
   // Initialize form
@@ -109,44 +72,126 @@ export default function UserBankAccount() {
     defaultValues: {
       accountName: '',
       accountNumber: '',
-      bankCode: '',
+      bankName: '',
+      branch: '',
     },
   })
 
-  // Submit handler
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    const selectedBank = vietnameseBanks.find((bank) => bank.code === values.bankCode)
-    if (selectedBank) {
-      const newAccount: BankAccount = {
-        ...values,
-        bankName: selectedBank.name,
+  // Fetch bank account data when the component mounts
+  useEffect(() => {
+    async function fetchBankData() {
+      try {
+        const userId = localStorage.getItem('user_id');
+        const response = await fetch(`/api/banks?where[user][equals]=${userId}`)
+        const data = await response.json()
+
+        // Assuming the first document is the user bank account
+        const userBank = data.docs[0] // Modify this if you need to handle multiple banks
+
+        setAccounts(data.docs)
+        // Populate form with the fetched data
+        form.setValue('accountName', userBank.name)
+        form.setValue('accountNumber', userBank.account_number)
+        form.setValue('bankName', userBank.bank_name)
+        form.setValue('branch', userBank.branch)
+      } catch (error) {
+        console.log(error)
       }
-      setAccounts([...accounts, newAccount])
-      form.reset()
+    }
+
+    fetchBankData()
+  }, [form, toast])
+
+  async function handleDelete(accountId: string) {
+    try {
+      // Send a DELETE request to the API to delete the bank account
+      const response = await fetch(`/api/banks/${Number(accountId)}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json', // Ensure we send JSON
+        },
+      });
+
+      if (response.ok) {
+        setIsDialogOpen(false);
+      
+        // Remove the deleted account from local state
+        setAccounts((prevAccounts) => prevAccounts.filter((account) => account.id !== accountId));
+
+        // Show success toast message
+        toast({
+          title: 'Bank Account Deleted',
+          description: 'The bank account has been successfully deleted.',
+        });
+      } else {
+        throw new Error('Failed to delete bank account');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setIsDialogOpen(false);
       toast({
-        title: 'Bank Account Added',
-        description: 'Your bank account has been successfully added.',
-      })
+        title: 'Error',
+        description: 'Failed to delete the bank account. Please try again later.',
+      });
     }
   }
 
-  // Delete handler
-  function handleDelete(account: BankAccount) {
-    setAccountToDelete(account)
-    setDeleteConfirmOpen(true)
+
+  // Submit handler
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const newAccount = {
+      user: Number(localStorage.getItem('user_id')),
+      name: values.accountName,
+      account_number: values.accountNumber,
+      bank_name: values.bankName,
+      branch: values.branch,
+    };
+    try {
+      // Send the data to the API
+      const response = await fetch('/api/banks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json', // Set the content type to JSON
+        },
+        body: JSON.stringify(newAccount), // Convert the object to a JSON string
+      });
+
+      // Check if the response is ok (status 200-299)
+      if (response.ok) {
+        const data = await response.json(); // Parse the response data if needed
+
+        // Update local state with the new account if necessary
+        setAccounts((prevAccounts) => [...prevAccounts, newAccount]);
+
+        // Reset the form and show success message
+        form.reset();
+        toast({
+          title: 'Bank Account Added',
+          description: 'Your bank account has been successfully added.',
+        });
+      } else {
+        throw new Error('Failed to add bank account');
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to add bank account. Please try again later.',
+      });
+      console.error('Error:', error);
+    }
   }
 
-  // Confirm delete
-  function confirmDelete() {
-    if (accountToDelete) {
-      setAccounts(accounts.filter((a) => a.accountNumber !== accountToDelete.accountNumber))
-      toast({
-        title: 'Bank Account Deleted',
-        description: 'Your bank account has been successfully deleted.',
-      })
-    }
-    setDeleteConfirmOpen(false)
-  }
+  // Handle delete button click
+  const handleDeleteClick = (accountId: string) => {
+    setIsDialogOpen(true); // Open the dialog
+    setBankId(accountId);
+  };
+
+  // Handle cancel action in dialog
+  const handleCancel = () => {
+    setIsDialogOpen(false); // Close dialog without deleting
+  };
+
 
   return (
     <div>
@@ -190,25 +235,28 @@ export default function UserBankAccount() {
               />
               <FormField
                 control={form.control}
-                name="bankCode"
+                name="bankName"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Bank Name</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a bank" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {vietnameseBanks.map((bank) => (
-                          <SelectItem key={bank.code} value={bank.code}>
-                            {bank.code} - {bank.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormDescription>Select your bank from the list.</FormDescription>
+                    <FormControl>
+                      <Input placeholder="Your bank name" {...field} />
+                    </FormControl>
+                    <FormDescription>Your bank name.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="branch"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Branch</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Your branch" {...field} />
+                    </FormControl>
+                    <FormDescription>Your branch.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -229,18 +277,25 @@ export default function UserBankAccount() {
                 <TableHead>Account Name</TableHead>
                 <TableHead>Account Number</TableHead>
                 <TableHead>Bank Name</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead>Branch</TableHead>
+                <TableHead>Action</TableHead> {/* Add action column */}
               </TableRow>
             </TableHeader>
             <TableBody>
               {accounts.map((account) => (
-                <TableRow key={account.accountNumber}>
-                  <TableCell>{account.accountName}</TableCell>
-                  <TableCell>{account.accountNumber}</TableCell>
-                  <TableCell>{account.bankName}</TableCell>
+                <TableRow key={account.id}>
+                  <TableCell>{account.name}</TableCell>
+                  <TableCell>{account.account_number}</TableCell>
+                  <TableCell>{account.bank_name}</TableCell>
+                  <TableCell>{account.branch}</TableCell>
                   <TableCell>
-                    <Button variant="destructive" size="sm" onClick={() => handleDelete(account)}>
-                      <Trash2 className="h-4 w-4" />
+                    {/* Delete button */}
+                    <Button
+                      onClick={() => handleDeleteClick(account.id)}
+                      color="red"
+                      size="sm"
+                    >
+                      <Trash2 /> {/* Icon inside the button */}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -249,22 +304,18 @@ export default function UserBankAccount() {
           </Table>
         </CardContent>
       </Card>
-
-      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+      {/* Confirmation Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogTitle>Are you sure?</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this bank account? This action cannot be undone.
+              This action will permanently delete the bank account. Do you want to proceed?
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteConfirmOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={confirmDelete}>
-              Delete
-            </Button>
+            <Button onClick={handleCancel} color="gray" size="sm">Cancel</Button>
+            <Button onClick={() => handleDelete(bankId)} color="red" size="sm">Delete</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

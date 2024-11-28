@@ -1,12 +1,28 @@
-import { PayloadRequest } from 'payload';
 import { getPayload } from 'payload'
 import config from '@payload-config';
+import { PayloadRequest } from 'payload';
 
 const getBalance = async (req: PayloadRequest) => {
     try {
+        const user_id = req.query.user_id;
+        const payload = await getPayload({
+            config,
+        });
+        const accounts = await payload.find({
+            collection: 'accounts',
+            where: {
+              user: {
+                equals: user_id, // Filter by user ID
+              },
+            },
+          });
+          
+          // Calculate the total amount
+          const totalAmount = accounts.docs.reduce((sum, account) => sum + account.amount, 0);
+
         return new Response(
             JSON.stringify({
-                data: { 'amount': "100000" },
+                total: totalAmount,
                 response: 'successfully',
             })
         );
@@ -25,7 +41,7 @@ const getBalance = async (req: PayloadRequest) => {
 };
 
 export default {
-    path: '/account/my/get-balance',
+    path: '/get-balance',
     method: 'get' as const,
     handler: getBalance,
 };

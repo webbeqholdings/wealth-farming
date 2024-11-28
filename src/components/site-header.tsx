@@ -45,7 +45,8 @@ export function SiteHeader() {
         
         // Calculate the total amount
         const totalAmount = data.docs.reduce((sum: number, account: {amount: number} ) => sum + account.amount, 0);
-        
+        localStorage.setItem('total_amount', totalAmount);
+        localStorage.setItem('account_number', data.docs[2].account_number);
         setBalance(totalAmount); // Update the balance state
       } catch (err) {
         console.log(err);
@@ -139,7 +140,7 @@ export function SiteHeader() {
                     </Avatar>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => router.push('/user-profile')}>
                       <UserCircle className="mr-2 h-4 w-4" />
                       <span>Profile</span>
                     </DropdownMenuItem>

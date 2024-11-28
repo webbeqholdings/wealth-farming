@@ -28,6 +28,7 @@ import verifyPassword from './routers/verifyPassword'
 import updatePassword from './routers/updatePassword'
 import createTransaction from './routers/createTransaction'
 import signUp from './routers/signUp'
+import recentTransaction from './routers/recentTransaction'
 import PostCategories from './collections/PostCategories'
 import Posts from './collections/Posts'
 import PostTags from './collections/PostTags'
@@ -75,7 +76,7 @@ export default buildConfig({
     TransferCashRequests,
     Units
   ],
-  endpoints: [createTransaction, signUp, getBalance, verifyOTPRoute, resendOTPRoute, forgotPasword, verifyPassword, updatePassword],
+  endpoints: [recentTransaction, createTransaction, signUp, getBalance, verifyOTPRoute, resendOTPRoute, forgotPasword, verifyPassword, updatePassword],
   globals: [SiteSettings, Header, Footer],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

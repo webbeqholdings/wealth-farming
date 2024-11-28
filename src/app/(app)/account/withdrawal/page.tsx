@@ -79,7 +79,7 @@ export default function WithdrawPage() {
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [amount, setAmount] = useState('')
-  const [currency, setCurrency] = useState('USD')
+  const [currency, setCurrency] = useState('VND')
   const [method, setMethod] = useState('bank')
   const [cardNumber, setCardNumber] = useState('')
   const [banks, setBanks] = useState([])
@@ -95,7 +95,7 @@ export default function WithdrawPage() {
   }
 
   const handleBankChange = (bankId: string) => {
-    setSelectBank(Number(bankId));
+    setSelectBank(bankId.toString());
   };
 
   useEffect(() => {
@@ -201,6 +201,7 @@ export default function WithdrawPage() {
                           <SelectValue placeholder="Currency" />
                         </SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="VND">VND</SelectItem>
                           <SelectItem value="USD">USD</SelectItem>
                           <SelectItem value="EUR">EUR</SelectItem>
                           <SelectItem value="GBP">GBP</SelectItem>
@@ -209,7 +210,7 @@ export default function WithdrawPage() {
                       <Input
                         id="amount"
                         type="number"
-                        placeholder="0.00"
+                        placeholder="0"
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
                         className="flex-1"
