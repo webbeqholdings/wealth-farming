@@ -180,48 +180,18 @@ const createTransaction = async (req: PayloadRequest) => {
                     amount: AmountFromAccount
                 }
             })
-            
-            const transactionUser = await payload.find({
+
+            await payload.create({
                 collection: 'transactions',
-                where: {
-                    user: {
-                        equals: request.user_id,
-                    },
-                    investment_product: {
-                        equals: product_id,
-                    },
+                data: {
+                    user: Number(request.user_id),
+                    amount: Number(request.amount),
+                    investment_product: product_id ? Number(product_id) : undefined,
+                    status: 'completed',
+                    from_account: investmentAccount.docs[0].id,
+                    type: request.type
                 },
-                sort: '-createdAt', // Sort by creation date in descending order
-                limit: 1,          // Limit results to the last record
             });
-            
-            // Retrieve the last transaction, if available
-            const lastTransaction = transactionUser.docs.length > 0 ? transactionUser.docs[0] : null;
-            if (lastTransaction) {
-                await payload.create({
-                    collection: 'transactions',
-                    data: {
-                        user: Number(request.user_id),
-                        amount: lastTransaction.amount + transactionAmount,
-                        investment_product: product_id ? Number(product_id) : undefined,
-                        status: 'completed',
-                        from_account: investmentAccount.docs[0].id,
-                        type: request.type
-                    },
-                });
-            }else{
-                await payload.create({
-                    collection: 'transactions',
-                    data: {
-                        user: Number(request.user_id),
-                        amount: Number(request.amount),
-                        investment_product: product_id ? Number(product_id) : undefined,
-                        status: 'completed',
-                        from_account: investmentAccount.docs[0].id,
-                        type: request.type
-                    },
-                });
-            }
         }
         
         return new Response(

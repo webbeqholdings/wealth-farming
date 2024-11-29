@@ -40,6 +40,18 @@ const InvestmentProducts: CollectionConfig = {
       label: 'Maximum Investment',
     },
     {
+      name: 'start_date',
+      type: 'date',
+      label: 'Start Date',
+      required: true,
+    },
+    {
+      name: 'end_date',
+      type: 'date',
+      label: 'End Date',
+      required: true,
+    },
+    {
       name: 'interest_rate_from',
       type: 'number',
       label: 'Interest Rate From (%)',

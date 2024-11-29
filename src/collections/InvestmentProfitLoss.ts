@@ -121,6 +121,19 @@ const InvestmentProfitLoss: CollectionConfig = {
                   status: 'completed',
                 },
               });
+
+              const investmentAccount = await payload.findByID({
+                collection: 'accounts',
+                id: fromAccountId,
+            });
+
+              await payload.update({
+                  collection: 'accounts',
+                  id: fromAccountId,
+                  data: {
+                      amount: investmentAccount.amount + calculatedAmount
+                  }
+              })
             }
           }
         }

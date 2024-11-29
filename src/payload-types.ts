@@ -227,6 +227,8 @@ export interface InvestmentProduct {
   description?: string | null;
   min_investment: number;
   max_investment?: number | null;
+  start_date: string;
+  end_date: string;
   interest_rate_from: number;
   interest_rate_to: number;
   profit_period: 'monthly' | 'quarterly' | 'semi_annually' | 'annually';
@@ -641,6 +643,8 @@ export interface InvestmentProductsSelect<T extends boolean = true> {
   description?: T;
   min_investment?: T;
   max_investment?: T;
+  start_date?: T;
+  end_date?: T;
   interest_rate_from?: T;
   interest_rate_to?: T;
   profit_period?: T;

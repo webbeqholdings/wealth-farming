@@ -18,6 +18,7 @@ import { CalendarIcon, DollarSignIcon, PercentIcon } from 'lucide-react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { useRouter } from 'next/navigation';
+import { format } from 'date-fns';
 
 export default function FinancialProductsPage() {
   const [financialProducts, setFinancialProducts] = useState([])
@@ -33,6 +34,8 @@ export default function FinancialProductsPage() {
   interface InvestmentProduct {
     id: string;
     product_name: string;
+    start_date: Date;
+    end_date: Date;
     description?: string;
     interest_rate_from: number;
     interest_rate_to: number;
@@ -54,6 +57,8 @@ export default function FinancialProductsPage() {
         const formattedProducts = docs.map((product: InvestmentProduct) => ({
           id: product.id,
           name: product.product_name,
+          start_date: product.start_date,
+          end_date: product.end_date,
           description: product.description || 'No description available.',
           type: product?.fund.name, // Default type for all products
           interestRate: `${product.interest_rate_from}% - ${product.interest_rate_to}%`,
@@ -123,7 +128,10 @@ export default function FinancialProductsPage() {
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredProducts.map((product) => (
-              <Card key={product.id} className="flex flex-col">
+              <Card
+                key={product.id}
+                className={`${product.status === 'unavailable' ? 'flex flex-col opacity-50 cursor-not-allowed' : 'flex flex-col'}`}
+              >
                 <CardHeader>
                   <div className="flex justify-between items-start">
                     <Badge>{product.type}</Badge>
@@ -149,6 +157,21 @@ export default function FinancialProductsPage() {
                         <span>Term: {product.term}</span>
                       </div>
                     )}
+
+                    {/* Add Start and End Date */}
+                    {product.start_date && (
+                      <div className="flex items-center">
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        <span>Start Date: {format(new Date(product.start_date), 'MMM dd, yyyy')}</span>
+                      </div>
+                    )}
+
+                    {product.end_date && (
+                      <div className="flex items-center">
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        <span>End Date: {format(new Date(product.end_date), 'MMM dd, yyyy')}</span>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
                 <CardFooter>
@@ -161,6 +184,7 @@ export default function FinancialProductsPage() {
                       // Navigate to the detail page
                       router.push(`/investment-products/detail`);
                     }}
+                    disabled={product.status === 'unavailable'}
                   >
                     Learn More & Invest
                   </Button>

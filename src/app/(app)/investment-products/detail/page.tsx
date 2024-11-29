@@ -21,6 +21,7 @@ import {
   PercentIcon,
   AlertTriangleIcon,
   BarChartIcon,
+  CalendarIcon
 } from 'lucide-react'
 import {
   LineChart,
@@ -35,6 +36,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { toast } from '@/hooks/use-toast'
+import { format } from 'date-fns';
 
 // Mock data for a single financial product
 const product = {
@@ -127,6 +129,8 @@ export default function ProductDetailPage() {
           term: data.profit_period
             ? data.profit_period.replace('_', ' ').toUpperCase()
             : 'N/A',
+          startDate: data.start_date,
+          endDate: data.end_date,
           status: data.status,
         }
         setFinancialProducts(formattedProducts)
@@ -190,7 +194,24 @@ export default function ProductDetailPage() {
               <div className="flex items-center">
                 <DollarSignIcon className="mr-2 h-5 w-5" />
                 <span>Min Investment: ${financialProducts?.minInvestment}</span>
+                <DollarSignIcon className="ml-10 h-5 w-5" />
+                <span>Max Investment: ${financialProducts?.maxInvestment}</span>
               </div>
+
+              {/* Start and End Date */}
+              {financialProducts?.startDate && (
+                <div className="flex items-center">
+                  <CalendarIcon className="mr-2 h-5 w-5" />
+                  <span>Start Date: {format(new Date(financialProducts?.startDate), 'MMM dd, yyyy')}</span>
+                </div>
+              )}
+
+              {financialProducts?.endDate && (
+                <div className="flex items-center">
+                  <CalendarIcon className="mr-2 h-5 w-5" />
+                  <span>End Date: {format(new Date(financialProducts?.endDate), 'MMM dd, yyyy')}</span>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
