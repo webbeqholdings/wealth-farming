@@ -76,6 +76,7 @@ export function SiteHeader() {
         if (data.user) {
           setIsLoggedIn(true);
         } else {
+          router.push('/join');
           setIsLoggedIn(false);
         }
       } catch (error) {
