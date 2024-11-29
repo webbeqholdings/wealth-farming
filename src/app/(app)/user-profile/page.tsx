@@ -32,6 +32,7 @@ import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import UserBankAccount from '@/components/UserBankAccount'
 import { useRouter } from 'next/navigation'
+import { formatSlug } from '@/utilities/formatSlug'
 
 export default function UserProfile() {
   const router = useRouter();
@@ -390,7 +391,7 @@ export default function UserProfile() {
                   <ul className="space-y-2">
                     {transactions.map((transaction) => (
                       <li key={transaction.id} className="flex justify-between items-center">
-                        <span>{transaction.type}</span>
+                        <span>{transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1).toLowerCase()}</span>
                         <span
                           className={transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'}
                         >

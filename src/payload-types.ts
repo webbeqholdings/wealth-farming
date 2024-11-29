@@ -316,9 +316,29 @@ export interface Post {
   published_date?: string | null;
   category?: (number | null) | PostCategory;
   tags?: (number | null) | PostTag;
-  content: string;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
   status?: ('draft' | 'published') | null;
   featured_image?: (number | null) | Media;
+  relatedPosts?:
+    | {
+        relatedPost?: (number | null) | Post;
+        id?: string | null;
+      }[]
+    | null;
   slug?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -696,6 +716,12 @@ export interface PostsSelect<T extends boolean = true> {
   content?: T;
   status?: T;
   featured_image?: T;
+  relatedPosts?:
+    | T
+    | {
+        relatedPost?: T;
+        id?: T;
+      };
   slug?: T;
   updatedAt?: T;
   createdAt?: T;

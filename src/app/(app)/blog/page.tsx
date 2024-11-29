@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
@@ -27,59 +27,107 @@ import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 
 // Mock data for news articles
-const newsArticles = [
-  {
-    id: 1,
-    title: 'New Technology Breakthrough',
-    excerpt: 'Scientists have made a groundbreaking discovery in quantum computing...',
-    date: '2023-06-01',
-    readTime: '5 min',
-    category: 'Technology',
-    image: '/placeholder.svg?height=200&width=400',
-  },
-  {
-    id: 2,
-    title: 'Global Climate Summit Concludes',
-    excerpt: 'World leaders have agreed on new measures to combat climate change...',
-    date: '2023-05-28',
-    readTime: '7 min',
-    category: 'Environment',
-    image: '/placeholder.svg?height=200&width=400',
-  },
-  {
-    id: 3,
-    title: 'Economic Outlook for 2024',
-    excerpt: 'Economists predict steady growth despite ongoing challenges...',
-    date: '2023-05-25',
-    readTime: '6 min',
-    category: 'Economy',
-    image: '/placeholder.svg?height=200&width=400',
-  },
-  {
-    id: 4,
-    title: 'Advancements in Renewable Energy',
-    excerpt: 'New solar panel technology promises to double energy efficiency...',
-    date: '2023-05-22',
-    readTime: '4 min',
-    category: 'Technology',
-    image: '/placeholder.svg?height=200&width=400',
-  },
-  {
-    id: 5,
-    title: 'Space Exploration Milestone',
-    excerpt: 'NASA announces plans for the first crewed mission to Mars...',
-    date: '2023-05-20',
-    readTime: '8 min',
-    category: 'Science',
-    image: '/placeholder.svg?height=200&width=400',
-  },
-]
+type Author = {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone_contact: string;
+  date_of_birth: string;
+  nation: string;
+  gender: string;
+  email_verified: boolean;
+};
+
+type Category = {
+  id: number;
+  name: string;
+  slug: string;
+};
+
+type Tag = {
+  id: number;
+  name: string;
+  slug: string;
+};
+
+type Content = {
+  root: {
+    type: string;
+    format: string;
+    indent: number;
+    version: number;
+    children: Array<{
+      type: string;
+      format: string;
+      indent: number;
+      children: Array<{ text: string; type: string }>;
+    }>;
+    direction: string;
+  };
+};
+
+type Blog = {
+  id: number;
+  slug: string,
+  title: string;
+  author: Author;
+  published_date: string;
+  category: Category;
+  tags: Tag;
+  content: Content;
+  status: string;
+  featured_image: {url: string};
+  excerpt: string;  // Added missing 'excerpt'
+  date: string;  // Added missing 'date'
+  readTime: string;  // Added missing 'readTime'
+  image: string;  // Added missing 'image' for the featured article
+};
+
+type NewsArticles = Blog[]; // Assuming `newsArticles` is an array of products
 
 export default function NewsPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const articlesPerPage = 3
   const indexOfLastArticle = currentPage * articlesPerPage
   const indexOfFirstArticle = indexOfLastArticle - articlesPerPage
+  const [newsArticles, setNewsArticles] = useState<NewsArticles>([]);
+
+  // Fetch data from the API when the component mounts
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/posts');
+        const data = await response.json();
+
+        // Assuming the response has a `docs` array with the products
+        const articles = data.docs.map((item: Blog) => ({
+          id: item.id,
+          slug: item.slug,
+          title: item.title,
+          author: item.author,
+          published_date: item.published_date,
+          category: item.category,
+          tags: item.tags,
+          content: item.content,
+          status: item.status,
+          featured_image: item.featured_image,
+          excerpt: item.excerpt,  // Ensure your API returns this
+          date: item.published_date,  // Assuming 'published_date' is your date
+          readTime: item.readTime,  // Ensure your API returns this
+          image: item.image,  // Ensure your API returns this image URL
+        }));
+
+        // Set the fetched articles to state
+        setNewsArticles(articles);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []); // Empty dependency array means this will run once when the component mounts
+  
   const currentArticles = newsArticles.slice(indexOfFirstArticle, indexOfLastArticle)
 
   return (
@@ -89,44 +137,44 @@ export default function NewsPage() {
         <h1 className="text-4xl font-bold mb-8">Latest News</h1>
 
         {/* Featured Article */}
-        <Card className="mb-12">
-          <CardContent className="p-0">
-            <div className="md:flex">
-              <div className="md:w-2/3 relative h-64 md:h-auto">
-                <Image
-                  src={newsArticles[0].image}
-                  alt={newsArticles[0].title}
-                  layout="fill"
-                  objectFit="cover"
-                  className="rounded-t-lg md:rounded-l-lg md:rounded-t-none"
-                />
-              </div>
-              <div className="md:w-1/3 p-6">
-                <Badge>{newsArticles[0].category}</Badge>
-                <CardTitle className="mt-4 mb-2">{newsArticles[0].title}</CardTitle>
-                <CardDescription>{newsArticles[0].excerpt}</CardDescription>
-                <div className="flex items-center mt-4 text-sm text-gray-500">
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  <span>{newsArticles[0].date}</span>
-                  <ClockIcon className="ml-4 mr-2 h-4 w-4" />
-                  <span>{newsArticles[0].readTime} read</span>
+        {newsArticles.length > 0 && (
+          <Card className="mb-12">
+            <CardContent className="p-0">
+              <div className="md:flex">
+                <div className="md:w-2/3 relative h-64 md:h-auto">
+                  <Image
+                    src={newsArticles[0].featured_image?.url}
+                    alt={newsArticles[0].title}
+                    layout="fill"
+                    objectFit="cover"
+                    className="rounded-t-lg md:rounded-l-lg md:rounded-t-none"
+                  />
                 </div>
-                <Button className="mt-4" asChild>
-                  <Link href={`/news/${newsArticles[0].id}`}>Read More</Link>
-                </Button>
+                <div className="md:w-1/3 p-6">
+                  <Badge>{newsArticles[0].category.name}</Badge>
+                  <CardTitle className="mt-4 mb-2">{newsArticles[0].title}</CardTitle>
+                  <CardDescription>{newsArticles[0].excerpt}</CardDescription>
+                  <div className="flex items-center mt-4 text-sm text-gray-500">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    <span>{new Date(newsArticles[0].date).toLocaleDateString('vi-VN')}</span>
+                  </div>
+                  <Button className="mt-4" asChild>
+                    <Link href={`/blog/${newsArticles[0].slug}`}>Read More</Link>
+                  </Button>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
         {/* News Articles List */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 mb-8">
-          {currentArticles.slice(1).map((article) => (
+          {currentArticles.map((article) => (
             <Card key={article.id}>
               <CardHeader className="p-0">
                 <div className="relative h-48">
                   <Image
-                    src={article.image}
+                    src={article.featured_image?.url}
                     alt={article.title}
                     layout="fill"
                     objectFit="cover"
@@ -135,17 +183,17 @@ export default function NewsPage() {
                 </div>
               </CardHeader>
               <CardContent className="p-6">
-                <Badge>{article.category}</Badge>
+                <Badge>{article.category.name}</Badge>
                 <CardTitle className="mt-2 mb-2">{article.title}</CardTitle>
                 <CardDescription>{article.excerpt}</CardDescription>
               </CardContent>
               <CardFooter className="flex justify-between items-center">
                 <div className="flex items-center text-sm text-gray-500">
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  <span>{article.date}</span>
+                  <span>{new Date(article.date).toLocaleDateString('vi-VN')}</span>
                 </div>
                 <Button variant="outline" asChild>
-                  <Link href={`/news/${article.id}`}>Read More</Link>
+                  <Link href={`/blog/${article.slug}`}>Read More</Link>
                 </Button>
               </CardFooter>
             </Card>

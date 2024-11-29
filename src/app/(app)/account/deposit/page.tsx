@@ -270,20 +270,29 @@ export default function DepositPage() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                  <Label htmlFor="fromAccount">Your Bank Account</Label>
-                  <Select value={selectBank} onValueChange={handleBankChange}>
-                    <SelectTrigger id="bank">
-                      <SelectValue placeholder="Select bank" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {banks.map((bank) => (
-                        <SelectItem key={bank.id} value={bank.id.toString()}>
-                          {bank.bank_name} - {bank.account_number}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                    <Label htmlFor="fromAccount">Your Bank Account</Label>
+                    <Select value={selectBank} onValueChange={handleBankChange}>
+                      <SelectTrigger id="bank">
+                        <SelectValue placeholder="Select bank" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {banks.map((bank) => (
+                          <SelectItem key={bank.id} value={bank.id.toString()}>
+                            {bank.bank_name} - {bank.account_number}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {banks.length <=0 ? <div className="mt-4">
+                      <div
+                        onClick={() => { router.push('/user-profile') }}
+                        className="text-blue-600 hover:text-blue-800 cursor-pointer"
+                      >
+                        Don&apos;t see your bank? Register
+                      </div>
+                    </div> : ''
+                    }
+                  </div>
                 </div>
               )}
 

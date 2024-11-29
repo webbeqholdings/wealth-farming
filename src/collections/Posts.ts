@@ -48,7 +48,7 @@ const Posts: CollectionConfig = {
     },
     {
       name: 'content',
-      type: 'textarea',
+      type: 'richText',
       required: true,
     },
     {
@@ -76,6 +76,17 @@ const Posts: CollectionConfig = {
       admin: {
         description: 'Featured image for this post',
       },
+    },
+    {
+      name: 'relatedPosts',
+      type: 'array',
+      fields: [
+        {
+          name: 'relatedPost',
+          type: 'relationship',
+          relationTo: 'posts', // Link to other articles
+        },
+      ],
     },
     {
       name: 'slug',

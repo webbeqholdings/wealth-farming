@@ -5,6 +5,7 @@ import { isIndividualOrAdmin } from '@/access/isIndividualOrAdmin';
 export const Media: CollectionConfig = {
   slug: 'media',
   access: {
+    read: () => true,
     create: isIndividualOrAdmin,
   },
   fields: [
