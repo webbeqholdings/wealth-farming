@@ -43,13 +43,11 @@ const InvestmentProducts: CollectionConfig = {
       name: 'start_date',
       type: 'date',
       label: 'Start Date',
-      required: true,
     },
     {
       name: 'end_date',
       type: 'date',
       label: 'End Date',
-      required: true,
     },
     {
       name: 'interest_rate_from',

@@ -1,5 +1,5 @@
 {
-  "id": "f5e455eb-2f74-40be-9fc5-7d54bb55fbcc",
+  "id": "281e0408-4bf0-4c51-b50f-f8902ec8b7d0",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -1054,13 +1054,13 @@
           "name": "start_date",
           "type": "timestamp(3) with time zone",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "end_date": {
           "name": "end_date",
           "type": "timestamp(3) with time zone",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "interest_rate_from": {
           "name": "interest_rate_from",

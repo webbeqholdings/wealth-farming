@@ -227,8 +227,8 @@ export interface InvestmentProduct {
   description?: string | null;
   min_investment: number;
   max_investment?: number | null;
-  start_date: string;
-  end_date: string;
+  start_date?: string | null;
+  end_date?: string | null;
   interest_rate_from: number;
   interest_rate_to: number;
   profit_period: 'monthly' | 'quarterly' | 'semi_annually' | 'annually';
