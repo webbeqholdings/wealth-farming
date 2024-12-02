@@ -42,9 +42,14 @@ const Posts: CollectionConfig = {
     },
     {
       name: 'tags',
-      type: 'relationship',
-      relationTo: 'post-tags',
-      required: false
+      type: 'array',
+      fields: [
+        {
+          name: 'postTags',
+          type: 'relationship',
+          relationTo: 'post-tags', // Link to other articles
+        },
+      ],
     },
     {
       name: 'content',

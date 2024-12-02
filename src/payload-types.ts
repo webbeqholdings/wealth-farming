@@ -317,7 +317,12 @@ export interface Post {
   author: number | User;
   published_date?: string | null;
   category?: (number | null) | PostCategory;
-  tags?: (number | null) | PostTag;
+  tags?:
+    | {
+        postTags?: (number | null) | PostTag;
+        id?: string | null;
+      }[]
+    | null;
   content: {
     root: {
       type: string;
@@ -716,7 +721,12 @@ export interface PostsSelect<T extends boolean = true> {
   author?: T;
   published_date?: T;
   category?: T;
-  tags?: T;
+  tags?:
+    | T
+    | {
+        postTags?: T;
+        id?: T;
+      };
   content?: T;
   status?: T;
   featured_image?: T;

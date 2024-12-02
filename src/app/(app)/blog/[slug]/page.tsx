@@ -15,6 +15,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
+import { SiteHeader } from '@/components/site-header';
 
 export default function NewsDetailPage() {
   const params = useParams();
@@ -29,7 +30,7 @@ export default function NewsDetailPage() {
     category: 'Technology',
     image: '/images/ai-future.jpg',
     content: `Artificial Intelligence (AI) stands at the forefront of technological innovation...`,
-    tags: ['Artificial Intelligence', 'Technology', 'Ethics', 'Future'],
+    tags: [{ postTags: { id: 1, name: 'global-investment' } }, { id: 2, relatedPost: { name: 'finance' } }, { relatedPost: { id: 3, name: 'economy' } }],
     relatedArticles: [],
   });
 
@@ -62,7 +63,7 @@ export default function NewsDetailPage() {
           publishDate: new Date(apiData.published_date),
           category: apiData.category.name,
           content: apiData.content.root.children.map((child: { children: Array<{ text: string }> }) => child.children[0].text).join(' '),
-          tags: [apiData.tags.name], // Assuming tags is a single object in the API response
+          tags: apiData.tags, // Assuming tags is a single object in the API response
           image: apiData.featured_image.url, // Example placeholder, replace if you have an image field in the API
           relatedArticles: apiData.relatedPosts.map((data: { relatedPost: RelatedPost }) => ({
             id: data?.relatedPost?.id,       // Access 'id' from 'relatedPost'
@@ -80,80 +81,86 @@ export default function NewsDetailPage() {
   }, []);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <article className="max-w-4xl mx-auto">
-        <header className="mb-8">
-          <h1 className="text-4xl font-bold mb-4">{article.title}</h1>
-          <div className="flex items-center space-x-4 text-muted-foreground">
-            <span className="flex items-center">
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {format(article.publishDate, 'MMMM d, yyyy')}
-            </span>
-            <Badge variant="secondary">{article.category}</Badge>
-          </div>
-        </header>
+    <div>
+      <SiteHeader />
+      <div className="container mx-auto px-4 py-8">
+        <article className="max-w-4xl mx-auto">
+          <header className="mb-8">
+            <h1 className="text-4xl font-bold mb-4">{article.title}</h1>
+            <div className="flex items-center space-x-4 text-muted-foreground">
+              <span className="flex items-center">
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {format(article.publishDate, 'MMMM d, yyyy')}
+              </span>
+              <Badge variant="secondary">{article.category}</Badge>
+            </div>
+          </header>
 
-        <Image
-          src={article.image}
-          alt="AI Future"
-          width={1200}
-          height={630}
-          className="rounded-lg mb-8"
-        />
+          <Image
+            src={article.image}
+            alt="AI Future"
+            width={1200}
+            height={630}
+            className="rounded-lg mb-8"
+          />
 
-        <div
-          className="prose prose-lg max-w-none mb-12"
-          dangerouslySetInnerHTML={{ __html: article.content }}
-        />
+          <div
+            className="prose prose-lg max-w-none mb-12"
+            dangerouslySetInnerHTML={{ __html: article.content }}
+          />
 
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex flex-wrap gap-2">
-            {article.tags.map((tag) => (
-              <Badge key={tag} variant="outline">
-                {tag}
-              </Badge>
-            ))}
-          </div>
-        </div>
-
-        <Separator className="my-8" />
-
-        <section className="mb-12">
-          <h2 className="text-2xl font-semibold mb-4">About the Author</h2>
-          <div className="flex items-center space-x-4">
-            <Avatar className="h-16 w-16">
-              <AvatarImage src={article.author.avatar} alt={article.author.name} />
-              <AvatarFallback>
-                {article.author.name
-                  .split(' ')
-                  .map((n) => n[0])
-                  .join('')}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <h3 className="font-semibold">{article.author.name}</h3>
-              <p className="text-muted-foreground">{article.author.bio}</p>
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex flex-wrap gap-2">
+              {article.tags.map((tag) => (
+                // Check if tag.postTags exists and has a name
+                tag.postTags && tag.postTags.name && (
+                  <Badge key={tag.postTags.id} variant="outline">
+                    {tag.postTags.name}
+                  </Badge>
+                )
+              ))}
             </div>
           </div>
-        </section>
-        {article.relatedArticles.length > 0 && article.relatedArticles[0].relatedPost != null ? <section className="mb-12">
-          <h2 className="text-2xl font-semibold mb-4">Related Articles</h2>
-          <div className="grid gap-4 md:grid-cols-3">
-            {article.relatedArticles.map((related, index) => (
-              <Card key={index}>
-                <CardHeader>
-                  <CardTitle className="text-lg">{related.title}</CardTitle>
-                </CardHeader>
-                <CardFooter>
-                  <Link href={`/blog/${related.slug}`} className="text-primary hover:underline">
-                    Read more
-                  </Link>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        </section> : ''}
-      </article>
+
+          <Separator className="my-8" />
+
+          <section className="mb-12">
+            <h2 className="text-2xl font-semibold mb-4">About the Author</h2>
+            <div className="flex items-center space-x-4">
+              <Avatar className="h-16 w-16">
+                <AvatarImage src={article.author.avatar} alt={article.author.name} />
+                <AvatarFallback>
+                  {article.author.name
+                    .split(' ')
+                    .map((n) => n[0])
+                    .join('')}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <h3 className="font-semibold">{article.author.name}</h3>
+                <p className="text-muted-foreground">{article.author.bio}</p>
+              </div>
+            </div>
+          </section>
+          {article.relatedArticles.length > 0 && article.relatedArticles[0].relatedPost != null ? <section className="mb-12">
+            <h2 className="text-2xl font-semibold mb-4">Related Articles</h2>
+            <div className="grid gap-4 md:grid-cols-3">
+              {article.relatedArticles.map((related, index) => (
+                <Card key={index}>
+                  <CardHeader>
+                    <CardTitle className="text-lg">{related.title}</CardTitle>
+                  </CardHeader>
+                  <CardFooter>
+                    <Link href={`/blog/${related.slug}`} className="text-primary hover:underline">
+                      Read more
+                    </Link>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          </section> : ''}
+        </article>
+      </div>
     </div>
   )
 }

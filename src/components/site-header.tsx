@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import { siteConfig } from '@/config/site';
 import { cn } from '@/lib/utils';
 
 import { MainNav } from '@/components/main-nav';
@@ -12,6 +11,7 @@ import { MobileNav } from '@/components/mobile-nav';
 import { ModeToggle } from '@/components/mode-toggle';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import userStatus from '@/lib/userStatus';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,8 +29,8 @@ import {
 } from 'lucide-react';
 
 export function SiteHeader() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [balance, setBalance] = useState(10000.5);
+  const { isLoggedIn, loading } = userStatus();
+  const [balance, setBalance] = useState(0);
   const router = useRouter(); // Use Next.js router for navigation
 
   useEffect(() => {
@@ -55,39 +55,6 @@ export function SiteHeader() {
 
     fetchData(); // Call the fetch function
   }, []);
-  // Check for user current
-  useEffect(() => {
-    const checkLoginStatus = async () => {
-      try {
-        const response = await fetch('/api/users/me', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include', // Include cookies in the request
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch user data');
-        }
-
-        const data = await response.json();
-        // Check if user is null
-        if (data.user) {
-          setIsLoggedIn(true);
-        } else {
-          router.push('/join');
-          setIsLoggedIn(false);
-        }
-      } catch (error) {
-        console.error('Error checking login status:', error);
-        setIsLoggedIn(false);
-      }
-    };
-
-    checkLoginStatus();
-  }, []);
-
   // Handle logout
   const handleLogout = async () => {
     try {
@@ -99,8 +66,7 @@ export function SiteHeader() {
       });
 
       if (response.ok) {
-        setIsLoggedIn(false); // Set logged-in state to false
-        router.push('/'); // Redirect to the home page after logout
+        router.push('/join'); // Redirect to the home page after logout
       } else {
         console.error('Logout failed');
       }

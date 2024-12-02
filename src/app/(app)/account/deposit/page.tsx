@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import userStatus from '@/lib/userStatus'
 import {
   Select,
   SelectContent,
@@ -78,6 +79,7 @@ function Steps({ currentStep, className, children }: StepsProps) {
 }
 
 export default function DepositPage() {
+  const { isLoggedIn, loading } = userStatus();
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [amount, setAmount] = useState('')
@@ -145,6 +147,17 @@ export default function DepositPage() {
     fetchBanks();
   }, []);
 
+  // If still loading, show a loading indicator (or spinner)
+  if (loading) {
+    return <div>Loading...</div>; // You can replace this with a loading spinner component if desired
+  }
+
+  // If the user is not logged in, redirect to the join page
+  if (!isLoggedIn) {
+    router.push('/join');
+    return <div>Redirecting...</div>; // Optional: Show a redirect message
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     // In a real application, this would process the deposit
@@ -170,7 +183,7 @@ export default function DepositPage() {
         const errorResponse = await response.json();
         const errorMessage = errorResponse.response?.error || 'An unknown error occurred';
         throw new Error(errorMessage);
-    }
+      }
       toast({
         title: 'Transaction created successfully',
       })
@@ -215,22 +228,22 @@ export default function DepositPage() {
             <form onSubmit={handleSubmit}>
               {step === 1 && (
                 <div className="space-y-4">
-                 <div className="space-y-2">
-                  <Label htmlFor="fromAccount">From Account</Label>
-                  <Select value={fromAccount} onValueChange={handleFromAccountChange}>
-                    <SelectTrigger id="fromAccount">
-                      <SelectValue placeholder="Select account" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {accounts.map((account) => (
-                        <SelectItem key={account.id} value={account.id.toString()}>
-                          {account.account_name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <p className="text-sm text-muted-foreground">Balance: ${selectedBalance}</p>
-                </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="fromAccount">From Account</Label>
+                    <Select value={fromAccount} onValueChange={handleFromAccountChange}>
+                      <SelectTrigger id="fromAccount">
+                        <SelectValue placeholder="Select account" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {accounts.map((account) => (
+                          <SelectItem key={account.id} value={account.id.toString()}>
+                            {account.account_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <p className="text-sm text-muted-foreground">Balance: ${selectedBalance}</p>
+                  </div>
                   <div className="space-y-2">
                     <Label htmlFor="amount">Deposit Amount</Label>
                     <div className="flex space-x-2">
@@ -283,7 +296,7 @@ export default function DepositPage() {
                         ))}
                       </SelectContent>
                     </Select>
-                    {banks.length <=0 ? <div className="mt-4">
+                    {banks.length <= 0 ? <div className="mt-4">
                       <div
                         onClick={() => { router.push('/user-profile') }}
                         className="text-blue-600 hover:text-blue-800 cursor-pointer"
