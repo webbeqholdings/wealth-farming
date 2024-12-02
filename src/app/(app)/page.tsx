@@ -19,6 +19,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import { CTASection } from '@/components/page-home/CTASection'
+import { BreakingNewsCarousel } from '@/components/page-home/BreakingNews'
 
 export const metadata: Metadata = {
   title: 'Wealth Farming | Cultivate wealth, harvest results',
@@ -152,6 +153,10 @@ export default function IndexPage() {
             ))}
           </Accordion>
         </div>
+        <div className="container mx-auto px-0 md:py-14">
+          <BreakingNewsCarousel />
+        </div>
+
         <div className="container mx-auto px-0 md:py-14">
           <CTASection />
         </div>
