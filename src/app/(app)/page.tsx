@@ -41,7 +41,7 @@ export default function IndexPage() {
       description: 'Simply enter the code on the verification page to complete your signup.',
       icon: Mail,
       buttonText: 'Sign Up Now',
-      buttonHref: '#',
+      buttonHref: '/join',
     },
     {
       number: '2',
@@ -49,7 +49,7 @@ export default function IndexPage() {
       description: 'Fund your account easily on the BeQ Web or App.',
       icon: Wallet,
       buttonText: 'Deposit Now',
-      buttonHref: '#',
+      buttonHref: '/account/deposit',
     },
     {
       number: '3',
@@ -57,7 +57,7 @@ export default function IndexPage() {
       description: 'Kick off your journey with your favorite Spot pairs or Futures contracts!',
       icon: BarChart3,
       buttonText: 'Trade Now',
-      buttonHref: '#',
+      buttonHref: 'investment-products',
     },
   ]
 

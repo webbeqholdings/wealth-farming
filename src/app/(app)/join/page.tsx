@@ -80,6 +80,7 @@ export default function Page() {
       if (response.ok) {
         const data = await response.json();
         if (type == '/login') {
+          localStorage.setItem('user_id', data.user.id);
           router.replace('/');
         } else if(type == '') {
           localStorage.setItem('user_id', data.doc.id);
