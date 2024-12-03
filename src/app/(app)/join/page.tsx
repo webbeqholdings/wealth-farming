@@ -110,10 +110,6 @@ export default function Page() {
     setShowPassword((prev) => !prev);
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = '/api/auth/login/google';
-  };
-
   return (
     <>
       <SiteHeader />
@@ -179,29 +175,6 @@ export default function Page() {
                 <CardFooter>
                   <Button type="submit" disabled={isLoading} className="w-full rounded-lg py-3 text-white shadow-lg">
                     {isLoading ? 'Loading...' : 'Login'}
-                  </Button>
-                </CardFooter>
-
-                <div className="flex items-center justify-center my-4">
-                  <hr className="flex-grow border-t border-gray-300" />
-                  <span className="mx-4 text-sm text-gray-500 font-medium">OR</span>
-                  <hr className="flex-grow border-t border-gray-300" />
-                </div>
-
-                <CardFooter>
-                  <Button
-                    onClick={handleGoogleLogin}
-                    className="mt-5 w-full rounded-lg py-3 bg-white hover:bg-gray-100 text-gray-800 shadow-lg flex items-center justify-center space-x-3 border border-gray-300"
-                    disabled={isLoading}
-                  >
-                    {/* Google Logo */}
-                    <Image
-                      src={logoGoogle}
-                      alt='Google Logo'
-                      className="h-6 w-6"
-                  />
-                    {/* Button Text */}
-                    <span>Login with Google</span>
                   </Button>
                 </CardFooter>
               </form>
