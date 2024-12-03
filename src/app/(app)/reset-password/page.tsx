@@ -28,7 +28,7 @@ const Page = () => {
         const formData = new FormData(event.currentTarget);
         const email = formData.get('email') as string;
         try {
-            const response = await fetch('/api/forgot-password', {
+            const response = await fetch('/api/password/forgot-password', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

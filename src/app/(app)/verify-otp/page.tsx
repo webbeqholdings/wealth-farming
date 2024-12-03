@@ -25,7 +25,7 @@ export default function Page() {
       otp: otp,
     };
     try {
-      const response = await fetch("/api/verify-otp", {
+      const response = await fetch("/api/otp/verify", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -55,7 +55,7 @@ export default function Page() {
   // Function to resend OTP
   const resendOTP = async () => {
     setTimer(60); // Reset timer to 60 seconds
-    await fetch("/api/resend-otp", {
+    await fetch("/api/otp/resend", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

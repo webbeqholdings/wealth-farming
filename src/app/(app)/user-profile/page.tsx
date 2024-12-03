@@ -110,7 +110,7 @@ export default function UserProfile() {
   useEffect(() => {
     const fetchTransactions = async () => {
       const userId = localStorage.getItem('user_id');
-      const response = await fetch(`/api/recent-transaction?user_id=${userId}`);
+      const response = await fetch(`/api/transaction/recent?user_id=${userId}`);
       const data = await response.json();
       setTransactions(data.data);
     };

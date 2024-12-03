@@ -69,7 +69,7 @@ export const sendEmail = async (to: string, subject: string, otp: string) => {
                     ${otp}
                   </p>
                   <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.5">
-                    This OTP will expire in 10 minutes. Please do not share this code with anyone.
+                    This OTP will expire in 2 minutes. Please do not share this code with anyone.
                   </p>
                   <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.5">
                     If you didn't request this code, please ignore this email or contact our support
