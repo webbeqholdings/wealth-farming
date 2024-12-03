@@ -44,7 +44,7 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>
 
 export default function TransferPage() {
-  const {isLoggedIn, loading} = UserStatus();
+  const {isLoggedIn, loading, user} = UserStatus();
   const router = useRouter()
   const [fromBalance, setFromBalance] = useState(0)
   const [toBalance, setToBalance] = useState(0)
@@ -80,8 +80,7 @@ export default function TransferPage() {
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
-        const userId = localStorage.getItem('user_id');
-        const response = await fetch(`/api/accounts?where[user][equals]=${userId}`); // Replace with dynamic user ID if necessary
+        const response = await fetch(`/api/accounts?where[user][equals]=${user.id}`); // Replace with dynamic user ID if necessary
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -94,7 +93,7 @@ export default function TransferPage() {
     };
 
     fetchAccounts();
-  }, []);
+  }, [loading]);
 
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
@@ -119,14 +118,13 @@ export default function TransferPage() {
     //   return
     // }
     try {
-      const userId = localStorage.getItem('user_id');
       const response = await fetch('/api/transaction/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json', // Specify JSON content type
         },
         body: JSON.stringify({
-          user_id: userId,
+          user_id: user.id,
           amount: amount,
           status: "completed",
           from_account: fromAccount,

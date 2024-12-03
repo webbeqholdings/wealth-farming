@@ -139,7 +139,7 @@ export const Users: CollectionConfig = {
     ],
     afterChange: [
       async ({ doc, operation }) => {
-        if (operation === 'create') {
+        if (operation === 'create' && !doc.email_verified) {
           try {
             await sendEmail(doc.email, 'Your OTP Code', doc.otp);
           } catch (error) {

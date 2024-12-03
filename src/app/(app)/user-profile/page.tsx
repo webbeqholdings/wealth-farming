@@ -36,7 +36,7 @@ import { formatSlug } from '@/utilities/formatSlug'
 import UserStatus from '@/lib/userStatus'
 
 export default function UserProfile() {
-  const {isLoggedIn, loading} = UserStatus();
+  const {isLoggedIn, loading, user} = UserStatus();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [userInfo, setUserInfo] = useState({
@@ -82,10 +82,9 @@ export default function UserProfile() {
     // Fetch data from your API
     const fetchData = async () => {
       try {
-        const userId = localStorage.getItem('user_id');
         const totalAmount = localStorage.getItem('total_amount');
         const accountNumber = localStorage.getItem('account_number');
-        const response = await fetch(`/api/users/${userId}`);
+        const response = await fetch(`/api/users/${user.id}`);
         const data = await response.json();
 
         // Update the userInfo state based on the response
@@ -105,24 +104,22 @@ export default function UserProfile() {
     };
 
     fetchData();
-  }, []);
+  }, [loading]);
 
   useEffect(() => {
     const fetchTransactions = async () => {
-      const userId = localStorage.getItem('user_id');
-      const response = await fetch(`/api/recent-transaction?user_id=${userId}`);
+      const response = await fetch(`/api/recent-transaction?user_id=${user.id}`);
       const data = await response.json();
       setTransactions(data.data);
     };
 
     fetchTransactions();
-  }, []);
+  }, [loading]);
 
   const handleUpdateProfile = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     // Collect form data
     const formData = new FormData(event.currentTarget);
-    const userId = localStorage.getItem('user_id');
     const firstName = formData.get('first_name') as string;
     const lastName = formData.get('last_name') as string;
     const email = formData.get('email') as string;
@@ -137,7 +134,7 @@ export default function UserProfile() {
     };
 
     try {
-      const response = await fetch(`/api/users/${userId}`, {
+      const response = await fetch(`/api/users/${user.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -201,14 +198,12 @@ export default function UserProfile() {
       formData.append('file', file);
 
       try {
-        let avatarUrl;
         if (userInfo.avatar === '/placeholder.svg?height=100&width=100') {
           // Upload a new avatar
-          const userId = localStorage.getItem('user_id');
           const uploadedAvatar = await uploadAvatar(formData); // Upload new avatar
     
           // Update user info with the new avatar
-          const updateUserResponse = await fetch(`/api/users/${userId}`, {
+          const updateUserResponse = await fetch(`/api/users/${user.id}`, {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',

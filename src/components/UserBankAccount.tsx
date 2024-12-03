@@ -32,16 +32,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { useToast } from '@/hooks/use-toast'
 import { Trash2 } from 'lucide-react'
 import { Separator } from './ui/separator'
+import UserStatus from '@/lib/userStatus'
 
 // Form schema
 const formSchema = z.object({
@@ -61,6 +55,7 @@ const formSchema = z.object({
 
 
 export default function UserBankAccount() {
+  const {isLoggedIn, loading, user} = UserStatus()
   const [accounts, setAccounts] = useState([])
   const [bankId, setBankId] = useState('')
   const [isDialogOpen, setIsDialogOpen] = useState(false); // Manage dialog visibility
@@ -81,8 +76,7 @@ export default function UserBankAccount() {
   useEffect(() => {
     async function fetchBankData() {
       try {
-        const userId = localStorage.getItem('user_id');
-        const response = await fetch(`/api/banks?where[user][equals]=${userId}`)
+        const response = await fetch(`/api/banks?where[user][equals]=${user.id}`)
         const data = await response.json()
 
         // Assuming the first document is the user bank account
@@ -100,7 +94,7 @@ export default function UserBankAccount() {
     }
 
     fetchBankData()
-  }, [form, toast])
+  }, [form, toast, loading])
 
   async function handleDelete(accountId: string) {
     try {
@@ -140,7 +134,7 @@ export default function UserBankAccount() {
   // Submit handler
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const newAccount = {
-      user: Number(localStorage.getItem('user_id')),
+      user: Number(user.id),
       name: values.accountName,
       account_number: values.accountNumber,
       bank_name: values.bankName,

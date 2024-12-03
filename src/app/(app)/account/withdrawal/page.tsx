@@ -77,7 +77,7 @@ function Steps({ currentStep, className, children }: StepsProps) {
 }
 
 export default function WithdrawPage() {
-  const {isLoggedIn, loading} = UserStatus();
+  const {isLoggedIn, loading, user} = UserStatus();
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [amount, setAmount] = useState('')
@@ -103,8 +103,7 @@ export default function WithdrawPage() {
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
-        const userId = localStorage.getItem('user_id');
-        const response = await fetch(`/api/accounts?where[user][equals]=${userId}&where[account_name][equals]=Main Account`); // Replace with dynamic user ID if necessary
+        const response = await fetch(`/api/accounts?where[user][equals]=${user.id}&where[account_name][equals]=Main Account`); // Replace with dynamic user ID if necessary
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -116,13 +115,12 @@ export default function WithdrawPage() {
     };
 
     fetchAccounts();
-  }, []);
+  }, [loading]);
 
   useEffect(() => {
     const fetchBanks = async () => {
       try {
-        const userId = localStorage.getItem('user_id');
-        const response = await fetch(`/api/banks?where[user][equals]=${userId}`); // Replace with dynamic user ID if necessary
+        const response = await fetch(`/api/banks?where[user][equals]=${user.id}`); // Replace with dynamic user ID if necessary
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -134,20 +132,19 @@ export default function WithdrawPage() {
     };
 
     fetchBanks();
-  }, []);
+  }, [loading]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     // In a real application, this would process the withdrawal
     try {
-      const userId = localStorage.getItem('user_id');
       const response = await fetch('/api/transaction/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json', // Specify JSON content type
         },
         body: JSON.stringify({
-          user_id: userId,
+          user_id: user.id,
           bank_id: selectBank,
           amount: -amount,
           status: "pending",

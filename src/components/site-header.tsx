@@ -29,15 +29,14 @@ import {
 } from 'lucide-react';
 
 export function SiteHeader() {
-  const { isLoggedIn, loading } = userStatus();
+  const { isLoggedIn, loading, user } = userStatus();
   const [balance, setBalance] = useState(0);
   const router = useRouter(); // Use Next.js router for navigation
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userId = localStorage.getItem('user_id');
-        const response = await fetch(`/api/accounts?where[user][equals]=${userId}`);
+        const response = await fetch(`/api/accounts?where[user][equals]=${user.id}`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -54,7 +53,7 @@ export function SiteHeader() {
     };
 
     fetchData(); // Call the fetch function
-  }, []);
+  }, [loading]);
   // Handle logout
   const handleLogout = async () => {
     try {

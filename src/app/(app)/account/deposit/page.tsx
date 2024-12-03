@@ -79,7 +79,7 @@ function Steps({ currentStep, className, children }: StepsProps) {
 }
 
 export default function DepositPage() {
-  const { isLoggedIn, loading } = userStatus();
+  const { isLoggedIn, loading, user } = userStatus();
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [amount, setAmount] = useState('')
@@ -114,8 +114,7 @@ export default function DepositPage() {
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
-        const userId = localStorage.getItem('user_id');
-        const response = await fetch(`/api/accounts?where[user][equals]=${userId}`); // Replace with dynamic user ID if necessary
+        const response = await fetch(`/api/accounts?where[user][equals]=${user.id}`); // Replace with dynamic user ID if necessary
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -127,13 +126,12 @@ export default function DepositPage() {
     };
 
     fetchAccounts();
-  }, []);
+  }, [loading]);
 
   useEffect(() => {
     const fetchBanks = async () => {
       try {
-        const userId = localStorage.getItem('user_id');
-        const response = await fetch(`/api/banks?where[user][equals]=${userId}`); // Replace with dynamic user ID if necessary
+        const response = await fetch(`/api/banks?where[user][equals]=${user.id}`); // Replace with dynamic user ID if necessary
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -145,7 +143,7 @@ export default function DepositPage() {
     };
 
     fetchBanks();
-  }, []);
+  }, [loading]);
 
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
@@ -162,14 +160,13 @@ export default function DepositPage() {
     e.preventDefault()
     // In a real application, this would process the deposit
     try {
-      const userId = localStorage.getItem('user_id');
       const response = await fetch('/api/transaction/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json', // Specify JSON content type
         },
         body: JSON.stringify({
-          user_id: userId,
+          user_id: user.id,
           bank_id: selectBank,
           amount: amount,
           status: "pending",
