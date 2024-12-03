@@ -108,7 +108,7 @@ export default function UserProfile() {
 
   useEffect(() => {
     const fetchTransactions = async () => {
-      const response = await fetch(`/api/recent-transaction?user_id=${user.id}`);
+      const response = await fetch(`/api/transaction/recent?user_id=${user.id}`);
       const data = await response.json();
       setTransactions(data.data);
     };
@@ -397,7 +397,7 @@ export default function UserProfile() {
                   </TabsContent>
                   <TabsContent value="transactions">
                     <ul className="space-y-2">
-                      {transactions.map((transaction) => (
+                      {transactions && transactions.map((transaction) => (
                         <li key={transaction.id} className="flex justify-between items-center">
                           <span>{transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1).toLowerCase()}</span>
                           <span

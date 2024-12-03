@@ -35,7 +35,16 @@ export async function POST(req: Request) {
       });
 
       if (fromAccount.amount < -Number(amount)) {
-        return NextResponse.json({ error: 'Amount not enough' }, { status: 400 });
+        const errorBody = { error: 'Amount not enough' };
+        return new Response(
+          JSON.stringify({
+            response: errorBody,
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
 
       const updatedAmount = fromAccount.amount + Number(amount);
@@ -73,7 +82,16 @@ export async function POST(req: Request) {
       });
 
       if (fromAccount.amount < transactionAmount) {
-        return NextResponse.json({ error: 'Amount not enough' }, { status: 400 });
+        const errorBody = { error: 'Amount not enough' };
+        return new Response(
+          JSON.stringify({
+            response: errorBody,
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
 
       const AmountFromAccount = fromAccount.amount - transactionAmount;
@@ -116,23 +134,39 @@ export async function POST(req: Request) {
           account_name: { equals: 'Investment Account' },
         },
       });
-
       const investmentProduct = await payload.findByID({
         collection: 'investment-products',
         id: product_id,
       });
 
       if (investmentAccount.docs[0].amount < transactionAmount) {
-        return NextResponse.json({ error: 'Amount not enough investment' }, { status: 400 });
+        const errorBody = { error: 'Amount not enough investment' };
+        return new Response(
+          JSON.stringify({
+            response: errorBody,
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
 
       if (
         transactionAmount < investmentProduct.min_investment ||
         transactionAmount > investmentProduct.max_investment
       ) {
-        return NextResponse.json({ error: 'Amount not allowed investment' }, { status: 400 });
+        const errorBody = { error: 'Amount not allowed investment' };
+        return new Response(
+          JSON.stringify({
+            response: errorBody,
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
-
       const AmountFromAccount = investmentAccount.docs[0].amount - transactionAmount;
       await payload.update({
         collection: 'accounts',
@@ -153,7 +187,11 @@ export async function POST(req: Request) {
       });
     }
 
-    return NextResponse.json({ response: 'Transfer Fund Successfully' });
+    return new Response(
+      JSON.stringify({
+        response: 'Transfer Fund Successfully',
+      })
+    );
   } catch (error) {
     console.error('Transaction error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
