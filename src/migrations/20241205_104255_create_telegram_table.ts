@@ -2,24 +2,99 @@ import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
 export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
   await payload.db.drizzle.execute(sql`
-   CREATE TYPE "public"."enum_users_role" AS ENUM('admin', 'individual', 'company');
-  CREATE TYPE "public"."enum_users_gender" AS ENUM('Male', 'Female', 'Other');
-  CREATE TYPE "public"."enum_investment_funds_status" AS ENUM('active', 'closed');
-  CREATE TYPE "public"."enum_investment_products_profit_period" AS ENUM('monthly', 'quarterly', 'semi_annually', 'annually');
-  CREATE TYPE "public"."enum_investment_products_status" AS ENUM('available', 'unavailable');
-  CREATE TYPE "public"."enum_contracts_status" AS ENUM('active', 'inactive', 'pending', 'closed');
-  CREATE TYPE "public"."enum_transactions_status" AS ENUM('pending', 'completed', 'failed');
-  CREATE TYPE "public"."enum_transactions_type" AS ENUM('deposit', 'withdraw', 'bonus', 'transfer', 'investment');
-  CREATE TYPE "public"."enum_posts_status" AS ENUM('draft', 'published');
-  CREATE TYPE "public"."enum__posts_v_version_status" AS ENUM('draft', 'published');
-  CREATE TYPE "public"."enum_transfer_cash_requests_type" AS ENUM('deposit', 'withdrawal', 'bonus');
-  CREATE TYPE "public"."enum_transfer_cash_requests_currency" AS ENUM('usd', 'vnd');
-  CREATE TYPE "public"."enum_transfer_cash_requests_status" AS ENUM('draft', 'published');
-  CREATE TYPE "public"."enum_transfer_cash_requests_payment_method" AS ENUM('bank_transfer', 'credit_card', 'paypal', 'crypto');
-  CREATE TYPE "public"."enum__transfer_cash_requests_v_version_type" AS ENUM('deposit', 'withdrawal', 'bonus');
-  CREATE TYPE "public"."enum__transfer_cash_requests_v_version_currency" AS ENUM('usd', 'vnd');
-  CREATE TYPE "public"."enum__transfer_cash_requests_v_version_status" AS ENUM('draft', 'published');
-  CREATE TYPE "public"."enum__transfer_cash_requests_v_version_payment_method" AS ENUM('bank_transfer', 'credit_card', 'paypal', 'crypto');
+  DO $$
+BEGIN
+    -- Check if the enum_users_role type exists
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_users_role') THEN
+        CREATE TYPE "public"."enum_users_role" AS ENUM ('admin', 'individual', 'company');
+    END IF;
+
+    -- Check if the enum_users_gender type exists
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_users_gender') THEN
+        CREATE TYPE "public"."enum_users_gender" AS ENUM ('Male', 'Female', 'Other');
+    END IF;
+
+    -- Check if the enum_investment_funds_status type exists
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_investment_funds_status') THEN
+        CREATE TYPE "public"."enum_investment_funds_status" AS ENUM ('active', 'closed');
+    END IF;
+
+    -- Check if the enum_investment_products_profit_period type exists
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_investment_products_profit_period') THEN
+        CREATE TYPE "public"."enum_investment_products_profit_period" AS ENUM ('monthly', 'quarterly', 'semi_annually', 'annually');
+    END IF;
+
+    -- Check if the enum_investment_products_status type exists
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_investment_products_status') THEN
+        CREATE TYPE "public"."enum_investment_products_status" AS ENUM ('available', 'unavailable');
+    END IF;
+
+    -- Check if the enum_contracts_status type exists
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_contracts_status') THEN
+        CREATE TYPE "public"."enum_contracts_status" AS ENUM ('active', 'inactive', 'pending', 'closed');
+    END IF;
+
+    -- Check if the enum_transactions_status type exists
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_transactions_status') THEN
+        CREATE TYPE "public"."enum_transactions_status" AS ENUM ('pending', 'completed', 'failed');
+    END IF;
+
+    -- Check if the enum_transactions_type type exists
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_transactions_type') THEN
+        CREATE TYPE "public"."enum_transactions_type" AS ENUM ('deposit', 'withdraw', 'bonus', 'transfer', 'investment');
+    END IF;
+
+    -- Check if the enum_posts_status type exists
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_posts_status') THEN
+        CREATE TYPE "public"."enum_posts_status" AS ENUM ('draft', 'published');
+    END IF;
+
+    -- Check if the enum__posts_v_version_status type exists
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum__posts_v_version_status') THEN
+        CREATE TYPE "public"."enum__posts_v_version_status" AS ENUM ('draft', 'published');
+    END IF;
+
+    -- Check if the enum_transfer_cash_requests_type type exists
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_transfer_cash_requests_type') THEN
+        CREATE TYPE "public"."enum_transfer_cash_requests_type" AS ENUM ('deposit', 'withdrawal', 'bonus');
+    END IF;
+
+    -- Check if the enum_transfer_cash_requests_currency type exists
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_transfer_cash_requests_currency') THEN
+        CREATE TYPE "public"."enum_transfer_cash_requests_currency" AS ENUM ('usd', 'vnd');
+    END IF;
+
+    -- Check if the enum_transfer_cash_requests_status type exists
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_transfer_cash_requests_status') THEN
+        CREATE TYPE "public"."enum_transfer_cash_requests_status" AS ENUM ('draft', 'published');
+    END IF;
+
+    -- Check if the enum_transfer_cash_requests_payment_method type exists
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_transfer_cash_requests_payment_method') THEN
+        CREATE TYPE "public"."enum_transfer_cash_requests_payment_method" AS ENUM ('bank_transfer', 'credit_card', 'paypal', 'crypto');
+    END IF;
+
+    -- Check if the enum__transfer_cash_requests_v_version_type type exists
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum__transfer_cash_requests_v_version_type') THEN
+        CREATE TYPE "public"."enum__transfer_cash_requests_v_version_type" AS ENUM ('deposit', 'withdrawal', 'bonus');
+    END IF;
+
+    -- Check if the enum__transfer_cash_requests_v_version_currency type exists
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum__transfer_cash_requests_v_version_currency') THEN
+        CREATE TYPE "public"."enum__transfer_cash_requests_v_version_currency" AS ENUM ('usd', 'vnd');
+    END IF;
+
+    -- Check if the enum__transfer_cash_requests_v_version_status type exists
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum__transfer_cash_requests_v_version_status') THEN
+        CREATE TYPE "public"."enum__transfer_cash_requests_v_version_status" AS ENUM ('draft', 'published');
+    END IF;
+
+    -- Check if the enum__transfer_cash_requests_v_version_payment_method type exists
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum__transfer_cash_requests_v_version_payment_method') THEN
+        CREATE TYPE "public"."enum__transfer_cash_requests_v_version_payment_method" AS ENUM ('bank_transfer', 'credit_card', 'paypal', 'crypto');
+    END IF;
+END $$;
+
   CREATE TABLE IF NOT EXISTS "accounts" (
   	"id" serial PRIMARY KEY NOT NULL,
   	"user_id" integer NOT NULL,
