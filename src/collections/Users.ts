@@ -23,6 +23,11 @@ export const Users: CollectionConfig = {
       relationTo: 'media',
     },
     {
+      name: 'telegram',
+      type: 'relationship',
+      relationTo: 'telegram'
+    },
+    {
       name: 'first_name',
       type: 'text',
       admin: {

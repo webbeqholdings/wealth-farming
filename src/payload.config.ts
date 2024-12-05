@@ -26,6 +26,7 @@ import PostTags from './collections/PostTags'
 import TransferCashRequests from './collections/TransferCashRequests'
 import Units from './collections/Units'
 import InvestmentProfitLoss from './collections/InvestmentProfitLoss'
+import Telegram from './collections/Telegram'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -60,6 +61,7 @@ export default buildConfig({
     InvestmentProducts,
     InvestmentProfitLoss,
     Contracts,
+    Telegram,
     Transactions,
     PostCategories,
     Posts,
