@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getPayloadHMR } from '@payloadcms/next/utilities';
 import config from '@payload-config';
-import { PayloadRequest } from 'payload';
+import { NextRequest } from 'next/server';  // Import NextRequest from 'next/server'
 
-export async function GET(req: PayloadRequest) {
+export async function GET(req: NextRequest) {  // Type the req parameter as NextRequest
   try {
     const url = new URL(req.url);  // req.url contains the full URL
     const user_id = url.searchParams.get('user_id');   // Extract the user_id from the query string
