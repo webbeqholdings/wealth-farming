@@ -1,4 +1,5 @@
-import React from 'react'
+'use client'
+import React, { useState, useEffect } from 'react'
 import {
   Carousel,
   CarouselContent,
@@ -36,7 +37,60 @@ const newsItems = [
   },
 ]
 
+type Content = {
+  root: {
+    type: string;
+    format: string;
+    indent: number;
+    version: number;
+    children: Array<{
+      type: string;
+      format: string;
+      indent: number;
+      children: Array<{ text: string; type: string }>;
+    }>;
+    direction: string;
+  };
+};
+
+type Blog = {
+  id: number;
+  slug: string,
+  title: string;
+  content: Content;
+  published_date: string;
+  status: string;
+  featured_image: {url: string};
+  excerpt: string;  // Added missing 'excerpt'
+  date: string;  // Added missing 'date'
+  readTime: string;  // Added missing 'readTime'
+  image: string;  // Added missing 'image' for the featured article
+};
+
 export function BreakingNewsCarousel() {
+  const [newsItems, setNewsItems] = useState([]);
+  useEffect(() => {
+    // Fetch data from API
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/posts'); // Replace with your actual API endpoint
+        const data = await response.json();
+
+        // Transform API response to the desired format
+        const formattedNews = data.docs.map((post: Blog) => ({
+          title: post.title,
+          content: post.content.root.children[0].children[0].text,
+          date: new Date(post.published_date).toISOString().split('T')[0], // Format date as YYYY-MM-DD
+        }));
+
+        setNewsItems(formattedNews);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []); // Empty dependency array to run only once
   return (
     <section className="py-16 bg-secondary/10">
       <div className="container mx-auto px-4">
