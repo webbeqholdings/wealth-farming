@@ -11,7 +11,7 @@ const TelegramButton: React.FC<TelegramButtonProps> = ({ userId }) => {
     const script = document.createElement('script');
     script.src = "https://telegram.org/js/telegram-widget.js";
     script.async = true;
-    script.setAttribute('data-telegram-login', 'Dev_quote_bot');
+    script.setAttribute('data-telegram-login', 'dev_wealth_farming_bot');
     script.setAttribute('data-size', 'large');
     script.setAttribute('data-auth-url', `https://dev.wealthfarming.org/api/auth/login/telegram?user_id=${userId}`);
     
