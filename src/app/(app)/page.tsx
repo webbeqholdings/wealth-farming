@@ -20,6 +20,8 @@ import {
 } from '@/components/ui/accordion'
 import { CTASection } from '@/components/page-home/CTASection'
 import { BreakingNewsCarousel } from '@/components/page-home/BreakingNews'
+import CryptoDashboard from '@/components/crypto/CryptoDashboard'
+import WorldIndicesDashboard from '@/components/crypto/WorldIndicesDashboard'
 
 export const metadata: Metadata = {
   title: 'Wealth Farming | Cultivate wealth, harvest results',
@@ -102,6 +104,13 @@ export default function IndexPage() {
         />
 
         <div className="container mx-auto px-0 md:py-14">
+          <CryptoDashboard />
+        </div>
+        <div className="container mx-auto px-0 md:py-14">
+          <WorldIndicesDashboard />
+        </div>
+
+        <div className="container mx-auto px-0 md:py-14">
           <div className="mt-10 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">
             Get Started in 30 Seconds!
           </div>
@@ -153,6 +162,7 @@ export default function IndexPage() {
             ))}
           </Accordion>
         </div>
+
         <div className="container mx-auto px-0 md:py-14">
           <BreakingNewsCarousel />
         </div>
