@@ -136,8 +136,8 @@ export default function ProductDetailPage() {
           description: data.description || 'No description available.',
           type: data?.fund.name, // Default type for all products
           interestRate: `${data.interest_rate_from}% - ${data.interest_rate_to}%`,
-          minInvestment: `${data.min_investment}`,
-          maxInvestment: `${data.max_investment}`,
+          minInvestment: data.min_investment,
+          maxInvestment: data.max_investment,
           term: data.profit_period
             ? data.profit_period.replace('_', ' ').toUpperCase()
             : 'N/A',
@@ -145,6 +145,7 @@ export default function ProductDetailPage() {
           endDate: data.end_date,
           status: data.status,
         }
+        setInvestmentAmount(data.min_investment)
         setFinancialProducts(formattedProducts)
       } catch (error) {
         console.error('Failed to fetch investment products:', error)
@@ -425,8 +426,8 @@ export default function ProductDetailPage() {
                   type="number"
                   value={investmentAmount}
                   onChange={(e) => setInvestmentAmount(Number(e.target.value))}
-                  min={product.minInvestment}
-                  max={product.maxInvestment}
+                  min={financialProducts?.minInvestment}
+                  max={financialProducts?.maxInvestment}
                 />
               </div>
               <div>
@@ -434,8 +435,8 @@ export default function ProductDetailPage() {
                 <Slider
                   value={[investmentAmount]}
                   onValueChange={(value) => setInvestmentAmount(value[0])}
-                  max={product.maxInvestment}
-                  min={product.minInvestment}
+                  min={financialProducts?.minInvestment}
+                  max={financialProducts?.maxInvestment}
                   step={100}
                 />
               </div>
