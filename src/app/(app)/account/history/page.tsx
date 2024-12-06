@@ -35,7 +35,7 @@ const chartData = [
 
 export default function HistoryPage() {
   const router = useRouter()
-  const { isLoggedIn, loading } = UserStatus()
+  const { isLoggedIn, loading, user } = UserStatus()
   const [activeTab, setActiveTab] = useState('all')
   const [transactions, setTransactions] = useState([]);
   const [accounts, setAccounts] = useState([]);
@@ -43,8 +43,7 @@ export default function HistoryPage() {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const userId = localStorage.getItem('user_id');
-        const response = await fetch(`/api/accounts?where[user][equals]=${userId}`); // Replace with dynamic user ID if necessary
+        const response = await fetch(`/api/accounts?where[user][equals]=${user.id}`); // Replace with dynamic user ID if necessary
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -64,13 +63,12 @@ export default function HistoryPage() {
     };
 
     fetchTransactions()
-  }, [])
+  }, [loading])
 
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
-        const userId = localStorage.getItem('user_id');
-        const response = await fetch(`/api/transactions?where[user][equals]=${userId}`); // Replace with dynamic user ID if necessary
+        const response = await fetch(`/api/transactions?where[user][equals]=${user.id}`); // Replace with dynamic user ID if necessary
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -95,7 +93,7 @@ export default function HistoryPage() {
     };
 
     fetchAccounts();
-  }, []);
+  }, [loading]);
 
   // If still loading, show a loading indicator (or spinner)
   if (loading) {

@@ -20,21 +20,13 @@ import InvestmentProducts from './collections/InvestmentProducts'
 import SiteSettings from './global-configs/site-settings'
 import { Header } from './global-configs/header'
 import { Footer } from './global-configs/footer'
-import verifyOTPRoute from './routers/verifyOTP'
-import resendOTPRoute from './routers/resendOTP'
-import getBalance from './routers/getBalance'
-import forgotPasword from './routers/forgotPassword'
-import verifyPassword from './routers/verifyPassword'
-import updatePassword from './routers/updatePassword'
-import createTransaction from './routers/createTransaction'
-import signUp from './routers/signUp'
-import recentTransaction from './routers/recentTransaction'
 import PostCategories from './collections/PostCategories'
 import Posts from './collections/Posts'
 import PostTags from './collections/PostTags'
 import TransferCashRequests from './collections/TransferCashRequests'
 import Units from './collections/Units'
 import InvestmentProfitLoss from './collections/InvestmentProfitLoss'
+import Telegram from './collections/Telegram'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -69,6 +61,7 @@ export default buildConfig({
     InvestmentProducts,
     InvestmentProfitLoss,
     Contracts,
+    Telegram,
     Transactions,
     PostCategories,
     Posts,
@@ -76,7 +69,6 @@ export default buildConfig({
     TransferCashRequests,
     Units
   ],
-  endpoints: [recentTransaction, createTransaction, signUp, getBalance, verifyOTPRoute, resendOTPRoute, forgotPasword, verifyPassword, updatePassword],
   globals: [SiteSettings, Header, Footer],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

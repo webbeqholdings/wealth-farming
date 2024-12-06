@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 
 export default function UserStatus() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true); // Loading state to handle async request
-  const router = useRouter(); // Use Next.js router for navigation
+  const [user, setUser] = useState(null); // State to hold the user data
 
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -22,15 +21,18 @@ export default function UserStatus() {
         }
 
         const data = await response.json();
-        // Check if user is null
+        // Check if user data is returned
         if (data.user) {
+          setUser(data.user); // Store the user data in state
           setIsLoggedIn(true);
         } else {
           setIsLoggedIn(false);
+          setUser(null);
         }
       } catch (error) {
         console.error('Error checking login status:', error);
         setIsLoggedIn(false);
+        setUser(null);
       } finally {
         setLoading(false); // Set loading to false when fetch completes
       }
@@ -39,5 +41,6 @@ export default function UserStatus() {
     checkLoginStatus();
   }, []);
 
-  return { isLoggedIn, loading }; // Return both isLoggedIn and loading states
+  // Return the user data, login status, and loading state
+  return { isLoggedIn, loading, user };
 }

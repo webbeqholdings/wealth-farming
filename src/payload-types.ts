@@ -21,6 +21,7 @@ export interface Config {
     'investment-products': InvestmentProduct;
     'investment-profit-loss': InvestmentProfitLoss;
     contracts: Contract;
+    telegram: Telegram;
     transactions: Transaction;
     'post-categories': PostCategory;
     posts: Post;
@@ -42,6 +43,7 @@ export interface Config {
     'investment-products': InvestmentProductsSelect<false> | InvestmentProductsSelect<true>;
     'investment-profit-loss': InvestmentProfitLossSelect<false> | InvestmentProfitLossSelect<true>;
     contracts: ContractsSelect<false> | ContractsSelect<true>;
+    telegram: TelegramSelect<false> | TelegramSelect<true>;
     transactions: TransactionsSelect<false> | TransactionsSelect<true>;
     'post-categories': PostCategoriesSelect<false> | PostCategoriesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
@@ -112,6 +114,7 @@ export interface Account {
 export interface User {
   id: number;
   avatar?: (number | null) | Media;
+  telegram?: (number | null) | Telegram;
   first_name?: string | null;
   last_name?: string | null;
   role: 'admin' | 'individual' | 'company';
@@ -153,6 +156,20 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "telegram".
+ */
+export interface Telegram {
+  id: number;
+  chat_id?: number | null;
+  first_name?: string | null;
+  last_name?: string | null;
+  auth_date?: string | null;
+  hash?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -457,6 +474,10 @@ export interface PayloadLockedDocument {
         value: number | Contract;
       } | null)
     | ({
+        relationTo: 'telegram';
+        value: number | Telegram;
+      } | null)
+    | ({
         relationTo: 'transactions';
         value: number | Transaction;
       } | null)
@@ -568,6 +589,7 @@ export interface BanksSelect<T extends boolean = true> {
  */
 export interface UsersSelect<T extends boolean = true> {
   avatar?: T;
+  telegram?: T;
   first_name?: T;
   last_name?: T;
   role?: T;
@@ -680,6 +702,19 @@ export interface ContractsSelect<T extends boolean = true> {
   amount?: T;
   created_at?: T;
   updated_at?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "telegram_select".
+ */
+export interface TelegramSelect<T extends boolean = true> {
+  chat_id?: T;
+  first_name?: T;
+  last_name?: T;
+  auth_date?: T;
+  hash?: T;
   updatedAt?: T;
   createdAt?: T;
 }

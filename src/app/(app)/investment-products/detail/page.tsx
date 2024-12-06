@@ -67,7 +67,7 @@ const product = {
 }
 
 export default function ProductDetailPage() {
-  const { isLoggedIn, loading } = UserStatus();
+  const { isLoggedIn, loading, user } = UserStatus();
   const [financialProducts, setFinancialProducts] = useState(null)
   const [investmentAmount, setInvestmentAmount] = useState(product.minInvestment)
   const [simulatedReturns, setSimulatedReturns] = useState<{ year: number; balance: number }[]>([])
@@ -86,7 +86,6 @@ export default function ProductDetailPage() {
         router.push('/join');
         return <div>Redirecting...</div>; // Optional: Show a redirect message
       }
-      const userId = localStorage.getItem('user_id');
       const productId = localStorage.getItem('product_id');
       const response = await fetch('/api/transaction/create', {
         method: 'POST',
@@ -94,7 +93,7 @@ export default function ProductDetailPage() {
           'Content-Type': 'application/json', // Specify JSON content type
         },
         body: JSON.stringify({
-          user_id: userId,
+          user_id: user.id,
           product_id: productId,
           amount: investmentAmount,
           status: "pending",

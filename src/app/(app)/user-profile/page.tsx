@@ -34,9 +34,10 @@ import UserBankAccount from '@/components/UserBankAccount'
 import { useRouter } from 'next/navigation'
 import { formatSlug } from '@/utilities/formatSlug'
 import UserStatus from '@/lib/userStatus'
+import TelegramButton from '@/components/TelegramButton'
 
 export default function UserProfile() {
-  const {isLoggedIn, loading} = UserStatus();
+  const { isLoggedIn, loading, user } = UserStatus();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [userInfo, setUserInfo] = useState({
@@ -68,7 +69,8 @@ export default function UserProfile() {
   });
 
   const [telegramNotifications, setTelegramNotifications] = useState({
-    connected: true,
+    id: null,
+    connected: false,
     username: '@alicejohnson',
     settings: {
       transactions: true,
@@ -82,10 +84,10 @@ export default function UserProfile() {
     // Fetch data from your API
     const fetchData = async () => {
       try {
-        const userId = localStorage.getItem('user_id');
+        // Delete the cookies stel_ssid and stel_token
         const totalAmount = localStorage.getItem('total_amount');
         const accountNumber = localStorage.getItem('account_number');
-        const response = await fetch(`/api/users/${userId}`);
+        const response = await fetch(`/api/users/${user.id}`);
         const data = await response.json();
 
         // Update the userInfo state based on the response
@@ -99,30 +101,37 @@ export default function UserProfile() {
           accountNumber: accountNumber, // You can replace this with actual data if available
           balance: Number(totalAmount), // Replace with actual balance if provided by the API
         });
+
+        if (data.telegram) {
+          setTelegramNotifications((prevUser) => ({
+            ...prevUser,
+            connected: true,
+            id: data.telegram.id,
+            username: `${data.telegram.first_name} ${data.telegram.last_name}`
+          }))
+        }
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
     };
 
     fetchData();
-  }, []);
+  }, [loading]);
 
   useEffect(() => {
     const fetchTransactions = async () => {
-      const userId = localStorage.getItem('user_id');
-      const response = await fetch(`/api/recent-transaction?user_id=${userId}`);
+      const response = await fetch(`/api/transaction/recent?user_id=${user.id}`);
       const data = await response.json();
       setTransactions(data.data);
     };
 
     fetchTransactions();
-  }, []);
+  }, [loading]);
 
   const handleUpdateProfile = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     // Collect form data
     const formData = new FormData(event.currentTarget);
-    const userId = localStorage.getItem('user_id');
     const firstName = formData.get('first_name') as string;
     const lastName = formData.get('last_name') as string;
     const email = formData.get('email') as string;
@@ -137,7 +146,7 @@ export default function UserProfile() {
     };
 
     try {
-      const response = await fetch(`/api/users/${userId}`, {
+      const response = await fetch(`/api/users/${user.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -201,14 +210,12 @@ export default function UserProfile() {
       formData.append('file', file);
 
       try {
-        let avatarUrl;
         if (userInfo.avatar === '/placeholder.svg?height=100&width=100') {
           // Upload a new avatar
-          const userId = localStorage.getItem('user_id');
           const uploadedAvatar = await uploadAvatar(formData); // Upload new avatar
     
           // Update user info with the new avatar
-          const updateUserResponse = await fetch(`/api/users/${userId}`, {
+          const updateUserResponse = await fetch(`/api/users/${user.id}`, {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',
@@ -267,24 +274,6 @@ export default function UserProfile() {
     }))
   }
 
-  const disconnectTelegram = () => {
-    setTelegramNotifications((prevUser) => ({
-      ...prevUser,
-      connected: false,
-      username: '',
-    }))
-  }
-
-  const connectTelegram = () => {
-    // In a real application, this would initiate the Telegram bot connection process
-    alert('Connecting to Telegram...')
-    setTelegramNotifications((prevUser) => ({
-      ...prevUser,
-      connected: true,
-      username: '@alicejohnson',
-    }))
-  }
-
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
     return <div>Loading...</div>; // You can replace this with a loading spinner component if desired
@@ -298,278 +287,286 @@ export default function UserProfile() {
 
   return (
     <>
-        <SiteHeader />
-        <div className="container mx-auto p-4">
-          <h1 className="text-3xl font-bold mb-6">User Profile</h1>
-          <div className="grid gap-6 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Personal Information</CardTitle>
-                <CardDescription>Manage your personal details</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-4">
-                    <Avatar className="w-20 h-20">
-                      <AvatarImage src={userInfo.avatar} alt={userInfo.firstName} />
-                      <AvatarFallback>
-                        {userInfo.firstName + ' ' + userInfo.lastName}
-                      </AvatarFallback>
-                    </Avatar>
-                    <Button variant="outline" onClick={handleButtonClick}>
-                      Change Avatar
-                    </Button>
-                    <input
-                      ref={fileInputRef} // Assign the ref to the input
-                      type="file"
-                      onChange={handleAvatarChange}
-                      className="hidden" // Keep the file input hidden
+      <SiteHeader />
+      <div className="container mx-auto p-4">
+        <h1 className="text-3xl font-bold mb-6">User Profile</h1>
+        <div className="grid gap-6 md:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <CardTitle>Personal Information</CardTitle>
+              <CardDescription>Manage your personal details</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-4">
+                  <Avatar className="w-20 h-20">
+                    <AvatarImage src={userInfo.avatar} alt={userInfo.firstName} />
+                    <AvatarFallback>
+                      {userInfo.firstName + ' ' + userInfo.lastName}
+                    </AvatarFallback>
+                  </Avatar>
+                  <Button variant="outline" onClick={handleButtonClick}>
+                    Change Avatar
+                  </Button>
+                  <input
+                    ref={fileInputRef} // Assign the ref to the input
+                    type="file"
+                    onChange={handleAvatarChange}
+                    className="hidden" // Keep the file input hidden
+                  />
+                </div>
+                <form onSubmit={handleUpdateProfile} className="space-y-4">
+                  <div className="flex space-x-4">
+                    <div className="space-y-2 flex-1">
+                      <Label htmlFor="first_name">First Name</Label>
+                      <Input
+                        id="first_name"
+                        name="first_name"
+                        value={userInfo.firstName}
+                        onChange={(e) =>
+                          setUserInfo({ ...userInfo, firstName: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2 flex-1">
+                      <Label htmlFor="last_name">Last Name</Label>
+                      <Input
+                        id="last_name"
+                        name="last_name"
+                        value={userInfo.lastName}
+                        onChange={(e) =>
+                          setUserInfo({ ...userInfo, lastName: e.target.value })
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      value={userInfo.email}
+                      onChange={(e) => setUserInfo({ ...userInfo, email: e.target.value })}
                     />
                   </div>
-                  <form onSubmit={handleUpdateProfile} className="space-y-4">
-                    <div className="flex space-x-4">
-                      <div className="space-y-2 flex-1">
-                        <Label htmlFor="first_name">First Name</Label>
-                        <Input
-                          id="first_name"
-                          name="first_name"
-                          value={userInfo.firstName}
-                          onChange={(e) =>
-                            setUserInfo({ ...userInfo, firstName: e.target.value })
-                          }
-                        />
-                      </div>
-                      <div className="space-y-2 flex-1">
-                        <Label htmlFor="last_name">Last Name</Label>
-                        <Input
-                          id="last_name"
-                          name="last_name"
-                          value={userInfo.lastName}
-                          onChange={(e) =>
-                            setUserInfo({ ...userInfo, lastName: e.target.value })
-                          }
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={userInfo.email}
-                        onChange={(e) => setUserInfo({ ...userInfo, email: e.target.value })}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Phone</Label>
-                      <Input
-                        id="phone"
-                        name="phone"
-                        type="tel"
-                        value={userInfo.phone}
-                        onChange={(e) => setUserInfo({ ...userInfo, phone: e.target.value })}
-                      />
-                    </div>
-                    <Button type="submit" className='mt-5'>Update Profile</Button>
-                  </form>
-                </div>
-
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Account Information</CardTitle>
-                <CardDescription>View your account details and recent transactions</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Tabs defaultValue="details">
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="details">Account Details</TabsTrigger>
-                    <TabsTrigger value="transactions">Recent Transactions</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="details" className="space-y-4">
-                    <div className="flex items-center space-x-4">
-                      <CreditCard className="h-5 w-5 text-muted-foreground" />
-                      <span>Account Number: {userInfo.accountNumber}</span>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      <DollarSign className="h-5 w-5 text-muted-foreground" />
-                      <span>Current Balance: {userInfo.balance.toLocaleString('en-US', { style: 'currency', currency: 'vnd' })}</span>
-                    </div>
-                  </TabsContent>
-                  <TabsContent value="transactions">
-                    <ul className="space-y-2">
-                      {transactions.map((transaction) => (
-                        <li key={transaction.id} className="flex justify-between items-center">
-                          <span>{transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1).toLowerCase()}</span>
-                          <span
-                            className={transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'}
-                          >
-                            {transaction.amount.toLocaleString('en-US', {
-                              style: 'currency',
-                              currency: 'VND',
-                            })}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-              <CardFooter>
-                <Button onClick={() => router.push('/account/history')} variant="outline" className="w-full">
-                  View Full Statement
-                </Button>
-              </CardFooter>
-            </Card>
-          </div>
-
-          <div className="mt-6">
-            <UserBankAccount />
-          </div>
-
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle>Security Settings</CardTitle>
-              <CardDescription>Manage your account security</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-4">
-                  <Lock className="h-5 w-5 text-muted-foreground" />
-                  <span>Two-Factor Authentication</span>
-                </div>
-                <Button variant="outline">Enable</Button>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Phone</Label>
+                    <Input
+                      id="phone"
+                      name="phone"
+                      type="tel"
+                      value={userInfo.phone}
+                      onChange={(e) => setUserInfo({ ...userInfo, phone: e.target.value })}
+                    />
+                  </div>
+                  <Button type="submit" className='mt-5'>Update Profile</Button>
+                </form>
               </div>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-4">
-                  <LineChart className="h-5 w-5 text-muted-foreground" />
-                  <span>Login Activity</span>
-                </div>
-                <Button variant="outline">View</Button>
-              </div>
+
             </CardContent>
           </Card>
 
-          <Card className="mt-6">
+          <Card>
             <CardHeader>
-              <CardTitle>Invite & Earn</CardTitle>
-              <CardDescription>Invite friends and earn rewards</CardDescription>
+              <CardTitle>Account Information</CardTitle>
+              <CardDescription>View your account details and recent transactions</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="referral-code">Your Referral Code</Label>
-                <div className="flex space-x-2">
-                  <Input id="referral-code" value={referralInfo.referralCode} readOnly />
-                  <Button variant="outline" size="icon" onClick={copyReferralCode}>
-                    <Copy className="h-4 w-4" />
-                    <span className="sr-only">Copy referral code</span>
-                  </Button>
-                  <Button variant="outline" size="icon" onClick={shareReferralCode}>
-                    <Share2 className="h-4 w-4" />
-                    <span className="sr-only">Share referral code</span>
-                  </Button>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span>Referral Progress</span>
-                  <span>{referralInfo.referralProgress}%</span>
-                </div>
-                <Progress value={referralInfo.referralProgress} className="w-full" />
-              </div>
-              <div className="space-y-2">
-                <h4 className="font-semibold">Your Referrals</h4>
-                <ul className="space-y-2">
-                  {referralInfo.referrals.map((referral, index) => (
-                    <li key={index} className="flex justify-between items-center">
-                      <span>{referral.name}</span>
-                      <Badge variant={referral.status === 'Active' ? 'default' : 'secondary'}>
-                        {referral.status}
-                      </Badge>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+            <CardContent>
+              <Tabs defaultValue="details">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="details">Account Details</TabsTrigger>
+                  <TabsTrigger value="transactions">Recent Transactions</TabsTrigger>
+                </TabsList>
+                <TabsContent value="details" className="space-y-4">
+                  <div className="flex items-center space-x-4">
+                    <CreditCard className="h-5 w-5 text-muted-foreground" />
+                    <span>Account Number: {userInfo.accountNumber}</span>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <DollarSign className="h-5 w-5 text-muted-foreground" />
+                    <span>Current Balance: {userInfo.balance.toLocaleString('en-US', { style: 'currency', currency: 'vnd' })}</span>
+                  </div>
+                </TabsContent>
+                <TabsContent value="transactions">
+                  <ul className="space-y-2">
+                    {transactions && transactions.map((transaction) => (
+                      <li key={transaction.id} className="flex justify-between items-center">
+                        <span>{transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1).toLowerCase()}</span>
+                        <span
+                          className={transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'}
+                        >
+                          {transaction.amount.toLocaleString('en-US', {
+                            style: 'currency',
+                            currency: 'VND',
+                          })}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </TabsContent>
+              </Tabs>
             </CardContent>
             <CardFooter>
-              <Button className="w-full">
-                <UserPlus className="mr-2 h-4 w-4" />
-                Invite More Friends
+              <Button onClick={() => router.push('/account/history')} variant="outline" className="w-full">
+                View Full Statement
               </Button>
             </CardFooter>
           </Card>
-
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle>Telegram Notifications</CardTitle>
-              <CardDescription>Manage your Telegram notification settings</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {telegramNotifications.connected ? (
-                <>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center space-x-4">
-                      <Bell className="h-5 w-5 text-muted-foreground" />
-                      <span>Connected to Telegram</span>
-                    </div>
-                    <Badge>{telegramNotifications.username}</Badge>
-                  </div>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between space-x-2">
-                      <Label htmlFor="transactions">Transaction Notifications</Label>
-                      <Switch
-                        id="transactions"
-                        checked={telegramNotifications.settings.transactions}
-                        onCheckedChange={() => toggleTelegramNotification('transactions')}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between space-x-2">
-                      <Label htmlFor="balanceUpdates">Balance Updates</Label>
-                      <Switch
-                        id="balanceUpdates"
-                        checked={telegramNotifications.settings.balanceUpdates}
-                        onCheckedChange={() => toggleTelegramNotification('balanceUpdates')}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between space-x-2">
-                      <Label htmlFor="securityAlerts">Security Alerts</Label>
-                      <Switch
-                        id="securityAlerts"
-                        checked={telegramNotifications.settings.securityAlerts}
-                        onCheckedChange={() => toggleTelegramNotification('securityAlerts')}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between space-x-2">
-                      <Label htmlFor="promotions">Promotions and Offers</Label>
-                      <Switch
-                        id="promotions"
-                        checked={telegramNotifications.settings.promotions}
-                        onCheckedChange={() => toggleTelegramNotification('promotions')}
-                      />
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div className="text-center">
-                  <p className="mb-4">Connect your Telegram account to receive notifications</p>
-                  <Button onClick={connectTelegram}>Connect Telegram</Button>
-                </div>
-              )}
-            </CardContent>
-            {telegramNotifications.connected && (
-              <CardFooter>
-                <Button variant="outline" className="w-full" onClick={disconnectTelegram}>
-                  Disconnect Telegram
-                </Button>
-              </CardFooter>
-            )}
-          </Card>
         </div>
-        <SiteFooter />
+
+        <div className="mt-6">
+          <UserBankAccount />
+        </div>
+
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Security Settings</CardTitle>
+            <CardDescription>Manage your account security</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center space-x-4">
+                <Lock className="h-5 w-5 text-muted-foreground" />
+                <span>Two-Factor Authentication</span>
+              </div>
+              <Button variant="outline">Enable</Button>
+            </div>
+            <div className="flex justify-between items-center">
+              <div className="flex items-center space-x-4">
+                <LineChart className="h-5 w-5 text-muted-foreground" />
+                <span>Login Activity</span>
+              </div>
+              <Button variant="outline">View</Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Invite & Earn</CardTitle>
+            <CardDescription>Invite friends and earn rewards</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="referral-code">Your Referral Code</Label>
+              <div className="flex space-x-2">
+                <Input id="referral-code" value={referralInfo.referralCode} readOnly />
+                <Button variant="outline" size="icon" onClick={copyReferralCode}>
+                  <Copy className="h-4 w-4" />
+                  <span className="sr-only">Copy referral code</span>
+                </Button>
+                <Button variant="outline" size="icon" onClick={shareReferralCode}>
+                  <Share2 className="h-4 w-4" />
+                  <span className="sr-only">Share referral code</span>
+                </Button>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span>Referral Progress</span>
+                <span>{referralInfo.referralProgress}%</span>
+              </div>
+              <Progress value={referralInfo.referralProgress} className="w-full" />
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-semibold">Your Referrals</h4>
+              <ul className="space-y-2">
+                {referralInfo.referrals.map((referral, index) => (
+                  <li key={index} className="flex justify-between items-center">
+                    <span>{referral.name}</span>
+                    <Badge variant={referral.status === 'Active' ? 'default' : 'secondary'}>
+                      {referral.status}
+                    </Badge>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button className="w-full">
+              <UserPlus className="mr-2 h-4 w-4" />
+              Invite More Friends
+            </Button>
+          </CardFooter>
+        </Card>
+
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Telegram Notifications</CardTitle>
+            <CardDescription>Manage your Telegram notification settings</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {telegramNotifications.connected ? (
+              <>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center space-x-4">
+                    <Bell className="h-5 w-5 text-muted-foreground" />
+                    <span>Connected to Telegram</span>
+                  </div>
+                  <Badge>{telegramNotifications.username}</Badge>
+                </div>
+
+                {/* Add the link to the Telegram bot */}
+                <div className="mt-4 flex justify-between items-center">
+                  <span className="text-sm text-gray-500">Chat with us on Telegram:</span>
+                  <a
+                    href="https://t.me/dev_wealth_farming_bot"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:text-blue-700 text-sm font-semibold"
+                  >
+                    @dev_wealth_farming_bot
+                  </a>
+                </div>
+
+                <div className="space-y-4 mt-4">
+                  <div className="flex items-center justify-between space-x-2">
+                    <Label htmlFor="transactions">Transaction Notifications</Label>
+                    <Switch
+                      id="transactions"
+                      checked={telegramNotifications.settings.transactions}
+                      onCheckedChange={() => toggleTelegramNotification('transactions')}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between space-x-2">
+                    <Label htmlFor="balanceUpdates">Balance Updates</Label>
+                    <Switch
+                      id="balanceUpdates"
+                      checked={telegramNotifications.settings.balanceUpdates}
+                      onCheckedChange={() => toggleTelegramNotification('balanceUpdates')}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between space-x-2">
+                    <Label htmlFor="securityAlerts">Security Alerts</Label>
+                    <Switch
+                      id="securityAlerts"
+                      checked={telegramNotifications.settings.securityAlerts}
+                      onCheckedChange={() => toggleTelegramNotification('securityAlerts')}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between space-x-2">
+                    <Label htmlFor="promotions">Promotions and Offers</Label>
+                    <Switch
+                      id="promotions"
+                      checked={telegramNotifications.settings.promotions}
+                      onCheckedChange={() => toggleTelegramNotification('promotions')}
+                    />
+                  </div>
+                </div>
+
+              </>
+            ) : (
+              <div className="text-center space-y-4">
+                <p className="mb-4">Connect your Telegram account to receive notifications</p>
+                <TelegramButton userId={user.id} />
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+      <SiteFooter />
     </>
   )
 }

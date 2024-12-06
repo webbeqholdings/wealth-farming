@@ -6,7 +6,7 @@ import { siteConfig } from '@/config/site'
 import { cn } from '@/lib/utils'
 
 import { ThemeProvider } from '@/components/theme-provider'
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from '@/components/ui/toaster'
 
 export const metadata: Metadata = {
   title: {
@@ -70,12 +70,15 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <>
-      <html lang="en" suppressHydrationWarning>
+      <html lang="en">
         <head />
-        <body className={cn('min-h-screen bg-background', openSans.className)}>
+        <body
+          suppressHydrationWarning
+          className={cn('min-h-screen bg-background', openSans.className)}
+        >
           <ThemeProvider
             attribute="class"
-            defaultTheme="system"
+            defaultTheme="dark"
             enableSystem
             disableTransitionOnChange
           >
@@ -83,7 +86,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
               <div className="relative flex min-h-screen flex-col bg-background">
                 {/* <AuthProvider> */}
                 {children}
-                <Toaster/>
+                <Toaster />
                 {/* </AuthProvider> */}
               </div>
             </div>
