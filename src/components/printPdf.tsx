@@ -1,10 +1,10 @@
-import html2pdf from 'html2pdf.js';
 import jsPDF from 'jspdf';
 
 export const printPdf = async () => {
   try {
     const element = document.getElementById('documentContent');
     if (element) {
+      const { default: html2pdf } = await import('html2pdf.js');
       // Show the content before generating the PDF
       element.style.visibility = 'visible';
       element.style.position = '';
