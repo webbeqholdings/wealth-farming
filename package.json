@@ -18,6 +18,7 @@
     "theme-gen": "node src/theme-gen.js"
   },
   "dependencies": {
+    "@fileforge/react-print": "^0.1.150",
     "@hookform/resolvers": "^3.9.1",
     "@payloadcms/db-postgres": "3.0.0-beta.122",
     "@payloadcms/next": "3.0.0-beta.122",
@@ -61,7 +62,9 @@
     "framer-motion": "^12.0.0-alpha.1",
     "geist": "^1.3.1",
     "graphql": "^16.8.1",
+    "html2pdf.js": "^0.10.2",
     "jotai": "^2.10.1",
+    "jspdf": "^2.5.2",
     "lucide-react": "^0.454.0",
     "next": "15.0.0",
     "next-themes": "^0.3.0",

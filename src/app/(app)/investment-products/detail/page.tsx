@@ -38,6 +38,8 @@ import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { toast } from '@/hooks/use-toast'
 import { format } from 'date-fns';
+import { Document } from '@/components/report_finance'
+import { printPdf } from '@/components/printPdf';
 
 // Mock data for a single financial product
 const product = {
@@ -385,14 +387,8 @@ export default function ProductDetailPage() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span>Annual Report 2023</span>
-                    <Button asChild>
-                      <a
-                        href="/reports/annual-report-2023.pdf"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Download PDF
-                      </a>
+                    <Button asChild onClick={printPdf}>
+                      <button>Download PDF</button>
                     </Button>
                   </div>
                   <div className="flex items-center justify-between">
@@ -452,6 +448,9 @@ export default function ProductDetailPage() {
         </Card>
       </div>
       <SiteFooter />
+      <div id="documentContent" style={{ visibility: 'hidden', position: 'absolute' }}>
+        <Document />
+      </div>
     </>
   )
 }
