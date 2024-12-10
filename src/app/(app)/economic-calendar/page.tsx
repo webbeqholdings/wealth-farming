@@ -72,10 +72,34 @@ export default function EconomicCalendar() {
     setDate(newDate);
   };
 
-  const clearFilters = () => {
-    setDate(undefined);
-    setEvents([]); // Clear events when filters are cleared
-  };
+  const clearFilters = async() => {
+      setDate(undefined);
+    
+      try {
+        // Fetch all data without filtering by date
+        const response = await fetch('/api/economic-calendar');
+    
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+    
+        const data = await response.json();
+    
+        // Map the response to the Event template form
+        const mappedEvents = data.docs.map((item: any) => ({
+          id: item.id.toString(),
+          date: new Date(item.createdAt), // Convert to Date object
+          time: item.time || 'N/A', // Handle missing time
+          currency: item.unit?.unit_code || 'N/A', // Handle missing unit
+          event: item.title || 'No title available', // Handle missing title
+          impact: item.impact || 'Low', // Default to 'Low' if impact is missing
+        }));
+    
+        setEvents(mappedEvents);
+      } catch (error) {
+        console.error('Error fetching all events:', error);
+      }
+    };
 
   return (
     <>
