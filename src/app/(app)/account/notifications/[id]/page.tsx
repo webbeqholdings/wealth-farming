@@ -163,11 +163,10 @@ export default function NotificationDetailPage() {
             <CardDescription>{notification.date}</CardDescription>
           </CardHeader>
           <CardContent>
-          {notification.content}
-            {/* <div
-            className="whitespace-pre-wrap"
+          <div
+            className="prose prose-lg max-w-none"
             dangerouslySetInnerHTML={{ __html: notification.content }}
-          /> */}
+          />
           </CardContent>
           <CardFooter className="flex justify-between">
             <Button>
