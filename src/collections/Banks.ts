@@ -8,7 +8,10 @@ export const Banks: CollectionConfig = {
   },
   access: {
     read: isIndividualOrAdmin,
-    update: isIndividualOrAdmin,
+    update: ({ req: { user }, id }) => {
+      // Allow if user is admin or updating their own record
+      return user?.role === 'admin' || user?.id === id;
+    }
   },
   fields: [
     {

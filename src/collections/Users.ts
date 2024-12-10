@@ -1,5 +1,4 @@
-import type { CollectionConfig } from 'payload'
-import { isIndividualOrAdmin } from '../access/isIndividualOrAdmin';
+import type { CollectionConfig } from 'payload';
 import { isAdmin } from '../access/isAdmin';
 import { sendEmail } from '@/utilities/emailSender';
 import { authenticator } from 'otplib';
@@ -13,8 +12,11 @@ export const Users: CollectionConfig = {
   access: {
     read: () => true,
     create: () => true,
-    update: isIndividualOrAdmin,
-    delete: isAdmin,
+    update: ({ req: { user }, id }) => {
+      // Allow if user is admin or updating their own record
+      return user?.role === 'admin' || user?.id === id;
+    },
+    delete: isAdmin, // Only admins can delete
   },
   fields: [
     {
@@ -60,6 +62,9 @@ export const Users: CollectionConfig = {
         },
       ],
       defaultValue: 'individual',
+      access: {
+        update: ({ req: { user } }) => user?.role === 'admin', // Only admins can update the role field
+      },
     },
     {
       name: 'company_name',
