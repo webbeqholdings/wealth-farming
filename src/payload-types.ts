@@ -242,6 +242,21 @@ export interface InvestmentProduct {
   fund: number | InvestmentFund;
   product_name: string;
   description?: string | null;
+  product_overview?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   min_investment: number;
   max_investment?: number | null;
   start_date?: string | null;
@@ -700,6 +715,7 @@ export interface InvestmentProductsSelect<T extends boolean = true> {
   fund?: T;
   product_name?: T;
   description?: T;
+  product_overview?: T;
   min_investment?: T;
   max_investment?: T;
   start_date?: T;

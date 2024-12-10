@@ -59,7 +59,7 @@ export default function NewsDetailPage() {
           category: apiData.category.name,
           content: apiData.content.root.children.map((child: any) => renderContent(child)).join(' '),
           tags: apiData.tags,
-          image: apiData.featured_image.url,
+          image: apiData.featured_image?.url,
           relatedArticles: apiData.relatedPosts.map((data: any) => ({
             id: data?.relatedPost?.id,
             title: data?.relatedPost?.title,

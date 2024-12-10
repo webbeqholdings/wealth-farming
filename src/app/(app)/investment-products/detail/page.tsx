@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { renderContent } from '@/components/contentRenderer'
 import {
   Card,
   CardContent,
@@ -136,6 +137,7 @@ export default function ProductDetailPage() {
           id: data.id,
           name: data.product_name,
           description: data.description || 'No description available.',
+          product_overview: data.product_overview.root.children.map((child: any) => renderContent(child)).join(' '),
           type: data?.fund.name, // Default type for all products
           interestRate: `${data.interest_rate_from}% - ${data.interest_rate_to}%`,
           minInvestment: data.min_investment,
@@ -241,25 +243,10 @@ export default function ProductDetailPage() {
           </TabsList>
           <TabsContent value="overview">
             <Card>
-              <CardHeader>
-                <CardTitle>Product Overview</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>
-                  The {financialProducts?.name} offers investors exposure to a carefully selected portfolio of
-                  growth stocks. This ETF aims to provide long-term capital appreciation by
-                  investing in companies with above-average growth potential.
-                </p>
-                <div className="mt-4">
-                  <h4 className="font-semibold mb-2">Key Features:</h4>
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li>Diversified exposure to growth stocks</li>
-                    <li>Professional management</li>
-                    <li>Low expense ratio compared to actively managed funds</li>
-                    <li>Potential for higher returns (with corresponding higher risk)</li>
-                  </ul>
-                </div>
-              </CardContent>
+              <div
+                className="prose prose-lg max-w-none p-7"
+                dangerouslySetInnerHTML={{ __html: financialProducts?.product_overview }}
+              />
             </Card>
           </TabsContent>
           <TabsContent value="performance">

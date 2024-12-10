@@ -23,13 +23,13 @@ export const renderContent = (child: any) => {
           .join('');
   
         if (child.listType === 'number') {
-          return `<ol style="list-style-type: decimal;">${listItems}</ol>`;
+          return `<ol style="list-style-type: decimal; margin-left: 15px">${listItems}</ol>`;
         }
         if (child.listType === 'bullet') {
-          return `<ul style="list-style-type: disc;">${listItems}</ul>`;
+          return `<ul style="list-style-type: disc; margin-left: 15px">${listItems}</ul>`;
         }
         if (child.listType === 'check') {
-          return `<ul style="list-style-type: none;">${listItems}</ul>`;
+          return `<ul style="list-style-type: none; margin-left: 15px">${listItems}</ul>`;
         }
       }
       case 'quote':
