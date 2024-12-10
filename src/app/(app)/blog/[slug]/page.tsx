@@ -1,5 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
+import { renderContent } from '@/components/contentRenderer';
 import Image from 'next/image'
 import Link from 'next/link'
 import { format } from 'date-fns'
@@ -33,12 +34,6 @@ export default function NewsDetailPage() {
     tags: [{ postTags: { id: 1, name: 'global-investment' } }, { id: 2, relatedPost: { name: 'finance' } }, { relatedPost: { id: 3, name: 'economy' } }],
     relatedArticles: [],
   });
-
-  type RelatedPost = {
-    id: number;
-    title: string;
-    slug: string;
-  };
 
   useEffect(() => {
     const loadArticleData = async () => {
@@ -78,76 +73,6 @@ export default function NewsDetailPage() {
 
     loadArticleData();
   }, []);
-
-  const renderContent = (child: any) => {
-    switch (child.type) {
-      case 'paragraph':
-        return `<p>${child.children[0]?.text ?? '</br>'}</p>`;
-      case 'upload':
-        return `<img src="${child.value.url}" width="${child.value.width}px" height="${child.value.height}px" alt="${child.value.filename}" class="rounded-lg mb-8" />`;
-      case 'list': {
-        // Determine if the list type is "check" or "number"
-        const listItems = child.children.map((item: any, index: number) => {
-          const text = item.children[0].text;
-          const isChecked = item.checked ? 'checked' : ''; // Check if the item is marked as checked
-          const textStyle = item.checked ? 'text-decoration: line-through;' : ''; // Apply strikethrough if checked
-
-          return `<li key="${index}">
-                      ${child.listType === 'check' ? `<input type="checkbox" ${isChecked} disabled />` : ''}
-                      <span style="${textStyle}">${text}</span>
-                    </li>`;
-        }).join('');
-
-        // If listType is "number", return ordered list (ol), otherwise default to unordered list (ul)
-        if (child.listType === 'number') {
-          return `<ol style="list-style-type: decimal;">${listItems}</ol>`
-        }
-        if (child.listType === 'bullet') {
-          return `<ul style="list-style-type: disc;">${listItems}</ul>`;
-        } 
-        if (child.listType === 'check'){
-          return `<ul style="list-style-type: none;">${listItems}</ul>`;
-        }
-      }
-      case 'quote':
-        return `<blockquote><p>${child.children[0]?.text || 'Quote text'}</p></blockquote>`;
-      case 'heading': {
-        const text = child.children[0].text;
-        let style = '';
-
-        // Set styles based on the tag type (h1, h2, h3, h4, h5, h6)
-        switch (child.tag) {
-          case 'h1':
-            style = 'font-size: 32px; margin-bottom: 10px; font-weight: bold;';
-            break;
-          case 'h2':
-            style = 'font-size: 28px; margin-bottom: 8px; font-weight: bold;';
-            break;
-          case 'h3':
-            style = 'font-size: 24px; margin-bottom: 8px; font-weight: bold;';
-            break;
-          case 'h4':
-            style = 'font-size: 20px; margin-bottom: 8px; font-weight: bold;';
-            break;
-          case 'h5':
-            style = 'font-size: 18px; margin-bottom: 8px; font-weight: bold;';
-            break;
-          case 'h6':
-            style = 'font-size: 16px; margin-bottom: 8px; font-weight: bold;';
-            break;
-          default:
-            style = ''; // If it's not a recognized heading tag
-        }
-
-        // Return the HTML with the style applied dynamically
-        return `<${child.tag} style="${style}">${text}</${child.tag}>`;
-      }
-      case 'horizontalrule':
-        return `<hr />`;
-      default:
-        return '';
-    }
-  };
 
   return (
     <div>
