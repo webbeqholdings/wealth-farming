@@ -1,4 +1,5 @@
-import { notFound } from 'next/navigation'
+'use client'
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link'
 import {
   Card,
@@ -11,21 +12,10 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Bell } from 'lucide-react'
-
-// This would typically come from an API or database
-const notifications = [
-  {
-    id: 1,
-    title: 'New Investment Opportunity',
-    description: 'A new high-yield fund is now available for investment.',
-    date: '2024-12-10',
-    type: 'opportunity',
-    isRead: false,
-    content:
-      'We are excited to announce a new investment opportunity in our high-yield fund. This fund focuses on emerging markets and has shown consistent returns over the past 5 years. Key features include:\n\n- Expected annual return: 8-10%\n- Minimum investment: $10,000\n- Low management fees\n- Diversified portfolio across multiple sectors\n\nPlease review the prospectus carefully before making any investment decisions. Our financial advisors are available to discuss this opportunity in detail and help you determine if it aligns with your investment goals.',
-  },
-  // ... other notifications (add full content for each)
-]
+import { formatDateTime } from '@/utilities/formatDateTime';
+import { useParams } from "next/navigation";
+import { SiteHeader } from '@/components/site-header';
+import { SiteFooter } from '@/components/site-footer';
 
 const getTypeColor = (type: string) => {
   switch (type) {
@@ -44,40 +34,79 @@ const getTypeColor = (type: string) => {
   }
 }
 
-export default function NotificationDetailPage({ params }: { params: { id: string } }) {
-  const notification = notifications.find((n) => n.id === parseInt(params.id))
+export default function NotificationDetailPage() {
+  const params = useParams();
+  const [notification, setNotification] = useState({
+    id: 1,
+    title: '',
+    description: '',
+    date: '',
+    type: '',
+    content: '',
+  });
 
-  if (!notification) {
-    notFound()
-  }
+  // Fetch data from API when the component mounts
+  useEffect(() => {
+    // Function to fetch notification data from the API
+    const fetchNotificationData = async () => {
+      try {
+        const response = await fetch(`/api/notifications/${params.id}`);
+        const data = await response.json();
+
+        // Update state with the fetched data
+        setNotification({
+          id: data.id,
+          title: data.title,
+          description: data.description,
+          date: formatDateTime(data.date), // Format the date
+          type: data.type,
+          content: data.content,
+        });
+      } catch (error) {
+        console.error('Error fetching notification:', error);
+      }
+    };
+
+    // Call the fetch function
+    fetchNotificationData();
+  }, []); // Empty dependency array ensures this runs only once on mount
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Link href="/notifications" className="flex items-center text-primary hover:underline mb-4">
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to Notifications
-      </Link>
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle className="text-2xl font-bold flex items-center">
-              <Bell className="mr-2" />
-              {notification.title}
-            </CardTitle>
-            <Badge className={`${getTypeColor(notification.type)} text-white`}>
-              {notification.type}
-            </Badge>
-          </div>
-          <CardDescription>{notification.date}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="whitespace-pre-wrap">{notification.content}</p>
-        </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button variant="outline">Mark as {notification.isRead ? 'Unread' : 'Read'}</Button>
-          <Button>Take Action</Button>
-        </CardFooter>
-      </Card>
-    </div>
+    <>
+      <SiteHeader />
+      <div className="container mx-auto px-4 py-8">
+        <Link href="/account/notifications" className="flex items-center text-primary hover:underline mb-4">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Notifications
+        </Link>
+        <Card className="max-w-2xl mx-auto">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-2xl font-bold flex items-center">
+                <Bell className="mr-2" />
+                {notification.title}
+              </CardTitle>
+              <Badge className={`${getTypeColor(notification.type)} text-white`}>
+                {notification.type}
+              </Badge>
+            </div>
+            <CardDescription>{notification.date}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="whitespace-pre-wrap">{notification.content}</p>
+          </CardContent>
+          <CardFooter className="flex justify-between">
+            <Button>
+              {notification.type == 'account' ?<Link href="/account/history">Take Action</Link> : ''}
+              {notification.type == 'transaction' ?<Link href="/account/history">Take Action</Link> : ''}
+              {notification.type == 'opportunity' ?<Link href="/investment-products">Take Action</Link> : ''}
+              {notification.type == 'security' ?<Link href="/account/history">Take Action</Link> : ''}
+              {notification.type == 'alert' ?<Link href="/account/history">Take Action</Link> : ''}
+            </Button>
+          </CardFooter>
+        </Card>
+        <SiteFooter />
+      </div>
+    </>
   )
 }

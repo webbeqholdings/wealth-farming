@@ -27,6 +27,8 @@ import TransferCashRequests from './collections/TransferCashRequests'
 import Units from './collections/Units'
 import InvestmentProfitLoss from './collections/InvestmentProfitLoss'
 import Telegram from './collections/Telegram'
+import Notification from './collections/Notifications'
+import EconomicCalendar from './collections/EconomicCalendar'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -54,20 +56,22 @@ export default buildConfig({
     Accounts,
     Address,
     Banks,
-    Users,
-    Media,
     Companies,
+    Contracts,
+    EconomicCalendar,
     InvestmentFunds,
     InvestmentProducts,
     InvestmentProfitLoss,
-    Contracts,
     Telegram,
     Transactions,
+    TransferCashRequests,
     PostCategories,
     Posts,
     PostTags,
-    TransferCashRequests,
-    Units
+    Users,
+    Units,
+    Notification,
+    Media,
   ],
   globals: [SiteSettings, Header, Footer],
   editor: lexicalEditor(),

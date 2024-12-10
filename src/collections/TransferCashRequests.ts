@@ -26,7 +26,6 @@ export const TransferCashRequests: CollectionConfig = {
     ],
     afterChange: [
       async ({ req, doc }) => {
-        console.log('doc TransferCashRequests ', doc)
         return doc
       },
     ],
