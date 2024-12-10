@@ -130,14 +130,15 @@ export default function EconomicCalendar() {
                           <Badge
                             variant={
                               event.impact === 'High'
-                                ? 'destructive'
+                                ? 'destructive' // High -> destructive
                                 : event.impact === 'Medium'
-                                  ? 'warning'
-                                  : 'secondary'
+                                  ? 'default' // Medium -> default
+                                  : 'secondary' // Low -> secondary
                             }
                           >
                             {event.impact}
                           </Badge>
+
                         </TableCell>
                       </TableRow>
                     ))
