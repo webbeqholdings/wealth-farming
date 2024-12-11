@@ -74,9 +74,6 @@ export default function UserProfile() {
     username: '@alicejohnson',
     settings: {
       transactions: true,
-      balanceUpdates: false,
-      securityAlerts: true,
-      promotions: false,
     },
   });
 
@@ -530,32 +527,7 @@ export default function UserProfile() {
                       onCheckedChange={() => toggleTelegramNotification('transactions')}
                     />
                   </div>
-                  <div className="flex items-center justify-between space-x-2">
-                    <Label htmlFor="balanceUpdates">Balance Updates</Label>
-                    <Switch
-                      id="balanceUpdates"
-                      checked={telegramNotifications.settings.balanceUpdates}
-                      onCheckedChange={() => toggleTelegramNotification('balanceUpdates')}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between space-x-2">
-                    <Label htmlFor="securityAlerts">Security Alerts</Label>
-                    <Switch
-                      id="securityAlerts"
-                      checked={telegramNotifications.settings.securityAlerts}
-                      onCheckedChange={() => toggleTelegramNotification('securityAlerts')}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between space-x-2">
-                    <Label htmlFor="promotions">Promotions and Offers</Label>
-                    <Switch
-                      id="promotions"
-                      checked={telegramNotifications.settings.promotions}
-                      onCheckedChange={() => toggleTelegramNotification('promotions')}
-                    />
-                  </div>
                 </div>
-
               </>
             ) : (
               <div className="text-center space-y-4">

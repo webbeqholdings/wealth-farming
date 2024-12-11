@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { renderContent } from '@/components/contentRenderer'
 import {
   Card,
   CardContent,
@@ -38,6 +39,8 @@ import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { toast } from '@/hooks/use-toast'
 import { format } from 'date-fns';
+import { Document } from '@/components/report_finance'
+import { printPdf } from '@/components/printPdf';
 
 // Mock data for a single financial product
 const product = {
@@ -134,10 +137,11 @@ export default function ProductDetailPage() {
           id: data.id,
           name: data.product_name,
           description: data.description || 'No description available.',
+          product_overview: data.product_overview.root.children.map((child: any) => renderContent(child)).join(' '),
           type: data?.fund.name, // Default type for all products
           interestRate: `${data.interest_rate_from}% - ${data.interest_rate_to}%`,
-          minInvestment: `${data.min_investment}`,
-          maxInvestment: `${data.max_investment}`,
+          minInvestment: data.min_investment,
+          maxInvestment: data.max_investment,
           term: data.profit_period
             ? data.profit_period.replace('_', ' ').toUpperCase()
             : 'N/A',
@@ -145,6 +149,7 @@ export default function ProductDetailPage() {
           endDate: data.end_date,
           status: data.status,
         }
+        setInvestmentAmount(data.min_investment)
         setFinancialProducts(formattedProducts)
       } catch (error) {
         console.error('Failed to fetch investment products:', error)
@@ -238,25 +243,10 @@ export default function ProductDetailPage() {
           </TabsList>
           <TabsContent value="overview">
             <Card>
-              <CardHeader>
-                <CardTitle>Product Overview</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>
-                  The {financialProducts?.name} offers investors exposure to a carefully selected portfolio of
-                  growth stocks. This ETF aims to provide long-term capital appreciation by
-                  investing in companies with above-average growth potential.
-                </p>
-                <div className="mt-4">
-                  <h4 className="font-semibold mb-2">Key Features:</h4>
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li>Diversified exposure to growth stocks</li>
-                    <li>Professional management</li>
-                    <li>Low expense ratio compared to actively managed funds</li>
-                    <li>Potential for higher returns (with corresponding higher risk)</li>
-                  </ul>
-                </div>
-              </CardContent>
+              <div
+                className="prose prose-lg max-w-none p-7"
+                dangerouslySetInnerHTML={{ __html: financialProducts?.product_overview }}
+              />
             </Card>
           </TabsContent>
           <TabsContent value="performance">
@@ -384,14 +374,8 @@ export default function ProductDetailPage() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span>Annual Report 2023</span>
-                    <Button asChild>
-                      <a
-                        href="/reports/annual-report-2023.pdf"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Download PDF
-                      </a>
+                    <Button asChild onClick={printPdf}>
+                      <button>Download PDF</button>
                     </Button>
                   </div>
                   <div className="flex items-center justify-between">
@@ -425,8 +409,8 @@ export default function ProductDetailPage() {
                   type="number"
                   value={investmentAmount}
                   onChange={(e) => setInvestmentAmount(Number(e.target.value))}
-                  min={product.minInvestment}
-                  max={product.maxInvestment}
+                  min={financialProducts?.minInvestment}
+                  max={financialProducts?.maxInvestment}
                 />
               </div>
               <div>
@@ -434,8 +418,8 @@ export default function ProductDetailPage() {
                 <Slider
                   value={[investmentAmount]}
                   onValueChange={(value) => setInvestmentAmount(value[0])}
-                  max={product.maxInvestment}
-                  min={product.minInvestment}
+                  min={financialProducts?.minInvestment}
+                  max={financialProducts?.maxInvestment}
                   step={100}
                 />
               </div>
@@ -451,6 +435,9 @@ export default function ProductDetailPage() {
         </Card>
       </div>
       <SiteFooter />
+      <div id="documentContent" style={{ visibility: 'hidden', position: 'absolute' }}>
+        <Document />
+      </div>
     </>
   )
 }

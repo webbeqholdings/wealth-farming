@@ -83,7 +83,7 @@ export default function DepositPage() {
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [amount, setAmount] = useState('')
-  const [currency, setCurrency] = useState('USD')
+  const [currency, setCurrency] = useState('VND')
   const [method, setMethod] = useState('bank')
   const [accountNumber, setAccountNumber] = useState('')
   const [accounts, setAccounts] = useState([]);
@@ -249,6 +249,7 @@ export default function DepositPage() {
                           <SelectValue placeholder="Currency" />
                         </SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="VND">VND</SelectItem>
                           <SelectItem value="USD">USD</SelectItem>
                           <SelectItem value="EUR">EUR</SelectItem>
                           <SelectItem value="GBP">GBP</SelectItem>

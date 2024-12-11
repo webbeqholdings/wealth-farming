@@ -29,6 +29,11 @@ const InvestmentProducts: CollectionConfig = {
       label: 'Product Description',
     },
     {
+      name: 'product_overview',
+      type: 'richText',
+      label: 'Product Overview',
+    },
+    {
       name: 'min_investment',
       type: 'number',
       label: 'Minimum Investment',

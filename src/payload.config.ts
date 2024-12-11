@@ -5,6 +5,7 @@ import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
+import { seoPlugin } from '@payloadcms/plugin-seo';
 
 import { Users } from './collections/Users'
 import { Banks } from './collections/Banks'
@@ -27,6 +28,8 @@ import TransferCashRequests from './collections/TransferCashRequests'
 import Units from './collections/Units'
 import InvestmentProfitLoss from './collections/InvestmentProfitLoss'
 import Telegram from './collections/Telegram'
+import Notification from './collections/Notifications'
+import EconomicCalendar from './collections/EconomicCalendar'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -36,6 +39,29 @@ export default buildConfig({
     user: Users.slug,
     importMap: {
       baseDir: path.resolve(dirname),
+    },
+    meta: {
+      openGraph: {
+        description: 'The best admin panel in the world',
+        images: [
+          {
+            url: 'https://i.postimg.cc/0NV32J1w/favicon-32x32.png',
+            width: 800,
+            height: 600,
+          },
+        ],
+        siteName: 'Payload',
+        title: 'My Admin Panel',
+      },
+      titleSuffix: '- Wealth Farming',
+      icons: [
+        {
+          url: 'https://i.postimg.cc/0NV32J1w/favicon-32x32.png',
+          rel: 'icon',
+          sizes: '32x32',
+          type: 'image/png',
+        },
+      ],
     },
   },
   email: nodemailerAdapter({
@@ -54,20 +80,26 @@ export default buildConfig({
     Accounts,
     Address,
     Banks,
-    Users,
-    Media,
     Companies,
+    Contracts,
+    EconomicCalendar,
     InvestmentFunds,
     InvestmentProducts,
     InvestmentProfitLoss,
-    Contracts,
     Telegram,
     Transactions,
+    TransferCashRequests,
     PostCategories,
     Posts,
     PostTags,
-    TransferCashRequests,
-    Units
+    Users,
+    Units,
+    Notification,
+    Media,
+    {
+      slug: 'pages',
+      fields: []
+    },
   ],
   globals: [SiteSettings, Header, Footer],
   editor: lexicalEditor(),
@@ -82,5 +114,14 @@ export default buildConfig({
   }),
   plugins: [
     // storage-adapter-placeholder
+    seoPlugin({
+      collections: [
+        'pages'
+      ],
+      uploadsCollection: 'media',
+      generateTitle: ({ doc }) => `Website.com — ${doc.title}`,
+      generateDescription: ({ doc }) => doc.excerpt,
+      generateURL: ({ doc, collectionSlug }) =>`https://dev.wealthfarming.org`,
+    })
   ],
 })

@@ -14,20 +14,23 @@ export interface Config {
     accounts: Account;
     address: Address;
     banks: Bank;
-    users: User;
-    media: Media;
     companies: Company;
+    contracts: Contract;
+    'economic-calendar': EconomicCalendar;
     'investment-funds': InvestmentFund;
     'investment-products': InvestmentProduct;
     'investment-profit-loss': InvestmentProfitLoss;
-    contracts: Contract;
     telegram: Telegram;
     transactions: Transaction;
+    'transfer-cash-requests': TransferCashRequest;
     'post-categories': PostCategory;
     posts: Post;
     'post-tags': PostTag;
-    'transfer-cash-requests': TransferCashRequest;
+    users: User;
     units: Unit;
+    notifications: Notification;
+    media: Media;
+    pages: Page;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -36,20 +39,23 @@ export interface Config {
     accounts: AccountsSelect<false> | AccountsSelect<true>;
     address: AddressSelect<false> | AddressSelect<true>;
     banks: BanksSelect<false> | BanksSelect<true>;
-    users: UsersSelect<false> | UsersSelect<true>;
-    media: MediaSelect<false> | MediaSelect<true>;
     companies: CompaniesSelect<false> | CompaniesSelect<true>;
+    contracts: ContractsSelect<false> | ContractsSelect<true>;
+    'economic-calendar': EconomicCalendarSelect<false> | EconomicCalendarSelect<true>;
     'investment-funds': InvestmentFundsSelect<false> | InvestmentFundsSelect<true>;
     'investment-products': InvestmentProductsSelect<false> | InvestmentProductsSelect<true>;
     'investment-profit-loss': InvestmentProfitLossSelect<false> | InvestmentProfitLossSelect<true>;
-    contracts: ContractsSelect<false> | ContractsSelect<true>;
     telegram: TelegramSelect<false> | TelegramSelect<true>;
     transactions: TransactionsSelect<false> | TransactionsSelect<true>;
+    'transfer-cash-requests': TransferCashRequestsSelect<false> | TransferCashRequestsSelect<true>;
     'post-categories': PostCategoriesSelect<false> | PostCategoriesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     'post-tags': PostTagsSelect<false> | PostTagsSelect<true>;
-    'transfer-cash-requests': TransferCashRequestsSelect<false> | TransferCashRequestsSelect<true>;
+    users: UsersSelect<false> | UsersSelect<true>;
     units: UnitsSelect<false> | UnitsSelect<true>;
+    notifications: NotificationsSelect<false> | NotificationsSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -216,6 +222,56 @@ export interface Company {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contracts".
+ */
+export interface Contract {
+  id: number;
+  product_id: number | InvestmentProduct;
+  account_id: number | Account;
+  status: 'active' | 'inactive' | 'pending' | 'closed';
+  amount: number;
+  created_at?: string | null;
+  updated_at?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "investment-products".
+ */
+export interface InvestmentProduct {
+  id: number;
+  fund: number | InvestmentFund;
+  product_name: string;
+  description?: string | null;
+  product_overview?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  min_investment: number;
+  max_investment?: number | null;
+  start_date?: string | null;
+  end_date?: string | null;
+  interest_rate_from: number;
+  interest_rate_to: number;
+  profit_period: 'monthly' | 'quarterly' | 'semi_annually' | 'annually';
+  status: 'available' | 'unavailable';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "investment-funds".
  */
 export interface InvestmentFund {
@@ -235,34 +291,14 @@ export interface InvestmentFund {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "investment-products".
+ * via the `definition` "economic-calendar".
  */
-export interface InvestmentProduct {
+export interface EconomicCalendar {
   id: number;
-  fund: number | InvestmentFund;
-  product_name: string;
-  description?: string | null;
-  min_investment: number;
-  max_investment?: number | null;
-  start_date?: string | null;
-  end_date?: string | null;
-  interest_rate_from: number;
-  interest_rate_to: number;
-  profit_period: 'monthly' | 'quarterly' | 'semi_annually' | 'annually';
-  status: 'available' | 'unavailable';
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "investment-profit-loss".
- */
-export interface InvestmentProfitLoss {
-  id: number;
-  investment_product: number | InvestmentProduct;
-  profit_or_loss: number;
-  unit: number | Unit;
-  description?: string | null;
+  title?: string | null;
+  impact?: string | null;
+  unit?: (number | null) | Unit;
+  time?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -280,16 +316,14 @@ export interface Unit {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "contracts".
+ * via the `definition` "investment-profit-loss".
  */
-export interface Contract {
+export interface InvestmentProfitLoss {
   id: number;
-  product_id: number | InvestmentProduct;
-  account_id: number | Account;
-  status: 'active' | 'inactive' | 'pending' | 'closed';
-  amount: number;
-  created_at?: string | null;
-  updated_at?: string | null;
+  investment_product: number | InvestmentProduct;
+  profit_or_loss: number;
+  unit: number | Unit;
+  description?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -311,6 +345,52 @@ export interface Transaction {
   type: 'deposit' | 'withdraw' | 'bonus' | 'transfer' | 'investment';
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "transfer-cash-requests".
+ */
+export interface TransferCashRequest {
+  id: number;
+  type: 'deposit' | 'withdrawal' | 'bonus';
+  amount: number;
+  currency: 'usd' | 'vnd';
+  status: 'pending' | 'approved' | 'rejected' | 'completed' | 'cancelled';
+  account: number | Account;
+  payment_method: 'bank_transfer' | 'credit_card' | 'paypal' | 'crypto';
+  transaction_details?: {
+    transaction_id?: string | null;
+    payment_proof?: (number | null) | Media;
+    processing_date?: string | null;
+  };
+  notes?: string | null;
+  admin_notes?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  extra_data?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -382,23 +462,15 @@ export interface PostTag {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "transfer-cash-requests".
+ * via the `definition` "notifications".
  */
-export interface TransferCashRequest {
+export interface Notification {
   id: number;
-  type: 'deposit' | 'withdrawal' | 'bonus';
-  amount: number;
-  currency: 'usd' | 'vnd';
-  status: 'pending' | 'approved' | 'rejected' | 'completed' | 'cancelled';
-  account: number | Account;
-  payment_method: 'bank_transfer' | 'credit_card' | 'paypal' | 'crypto';
-  transaction_details?: {
-    transaction_id?: string | null;
-    payment_proof?: (number | null) | Media;
-    processing_date?: string | null;
-  };
-  notes?: string | null;
-  admin_notes?: {
+  title: string;
+  description: string;
+  date: string;
+  type: 'opportunity' | 'account' | 'alert' | 'transaction' | 'security';
+  content?: {
     root: {
       type: string;
       children: {
@@ -413,18 +485,22 @@ export interface TransferCashRequest {
     };
     [k: string]: unknown;
   } | null;
-  extra_data?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
   updatedAt: string;
   createdAt: string;
-  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: number;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    image?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -446,16 +522,16 @@ export interface PayloadLockedDocument {
         value: number | Bank;
       } | null)
     | ({
-        relationTo: 'users';
-        value: number | User;
-      } | null)
-    | ({
-        relationTo: 'media';
-        value: number | Media;
-      } | null)
-    | ({
         relationTo: 'companies';
         value: number | Company;
+      } | null)
+    | ({
+        relationTo: 'contracts';
+        value: number | Contract;
+      } | null)
+    | ({
+        relationTo: 'economic-calendar';
+        value: number | EconomicCalendar;
       } | null)
     | ({
         relationTo: 'investment-funds';
@@ -470,16 +546,16 @@ export interface PayloadLockedDocument {
         value: number | InvestmentProfitLoss;
       } | null)
     | ({
-        relationTo: 'contracts';
-        value: number | Contract;
-      } | null)
-    | ({
         relationTo: 'telegram';
         value: number | Telegram;
       } | null)
     | ({
         relationTo: 'transactions';
         value: number | Transaction;
+      } | null)
+    | ({
+        relationTo: 'transfer-cash-requests';
+        value: number | TransferCashRequest;
       } | null)
     | ({
         relationTo: 'post-categories';
@@ -494,12 +570,24 @@ export interface PayloadLockedDocument {
         value: number | PostTag;
       } | null)
     | ({
-        relationTo: 'transfer-cash-requests';
-        value: number | TransferCashRequest;
+        relationTo: 'users';
+        value: number | User;
       } | null)
     | ({
         relationTo: 'units';
         value: number | Unit;
+      } | null)
+    | ({
+        relationTo: 'notifications';
+        value: number | Notification;
+      } | null)
+    | ({
+        relationTo: 'media';
+        value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'pages';
+        value: number | Page;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -585,53 +673,6 @@ export interface BanksSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users_select".
- */
-export interface UsersSelect<T extends boolean = true> {
-  avatar?: T;
-  telegram?: T;
-  first_name?: T;
-  last_name?: T;
-  role?: T;
-  company_name?: T;
-  registration_number?: T;
-  phone_contact?: T;
-  date_of_birth?: T;
-  nation?: T;
-  gender?: T;
-  email_verified?: T;
-  otp?: T;
-  otp_expires_at?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  email?: T;
-  resetPasswordToken?: T;
-  resetPasswordExpiration?: T;
-  salt?: T;
-  hash?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media_select".
- */
-export interface MediaSelect<T extends boolean = true> {
-  alt?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "companies_select".
  */
 export interface CompaniesSelect<T extends boolean = true> {
@@ -639,6 +680,32 @@ export interface CompaniesSelect<T extends boolean = true> {
   registration_number?: T;
   address?: T;
   contact_person?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contracts_select".
+ */
+export interface ContractsSelect<T extends boolean = true> {
+  product_id?: T;
+  account_id?: T;
+  status?: T;
+  amount?: T;
+  created_at?: T;
+  updated_at?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "economic-calendar_select".
+ */
+export interface EconomicCalendarSelect<T extends boolean = true> {
+  title?: T;
+  impact?: T;
+  unit?: T;
+  time?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -668,6 +735,7 @@ export interface InvestmentProductsSelect<T extends boolean = true> {
   fund?: T;
   product_name?: T;
   description?: T;
+  product_overview?: T;
   min_investment?: T;
   max_investment?: T;
   start_date?: T;
@@ -688,20 +756,6 @@ export interface InvestmentProfitLossSelect<T extends boolean = true> {
   profit_or_loss?: T;
   unit?: T;
   description?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "contracts_select".
- */
-export interface ContractsSelect<T extends boolean = true> {
-  product_id?: T;
-  account_id?: T;
-  status?: T;
-  amount?: T;
-  created_at?: T;
-  updated_at?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -735,6 +789,31 @@ export interface TransactionsSelect<T extends boolean = true> {
   type?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "transfer-cash-requests_select".
+ */
+export interface TransferCashRequestsSelect<T extends boolean = true> {
+  type?: T;
+  amount?: T;
+  currency?: T;
+  status?: T;
+  account?: T;
+  payment_method?: T;
+  transaction_details?:
+    | T
+    | {
+        transaction_id?: T;
+        payment_proof?: T;
+        processing_date?: T;
+      };
+  notes?: T;
+  admin_notes?: T;
+  extra_data?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -789,28 +868,32 @@ export interface PostTagsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "transfer-cash-requests_select".
+ * via the `definition` "users_select".
  */
-export interface TransferCashRequestsSelect<T extends boolean = true> {
-  type?: T;
-  amount?: T;
-  currency?: T;
-  status?: T;
-  account?: T;
-  payment_method?: T;
-  transaction_details?:
-    | T
-    | {
-        transaction_id?: T;
-        payment_proof?: T;
-        processing_date?: T;
-      };
-  notes?: T;
-  admin_notes?: T;
-  extra_data?: T;
+export interface UsersSelect<T extends boolean = true> {
+  avatar?: T;
+  telegram?: T;
+  first_name?: T;
+  last_name?: T;
+  role?: T;
+  company_name?: T;
+  registration_number?: T;
+  phone_contact?: T;
+  date_of_birth?: T;
+  nation?: T;
+  gender?: T;
+  email_verified?: T;
+  otp?: T;
+  otp_expires_at?: T;
   updatedAt?: T;
   createdAt?: T;
-  _status?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -820,6 +903,54 @@ export interface UnitsSelect<T extends boolean = true> {
   unit_name?: T;
   unit_code?: T;
   description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notifications_select".
+ */
+export interface NotificationsSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  date?: T;
+  type?: T;
+  content?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  meta?:
+    | T
+    | {
+        overview?: T;
+        title?: T;
+        description?: T;
+        image?: T;
+        preview?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

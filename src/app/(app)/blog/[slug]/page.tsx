@@ -1,5 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
+import { renderContent } from '@/components/contentRenderer';
 import Image from 'next/image'
 import Link from 'next/link'
 import { format } from 'date-fns'
@@ -29,51 +30,44 @@ export default function NewsDetailPage() {
     publishDate: new Date('2024-03-15'),
     category: 'Technology',
     image: '/images/ai-future.jpg',
-    content: `Artificial Intelligence (AI) stands at the forefront of technological innovation...`,
+    content: '',
     tags: [{ postTags: { id: 1, name: 'global-investment' } }, { id: 2, relatedPost: { name: 'finance' } }, { relatedPost: { id: 3, name: 'economy' } }],
     relatedArticles: [],
   });
-
-  type RelatedPost = {
-    id: number;
-    title: string;
-    slug: string;
-  };
-
 
   useEffect(() => {
     const loadArticleData = async () => {
       // Fetch the article data from API
       try {
-        const response = await fetch(`/api/posts?where[slug][equals]=${params.slug}`); // Replace with dynamic user ID if necessary
+        const response = await fetch(`/api/posts?where[slug][equals]=${params.slug}`); // API call
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
         const apiData = data.docs[0];
-        // Merge API data with the initial object (you can modify this as per your needs)
+
+        // Merge API data with the initial state
         setArticle(prevState => ({
           ...prevState,
           title: apiData.title,
           author: {
             name: `${apiData.author.first_name} ${apiData.author.last_name}`,
             avatar: apiData.author.avatar || '/default-avatar.jpg',
-            bio: apiData.author.phone_contact, // Use phone_contact as bio for example, adjust as needed
+            bio: apiData.author.phone_contact, // Adjust as needed
           },
           publishDate: new Date(apiData.published_date),
           category: apiData.category.name,
-          content: apiData.content.root.children.map((child: { children: Array<{ text: string }> }) => child.children[0].text).join(' '),
-          tags: apiData.tags, // Assuming tags is a single object in the API response
-          image: apiData.featured_image.url, // Example placeholder, replace if you have an image field in the API
-          relatedArticles: apiData.relatedPosts.map((data: { relatedPost: RelatedPost }) => ({
-            id: data?.relatedPost?.id,       // Access 'id' from 'relatedPost'
-            title: data?.relatedPost?.title, // Access 'title' from 'relatedPost'
-            slug: data?.relatedPost?.slug,    // Access 'slug' from 'relatedPost'
-            relatedPost: data?.relatedPost
+          content: apiData.content.root.children.map((child: any) => renderContent(child)).join(' '),
+          tags: apiData.tags,
+          image: apiData.featured_image?.url,
+          relatedArticles: apiData.relatedPosts.map((data: any) => ({
+            id: data?.relatedPost?.id,
+            title: data?.relatedPost?.title,
+            slug: data?.relatedPost?.slug,
           }))
         }));
       } catch (error) {
-        console.error('Failed to fetch accounts:', error);
+        console.error('Failed to fetch article data:', error);
       }
     };
 
@@ -98,7 +92,7 @@ export default function NewsDetailPage() {
 
           <Image
             src={article.image}
-            alt="AI Future"
+            alt="Article Image"
             width={1200}
             height={630}
             className="rounded-lg mb-8"
@@ -112,8 +106,7 @@ export default function NewsDetailPage() {
           <div className="flex items-center justify-between mb-8">
             <div className="flex flex-wrap gap-2">
               {article.tags.map((tag) => (
-                // Check if tag.postTags exists and has a name
-                tag.postTags && tag.postTags.name && (
+                tag.postTags?.name && (
                   <Badge key={tag.postTags.id} variant="outline">
                     {tag.postTags.name}
                   </Badge>
@@ -123,17 +116,13 @@ export default function NewsDetailPage() {
           </div>
 
           <Separator className="my-8" />
-
           <section className="mb-12">
             <h2 className="text-2xl font-semibold mb-4">About the Author</h2>
             <div className="flex items-center space-x-4">
               <Avatar className="h-16 w-16">
                 <AvatarImage src={article.author.avatar} alt={article.author.name} />
                 <AvatarFallback>
-                  {article.author.name
-                    .split(' ')
-                    .map((n) => n[0])
-                    .join('')}
+                  {article.author.name.split(' ').map((n) => n[0]).join('')}
                 </AvatarFallback>
               </Avatar>
               <div>
@@ -142,25 +131,28 @@ export default function NewsDetailPage() {
               </div>
             </div>
           </section>
-          {article.relatedArticles.length > 0 && article.relatedArticles[0].relatedPost != null ? <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-4">Related Articles</h2>
-            <div className="grid gap-4 md:grid-cols-3">
-              {article.relatedArticles.map((related, index) => (
-                <Card key={index}>
-                  <CardHeader>
-                    <CardTitle className="text-lg">{related.title}</CardTitle>
-                  </CardHeader>
-                  <CardFooter>
-                    <Link href={`/blog/${related.slug}`} className="text-primary hover:underline">
-                      Read more
-                    </Link>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-          </section> : ''}
+
+          {article.relatedArticles.length > 0 && article.relatedArticles[0].relatedPost !== null && (
+            <section className="mb-12">
+              <h2 className="text-2xl font-semibold mb-4">Related Articles</h2>
+              <div className="grid gap-4 md:grid-cols-3">
+                {article.relatedArticles.map((related, index) => (
+                  <Card key={index}>
+                    <CardHeader>
+                      <CardTitle className="text-lg">{related.title}</CardTitle>
+                    </CardHeader>
+                    <CardFooter>
+                      <Link href={`/blog/${related.slug}`} className="text-primary hover:underline">
+                        Read more
+                      </Link>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
+            </section>
+          )}
         </article>
       </div>
     </div>
-  )
+  );
 }
