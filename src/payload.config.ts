@@ -39,6 +39,29 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    meta: {
+      openGraph: {
+        description: 'The best admin panel in the world',
+        images: [
+          {
+            url: 'https://i.postimg.cc/0NV32J1w/favicon-32x32.png',
+            width: 800,
+            height: 600,
+          },
+        ],
+        siteName: 'Payload',
+        title: 'My Admin Panel',
+      },
+      titleSuffix: '- Wealth Farming',
+      icons: [
+        {
+          url: 'https://i.postimg.cc/0NV32J1w/favicon-32x32.png',
+          rel: 'icon',
+          sizes: '32x32',
+          type: 'image/png',
+        },
+      ],
+    },
   },
   email: nodemailerAdapter({
     defaultFromAddress: 'beq@beqholdings.com',
