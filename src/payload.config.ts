@@ -63,7 +63,13 @@ export default buildConfig({
         },
       ],
     },
-  },
+    components: {
+      graphics: {
+        Icon: './graphics/Icon#Icon',
+        Logo: './graphics/Logo#Logo',  // Correct the path and use default export
+      },
+    },
+  },  
   email: nodemailerAdapter({
     defaultFromAddress: 'beq@beqholdings.com',
     defaultFromName: 'Beq Holdings',
