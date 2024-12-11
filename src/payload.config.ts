@@ -5,6 +5,7 @@ import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
+import { seoPlugin } from '@payloadcms/plugin-seo';
 
 import { Users } from './collections/Users'
 import { Banks } from './collections/Banks'
@@ -95,6 +96,10 @@ export default buildConfig({
     Units,
     Notification,
     Media,
+    {
+      slug: 'pages',
+      fields: []
+    },
   ],
   globals: [SiteSettings, Header, Footer],
   editor: lexicalEditor(),
@@ -109,5 +114,14 @@ export default buildConfig({
   }),
   plugins: [
     // storage-adapter-placeholder
+    seoPlugin({
+      collections: [
+        'pages'
+      ],
+      uploadsCollection: 'media',
+      generateTitle: ({ doc }) => `Website.com — ${doc.title}`,
+      generateDescription: ({ doc }) => doc.excerpt,
+      generateURL: ({ doc, collectionSlug }) =>`https://dev.wealthfarming.org`,
+    })
   ],
 })
