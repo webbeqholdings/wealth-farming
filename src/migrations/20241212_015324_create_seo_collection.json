@@ -1,5 +1,5 @@
 {
-  "id": "4dbb86f5-2cb2-4d03-8c27-1358703fce66",
+  "id": "1365a937-41e6-4dfa-bbbb-c3e9f6e50439",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -3891,8 +3891,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "public.pages": {
-      "name": "pages",
+    "public.seo": {
+      "name": "seo",
       "schema": "",
       "columns": {
         "id": {
@@ -3935,8 +3935,8 @@
         }
       },
       "indexes": {
-        "pages_meta_meta_image_idx": {
-          "name": "pages_meta_meta_image_idx",
+        "seo_meta_meta_image_idx": {
+          "name": "seo_meta_meta_image_idx",
           "columns": [
             {
               "expression": "meta_image_id",
@@ -3950,8 +3950,8 @@
           "method": "btree",
           "with": {}
         },
-        "pages_updated_at_idx": {
-          "name": "pages_updated_at_idx",
+        "seo_updated_at_idx": {
+          "name": "seo_updated_at_idx",
           "columns": [
             {
               "expression": "updated_at",
@@ -3965,8 +3965,8 @@
           "method": "btree",
           "with": {}
         },
-        "pages_created_at_idx": {
-          "name": "pages_created_at_idx",
+        "seo_created_at_idx": {
+          "name": "seo_created_at_idx",
           "columns": [
             {
               "expression": "created_at",
@@ -3982,9 +3982,9 @@
         }
       },
       "foreignKeys": {
-        "pages_meta_image_id_media_id_fk": {
-          "name": "pages_meta_image_id_media_id_fk",
-          "tableFrom": "pages",
+        "seo_meta_image_id_media_id_fk": {
+          "name": "seo_meta_image_id_media_id_fk",
+          "tableFrom": "seo",
           "tableTo": "media",
           "columnsFrom": [
             "meta_image_id"
@@ -4225,8 +4225,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "pages_id": {
-          "name": "pages_id",
+        "seo_id": {
+          "name": "seo_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": false
@@ -4563,11 +4563,11 @@
           "method": "btree",
           "with": {}
         },
-        "payload_locked_documents_rels_pages_id_idx": {
-          "name": "payload_locked_documents_rels_pages_id_idx",
+        "payload_locked_documents_rels_seo_id_idx": {
+          "name": "payload_locked_documents_rels_seo_id_idx",
           "columns": [
             {
-              "expression": "pages_id",
+              "expression": "seo_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -4840,12 +4840,12 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "payload_locked_documents_rels_pages_fk": {
-          "name": "payload_locked_documents_rels_pages_fk",
+        "payload_locked_documents_rels_seo_fk": {
+          "name": "payload_locked_documents_rels_seo_fk",
           "tableFrom": "payload_locked_documents_rels",
-          "tableTo": "pages",
+          "tableTo": "seo",
           "columnsFrom": [
-            "pages_id"
+            "seo_id"
           ],
           "columnsTo": [
             "id"

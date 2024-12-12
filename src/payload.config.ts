@@ -63,7 +63,13 @@ export default buildConfig({
         },
       ],
     },
-  },
+    components: {
+      graphics: {
+        Icon: './graphics/Icon#Icon',
+        Logo: './graphics/Logo#Logo',  // Correct the path and use default export
+      },
+    },
+  },  
   email: nodemailerAdapter({
     defaultFromAddress: 'beq@beqholdings.com',
     defaultFromName: 'Beq Holdings',
@@ -97,7 +103,7 @@ export default buildConfig({
     Notification,
     Media,
     {
-      slug: 'pages',
+      slug: 'seo',
       fields: []
     },
   ],
@@ -116,7 +122,7 @@ export default buildConfig({
     // storage-adapter-placeholder
     seoPlugin({
       collections: [
-        'pages'
+        'seo'
       ],
       uploadsCollection: 'media',
       generateTitle: ({ doc }) => `Website.com — ${doc.title}`,
