@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { renderContent } from '@/components/contentRenderer'
+import { renderContent } from '@/components/contentRender'
 import {
   Card,
   CardContent,

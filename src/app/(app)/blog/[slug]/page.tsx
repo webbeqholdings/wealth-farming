@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import { renderContent } from '@/components/contentRenderer';
+import { renderContent } from '@/components/contentRender';
 import Image from 'next/image'
 import Link from 'next/link'
 import { format } from 'date-fns'
