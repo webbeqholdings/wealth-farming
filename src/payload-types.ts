@@ -30,7 +30,7 @@ export interface Config {
     units: Unit;
     notifications: Notification;
     media: Media;
-    pages: Page;
+    seo: Seo;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -55,7 +55,7 @@ export interface Config {
     units: UnitsSelect<false> | UnitsSelect<true>;
     notifications: NotificationsSelect<false> | NotificationsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
-    pages: PagesSelect<false> | PagesSelect<true>;
+    seo: SeoSelect<false> | SeoSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -490,9 +490,9 @@ export interface Notification {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pages".
+ * via the `definition` "seo".
  */
-export interface Page {
+export interface Seo {
   id: number;
   meta?: {
     title?: string | null;
@@ -586,8 +586,8 @@ export interface PayloadLockedDocument {
         value: number | Media;
       } | null)
     | ({
-        relationTo: 'pages';
-        value: number | Page;
+        relationTo: 'seo';
+        value: number | Seo;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -939,9 +939,9 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pages_select".
+ * via the `definition` "seo_select".
  */
-export interface PagesSelect<T extends boolean = true> {
+export interface SeoSelect<T extends boolean = true> {
   meta?:
     | T
     | {

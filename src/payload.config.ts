@@ -103,7 +103,7 @@ export default buildConfig({
     Notification,
     Media,
     {
-      slug: 'pages',
+      slug: 'seo',
       fields: []
     },
   ],
@@ -122,7 +122,7 @@ export default buildConfig({
     // storage-adapter-placeholder
     seoPlugin({
       collections: [
-        'pages'
+        'seo'
       ],
       uploadsCollection: 'media',
       generateTitle: ({ doc }) => `Website.com — ${doc.title}`,
