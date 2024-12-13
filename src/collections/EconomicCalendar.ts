@@ -5,7 +5,7 @@ const EconomicCalendar: CollectionConfig = {
   slug: 'economic-calendar',
   access: {
     read: () => true,
-    create: isAdmin,
+    create: () => true,
   },
   fields: [
     {
