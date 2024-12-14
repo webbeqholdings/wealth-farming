@@ -5,8 +5,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 import { cn } from '@/lib/utils'
-
-import { MainNav } from '@/components/main-nav'
 import { MainNavDropdown } from '@/components/main-nav-dropdown'
 import { MobileNav } from '@/components/mobile-nav'
 import { ModeToggle } from '@/components/mode-toggle'
@@ -79,45 +77,45 @@ export function SiteHeader() {
   }
 
   return (
-    <header className='sticky top-0 z-50 w-full border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
-      <div className='container flex h-14 max-w-screen-2xl items-center'>
+    <header className="sticky top-0 z-50 w-full border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-14 max-w-screen-2xl items-center">
         <MainNavDropdown />
         <MobileNav />
-        <div className='flex flex-1 items-center justify-between space-x-2 md:justify-end'>
-          <nav className='flex items-center space-x-2'>
+        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+          <nav className="flex items-center space-x-2">
             {isLoggedIn ? (
               <>
-                <div className='hidden md:flex items-center space-x-2 bg-muted p-2 rounded-md'>
-                  <DollarSign className='h-4 w-4 text-green-500' />
-                  <span className='font-medium'>
+                <div className="hidden md:flex items-center space-x-2 bg-muted p-2 rounded-md">
+                  <DollarSign className="h-4 w-4 text-green-500" />
+                  <span className="font-medium">
                     {balance.toLocaleString('en-US', { style: 'currency', currency: 'vnd' })}
                   </span>
                 </div>
                 <Button
-                  variant='default'
-                  className='hidden md:inline-flex bg-green-500 hover:bg-green-600 text-white'
+                  variant="default"
+                  className="hidden md:inline-flex bg-green-500 hover:bg-green-600 text-white"
                   onClick={() => router.push('/account/deposit')}
                 >
                   Deposit
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Avatar className='h-8 w-8 cursor-pointer'>
-                      <AvatarImage src='/placeholder.svg?height=32&width=32' alt='User' />
+                    <Avatar className="h-8 w-8 cursor-pointer">
+                      <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
                       <AvatarFallback>U</AvatarFallback>
                     </Avatar>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align='end' className='w-56'>
+                  <DropdownMenuContent align="end" className="w-56">
                     <DropdownMenuItem onClick={() => router.push('/user-profile')}>
-                      <UserCircle className='mr-2 h-4 w-4' />
+                      <UserCircle className="mr-2 h-4 w-4" />
                       <span>Profile</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
-                      <Settings className='mr-2 h-4 w-4' />
+                      <Settings className="mr-2 h-4 w-4" />
                       <span>Settings</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleLogout}>
-                      <LogOut className='mr-2 h-4 w-4' />
+                      <LogOut className="mr-2 h-4 w-4" />
                       <span>Log out</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -126,7 +124,7 @@ export function SiteHeader() {
             ) : (
               <Button onClick={() => router.push('/join')}>Login</Button>
             )}
-            <Link href='#' target='_blank' rel='noreferrer'>
+            <Link href="#" target="_blank" rel="noreferrer">
               <div
                 className={cn(
                   buttonVariants({
@@ -135,11 +133,11 @@ export function SiteHeader() {
                   'h-8 w-8 px-0',
                 )}
               >
-                <Facebook className='h-4 w-4' />
-                <span className='sr-only'>Facebook</span>
+                <Facebook className="h-4 w-4" />
+                <span className="sr-only">Facebook</span>
               </div>
             </Link>
-            <Link href='#' target='_blank' rel='noreferrer'>
+            <Link href="#" target="_blank" rel="noreferrer">
               <div
                 className={cn(
                   buttonVariants({
@@ -148,11 +146,11 @@ export function SiteHeader() {
                   'h-8 w-8 px-0',
                 )}
               >
-                <Youtube className='h-4 w-4' />
-                <span className='sr-only'>Youtube</span>
+                <Youtube className="h-4 w-4" />
+                <span className="sr-only">Youtube</span>
               </div>
             </Link>
-            <Link href='#' target='_blank' rel='noreferrer'>
+            <Link href="#" target="_blank" rel="noreferrer">
               <div
                 className={cn(
                   buttonVariants({
@@ -161,8 +159,8 @@ export function SiteHeader() {
                   'h-8 w-8 px-0',
                 )}
               >
-                <Instagram className='h-4 w-4' />
-                <span className='sr-only'>Instagram</span>
+                <Instagram className="h-4 w-4" />
+                <span className="sr-only">Instagram</span>
               </div>
             </Link>
             <ModeToggle />
