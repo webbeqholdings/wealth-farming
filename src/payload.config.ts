@@ -5,7 +5,7 @@ import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
-import { seoPlugin } from '@payloadcms/plugin-seo';
+import { seoPlugin } from '@payloadcms/plugin-seo'
 
 import { Users } from './collections/Users'
 import { Banks } from './collections/Banks'
@@ -30,6 +30,7 @@ import InvestmentProfitLoss from './collections/InvestmentProfitLoss'
 import Telegram from './collections/Telegram'
 import Notification from './collections/Notifications'
 import EconomicCalendar from './collections/EconomicCalendar'
+import MainMenu from './global-configs/main-menu'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -66,10 +67,10 @@ export default buildConfig({
     components: {
       graphics: {
         Icon: './graphics/Icon#Icon',
-        Logo: './graphics/Logo#Logo',  // Correct the path and use default export
+        Logo: './graphics/Logo#Logo', // Correct the path and use default export
       },
     },
-  },  
+  },
   email: nodemailerAdapter({
     defaultFromAddress: 'beq@beqholdings.com',
     defaultFromName: 'Beq Holdings',
@@ -104,10 +105,10 @@ export default buildConfig({
     Media,
     {
       slug: 'seo',
-      fields: []
+      fields: [],
     },
   ],
-  globals: [SiteSettings, Header, Footer],
+  globals: [SiteSettings, MainMenu, Header, Footer],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
@@ -121,13 +122,11 @@ export default buildConfig({
   plugins: [
     // storage-adapter-placeholder
     seoPlugin({
-      collections: [
-        'seo'
-      ],
+      collections: ['seo'],
       uploadsCollection: 'media',
       generateTitle: ({ doc }) => `Website.com — ${doc.title}`,
       generateDescription: ({ doc }) => doc.excerpt,
-      generateURL: ({ doc, collectionSlug }) =>`https://dev.wealthfarming.org`,
-    })
+      generateURL: ({ doc, collectionSlug }) => process.env.BASE_URL, // recommend env
+    }),
   ],
 })
