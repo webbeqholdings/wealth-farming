@@ -26,28 +26,28 @@ type Event = {
 }
 
 export default function EconomicCalendar() {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [events, setEvents] = useState<Event[]>([])
+  const [date, setDate] = useState<Date | undefined>(new Date())
 
   useEffect(() => {
     // Fetch data from the API based on the selected date
     const fetchEvents = async () => {
-      if (!date) return; // Don't fetch if no date is selected
+      if (!date) return // Don't fetch if no date is selected
 
       // Format the selected date as the start of the day (ISO format)
-      const startOfDay = new Date(date.setHours(0, 0, 0, 0)).toISOString();
-      const endOfDay = new Date(date.setHours(23, 59, 59, 999)).toISOString();
+      const startOfDay = new Date(date.setHours(0, 0, 0, 0)).toISOString()
+      const endOfDay = new Date(date.setHours(23, 59, 59, 999)).toISOString()
 
       try {
         const response = await fetch(
-          `/api/economic-calendar?where[createdAt][greater_than]=${startOfDay}&where[createdAt][less_than]=${endOfDay}`
-        );
+          `/api/economic-calendar?where[createdAt][greater_than]=${startOfDay}&where[createdAt][less_than]=${endOfDay}`,
+        )
 
         if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+          throw new Error(`HTTP error! Status: ${response.status}`)
         }
 
-        const data = await response.json();
+        const data = await response.json()
 
         // Map the response to the Event template form
         const mappedEvents = data.docs.map((item: any) => ({
@@ -57,69 +57,69 @@ export default function EconomicCalendar() {
           currency: item.unit?.unit_code || 'N/A', // Handle missing unit
           event: item.title || 'No title available', // Handle missing title
           impact: item.impact || 'Low', // Default to 'Low' if impact is missing
-        }));
+        }))
 
-        setEvents(mappedEvents);
+        setEvents(mappedEvents)
       } catch (error) {
-        console.error('Error fetching events:', error);
+        console.error('Error fetching events:', error)
       }
-    };
+    }
 
-    fetchEvents();
-  }, [date]); // Re-run whenever the selected date changes
+    fetchEvents()
+  }, [date]) // Re-run whenever the selected date changes
 
   const handleDateSelect = (newDate: Date | undefined) => {
-    setDate(newDate);
-  };
+    setDate(newDate)
+  }
 
-  const clearFilters = async() => {
-      setDate(undefined);
-    
-      try {
-        // Fetch all data without filtering by date
-        const response = await fetch('/api/economic-calendar');
-    
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-    
-        const data = await response.json();
-    
-        // Map the response to the Event template form
-        const mappedEvents = data.docs.map((item: any) => ({
-          id: item.id.toString(),
-          date: new Date(item.createdAt), // Convert to Date object
-          time: item.time || 'N/A', // Handle missing time
-          currency: item.unit?.unit_code || 'N/A', // Handle missing unit
-          event: item.title || 'No title available', // Handle missing title
-          impact: item.impact || 'Low', // Default to 'Low' if impact is missing
-        }));
-    
-        setEvents(mappedEvents);
-      } catch (error) {
-        console.error('Error fetching all events:', error);
+  const clearFilters = async () => {
+    setDate(undefined)
+
+    try {
+      // Fetch all data without filtering by date
+      const response = await fetch('/api/economic-calendar')
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`)
       }
-    };
+
+      const data = await response.json()
+
+      // Map the response to the Event template form
+      const mappedEvents = data.docs.map((item: any) => ({
+        id: item.id.toString(),
+        date: new Date(item.createdAt), // Convert to Date object
+        time: item.time || 'N/A', // Handle missing time
+        currency: item.unit?.unit_code || 'N/A', // Handle missing unit
+        event: item.title || 'No title available', // Handle missing title
+        impact: item.impact || 'Low', // Default to 'Low' if impact is missing
+      }))
+
+      setEvents(mappedEvents)
+    } catch (error) {
+      console.error('Error fetching all events:', error)
+    }
+  }
 
   return (
     <>
       <SiteHeader />
-      <div className="container mx-auto py-8">
-        <h1 className="text-3xl font-bold mb-6">Economic Calendar</h1>
-        <div className="grid gap-6 md:grid-cols-[300px_1fr]">
+      <div className='container mx-auto py-8'>
+        <h1 className='text-3xl font-bold mb-6'>Economic Calendar</h1>
+        <div className='grid gap-6 md:grid-cols-[300px_1fr]'>
           <Card>
             <CardHeader>
               <CardTitle>Filters</CardTitle>
               <CardDescription>Select date and currency</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className='space-y-4'>
               <Calendar
-                mode="single"
+                mode='single'
                 selected={date}
                 onSelect={handleDateSelect}
-                className="rounded-md border shadow"
+                className='rounded-md border shadow'
               />
-              <Button onClick={clearFilters} variant="outline" className="w-full">
+              <Button onClick={clearFilters} variant='outline' className='w-full'>
                 Clear Filters
               </Button>
             </CardContent>
@@ -162,13 +162,12 @@ export default function EconomicCalendar() {
                           >
                             {event.impact}
                           </Badge>
-
                         </TableCell>
                       </TableRow>
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center">
+                      <TableCell colSpan={8} className='text-center'>
                         No events found for the selected date.
                       </TableCell>
                     </TableRow>
@@ -181,5 +180,5 @@ export default function EconomicCalendar() {
       </div>
       <SiteFooter />
     </>
-  );
+  )
 }
