@@ -42,8 +42,8 @@ const formSchema = z.object({
   accountName: z.string().min(2, {
     message: 'Account name must be at least 2 characters.',
   }),
-  accountNumber: z.string().min(10, {
-    message: 'Account number must be at least 10 characters.',
+  accountNumber: z.string().min(2, {
+    message: 'Please input a Account Number.',
   }),
   bankName: z.string().min(2, {
     message: 'Please input a bank.',
