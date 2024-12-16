@@ -20,7 +20,7 @@ import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { z } from 'zod'
 import { useToast } from '@/hooks/use-toast'
-import { useSearchParams } from 'next/navigation'
+// import { useSearchParams } from 'next/navigation'
 
 // Define Zod schemas
 const loginSchema = z.object({
@@ -43,8 +43,9 @@ export default function Page() {
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
 
-  const searchParams = useSearchParams()
-  const urlReferralCode = searchParams.get('ref')
+  // const searchParams = useSearchParams()
+  // const urlReferralCode = searchParams.get('ref')
+  const urlReferralCode = 1
   // Click Submit
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>, type: '/login' | '') => {
     event.preventDefault()

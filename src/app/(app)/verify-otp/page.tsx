@@ -24,7 +24,6 @@ export default function Page() {
       id: userId, // Replace with the actual ID value if needed
       otp: otp,
     }
-    console.log('formData', formData)
     try {
       const response = await fetch('/api/otp/verify', {
         method: 'POST',
@@ -33,8 +32,6 @@ export default function Page() {
         },
         body: JSON.stringify(formData),
       })
-
-      console.log('response', response)
 
       const data = await response.json()
       if (response.ok) {
