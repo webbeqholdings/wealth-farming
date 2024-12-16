@@ -4,6 +4,7 @@ import * as migration_20241210_091236_add_field_product_overview from './2024121
 import * as migration_20241212_015324_create_seo_collection from './20241212_015324_create_seo_collection';
 import * as migration_20241216_022626_create_main_menu_global from './20241216_022626_create_main_menu_global';
 import * as migration_20241216_045325_add_column_amount_to_currency from './20241216_045325_add_column_amount_to_currency';
+import * as migration_20241216_073305_create_user_referrals_collection from './20241216_073305_create_user_referrals_collection';
 
 export const migrations = [
   {
@@ -34,6 +35,11 @@ export const migrations = [
   {
     up: migration_20241216_045325_add_column_amount_to_currency.up,
     down: migration_20241216_045325_add_column_amount_to_currency.down,
-    name: '20241216_045325_add_column_amount_to_currency'
+    name: '20241216_045325_add_column_amount_to_currency',
+  },
+  {
+    up: migration_20241216_073305_create_user_referrals_collection.up,
+    down: migration_20241216_073305_create_user_referrals_collection.down,
+    name: '20241216_073305_create_user_referrals_collection'
   },
 ];
