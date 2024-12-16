@@ -5,10 +5,12 @@ import { authenticator } from 'otplib';
 
 export const Users: CollectionConfig = {
   slug: 'users',
+  auth: {
+    maxLoginAttempts: 0, // Automatically lock a user out after X amount of failed logins
+  },
   admin: {
     useAsTitle: 'email',
   },
-  auth: true,
   access: {
     read: () => true,
     create: () => true,

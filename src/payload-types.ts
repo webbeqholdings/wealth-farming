@@ -65,11 +65,13 @@ export interface Config {
   };
   globals: {
     'site-settings': SiteSetting;
+    'main-menu': MainMenu;
     header: Header;
     footer: Footer;
   };
   globalsSelect?: {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    'main-menu': MainMenuSelect<false> | MainMenuSelect<true>;
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
   };
@@ -140,8 +142,6 @@ export interface User {
   resetPasswordExpiration?: string | null;
   salt?: string | null;
   hash?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
   password?: string | null;
 }
 /**
@@ -892,8 +892,6 @@ export interface UsersSelect<T extends boolean = true> {
   resetPasswordExpiration?: T;
   salt?: T;
   hash?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1010,6 +1008,30 @@ export interface SiteSetting {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "main-menu".
+ */
+export interface MainMenu {
+  id: number;
+  menuItems?:
+    | {
+        title: string;
+        url: string;
+        children?:
+          | {
+              title: string;
+              url: string;
+              description?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header".
  */
 export interface Header {
@@ -1072,6 +1094,30 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         id?: T;
       };
   business_hours?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "main-menu_select".
+ */
+export interface MainMenuSelect<T extends boolean = true> {
+  menuItems?:
+    | T
+    | {
+        title?: T;
+        url?: T;
+        children?:
+          | T
+          | {
+              title?: T;
+              url?: T;
+              description?: T;
+              id?: T;
+            };
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
