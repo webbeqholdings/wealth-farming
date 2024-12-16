@@ -1,5 +1,4 @@
-import type { CollectionConfig } from 'payload'
-import { isAdmin } from '../access/isAdmin';
+import type { CollectionConfig } from 'payload';
 import { isIndividualOrAdmin } from '@/access/isIndividualOrAdmin';
 
 export const Media: CollectionConfig = {
