@@ -9,16 +9,22 @@ export async function POST(req: Request) {
       config,
     });
 
-    let { to_account, from_account, bank_id, product_id, type, amount, user_id } = request;
+    let { to_account, from_account, bank_id, product_id, type, amount, user_id, currency } = request;
     // Handle deposit type
     if (type === 'deposit') {
+      const unit = await payload.find({
+        collection: 'units',
+        where: {
+          unit_code: { equals: "USD" }
+        },
+      });
       await payload.create({
         collection: 'transactions',
         data: {
           user: Number(user_id),
           bank: bank_id ? Number(bank_id) : undefined,
           investment_product: product_id ? Number(product_id) : undefined,
-          amount: Number(amount),
+          amount: currency == 'VND' ? Number(amount/unit.docs[0].amount): Number(amount),
           status: 'pending',
           from_account: from_account ? Number(from_account) : undefined,
           to_account: to_account ? Number(to_account) : undefined,
@@ -29,13 +35,20 @@ export async function POST(req: Request) {
 
     // Handle withdraw type
     if (type === 'withdraw') {
+      const unit = await payload.find({
+        collection: 'units',
+        where: {
+          unit_code: { equals: "USD" }
+        },
+      });
+      const amountWithdraw = currency == 'VND' ? Number(amount/unit.docs[0].amount): Number(amount);
       const fromAccount = await payload.findByID({
         collection: 'accounts',
         id: from_account,
       });
 
-      if (fromAccount.amount < -Number(amount)) {
-        const errorBody = { error: 'Amount not enough' };
+      if (fromAccount.amount < -Number(amountWithdraw)) {
+        const errorBody = { error: 'Amount account main not enough' };
         return new Response(
           JSON.stringify({
             response: errorBody,
@@ -47,7 +60,7 @@ export async function POST(req: Request) {
         );
       }
 
-      const updatedAmount = fromAccount.amount + Number(amount);
+      const updatedAmount = fromAccount.amount + Number(amountWithdraw);
       await payload.update({
         collection: 'accounts',
         id: from_account,
@@ -60,7 +73,7 @@ export async function POST(req: Request) {
           user: Number(user_id),
           bank: bank_id ? Number(bank_id) : undefined,
           investment_product: product_id ? Number(product_id) : undefined,
-          amount: Number(amount),
+          amount: amountWithdraw,
           status: 'pending',
           from_account: from_account ? Number(from_account) : undefined,
           to_account: to_account ? Number(to_account) : undefined,
@@ -80,7 +93,6 @@ export async function POST(req: Request) {
         collection: 'accounts',
         id: to_account,
       });
-
       if (fromAccount.amount < transactionAmount) {
         const errorBody = { error: 'Amount not enough' };
         return new Response(
@@ -140,7 +152,7 @@ export async function POST(req: Request) {
       });
 
       if (investmentAccount.docs[0].amount < transactionAmount) {
-        const errorBody = { error: 'Amount not enough investment' };
+        const errorBody = { error: 'Amount account investment not enough' };
         return new Response(
           JSON.stringify({
             response: errorBody,

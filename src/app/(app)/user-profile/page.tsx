@@ -383,7 +383,7 @@ export default function UserProfile() {
                   </div>
                   <div className="flex items-center space-x-4">
                     <DollarSign className="h-5 w-5 text-muted-foreground" />
-                    <span>Current Balance: {userInfo.balance.toLocaleString('en-US', { style: 'currency', currency: 'vnd' })}</span>
+                    <span>Current Balance: {userInfo.balance.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</span>
                   </div>
                 </TabsContent>
                 <TabsContent value="transactions">
@@ -396,7 +396,7 @@ export default function UserProfile() {
                         >
                           {transaction.amount.toLocaleString('en-US', {
                             style: 'currency',
-                            currency: 'VND',
+                            currency: 'USD',
                           })}
                         </span>
                       </li>

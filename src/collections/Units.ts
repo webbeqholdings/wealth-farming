@@ -28,6 +28,11 @@ const Units: CollectionConfig = {
       },
     },
     {
+      name: 'amount',
+      type: 'number',
+      label: 'Amount',
+    },
+    {
       name: 'description',
       type: 'textarea',
       label: 'Description',

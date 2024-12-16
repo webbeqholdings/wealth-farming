@@ -91,6 +91,16 @@ export default function DepositPage() {
   const [selectBank, setSelectBank] = useState(null);
   const [fromAccount, setFromAccount] = useState(null);
   const [selectedBalance, setSelectedBalance] = useState(0)
+  const [exchangeRate, setExchangeRate] = useState(1); // Default exchange rate
+  const quickAmounts = [
+    { label: '500K', value: 500000 },
+    { label: '1M', value: 1000000 },
+    { label: '10M', value: 10000000 },
+    { label: '50M', value: 50000000 },
+    { label: '100M', value: 100000000 },
+  ];
+
+  const [convertedQuickAmounts, setConvertedQuickAmounts] = useState(quickAmounts);
 
   const handleNextStep = () => {
     if (step < 3) setStep(step + 1)
@@ -109,6 +119,39 @@ export default function DepositPage() {
 
   const handleBankChange = (bankId: string) => {
     setSelectBank(bankId.toString()); // Convert the string to a number
+  };
+
+   // Fetch exchange rate when the currency changes
+   useEffect(() => {
+    const fetchExchangeRate = async () => {
+      if (currency === 'USD') {
+        try {
+          const response = await fetch('/api/units?where[unit_code][equals]=USD');
+          const data = await response.json();
+          setExchangeRate(1 / data.docs[0].amount); // Convert VND to USD
+        } catch (error) {
+          console.error('Error fetching exchange rate:', error);
+          setExchangeRate(1); // Default to 1 if the fetch fails
+        }
+      } else {
+        setExchangeRate(1); // Default to 1 for VND
+      }
+    };
+
+    fetchExchangeRate();
+  }, [currency]);
+
+  // Update the displayed quickAmounts when the currency or exchange rate changes
+  useEffect(() => {
+    const updatedQuickAmounts = quickAmounts.map((item) => ({
+      ...item,
+      value: currency === 'USD' ? parseFloat((item.value * exchangeRate).toFixed(2)) : item.value,
+    }));
+    setConvertedQuickAmounts(updatedQuickAmounts);
+  }, [currency, exchangeRate]);
+
+  const handleQuickAmount = (value: any) => {
+    setAmount(value.toString())
   };
 
   useEffect(() => {
@@ -171,7 +214,8 @@ export default function DepositPage() {
           amount: amount,
           status: "pending",
           from_account: fromAccount,
-          type: "deposit"
+          type: "deposit",
+          currency: currency
         }), // Convert the request body to JSON
       });
 
@@ -191,18 +235,6 @@ export default function DepositPage() {
       })
     }
     router.push('/account/history') // Assuming there's a dashboard page to redirect to
-  }
-
-  const quickAmounts = [
-    { label: '500K', value: 500000 },
-    { label: '1M', value: 1000000 },
-    { label: '10M', value: 10000000 },
-    { label: '50M', value: 50000000 },
-    { label: '100M', value: 100000000 },
-  ]
-
-  const handleQuickAmount = (value: number) => {
-    setAmount(value.toString())
   }
 
   return (
@@ -239,7 +271,10 @@ export default function DepositPage() {
                         ))}
                       </SelectContent>
                     </Select>
-                    <p className="text-sm text-muted-foreground">Balance: ${selectedBalance}</p>
+                    <p className="text-sm text-muted-foreground">Balance: {selectedBalance.toLocaleString('en-US', {
+                              style: 'currency',
+                              currency: 'USD',
+                            })}</p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="amount">Deposit Amount</Label>
@@ -251,8 +286,6 @@ export default function DepositPage() {
                         <SelectContent>
                           <SelectItem value="VND">VND</SelectItem>
                           <SelectItem value="USD">USD</SelectItem>
-                          <SelectItem value="EUR">EUR</SelectItem>
-                          <SelectItem value="GBP">GBP</SelectItem>
                         </SelectContent>
                       </Select>
                       <Input
@@ -268,14 +301,16 @@ export default function DepositPage() {
                   <div className="space-y-2">
                     <Label>Quick Amount</Label>
                     <div className="flex flex-wrap gap-2">
-                      {quickAmounts.map((quickAmount) => (
+                      {convertedQuickAmounts.map((quickAmount) => (
                         <Button
                           key={quickAmount.label}
                           variant="outline"
                           type="button"
                           onClick={() => handleQuickAmount(quickAmount.value)}
                         >
-                          {quickAmount.label}
+                          {currency === 'USD'
+                            ? `$${quickAmount.value}` // Display in USD
+                            : `${quickAmount.label}`} {/* Display in VND */}
                         </Button>
                       ))}
                     </div>

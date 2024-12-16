@@ -310,6 +310,7 @@ export interface Unit {
   id: number;
   unit_name: string;
   unit_code?: string | null;
+  amount?: number | null;
   description?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -900,6 +901,7 @@ export interface UsersSelect<T extends boolean = true> {
 export interface UnitsSelect<T extends boolean = true> {
   unit_name?: T;
   unit_code?: T;
+  amount?: T;
   description?: T;
   updatedAt?: T;
   createdAt?: T;

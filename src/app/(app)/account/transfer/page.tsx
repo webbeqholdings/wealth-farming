@@ -184,7 +184,10 @@ export default function TransferPage() {
                         ))}
                       </SelectContent>
                     </Select>
-                    <p className="text-sm text-muted-foreground">Balance: ${fromBalance}</p>
+                    <p className="text-sm text-muted-foreground">Balance: {fromBalance.toLocaleString('en-US', {
+                              style: 'currency',
+                              currency: 'USD',
+                            })}</p>
                   </div>
 
                   <div className="flex justify-center">
@@ -209,7 +212,10 @@ export default function TransferPage() {
                         ))}
                       </SelectContent>
                     </Select>
-                    <p className="text-sm text-muted-foreground">Balance: ${toBalance}</p>
+                    <p className="text-sm text-muted-foreground">Balance: {toBalance.toLocaleString('en-US', {
+                              style: 'currency',
+                              currency: 'USD',
+                            })}</p>
                   </div>
 
                   <div className="space-y-2">

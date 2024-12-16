@@ -3,6 +3,7 @@ import * as migration_20241210_041714_add_notification_and_economic_calendar fro
 import * as migration_20241210_091236_add_field_product_overview from './20241210_091236_add_field_product_overview';
 import * as migration_20241212_015324_create_seo_collection from './20241212_015324_create_seo_collection';
 import * as migration_20241216_022626_create_main_menu_global from './20241216_022626_create_main_menu_global';
+import * as migration_20241216_045325_add_column_amount_to_currency from './20241216_045325_add_column_amount_to_currency';
 
 export const migrations = [
   {
@@ -28,6 +29,11 @@ export const migrations = [
   {
     up: migration_20241216_022626_create_main_menu_global.up,
     down: migration_20241216_022626_create_main_menu_global.down,
-    name: '20241216_022626_create_main_menu_global'
+    name: '20241216_022626_create_main_menu_global',
+  },
+  {
+    up: migration_20241216_045325_add_column_amount_to_currency.up,
+    down: migration_20241216_045325_add_column_amount_to_currency.down,
+    name: '20241216_045325_add_column_amount_to_currency'
   },
 ];

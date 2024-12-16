@@ -149,7 +149,8 @@ export default function WithdrawPage() {
           amount: -amount,
           status: "pending",
           from_account: accounts[0].id,
-          type: "withdraw"
+          type: "withdraw",
+          currency: currency
         }), // Convert the request body to JSON
       });
 
@@ -213,8 +214,8 @@ export default function WithdrawPage() {
                           <SelectContent>
                             <SelectItem value="VND">VND</SelectItem>
                             <SelectItem value="USD">USD</SelectItem>
-                            <SelectItem value="EUR">EUR</SelectItem>
-                            <SelectItem value="GBP">GBP</SelectItem>
+                            {/* <SelectItem value="EUR">EUR</SelectItem>
+                            <SelectItem value="GBP">GBP</SelectItem> */}
                           </SelectContent>
                         </Select>
                         <Input
