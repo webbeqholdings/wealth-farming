@@ -472,7 +472,7 @@ export interface UserReferral {
   id: number;
   parent: number | User;
   child: number | User;
-  referral_at: string;
+  referral_at?: string | null;
   updatedAt: string;
   createdAt: string;
 }

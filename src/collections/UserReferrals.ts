@@ -9,8 +9,8 @@ const UserReferrals: CollectionConfig = {
   access: {
     create: () => true,
     read: () => true,
-    update: () => false, // Referrals should not be updated
-    delete: () => false, // Referrals should not be deleted
+    update: () => true,
+    delete: () => true,
   },
   fields: [
     {
@@ -31,7 +31,7 @@ const UserReferrals: CollectionConfig = {
     {
       name: 'referral_at',
       type: 'date',
-      required: true,
+      required: false,
       defaultValue: () => new Date(),
     },
   ],

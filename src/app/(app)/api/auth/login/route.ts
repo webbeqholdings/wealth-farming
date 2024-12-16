@@ -1,18 +1,12 @@
 import { NextResponse } from 'next/server'
-// import payload from 'payload'
-
 import config from '@payload-config'
-import { getPayloadHMR } from '@payloadcms/next/utilities'
+import { getPayload } from 'payload'
+const payload = await getPayload({ config })
 
 export async function POST(req: Request) {
   try {
     const { email, password } = await req.json()
-
-    const payload = await getPayloadHMR({
-      config,
-    })
-
-    const result = await payload.login({
+    const { token, user } = await payload.login({
       collection: 'users',
       data: {
         email,
@@ -20,20 +14,18 @@ export async function POST(req: Request) {
       },
     })
 
-    if (result.token) {
-      const response = NextResponse.json({ success: true })
-      response.cookies.set('payload-token', result.token, {
+    if (token) {
+      const response = NextResponse.json({ status: true, user_id: user.id })
+      response.cookies.set('payload-token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
         path: '/',
       })
       return response
-    } else {
-      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
     }
+    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
   } catch (error) {
-    console.error('Login error:', error)
     return NextResponse.json({ error: 'An error occurred during login' }, { status: 500 })
   }
 }
