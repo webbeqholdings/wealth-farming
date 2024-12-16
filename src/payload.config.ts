@@ -32,6 +32,7 @@ import Notification from './collections/Notifications'
 import EconomicCalendar from './collections/EconomicCalendar'
 import MainMenu from './global-configs/main-menu'
 import UserReferrals from './collections/UserReferrals'
+import {s3Storage} from '@payloadcms/storage-s3'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -122,13 +123,31 @@ export default buildConfig({
     },
   }),
   plugins: [
-    // storage-adapter-placeholder
     seoPlugin({
       collections: ['seo'],
       uploadsCollection: 'media',
       generateTitle: ({ doc }) => `Website.com — ${doc.title}`,
       generateDescription: ({ doc }) => doc.excerpt,
       generateURL: ({ doc, collectionSlug }) => process.env.BASE_URL, // recommend env
+    }),
+    // store media to minio storage
+    s3Storage({
+      bucket: process.env.MINIO_BUCKET_NAME,
+      acl: 'public-read',
+      config: {
+        endpoint: process.env.MINIO_END_POINT,
+        region: process.env.MINIO_REGION,
+        credentials: {
+          accessKeyId: process.env.MINIO_ACCESS_KEY_ID, 
+          secretAccessKey: process.env.MINIO_SECRET_ACCESS_KEY,
+        },
+        forcePathStyle: true, 
+      },
+      collections: {
+        media: true,
+      },
+      disableLocalStorage: true,
+      enabled: true, // Enable the plugin
     }),
   ],
 })
