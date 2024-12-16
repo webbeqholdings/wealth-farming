@@ -26,6 +26,7 @@ export interface Config {
     'post-categories': PostCategory;
     posts: Post;
     'post-tags': PostTag;
+    'user-referrals': UserReferral;
     users: User;
     units: Unit;
     notifications: Notification;
@@ -51,6 +52,7 @@ export interface Config {
     'post-categories': PostCategoriesSelect<false> | PostCategoriesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     'post-tags': PostTagsSelect<false> | PostTagsSelect<true>;
+    'user-referrals': UserReferralsSelect<false> | UserReferralsSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     units: UnitsSelect<false> | UnitsSelect<true>;
     notifications: NotificationsSelect<false> | NotificationsSelect<true>;
@@ -135,6 +137,7 @@ export interface User {
   email_verified?: boolean | null;
   otp?: string | null;
   otp_expires_at?: string | null;
+  referral_code?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -463,6 +466,18 @@ export interface PostTag {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user-referrals".
+ */
+export interface UserReferral {
+  id: number;
+  parent: number | User;
+  child: number | User;
+  referral_at: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "notifications".
  */
 export interface Notification {
@@ -569,6 +584,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'post-tags';
         value: number | PostTag;
+      } | null)
+    | ({
+        relationTo: 'user-referrals';
+        value: number | UserReferral;
       } | null)
     | ({
         relationTo: 'users';
@@ -869,6 +888,17 @@ export interface PostTagsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user-referrals_select".
+ */
+export interface UserReferralsSelect<T extends boolean = true> {
+  parent?: T;
+  child?: T;
+  referral_at?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
@@ -886,6 +916,7 @@ export interface UsersSelect<T extends boolean = true> {
   email_verified?: T;
   otp?: T;
   otp_expires_at?: T;
+  referral_code?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;

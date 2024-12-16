@@ -31,6 +31,7 @@ import Telegram from './collections/Telegram'
 import Notification from './collections/Notifications'
 import EconomicCalendar from './collections/EconomicCalendar'
 import MainMenu from './global-configs/main-menu'
+import UserReferrals from './collections/UserReferrals'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -99,6 +100,7 @@ export default buildConfig({
     PostCategories,
     Posts,
     PostTags,
+    UserReferrals,
     Users,
     Units,
     Notification,

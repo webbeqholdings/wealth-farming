@@ -1,7 +1,8 @@
-import type { CollectionConfig } from 'payload';
-import { isAdmin } from '../access/isAdmin';
-import { sendEmail } from '@/utilities/emailSender';
-import { authenticator } from 'otplib';
+import type { CollectionConfig } from 'payload'
+import { isAdmin } from '../access/isAdmin'
+import { sendEmail } from '@/utilities/emailSender'
+import { authenticator } from 'otplib'
+import { generateReferralCode } from '@/utilities/referralCode'
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -16,7 +17,7 @@ export const Users: CollectionConfig = {
     create: () => true,
     update: ({ req: { user }, id }) => {
       // Allow if user is admin or updating their own record
-      return user?.role === 'admin' || user?.id === id;
+      return user?.role === 'admin' || user?.id === id
     },
     delete: isAdmin, // Only admins can delete
   },
@@ -29,7 +30,7 @@ export const Users: CollectionConfig = {
     {
       name: 'telegram',
       type: 'relationship',
-      relationTo: 'telegram'
+      relationTo: 'telegram',
     },
     {
       name: 'first_name',
@@ -128,7 +129,25 @@ export const Users: CollectionConfig = {
         readOnly: true, // Optional: Prevent editing
         hidden: true, // Completely hide the field in the admin panel
       },
-    }
+    },
+    {
+      name: 'referral_code',
+      type: 'text',
+      unique: true,
+      admin: {
+        readOnly: true,
+      },
+      hooks: {
+        beforeChange: [
+          ({ data }) => {
+            if (!data.referral_code) {
+              return generateReferralCode()
+            }
+            return data.referral_code
+          },
+        ],
+      },
+    },
   ],
   hooks: {
     beforeLogin: [
@@ -142,24 +161,24 @@ export const Users: CollectionConfig = {
     beforeChange: [
       async ({ data, operation }) => {
         if (operation === 'create') {
-          data.email_verified = false;
-          data.otp = authenticator.generate(process.env.OTP_SECRET);
-          data.otp_expires_at = new Date();
+          data.email_verified = false
+          data.otp = authenticator.generate(process.env.OTP_SECRET)
+          data.otp_expires_at = new Date()
         }
-        return data;
+        return data
       },
     ],
     afterChange: [
       async ({ doc, operation }) => {
         if (operation === 'create' && !doc.email_verified) {
           try {
-            await sendEmail(doc.email, 'Your OTP Code', doc.otp);
+            await sendEmail(doc.email, 'Your OTP Code', doc.otp)
           } catch (error) {
-            console.error('Error sending welcome email:', error);
+            console.error('Error sending welcome email:', error)
           }
         }
-        return doc;
+        return doc
       },
-    ]
-  }
+    ],
+  },
 }
