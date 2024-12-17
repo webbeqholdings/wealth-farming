@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 
 export function CTASection() {
   return (
@@ -10,7 +11,7 @@ export function CTASection() {
           innovative agricultural projects.
         </p>
         <Button size="lg" className="font-semibold text-lg px-8" asChild>
-          <a href="/join">Join Now</a>
+          <Link href="/join">Join Now</Link>
         </Button>
       </div>
     </section>
