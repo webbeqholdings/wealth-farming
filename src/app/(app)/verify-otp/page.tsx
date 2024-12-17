@@ -11,13 +11,15 @@ export default function Page() {
   const [timer, setTimer] = useState(60) // Initial timer set to 60 seconds
   const router = useRouter()
   const { toast } = useToast()
-  let checkOtp = null;
+  const [checkOtp, setCheckOtp] = useState(null);
 
   useEffect(() => {
     // Access localStorage only on the client side
-    checkOtp = localStorage.getItem('wait_otp_confirm');
-    if(checkOtp != 'true'){
-      router.replace('/')
+    const waitOtpConfirm = localStorage.getItem('wait_otp_confirm');
+    setCheckOtp(waitOtpConfirm === 'true'); // Convert string to boolean
+
+    if (waitOtpConfirm !== 'true') {
+      router.replace('/');
     }
     const storedUserId = localStorage.getItem('user_id')
     setUserId(storedUserId)
@@ -90,7 +92,7 @@ export default function Page() {
 
   return (
     <div>
-      {checkOtp && checkOtp == 'true' ?
+      {checkOtp?
         <>
           <SiteHeader />
           <div className="min-h-screen flex items-center justify-center ">
@@ -120,7 +122,7 @@ export default function Page() {
             </div>
           </div>
           <SiteFooter />
-        </> : <></>}
+        </> : null}
     </div>
   )
 }

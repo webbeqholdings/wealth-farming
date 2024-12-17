@@ -18,14 +18,17 @@ export default function Page() {
   const [timer, setTimer] = useState(60); // Initial timer set to 60 seconds
   const [error, setError] = useState('');
   const router = useRouter();
-  let checkOtp = null;
+  const [checkOtp, setCheckOtp] = useState(null);
 
   useEffect(() => {
     // Access localStorage only on the client side
-    checkOtp = localStorage.getItem('wait_otp_confirm');
-    if (checkOtp != 'true') {
-      router.replace('/')
+    const waitOtpConfirm = localStorage.getItem('wait_otp_confirm');
+    setCheckOtp(waitOtpConfirm === 'true'); // Convert string to boolean
+
+    if (waitOtpConfirm !== 'true') {
+      router.replace('/');
     }
+
     const storedUserId = localStorage.getItem('user_id');
     setUserId(storedUserId);
   }, []);
@@ -134,7 +137,7 @@ export default function Page() {
 
   return (
     <div>
-      {checkOtp && checkOtp == 'true' ?
+      {checkOtp ?
         <>
           <SiteHeader />
           <div className="min-h-screen flex items-center justify-center ">
@@ -145,7 +148,7 @@ export default function Page() {
 
                   <div className="flex space-x-3">
                     <InputOTP onChange={handleOTPChange} maxLength={6}>
-                      <InputOTPGroup>
+                      <InputOTPGroup className="space-x-1">
                         <InputOTPSlot index={0} />
                         <InputOTPSlot index={1} />
                         <InputOTPSlot index={2} />
@@ -181,9 +184,9 @@ export default function Page() {
                           className="flex h-10 w-[360px] rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                         />
                         <button
-                        type="button"
-                        onClick={togglePasswordVisibility}
-                        className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"
+                          type="button"
+                          onClick={togglePasswordVisibility}
+                          className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"
                         >
                           {showPassword ? (
                             <EyeOff className="h-4 w-4" />
@@ -205,9 +208,9 @@ export default function Page() {
                           className="flex h-10 w-[360px] rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                         />
                         <button
-                        type="button"
-                        onClick={toggleConfirmPasswordVisibility}
-                        className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"
+                          type="button"
+                          onClick={toggleConfirmPasswordVisibility}
+                          className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"
                         >
                           {showConfirmPassword ? (
                             <EyeOff className="h-4 w-4" />
@@ -231,7 +234,7 @@ export default function Page() {
           </div>
           <SiteFooter />
         </>
-        : <></>}
+        : null}
     </div>
   );
 }
