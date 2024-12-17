@@ -27,6 +27,7 @@ import {
   Copy,
   Share2,
   Bell,
+  AlertTriangle
 } from 'lucide-react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
@@ -282,6 +283,21 @@ export default function UserProfile() {
     return <div>Redirecting...</div>; // Optional: Show a redirect message
   }
 
+  // Placeholder for disconnect logic (unchanged)
+  const handleDisconnectTelegram = async () => {
+    try {
+      const response = await fetch(`/api/telegram/${telegramNotifications.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log('check response: ', response);
+    } catch (error) {
+      console.error('Error during avatar update process:', error);
+    }
+  };
+
   return (
     <>
       <SiteHeader />
@@ -527,6 +543,16 @@ export default function UserProfile() {
                       onCheckedChange={() => toggleTelegramNotification('transactions')}
                     />
                   </div>
+                </div>
+                <div className="mt-6">
+                  <Button
+                    variant="destructive"
+                    onClick={handleDisconnectTelegram}
+                    className="w-full"
+                  >
+                    <AlertTriangle className="mr-2 h-4 w-4" />
+                    Disconnect Telegram
+                  </Button>
                 </div>
               </>
             ) : (
