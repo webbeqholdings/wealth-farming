@@ -9,10 +9,10 @@ import { useToast } from '@/hooks/use-toast'
 export default function Page() {
   const [userId, setUserId] = useState<string | null>(null)
   const [timer, setTimer] = useState(60) // Initial timer set to 60 seconds
-  const [checkOtp, setCheckOtp] = useState(localStorage.getItem('wait_otp_confirm'))
   const router = useRouter()
   const { toast } = useToast()
-
+  const checkOtp = localStorage.getItem('wait_otp_confirm')
+  
   useEffect(() => {
     // Access localStorage only on the client side
     if(checkOtp != 'true'){
