@@ -18,10 +18,11 @@ export default function Page() {
   const [timer, setTimer] = useState(60); // Initial timer set to 60 seconds
   const [error, setError] = useState('');
   const router = useRouter();
-  const checkOtp = localStorage.getItem('wait_otp_confirm')
+  let checkOtp = null;
 
   useEffect(() => {
     // Access localStorage only on the client side
+    checkOtp = localStorage.getItem('wait_otp_confirm');
     if (checkOtp != 'true') {
       router.replace('/')
     }
