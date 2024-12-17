@@ -9,11 +9,15 @@ import { useToast } from '@/hooks/use-toast'
 export default function Page() {
   const [userId, setUserId] = useState<string | null>(null)
   const [timer, setTimer] = useState(60) // Initial timer set to 60 seconds
+  const [checkOtp, setCheckOtp] = useState(localStorage.getItem('wait_otp_confirm'))
   const router = useRouter()
   const { toast } = useToast()
 
   useEffect(() => {
     // Access localStorage only on the client side
+    if(checkOtp != 'true'){
+      router.replace('/')
+    }
     const storedUserId = localStorage.getItem('user_id')
     setUserId(storedUserId)
   }, [])
@@ -35,6 +39,7 @@ export default function Page() {
 
       const data = await response.json()
       if (response.ok) {
+        localStorage.removeItem('wait_otp_confirm');
         toast({
           title: 'Success',
           description: 'Register successfully!',
@@ -84,35 +89,37 @@ export default function Page() {
 
   return (
     <div>
-      <SiteHeader />
-      <div className="min-h-screen flex items-center justify-center ">
-        <div className="flex flex-col items-center space-y-6 p-10  rounded-xl shadow-2xl w-100 h-auto">
-          <h2 className="text-2xl font-semibold ">OTP Verification</h2>
-          <div className="flex">
-            <InputOTP onChange={handleOTPChange} maxLength={6}>
-              <InputOTPGroup className="space-x-1">
-                <InputOTPSlot index={0} />
-                <InputOTPSlot index={1} />
-                <InputOTPSlot index={2} />
-                <InputOTPSlot index={3} />
-                <InputOTPSlot index={4} />
-                <InputOTPSlot index={5} />
-              </InputOTPGroup>
-            </InputOTP>
+      {checkOtp && checkOtp == 'true' ?
+        <>
+          <SiteHeader />
+          <div className="min-h-screen flex items-center justify-center ">
+            <div className="flex flex-col items-center space-y-6 p-10  rounded-xl shadow-2xl w-100 h-auto">
+              <h2 className="text-2xl font-semibold ">OTP Verification</h2>
+              <div className="flex">
+                <InputOTP onChange={handleOTPChange} maxLength={6}>
+                  <InputOTPGroup className="space-x-1">
+                    <InputOTPSlot index={0} />
+                    <InputOTPSlot index={1} />
+                    <InputOTPSlot index={2} />
+                    <InputOTPSlot index={3} />
+                    <InputOTPSlot index={4} />
+                    <InputOTPSlot index={5} />
+                  </InputOTPGroup>
+                </InputOTP>
+              </div>
+              <p className="text-sm ">Please enter the 6-digit code sent to your email.</p>
+              <button
+                onClick={resendOTP}
+                disabled={timer > 0}
+                className={`mt-6 px-6 py-3 rounded-lg text-white font-medium ${timer > 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+                  }`}
+              >
+                {timer > 0 ? `Resend in ${timer}s` : 'Resend OTP'}
+              </button>
+            </div>
           </div>
-          <p className="text-sm ">Please enter the 6-digit code sent to your email.</p>
-          <button
-            onClick={resendOTP}
-            disabled={timer > 0}
-            className={`mt-6 px-6 py-3 rounded-lg text-white font-medium ${
-              timer > 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
-            }`}
-          >
-            {timer > 0 ? `Resend in ${timer}s` : 'Resend OTP'}
-          </button>
-        </div>
-      </div>
-      <SiteFooter />
+          <SiteFooter />
+        </> : <></>}
     </div>
   )
 }

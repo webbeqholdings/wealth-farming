@@ -44,8 +44,7 @@ export default function Page() {
   const [showPassword, setShowPassword] = useState(false)
 
   const params = useParams()
-  const urlReferralCode = params.ref;
-
+  const urlReferralCode = params['ref-code'];
   // Click Submit
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>, type: '/login' | '') => {
     event.preventDefault()

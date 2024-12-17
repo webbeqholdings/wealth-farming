@@ -40,6 +40,7 @@ const Page = () => {
       if (response.ok) {
         const data = await response.json()
         localStorage.setItem('user_id', data.user.id)
+        localStorage.setItem('wait_otp_confirm', 'true')
         router.replace('/verify-password')
       } else {
         // Handle error response
