@@ -1,0 +1,64 @@
+{
+  "holidays": [
+    {
+      "name": "New Year's Day",
+      "2024": "Monday, January 1",
+      "2025": "Wednesday, January 1",
+      "2026": "Thursday, January 1"
+    },
+    {
+      "name": "Martin Luther King, Jr. Day",
+      "2024": "Monday, January 15",
+      "2025": "Monday, January 20",
+      "2026": "Monday, January 19"
+    },
+    {
+      "name": "Washington's Birthday",
+      "2024": "Monday, February 19",
+      "2025": "Monday, February 17",
+      "2026": "Monday, February 16"
+    },
+    {
+      "name": "Good Friday",
+      "2024": "Friday, March 29",
+      "2025": "Friday, April 18",
+      "2026": "Friday, April 3"
+    },
+    {
+      "name": "Memorial Day",
+      "2024": "Monday, May 27",
+      "2025": "Monday, May 26",
+      "2026": "Monday, May 25"
+    },
+    {
+      "name": "Juneteenth National Independence Day",
+      "2024": "Wednesday, June 19",
+      "2025": "Thursday, June 19",
+      "2026": "Friday, June 19"
+    },
+    {
+      "name": "Independence Day",
+      "2024": "Thursday, July 4*",
+      "2025": "Friday, July 4*",
+      "2026": "Friday, July 3 (Independence Day observed)"
+    },
+    {
+      "name": "Labor Day",
+      "2024": "Monday, September 2",
+      "2025": "Monday, September 1",
+      "2026": "Monday, September 7"
+    },
+    {
+      "name": "Thanksgiving Day",
+      "2024": "Thursday, November 28**",
+      "2025": "Thursday, November 27**",
+      "2026": "Thursday, November 26**"
+    },
+    {
+      "name": "Christmas Day",
+      "2024": "Wednesday, December 25***",
+      "2025": "Thursday, December 25***",
+      "2026": "Friday, December 25***"
+    }
+  ]
+}
