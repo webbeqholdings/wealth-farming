@@ -286,13 +286,21 @@ export default function UserProfile() {
   // Placeholder for disconnect logic (unchanged)
   const handleDisconnectTelegram = async () => {
     try {
-      const response = await fetch(`/api/telegram/${telegramNotifications.id}`, {
+      const response = await fetch(`/api/telegram?where[id][equals]=${telegramNotifications.id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
         },
       });
-      console.log('check response: ', response);
+
+      setTelegramNotifications({
+        id: null,
+        connected: false,
+        username: '@alicejohnson',
+        settings: {
+          transactions: true,
+        },
+      });
     } catch (error) {
       console.error('Error during avatar update process:', error);
     }
