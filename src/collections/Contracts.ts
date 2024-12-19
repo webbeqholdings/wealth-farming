@@ -37,6 +37,24 @@ const Contracts: CollectionConfig = {
       required: true,
     },
     {
+      name: 'note_log',
+      type: 'number',
+      label: 'Note',
+      required: true,
+    },
+    {
+      name: 'product_log',
+      type: 'json',
+      label: 'Product Log',
+      required: false,
+    },
+    {
+      name: 'config_log',
+      type: 'json',
+      label: 'Config Log',
+      required: false,
+    },
+    {
       name: 'created_at',
       type: 'date',
       label: 'Contract Creation Date',
