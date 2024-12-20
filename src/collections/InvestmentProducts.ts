@@ -55,16 +55,21 @@ const InvestmentProducts: CollectionConfig = {
       label: 'End Date',
     },
     {
+      name: 'interest_rate_month',
+      type: 'number',
+      label: 'Interest Rate Month (%)',
+    },
+    {
       name: 'interest_rate_from',
       type: 'number',
       label: 'Interest Rate From (%)',
-      required: true,
+      required: false,
     },
     {
       name: 'interest_rate_to',
       type: 'number',
       label: 'Interest Rate To (%)',
-      required: true,
+      required: false,
     },
     {
       name: 'profit_period', // Kì hạn nhận lãi (bonus)

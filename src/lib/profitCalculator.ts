@@ -110,12 +110,14 @@ export const buildProfitRecordsAnnualy = (principal: number, startDate: Date, en
   let masterTimeline = dataAnnualy.filter((item) => {
     return item.isValid == true
   })
+  console.log('check masterTimeline: ', masterTimeline);
 
   let invalidYears = dataAnnualy
     .filter((x) => x.isValid === false)
     .map((item: any) => {
       return item.year
     })
+    console.log('check invalidYears: ', invalidYears);
 
   const dataSemester = findTermSemester(startDate, endDate).result
   const dataQuarterly = findTermQuarterly(startDate, endDate).result
@@ -129,7 +131,6 @@ export const buildProfitRecordsAnnualy = (principal: number, startDate: Date, en
     let _goodSemesterMonths = dataSemester.filter((item) => {
       return item.year == yearData.year
     })
-
     let _saveSemesterMonths = []
 
     _goodSemesterMonths.forEach((item) => {
@@ -162,7 +163,7 @@ export const buildProfitRecordsAnnualy = (principal: number, startDate: Date, en
       obj.tradingDaysLayer.push({
         month: format(startDate, 'MM'),
         days: tradingDaysStartOrEnd.startDate,
-        rate: rateConfig.find((r) => r.term === 'partialMonth').rate,
+        rate: rateConfig.find((r) => r.term === 'partialMonth').rate,// () / days trong file market trading days
         valid: false,
         gender: 'Partial Month',
       })
@@ -189,6 +190,11 @@ export const buildProfitRecordsAnnualy = (principal: number, startDate: Date, en
   masterTimeline.forEach((yearData) => {
     yearData.tradingDaysLayer.forEach((monthItem) => {
       let periodInterest = balance * monthItem.rate
+      let note = monthItem.gender
+      if(monthItem.gender == 'Partial Month'){
+        note = `${findMarketTradingDays(monthItem.month, yearData.year)} ${monthItem.gender}`
+        periodInterest = balance * monthItem.rate * monthItem.days / (findMarketTradingDays(monthItem.month, yearData.year))
+      }
       balance += periodInterest
 
       profitData.push({
@@ -198,11 +204,119 @@ export const buildProfitRecordsAnnualy = (principal: number, startDate: Date, en
         profit: balance - principal,
         interestEarned: periodInterest,
         rate: monthItem.rate * 100,
-        termType: monthItem.gender,
+        termType: note,
         days: monthItem.days,
       })
     })
   })
 
   return groupByYear(profitData)
+}
+
+export const calculateTotalProfit = (principal: number, startDate: Date, endDate: Date) => {
+  const tradingDaysStartOrEnd = getTradingDaysStartOrEnd(startDate, endDate)
+  const dataAnnualy = findTermAnnualy(startDate, endDate).result
+
+  let masterTimeline = dataAnnualy.filter((item) => {
+    return item.isValid == true
+  })
+
+  let invalidYears = dataAnnualy
+    .filter((x) => x.isValid === false)
+    .map((item: any) => {
+      return item.year
+    })
+
+  const dataSemester = findTermSemester(startDate, endDate).result
+  const dataQuarterly = findTermQuarterly(startDate, endDate).result
+  const dataYearLoop = dataAnnualy.filter((y) => {
+    return y.isValid == false
+  })
+
+  for (const [index, yearData] of dataYearLoop.entries()) {
+    let obj = { year: yearData.year, tradingDaysLayer: [] }
+    let _goodPerfectMonths = []
+    let _goodSemesterMonths = dataSemester.filter((item) => {
+      return item.year == yearData.year
+    })
+    let _saveSemesterMonths = []
+
+    _goodSemesterMonths.forEach((item) => {
+      item.tradingDaysLayer.forEach((x) => {
+        if (x.valid == true) {
+          obj.tradingDaysLayer.push(x)
+          _saveSemesterMonths.push(x.month)
+        }
+      })
+    })
+
+    let _goodQuarters = dataQuarterly.filter((item) => {
+      return item.year == yearData.year
+    })
+
+    _goodQuarters.forEach((item) => {
+      item.tradingDaysLayer.forEach((x) => {
+        if (!_saveSemesterMonths.includes(x.month)) {
+          if (!x.valid) x.rate = 0.04
+
+          obj.tradingDaysLayer.push(x)
+        }
+        if (x.valid == false && !_saveSemesterMonths.includes(x.month))
+          _goodPerfectMonths.push(x.month)
+      })
+    })
+
+    if (index == 0 && !isStartOfMonth(startDate)) {
+      // Gắn tháng của StartDate
+      obj.tradingDaysLayer.push({
+        month: format(startDate, 'MM'),
+        days: tradingDaysStartOrEnd.startDate,
+        rate: rateConfig.find((r) => r.term === 'partialMonth').rate,// () / days trong file market trading days
+        valid: false,
+        gender: 'Partial Month',
+      })
+    }
+    if (index == dataYearLoop.length - 1 && !isEndOfMonth(endDate)) {
+      obj.tradingDaysLayer.push({
+        month: format(endDate, 'MM'),
+        days: tradingDaysStartOrEnd.endDate,
+        rate: rateConfig.find((r) => r.term === 'partialMonth').rate,
+        valid: false,
+        gender: 'Partial Month',
+      })
+    }
+
+    obj.tradingDaysLayer.sort((a, b) => a.month - b.month)
+    masterTimeline.push(obj)
+  }
+
+  masterTimeline.sort((a, b) => a.year - b.year)
+  const profitData = []
+
+  let balance = principal
+
+  masterTimeline.forEach((yearData) => {
+    yearData.tradingDaysLayer.forEach((monthItem) => {
+      let periodInterest = balance * monthItem.rate
+      let note = monthItem.gender
+      if(monthItem.gender == 'Partial Month'){
+        note = `${findMarketTradingDays(monthItem.month, yearData.year)} ${monthItem.gender}`
+        periodInterest = balance * monthItem.rate * monthItem.days / (findMarketTradingDays(monthItem.month, yearData.year))
+      }
+      balance += periodInterest
+
+      profitData.push({
+        year: yearData,
+        date: new Date(`${yearData.year}-${monthItem.month}-01`),
+        balance: balance,
+        profit: balance - principal,
+        interestEarned: periodInterest,
+        rate: monthItem.rate * 100,
+        termType: note,
+        days: monthItem.days,
+      })
+    })
+  })
+
+  return balance;
 }

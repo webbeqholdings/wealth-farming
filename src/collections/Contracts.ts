@@ -5,18 +5,36 @@ const Contracts: CollectionConfig = {
   slug: 'contracts',
   fields: [
     {
-      name: 'product_id',
+      name: 'user',
       type: 'relationship',
-      relationTo: 'investment-products', // Liên kết đến collection investment_products
-      label: 'Investment Product',
-      required: true,
+      relationTo: 'users', // Liên kết đến collection accounts
+      label: 'User',
+      required: true
     },
     {
-      name: 'account_id',
-      type: 'relationship',
-      relationTo: 'accounts', // Liên kết đến collection accounts
-      label: 'Account',
-      required: true,
+      name: 'amount',
+      type: 'number',
+      label: 'Investment Amount',
+    },
+    {
+      name: 'balance',
+      type: 'number',
+      label: 'Available Balance',
+    },
+    {
+      name: 'expected_return',
+      type: 'number',
+      label: 'Expected Return',
+    },
+    {
+      name: 'start_date',
+      type: 'date',
+      label: 'Start Date',
+    },
+    {
+      name: 'end_date',
+      type: 'date',
+      label: 'End Date',
     },
     {
       name: 'status',
@@ -31,58 +49,19 @@ const Contracts: CollectionConfig = {
       required: true,
     },
     {
-      name: 'amount',
-      type: 'number',
-      label: 'Investment Amount',
-      required: true,
-    },
-    {
       name: 'note_log',
-      type: 'number',
+      type: 'json',
       label: 'Note',
-      required: true,
     },
     {
       name: 'product_log',
       type: 'json',
       label: 'Product Log',
-      required: false,
     },
     {
       name: 'config_log',
       type: 'json',
       label: 'Config Log',
-      required: false,
-    },
-    {
-      name: 'created_at',
-      type: 'date',
-      label: 'Contract Creation Date',
-      admin: {
-        disabled: true, // Disable editing in the admin UI
-      },
-      hooks: {
-        beforeChange: [
-          ({ data }) => {
-            data.created_at = new Date() // Set to current date
-          },
-        ],
-      },
-    },
-    {
-      name: 'updated_at',
-      type: 'date',
-      label: 'Last Updated',
-      admin: {
-        disabled: true, // Disable editing in the admin UI
-      },
-      hooks: {
-        beforeChange: [
-          ({ data }) => {
-            data.updated_at = new Date() // Set to current date
-          },
-        ],
-      },
     },
   ],
 }

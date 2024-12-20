@@ -80,7 +80,7 @@ export function InvestmentProcessForm({ onCalculate }: { onCalculate: (data: any
     e.preventDefault()
     if (startDate && endDate && depositAmount) {
       const daysDifference = differenceInDays(endDate, startDate)
-      if (daysDifference < 14) {
+      if (daysDifference < 50) {
         toast({
           title: 'Error',
           description: `The investment period must be at least ${minRangeDays} days.`,

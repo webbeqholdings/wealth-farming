@@ -3,7 +3,7 @@ import type { CollectionConfig } from 'payload'
 const Accounts: CollectionConfig = {
   slug: 'accounts',
   admin: {
-    useAsTitle: 'account_name',
+    useAsTitle: 'account_number',
   },
   access: {
     read: () => true

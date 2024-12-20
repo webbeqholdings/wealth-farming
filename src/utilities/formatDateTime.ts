@@ -340,12 +340,12 @@ export function findTermAnnualy(startDate: Date, endDate: Date): boolean | objec
   }
 
   for (let yearItem of listOfMonths) {
-    let monthsMatcher = []
+    //let monthsMatcher = []
     let tradingDaysMatcher = []
 
     // if : Annualy is true
     if (isSubArrayContained(defineAnnualy, yearItem.months)) {
-      monthsMatcher.push(defineAnnualy)
+      // monthsMatcher.push(defineAnnualy)
 
       for (let tradingMonth of defineAnnualy) {
         tradingDaysMatcher.push({
@@ -382,7 +382,7 @@ export function findTermAnnualy(startDate: Date, endDate: Date): boolean | objec
 export function findMarketTradingDays(_month: string, _year: string | number) {
   const data = dataMarketWorkingDays
   let monthName = format(new Date(`${_year}-${_month}-01`), 'LLL')
-
+  // excute > 2026
   // @ts-ignore
   return data[_year].months[monthName]
 }
@@ -416,7 +416,7 @@ export function getTradingDaysStartOrEnd(startDate: Date, endDate: Date): object
     let daysInMonth = getDaysInMonth(endDate)
     let month = format(endDate, 'MM')
     let offsetDays =
-      differenceInDaysNotWeekend(endDate, new Date(`${year}-${month}-${daysInMonth}`)) - 1
+      differenceInDaysNotWeekend(endDate, new Date(`${year}-${month}-${daysInMonth}`)) -1
     let tradingDays = findMarketTradingDays(month, year) - offsetDays
     result.endDate = tradingDays
   }

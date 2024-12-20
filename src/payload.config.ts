@@ -32,10 +32,11 @@ import Notification from './collections/Notifications'
 import EconomicCalendar from './collections/EconomicCalendar'
 import MainMenu from './global-configs/main-menu'
 import UserReferrals from './collections/UserReferrals'
+import Withdrawals from './collections/Withdrawls'
 import {s3Storage} from '@payloadcms/storage-s3'
 
-const filename = fileURLToPath(import.meta.url)
-const dirname = path.dirname(filename)
+const filename = fileURLToPath(import.meta.url);
+const dirname = path.dirname(filename);
 
 export default buildConfig({
   admin: {
@@ -110,6 +111,7 @@ export default buildConfig({
       slug: 'seo',
       fields: [],
     },
+    Withdrawals
   ],
   globals: [SiteSettings, MainMenu, Header, Footer],
   editor: lexicalEditor(),
@@ -122,6 +124,15 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URL || '',
     },
   }),
+  jobs: {
+    tasks: [
+      {
+        slug: 'updateProfit',
+        handler: path.resolve(dirname, 'tasks/updateProfit.ts') + '#updateProfitHandler',
+      },
+    ],
+    workflows: [],
+  },
   plugins: [
     seoPlugin({
       collections: ['seo'],

@@ -32,6 +32,8 @@ export interface Config {
     notifications: Notification;
     media: Media;
     seo: Seo;
+    withdrawals: Withdrawal;
+    'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -58,6 +60,8 @@ export interface Config {
     notifications: NotificationsSelect<false> | NotificationsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     seo: SeoSelect<false> | SeoSelect<true>;
+    withdrawals: WithdrawalsSelect<false> | WithdrawalsSelect<true>;
+    'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -82,7 +86,13 @@ export interface Config {
     collection: 'users';
   };
   jobs?: {
-    tasks: unknown;
+    tasks: {
+      updateProfit: TaskUpdateProfit;
+      inline?: {
+        input: unknown;
+        output: unknown;
+      };
+    };
     workflows?: unknown;
   };
 }
@@ -229,12 +239,85 @@ export interface Company {
  */
 export interface Contract {
   id: number;
-  product_id: number | InvestmentProduct;
-  account_id: number | Account;
+  user: number | User;
+  amount?: number | null;
+  balance?: number | null;
+  expected_return?: number | null;
+  start_date?: string | null;
+  end_date?: string | null;
   status: 'active' | 'inactive' | 'pending' | 'closed';
-  amount: number;
-  created_at?: string | null;
-  updated_at?: string | null;
+  note_log?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  product_log?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  config_log?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "economic-calendar".
+ */
+export interface EconomicCalendar {
+  id: number;
+  title?: string | null;
+  impact?: string | null;
+  unit?: (number | null) | Unit;
+  time?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "units".
+ */
+export interface Unit {
+  id: number;
+  unit_name: string;
+  unit_code?: string | null;
+  amount?: number | null;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "investment-funds".
+ */
+export interface InvestmentFund {
+  id: number;
+  name: string;
+  description?: string | null;
+  category?: string | null;
+  start_date: string;
+  end_date: string;
+  interest_rate: number;
+  min_investment: number;
+  max_investment?: number | null;
+  fund_manager: number | User;
+  status: 'active' | 'closed';
   updatedAt: string;
   createdAt: string;
 }
@@ -266,55 +349,11 @@ export interface InvestmentProduct {
   max_investment?: number | null;
   start_date?: string | null;
   end_date?: string | null;
-  interest_rate_from: number;
-  interest_rate_to: number;
+  interest_rate_month?: number | null;
+  interest_rate_from?: number | null;
+  interest_rate_to?: number | null;
   profit_period: 'monthly' | 'quarterly' | 'semi_annually' | 'annually';
   status: 'available' | 'unavailable';
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "investment-funds".
- */
-export interface InvestmentFund {
-  id: number;
-  name: string;
-  description?: string | null;
-  category?: string | null;
-  start_date: string;
-  end_date: string;
-  interest_rate: number;
-  min_investment: number;
-  max_investment?: number | null;
-  fund_manager: number | User;
-  status: 'active' | 'closed';
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "economic-calendar".
- */
-export interface EconomicCalendar {
-  id: number;
-  title?: string | null;
-  impact?: string | null;
-  unit?: (number | null) | Unit;
-  time?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "units".
- */
-export interface Unit {
-  id: number;
-  unit_name: string;
-  unit_code?: string | null;
-  amount?: number | null;
-  description?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -520,6 +559,100 @@ export interface Seo {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "withdrawals".
+ */
+export interface Withdrawal {
+  id: number;
+  contract?: (number | null) | Contract;
+  user?: (number | null) | User;
+  amount: number;
+  status: 'completed' | 'pending' | 'failed';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs".
+ */
+export interface PayloadJob {
+  id: number;
+  input?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  taskStatus?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  completedAt?: string | null;
+  totalTried?: number | null;
+  hasError?: boolean | null;
+  error?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  log?:
+    | {
+        executedAt: string;
+        completedAt: string;
+        taskSlug: 'inline' | 'updateProfit';
+        taskID: string;
+        input?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        output?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        state: 'failed' | 'succeeded';
+        error?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  workflowSlug?: string | null;
+  taskSlug?: ('inline' | 'updateProfit') | null;
+  queue?: 'default' | null;
+  waitUntil?: string | null;
+  processing?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -608,6 +741,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'seo';
         value: number | Seo;
+      } | null)
+    | ({
+        relationTo: 'withdrawals';
+        value: number | Withdrawal;
+      } | null)
+    | ({
+        relationTo: 'payload-jobs';
+        value: number | PayloadJob;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -708,12 +849,16 @@ export interface CompaniesSelect<T extends boolean = true> {
  * via the `definition` "contracts_select".
  */
 export interface ContractsSelect<T extends boolean = true> {
-  product_id?: T;
-  account_id?: T;
-  status?: T;
+  user?: T;
   amount?: T;
-  created_at?: T;
-  updated_at?: T;
+  balance?: T;
+  expected_return?: T;
+  start_date?: T;
+  end_date?: T;
+  status?: T;
+  note_log?: T;
+  product_log?: T;
+  config_log?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -760,6 +905,7 @@ export interface InvestmentProductsSelect<T extends boolean = true> {
   max_investment?: T;
   start_date?: T;
   end_date?: T;
+  interest_rate_month?: T;
   interest_rate_from?: T;
   interest_rate_to?: T;
   profit_period?: T;
@@ -987,6 +1133,50 @@ export interface SeoSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "withdrawals_select".
+ */
+export interface WithdrawalsSelect<T extends boolean = true> {
+  contract?: T;
+  user?: T;
+  amount?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs_select".
+ */
+export interface PayloadJobsSelect<T extends boolean = true> {
+  input?: T;
+  taskStatus?: T;
+  completedAt?: T;
+  totalTried?: T;
+  hasError?: T;
+  error?: T;
+  log?:
+    | T
+    | {
+        executedAt?: T;
+        completedAt?: T;
+        taskSlug?: T;
+        taskID?: T;
+        input?: T;
+        output?: T;
+        state?: T;
+        error?: T;
+        id?: T;
+      };
+  workflowSlug?: T;
+  taskSlug?: T;
+  queue?: T;
+  waitUntil?: T;
+  processing?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents_select".
  */
 export interface PayloadLockedDocumentsSelect<T extends boolean = true> {
@@ -1200,6 +1390,14 @@ export interface FooterSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskUpdateProfit".
+ */
+export interface TaskUpdateProfit {
+  input?: unknown;
+  output?: unknown;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
