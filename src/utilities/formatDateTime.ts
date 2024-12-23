@@ -202,7 +202,7 @@ export function findTermQuarterly(startDate: Date, endDate: Date): boolean | obj
           days: findMarketTradingDays(_badMonth, yearItem.year),
           rate: 0,
           valid: false,
-          gender: genderName + ' Fail',
+          gender: 'Monthly',
         })
       }
     }
@@ -406,6 +406,14 @@ export function getTradingDaysStartOrEnd(startDate: Date, endDate: Date): object
     let year = getYear(startDate)
     let month = format(startDate, 'MM')
 
+    if (year > 2026) {
+      year = 2026
+    }
+
+    if (year < 2024) {
+      year = 2024
+    }
+
     let offsetDays = differenceInDaysNotWeekend(new Date(`${year}-${month}-01`), startDate) - 1
     let tradingDays = findMarketTradingDays(month, year) - offsetDays
     result.startDate = tradingDays
@@ -416,7 +424,7 @@ export function getTradingDaysStartOrEnd(startDate: Date, endDate: Date): object
     let daysInMonth = getDaysInMonth(endDate)
     let month = format(endDate, 'MM')
     let offsetDays =
-      differenceInDaysNotWeekend(endDate, new Date(`${year}-${month}-${daysInMonth}`)) -1
+      differenceInDaysNotWeekend(endDate, new Date(`${year}-${month}-${daysInMonth}`)) - 1
     let tradingDays = findMarketTradingDays(month, year) - offsetDays
     result.endDate = tradingDays
   }

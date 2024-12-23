@@ -110,14 +110,14 @@ export const buildProfitRecordsAnnualy = (principal: number, startDate: Date, en
   let masterTimeline = dataAnnualy.filter((item) => {
     return item.isValid == true
   })
-  console.log('check masterTimeline: ', masterTimeline);
+  console.log('check masterTimeline: ', masterTimeline)
 
   let invalidYears = dataAnnualy
     .filter((x) => x.isValid === false)
     .map((item: any) => {
       return item.year
     })
-    console.log('check invalidYears: ', invalidYears);
+  console.log('check invalidYears: ', invalidYears)
 
   const dataSemester = findTermSemester(startDate, endDate).result
   const dataQuarterly = findTermQuarterly(startDate, endDate).result
@@ -163,7 +163,7 @@ export const buildProfitRecordsAnnualy = (principal: number, startDate: Date, en
       obj.tradingDaysLayer.push({
         month: format(startDate, 'MM'),
         days: tradingDaysStartOrEnd.startDate,
-        rate: rateConfig.find((r) => r.term === 'partialMonth').rate,// () / days trong file market trading days
+        rate: rateConfig.find((r) => r.term === 'partialMonth').rate, // () / days trong file market trading days
         valid: false,
         gender: 'Partial Month',
       })
@@ -191,9 +191,11 @@ export const buildProfitRecordsAnnualy = (principal: number, startDate: Date, en
     yearData.tradingDaysLayer.forEach((monthItem) => {
       let periodInterest = balance * monthItem.rate
       let note = monthItem.gender
-      if(monthItem.gender == 'Partial Month'){
-        note = `${findMarketTradingDays(monthItem.month, yearData.year)} ${monthItem.gender}`
-        periodInterest = balance * monthItem.rate * monthItem.days / (findMarketTradingDays(monthItem.month, yearData.year))
+      if (monthItem.gender == 'Partial Month') {
+        note = `(${monthItem.days} / ${findMarketTradingDays(monthItem.month, yearData.year)} days) ${monthItem.gender}`
+        periodInterest =
+          (balance * monthItem.rate * monthItem.days) /
+          findMarketTradingDays(monthItem.month, yearData.year)
       }
       balance += periodInterest
 
@@ -271,7 +273,7 @@ export const calculateTotalProfit = (principal: number, startDate: Date, endDate
       obj.tradingDaysLayer.push({
         month: format(startDate, 'MM'),
         days: tradingDaysStartOrEnd.startDate,
-        rate: rateConfig.find((r) => r.term === 'partialMonth').rate,// () / days trong file market trading days
+        rate: rateConfig.find((r) => r.term === 'partialMonth').rate, // () / days trong file market trading days
         valid: false,
         gender: 'Partial Month',
       })
@@ -299,9 +301,11 @@ export const calculateTotalProfit = (principal: number, startDate: Date, endDate
     yearData.tradingDaysLayer.forEach((monthItem) => {
       let periodInterest = balance * monthItem.rate
       let note = monthItem.gender
-      if(monthItem.gender == 'Partial Month'){
-        note = `${findMarketTradingDays(monthItem.month, yearData.year)} ${monthItem.gender}`
-        periodInterest = balance * monthItem.rate * monthItem.days / (findMarketTradingDays(monthItem.month, yearData.year))
+      if (monthItem.gender == 'Partial Month') {
+        note = `${findMarketTradingDays(monthItem.month, yearData.year)} xx ${monthItem.gender}`
+        periodInterest =
+          (balance * monthItem.rate * monthItem.days) /
+          findMarketTradingDays(monthItem.month, yearData.year)
       }
       balance += periodInterest
 
@@ -318,5 +322,5 @@ export const calculateTotalProfit = (principal: number, startDate: Date, endDate
     })
   })
 
-  return balance;
+  return balance
 }
