@@ -3,10 +3,11 @@ import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
   await payload.db.drizzle.execute(sql`
    ALTER TYPE "public"."enum_payload_jobs_workflow_slug" ADD VALUE 'workflow';
-  DROP TABLE "seo";
   ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_seo_fk";
   
   DROP INDEX IF EXISTS "payload_locked_documents_rels_seo_id_idx";
+  DROP TABLE "seo";
+
   ALTER TABLE "posts" ADD COLUMN "meta_title" varchar;
   ALTER TABLE "posts" ADD COLUMN "meta_description" varchar;
   ALTER TABLE "posts" ADD COLUMN "meta_image_id" integer;
