@@ -27,14 +27,14 @@ interface Rate {
 }
 
 const rates: Rate[] = [
-  { term: 'less than 1 month', rate: 0.04 },
-  { term: '1 month', rate: 0.0595 },
-  { term: 'quarterly', rate: 0.0615 },
-  { term: 'semester', rate: 0.0635 },
+  // { term: 'less than 1 month', rate: 0.04 },
+  // { term: '1 month', rate: 0.0595 },
+  // { term: 'quarterly', rate: 0.0615 },
+  // { term: 'semester', rate: 0.0635 },
   { term: 'annually', rate: 0.0655 },
 ]
 
-const minRangeDays = 50
+const minRangeDays = 15
 
 export function InvestmentProcessForm({ onCalculate }: { onCalculate: (data: any) => void }) {
   const [startDate, setStartDate] = useState<Date | undefined>(undefined)
@@ -42,7 +42,7 @@ export function InvestmentProcessForm({ onCalculate }: { onCalculate: (data: any
   const [term, setTerm] = useState<Term>('less than 1 month')
   const [depositAmount, setDepositAmount] = useState<number>(10000)
   const [dayCount, setDayCount] = useState<number>(0)
-  const tomorrow = addDays(new Date(), 1)
+  const tomorrow = addDays(new Date(), 0)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -80,7 +80,7 @@ export function InvestmentProcessForm({ onCalculate }: { onCalculate: (data: any
     e.preventDefault()
     if (startDate && endDate && depositAmount) {
       const daysDifference = differenceInDays(endDate, startDate)
-      if (daysDifference < 50) {
+      if (daysDifference < minRangeDays) {
         toast({
           title: 'Error',
           description: `The investment period must be at least ${minRangeDays} days.`,
@@ -182,10 +182,11 @@ export function InvestmentProcessForm({ onCalculate }: { onCalculate: (data: any
               </PopoverContent>
             </Popover>
           </div>
-          <p>{dayCount} Days</p>
+
           <Button type="submit" className="w-full">
             Calculate Investment
           </Button>
+          <p>{dayCount} Days</p>
         </form>
       </CardContent>
     </Card>
