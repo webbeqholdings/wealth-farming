@@ -107,10 +107,6 @@ export default buildConfig({
     Units,
     Notification,
     Media,
-    {
-      slug: 'seo',
-      fields: [],
-    },
     Withdrawals
   ],
   globals: [SiteSettings, MainMenu, Header, Footer],
@@ -131,15 +127,20 @@ export default buildConfig({
         handler: path.resolve(dirname, 'tasks/updateProfit.ts') + '#updateProfitHandler',
       },
     ],
-    workflows: [],
+    workflows: [
+      {
+        slug: 'workflow',
+        handler: path.resolve(dirname, 'tasks/updateProfit.ts') + '#updateProfitHandler',
+      },
+    ],
   },
   plugins: [
     seoPlugin({
-      collections: ['seo'],
+      collections: ['posts'],
       uploadsCollection: 'media',
       generateTitle: ({ doc }) => `Website.com — ${doc.title}`,
-      generateDescription: ({ doc }) => doc.excerpt,
-      generateURL: ({ doc, collectionSlug }) => process.env.BASE_URL, // recommend env
+      generateDescription: ({ doc }) => doc.title,
+      generateURL: ({ doc, collectionSlug }) => process.env.BASE_URL + `/${doc.slug}`, // recommend env
     }),
     // store media to minio storage
     s3Storage({

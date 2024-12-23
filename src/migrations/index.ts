@@ -6,6 +6,7 @@ import * as migration_20241216_022626_create_main_menu_global from './20241216_0
 import * as migration_20241216_045325_add_column_amount_to_currency from './20241216_045325_add_column_amount_to_currency';
 import * as migration_20241216_073305_create_user_referrals_collection from './20241216_073305_create_user_referrals_collection';
 import * as migration_20241220_120738_create_withdrawl_contracts_and_payload_jobs_table from './20241220_120738_create_withdrawl_contracts_and_payload_jobs_table';
+import * as migration_20241223_042430_drop_seo_and_add_enum_workflow from './20241223_042430_drop_seo_and_add_enum_workflow';
 
 export const migrations = [
   {
@@ -46,6 +47,11 @@ export const migrations = [
   {
     up: migration_20241220_120738_create_withdrawl_contracts_and_payload_jobs_table.up,
     down: migration_20241220_120738_create_withdrawl_contracts_and_payload_jobs_table.down,
-    name: '20241220_120738_create_withdrawl_contracts_and_payload_jobs_table'
+    name: '20241220_120738_create_withdrawl_contracts_and_payload_jobs_table',
+  },
+  {
+    up: migration_20241223_042430_drop_seo_and_add_enum_workflow.up,
+    down: migration_20241223_042430_drop_seo_and_add_enum_workflow.down,
+    name: '20241223_042430_drop_seo_and_add_enum_workflow'
   },
 ];

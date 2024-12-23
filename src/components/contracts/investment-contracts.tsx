@@ -158,7 +158,7 @@ export function InvestmentContracts() {
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold ">
-                                {investments.filter((inv) => inv.status === 'active').length}
+                                {investments && investments.filter((inv) => inv.status === 'active').length}
                             </div>
                         </CardContent>
                     </Card>

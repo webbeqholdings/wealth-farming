@@ -31,7 +31,6 @@ export interface Config {
     units: Unit;
     notifications: Notification;
     media: Media;
-    seo: Seo;
     withdrawals: Withdrawal;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -59,7 +58,6 @@ export interface Config {
     units: UnitsSelect<false> | UnitsSelect<true>;
     notifications: NotificationsSelect<false> | NotificationsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
-    seo: SeoSelect<false> | SeoSelect<true>;
     withdrawals: WithdrawalsSelect<false> | WithdrawalsSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -93,7 +91,9 @@ export interface Config {
         output: unknown;
       };
     };
-    workflows?: unknown;
+    workflows?: {
+      workflow?: WorkflowWorkflow;
+    };
   };
 }
 export interface UserAuthOperations {
@@ -487,6 +487,11 @@ export interface Post {
       }[]
     | null;
   slug?: string | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    image?: (number | null) | Media;
+  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -540,20 +545,6 @@ export interface Notification {
     };
     [k: string]: unknown;
   } | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "seo".
- */
-export interface Seo {
-  id: number;
-  meta?: {
-    title?: string | null;
-    description?: string | null;
-    image?: (number | null) | Media;
-  };
   updatedAt: string;
   createdAt: string;
 }
@@ -643,7 +634,7 @@ export interface PayloadJob {
         id?: string | null;
       }[]
     | null;
-  workflowSlug?: string | null;
+  workflowSlug?: 'workflow' | null;
   taskSlug?: ('inline' | 'updateProfit') | null;
   queue?: 'default' | null;
   waitUntil?: string | null;
@@ -737,10 +728,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
-      } | null)
-    | ({
-        relationTo: 'seo';
-        value: number | Seo;
       } | null)
     | ({
         relationTo: 'withdrawals';
@@ -1017,6 +1004,15 @@ export interface PostsSelect<T extends boolean = true> {
         id?: T;
       };
   slug?: T;
+  meta?:
+    | T
+    | {
+        overview?: T;
+        title?: T;
+        description?: T;
+        image?: T;
+        preview?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -1113,23 +1109,6 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "seo_select".
- */
-export interface SeoSelect<T extends boolean = true> {
-  meta?:
-    | T
-    | {
-        overview?: T;
-        title?: T;
-        description?: T;
-        image?: T;
-        preview?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1398,6 +1377,13 @@ export interface FooterSelect<T extends boolean = true> {
 export interface TaskUpdateProfit {
   input?: unknown;
   output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "WorkflowWorkflow".
+ */
+export interface WorkflowWorkflow {
+  input?: unknown;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
