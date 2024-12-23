@@ -8,9 +8,19 @@ export const Banks: CollectionConfig = {
   },
   access: {
     read: isIndividualOrAdmin,
-    update: ({ req: { user }, id }) => {
-      // Allow if user is admin or updating their own record
-      return user?.role === 'admin' || user?.id === id;
+    update: ({ req: { user, query }, id }) => {
+      if (user?.role == 'admin') {
+        return true;
+      }
+      // Extract the ID from the query
+      if (typeof query.where === 'object' && 'user' in query.where && typeof query.where.user === 'object' && 'equals' in query.where.user) {
+        const id = Number(query?.where?.user?.equals);
+        if (id !== Number(user?.id)) {
+          return false
+        }
+        return true
+      }
+      return false
     }
   },
   fields: [
