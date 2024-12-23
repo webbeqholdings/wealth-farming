@@ -73,7 +73,7 @@ export default function ReferralPage() {
     }
 
     fetchReferralData()
-  }, [])
+  }, [loading])
 
   const copyReferralLink = () => {
     navigator.clipboard.writeText(referralLink)
