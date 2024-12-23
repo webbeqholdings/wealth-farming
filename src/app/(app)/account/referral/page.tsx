@@ -16,6 +16,8 @@ import { Users, Link, DollarSign, Award } from 'lucide-react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { getReferralsByParentId } from '@/lib/referrals'
+import userStatus from '@/lib/userStatus'
+import { useRouter } from 'next/navigation'
 
 interface Referral {
   id: string
@@ -26,6 +28,8 @@ interface Referral {
 }
 
 export default function ReferralPage() {
+  const router = useRouter()
+  const { isLoggedIn, loading, user } = userStatus();
   const [referralLink, setReferralLink] = useState('')
   const [referrals, setReferrals] = useState<Referral[]>([])
   const [stats, setStats] = useState({
@@ -38,7 +42,7 @@ export default function ReferralPage() {
   useEffect(() => {
     // Simulating API call to fetch referral data
     const fetchReferralData = async () => {
-      const response: any = await getReferralsByParentId(6)
+      const response: any = await getReferralsByParentId(user.id)
 
       if (response && response.length > 0) {
         // Extract the referral link from the first response parent
@@ -74,6 +78,17 @@ export default function ReferralPage() {
   const copyReferralLink = () => {
     navigator.clipboard.writeText(referralLink)
     alert('Referral link copied to clipboard!')
+  }
+
+  // If still loading, show a loading indicator (or spinner)
+  if (loading) {
+    return <div>Loading...</div>; // You can replace this with a loading spinner component if desired
+  }
+
+  // If the user is not logged in, redirect to the join page
+  if (!isLoggedIn) {
+    router.push('/join');
+    return <div>Redirecting...</div>; // Optional: Show a redirect message
   }
 
   return (
