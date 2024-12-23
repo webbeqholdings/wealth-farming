@@ -17,15 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import {
-  Facebook,
-  Youtube,
-  Instagram,
-  DollarSign,
-  UserCircle,
-  Settings,
-  LogOut,
-} from 'lucide-react'
+import { Facebook, Gift, DollarSign, UserCircle, Settings, LogOut } from 'lucide-react'
 
 export function SiteHeader() {
   const { isLoggedIn, loading, user } = userStatus()
@@ -110,6 +102,12 @@ export function SiteHeader() {
                       <UserCircle className="mr-2 h-4 w-4" />
                       <span>Profile</span>
                     </DropdownMenuItem>
+
+                    <DropdownMenuItem onClick={() => router.push('/account/referral')}>
+                      <Gift className="mr-2 h-4 w-4" />
+                      <span>Referral Reward</span>
+                    </DropdownMenuItem>
+
                     <DropdownMenuItem>
                       <Settings className="mr-2 h-4 w-4" />
                       <span>Settings</span>
@@ -135,32 +133,6 @@ export function SiteHeader() {
               >
                 <Facebook className="h-4 w-4" />
                 <span className="sr-only">Facebook</span>
-              </div>
-            </Link>
-            <Link href="#" target="_blank" rel="noreferrer">
-              <div
-                className={cn(
-                  buttonVariants({
-                    variant: 'ghost',
-                  }),
-                  'h-8 w-8 px-0',
-                )}
-              >
-                <Youtube className="h-4 w-4" />
-                <span className="sr-only">Youtube</span>
-              </div>
-            </Link>
-            <Link href="#" target="_blank" rel="noreferrer">
-              <div
-                className={cn(
-                  buttonVariants({
-                    variant: 'ghost',
-                  }),
-                  'h-8 w-8 px-0',
-                )}
-              >
-                <Instagram className="h-4 w-4" />
-                <span className="sr-only">Instagram</span>
               </div>
             </Link>
             <ModeToggle />
