@@ -22,11 +22,6 @@ const Contracts: CollectionConfig = {
       label: 'Available Balance',
     },
     {
-      name: 'expected_return',
-      type: 'number',
-      label: 'Expected Return',
-    },
-    {
       name: 'start_date',
       type: 'date',
       label: 'Start Date',

@@ -242,7 +242,6 @@ export interface Contract {
   user: number | User;
   amount?: number | null;
   balance?: number | null;
-  expected_return?: number | null;
   start_date?: string | null;
   end_date?: string | null;
   status: 'active' | 'inactive' | 'pending' | 'closed';
@@ -839,7 +838,6 @@ export interface ContractsSelect<T extends boolean = true> {
   user?: T;
   amount?: T;
   balance?: T;
-  expected_return?: T;
   start_date?: T;
   end_date?: T;
   status?: T;

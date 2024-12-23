@@ -96,7 +96,7 @@ const Transactions: CollectionConfig = {
           config,
         });
         if (operation === 'update' && doc.type === 'deposit' && doc.status === 'completed') {
-          const fromAccountId = doc.from_account.id;
+          const fromAccountId = doc.from_account;
           const transactionAmount = doc.amount;
           // Fetch the existing account details
           const fromAccount = await payload.findByID({
@@ -119,7 +119,7 @@ const Transactions: CollectionConfig = {
           }
         }
         if (operation === 'update' && doc.type === 'withdraw' && doc.status === 'failed') {
-          const fromAccountId = doc.from_account.id;
+          const fromAccountId = doc.from_account;
           const transactionAmount = doc.amount;
           // Fetch the existing account details
           const fromAccount = await payload.findByID({

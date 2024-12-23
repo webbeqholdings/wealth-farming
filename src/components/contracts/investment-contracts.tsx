@@ -16,7 +16,7 @@ import {
 import { WithdrawDialog } from '@/components/withdraw-dialog'
 import userStatus from '@/lib/userStatus'
 import { useRouter } from 'next/navigation'
-import { getContracts, getWithdrawals } from '@/lib/api/contract'
+import { getContracts, getWithdrawals } from '@/lib/contract'
 
 interface Investment {
     id: string

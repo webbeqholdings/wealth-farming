@@ -15,6 +15,7 @@ import {
 import { Users, Link, DollarSign, Award } from 'lucide-react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
+import { getReferralsByParentId } from '@/lib/referrals'
 
 interface Referral {
   id: string
@@ -37,31 +38,28 @@ export default function ReferralPage() {
   useEffect(() => {
     // Simulating API call to fetch referral data
     const fetchReferralData = async () => {
-      // In a real application, you would fetch this data from your API
-      setReferralLink('https://yourdomain.com/ref/ABC123')
-      setReferrals([
-        {
-          id: '1',
-          name: 'John Doe',
-          email: 'john@example.com',
-          date: '2023-05-15',
-          status: 'Completed',
-        },
-        {
-          id: '2',
-          name: 'Jane Smith',
-          email: 'jane@example.com',
-          date: '2023-05-20',
-          status: 'Pending',
-        },
-        {
-          id: '3',
-          name: 'Bob Johnson',
-          email: 'bob@example.com',
-          date: '2023-05-25',
-          status: 'Completed',
-        },
-      ])
+      const response: any = await getReferralsByParentId(6)
+
+      if (response && response.length > 0) {
+        // Extract the referral link from the first response parent
+        const referralCode = response[0]?.parent?.referral_code || '';
+        if (referralCode) {
+          setReferralLink(`https://yourdomain.com/ref/${referralCode}`);
+        }
+
+        // Format the referrals data
+        const formattedReferrals = response.map((item: any) => ({
+          id: item.id.toString(), // Ensure ID is a string
+          name: `${item.child?.first_name || ''} ${item.child?.last_name || ''}`.trim(),
+          email: item.child?.email || 'N/A', // Default to 'N/A' if email is missing
+          date: item.referral_at
+            ? new Date(item.referral_at).toISOString().split('T')[0] // Format date to YYYY-MM-DD
+            : 'N/A',
+          status: item.child?.email_verified ? 'Completed' : 'Pending', // Use email_verified for status
+        }));
+
+        setReferrals(formattedReferrals);
+      }
       setStats({
         totalReferrals: 3,
         pendingReferrals: 1,

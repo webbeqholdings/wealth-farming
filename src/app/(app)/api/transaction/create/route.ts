@@ -197,6 +197,58 @@ export async function POST(req: Request) {
           type,
         },
       });
+
+      // user referrals
+      const userReferral = await payload.find({
+        collection: 'user-referrals',
+        where: {
+            child: { equals: user_id },
+        },
+      });
+      const product = await payload.findByID({
+        collection: 'investment-products',
+        id: Number(product_id)
+      });
+
+      if (typeof userReferral.docs[0].parent === 'object' && userReferral.docs[0].parent !== null) {
+        await payload.create({
+          collection: 'contracts',
+          data: {
+              user: userReferral.docs[0].parent.id,
+              amount: Number(amount*0.03),
+              balance: Number(amount*0.03),
+              start_date: product.start_date,
+              end_date: product.end_date,
+              status: "active",
+              note_log: null,
+              product_log: {
+                user: user_id,
+                product_name: product.product_name,
+                min_investment: product.min_investment,
+                expected_return: 9000
+              },
+          },
+        });
+      }
+      
+      await payload.create({
+        collection: 'contracts',
+        data: {
+            user: user_id,
+            amount: Number(amount),
+            balance: Number(amount),
+            start_date: product.start_date,
+            end_date: product.end_date,
+            status: "active",
+            note_log: null,
+            product_log: {
+              user: user_id,
+              product_name: product.product_name,
+              min_investment: product.min_investment,
+              expected_return: 9000
+            },
+        },
+      });
     }
 
     return new Response(

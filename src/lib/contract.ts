@@ -2,7 +2,6 @@
 import { getPayload } from 'payload';
 import config from '@payload-config';
 import { headers as nextHeaders } from 'next/headers'
-import { User } from 'lucide-react';
 // Define the Investment interface
 interface Investment {
   id: string;
