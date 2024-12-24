@@ -22,6 +22,15 @@ import { TabMenu } from '@/components/w88/TabMenu'
 import { accountConfig } from '@/config/accounts'
 import { formatDateTime } from '@/utilities/formatDateTime'
 import UserStatus from '@/lib/userStatus'
+import { getTransactions } from '@/lib/transaction'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 
 // Mock data for chart
 const chartData = [
@@ -39,9 +48,11 @@ export default function HistoryPage() {
   const [activeTab, setActiveTab] = useState('all')
   const [transactions, setTransactions] = useState([]);
   const [accounts, setAccounts] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    const fetchTransactions = async () => {
+    const fetchAccounts = async () => {
       try {
         const response = await fetch(`/api/accounts?where[user][equals]=${user.id}`); // Replace with dynamic user ID if necessary
         if (!response.ok) {
@@ -62,38 +73,23 @@ export default function HistoryPage() {
       }
     };
 
-    fetchTransactions()
+    fetchAccounts()
   }, [loading])
 
   useEffect(() => {
-    const fetchAccounts = async () => {
+    const fetchTransactions = async () => {
       try {
-        const response = await fetch(`/api/transactions?where[user][equals]=${user.id}`); // Replace with dynamic user ID if necessary
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.json();
-        // Transform API response into desired format
-        const transformedTransactions = data.docs.map((transaction: { id: number, type: string, amount: number, createdAt: string, updatedAt: string, status: string, profit_or_loss: string, unit: { unit_name: string, unit_code: string }, investment_product: { product_name: string }, from_account: { account_name: string }, to_account: { account_name: string } }) => ({
-          id: transaction.id,
-          type: transaction.type,
-          amount: transaction.amount,
-          date: formatDateTime(transaction.updatedAt),
-          account: transaction.from_account?.account_name,
-          to_account: transaction.to_account?.account_name,
-          profit_or_loss: transaction?.profit_or_loss,
-          unit_code: transaction?.unit?.unit_code,
-          product_name: transaction?.investment_product?.product_name,
-          status: transaction?.status
-        }));
-        setTransactions(transformedTransactions); // Store the accounts in state
+        const { docs, totalPages } = await getTransactions(currentPage, 10, activeTab);
+
+        setTransactions(docs); // Store the accounts in state
+        setTotalPages(totalPages);
       } catch (error) {
         console.error('Failed to fetch accounts:', error);
       }
     };
 
-    fetchAccounts();
-  }, [loading]);
+    fetchTransactions();
+  }, [loading, activeTab, currentPage]);
 
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
@@ -143,31 +139,31 @@ export default function HistoryPage() {
             <div className="flex justify-end space-x-2 mb-4">
               <Button
                 variant={activeTab === 'all' ? 'default' : 'outline'}
-                onClick={() => setActiveTab('all')}
+                onClick={() => { setActiveTab('all'); setCurrentPage(1) }}
               >
                 All
               </Button>
               <Button
-                variant={activeTab === 'deposits' ? 'default' : 'outline'}
-                onClick={() => setActiveTab('deposits')}
+                variant={activeTab === 'deposit' ? 'default' : 'outline'}
+                onClick={() => { setActiveTab('deposit'); setCurrentPage(1) }}
               >
                 Deposits
               </Button>
               <Button
-                variant={activeTab === 'withdrawals' ? 'default' : 'outline'}
-                onClick={() => setActiveTab('withdrawals')}
+                variant={activeTab === 'withdraw' ? 'default' : 'outline'}
+                onClick={() => { setActiveTab('withdraw'); setCurrentPage(1) }}
               >
                 Withdrawals
               </Button>
               <Button
-                variant={activeTab === 'transfers' ? 'default' : 'outline'}
-                onClick={() => setActiveTab('transfers')}
+                variant={activeTab === 'transfer' ? 'default' : 'outline'}
+                onClick={() => { setActiveTab('transfer'); setCurrentPage(1) }}
               >
                 Transfers
               </Button>
               <Button
-                variant={activeTab === 'investments' ? 'default' : 'outline'}
-                onClick={() => setActiveTab('investments')}
+                variant={activeTab === 'investment' ? 'default' : 'outline'}
+                onClick={() => { setActiveTab('investment'); setCurrentPage(1) }}
               >
                 Investments
               </Button>
@@ -177,13 +173,13 @@ export default function HistoryPage() {
                 <TableRow>
                   <TableHead>Date</TableHead>
                   <TableHead>Type</TableHead>
-                  {activeTab === 'all' || activeTab === 'investments' ? <TableHead>Product</TableHead> : ''}
+                  {activeTab === 'all' || activeTab === 'investment' ? <TableHead>Product</TableHead> : ''}
                   <TableHead>Amount</TableHead>
-                  {activeTab === 'all' || activeTab === 'investments' ? <TableHead>Profit</TableHead> : ''}
-                  {activeTab !== 'transfers' ? <TableHead>Account</TableHead> : ''}
-                  {activeTab === 'transfers' ? <TableHead>From Account</TableHead> : ''}
-                  {activeTab === 'transfers' ? <TableHead>To Account</TableHead> : ''}
-                  {activeTab === 'all' || activeTab === 'deposits' || activeTab === 'withdrawals' ? <TableHead>Status</TableHead> : ''}
+                  {activeTab === 'all' || activeTab === 'investment' ? <TableHead>Profit</TableHead> : ''}
+                  {activeTab !== 'transfer' ? <TableHead>Account</TableHead> : ''}
+                  {activeTab === 'transfer' ? <TableHead>From Account</TableHead> : ''}
+                  {activeTab === 'transfer' ? <TableHead>To Account</TableHead> : ''}
+                  {activeTab === 'all' || activeTab === 'deposit' || activeTab === 'withdraw' ? <TableHead>Status</TableHead> : ''}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -191,16 +187,16 @@ export default function HistoryPage() {
                   .filter(
                     (t) =>
                       activeTab === 'all' ||
-                      (activeTab === 'deposits' && t.type == 'deposit') ||
-                      (activeTab === 'withdrawals' && t.type == 'withdraw') ||
-                      (activeTab === 'transfers' && t.type == 'transfer') ||
-                      (activeTab === 'investments' && t.type == 'investment')
+                      (activeTab === 'deposit' && t.type == 'deposit') ||
+                      (activeTab === 'withdraw' && t.type == 'withdraw') ||
+                      (activeTab === 'transfer' && t.type == 'transfer') ||
+                      (activeTab === 'investment' && t.type == 'investment')
                   )
                   .map((transaction) => (
                     <TableRow key={transaction.id}>
                       <TableCell>{transaction.date}</TableCell>
                       <TableCell>{transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1).toLowerCase()}</TableCell>
-                      {activeTab === 'all' || activeTab === 'investments' ? <TableHead>{transaction.product_name}</TableHead> : ''}
+                      {activeTab === 'all' || activeTab === 'investment' ? <TableHead>{transaction.product_name}</TableHead> : ''}
                       <TableCell>
                         <span
                           className={transaction.amount >= 0 && transaction.profit_or_loss >= 0 ? 'text-green-600' : 'text-red-600'}
@@ -211,12 +207,12 @@ export default function HistoryPage() {
                           })}
                         </span>
                       </TableCell>
-                      {activeTab === 'all' || activeTab === 'investments' ? <TableCell><span
+                      {activeTab === 'all' || activeTab === 'investment' ? <TableCell><span
                         className={transaction.amount >= 0 && transaction.profit_or_loss >= 0 ? 'text-green-600' : 'text-red-600'}
                       >{transaction.profit_or_loss}{transaction.unit_code}</span></TableCell> : ''}
                       <TableCell>{transaction.account}</TableCell>
                       {activeTab === 'transfers' ? <TableCell>{transaction.to_account}</TableCell> : ''}
-                      {activeTab === 'all' || activeTab === 'deposits' || activeTab === 'withdrawals' ? (
+                      {activeTab === 'all' || activeTab === 'deposit' || activeTab === 'withdraw' ? (
                         <TableCell
                           className={clsx({
                             'text-yellow-500': transaction.status === 'pending',  // Yellow font
@@ -233,6 +229,38 @@ export default function HistoryPage() {
                   ))}
               </TableBody>
             </Table>
+            {transactions && transactions.length > 0 ? <div className="flex justify-end mt-4 mb-4">
+              <Pagination className="cursor-pointer">
+                <PaginationPrevious
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  className="text-sm font-medium rounded-lg hover:bg-gray-100"
+                >
+                  Previous
+                </PaginationPrevious>
+                <PaginationContent>
+                  {[...Array(totalPages)].map((_, index) => (
+                    <PaginationItem key={index}>
+                      <PaginationLink
+                        onClick={() => setCurrentPage(index + 1)}
+                        isActive={currentPage === index + 1}
+                        className={`text-sm font-medium rounded-lg ${currentPage === index + 1
+                          ? 'border-gray-400'
+                          : ''
+                          }`}
+                      >
+                        {index + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                </PaginationContent>
+                <PaginationNext
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  className="px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-100"
+                >
+                  Next
+                </PaginationNext>
+              </Pagination>
+            </div> : <></>}
           </TabsContent>
           <TabsContent value="chart">
             <Card>

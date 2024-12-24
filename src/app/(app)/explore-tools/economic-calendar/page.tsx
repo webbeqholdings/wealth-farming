@@ -143,7 +143,7 @@ export default function EconomicCalendar() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {events.length > 0 ? (
+                  {events && events.length > 0 ? (
                     events.map((event) => (
                       <TableRow key={event.id}>
                         <TableCell>{event.date.toDateString()}</TableCell>

@@ -137,7 +137,7 @@ export default function NewsPage() {
         <h1 className="text-4xl font-bold mb-8">Latest News</h1>
 
         {/* Featured Article */}
-        {newsArticles.length > 0 && (
+        {newsArticles && newsArticles.length > 0 && (
           <Card className="mb-12">
             <CardContent className="p-0">
               <div className="md:flex">
