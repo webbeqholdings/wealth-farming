@@ -18,6 +18,14 @@ import { SiteFooter } from '@/components/site-footer'
 import { getReferralsByParentId } from '@/lib/referrals'
 import userStatus from '@/lib/userStatus'
 import { useRouter } from 'next/navigation'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 
 interface Referral {
   id: string
@@ -38,32 +46,18 @@ export default function ReferralPage() {
     completedReferrals: 0,
     totalEarnings: 0,
   })
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     // Simulating API call to fetch referral data
     const fetchReferralData = async () => {
-      const response: any = await getReferralsByParentId(user.id)
+      const { docs, totalPages, referral_code } = await getReferralsByParentId(currentPage, 10);
 
-      if (response && response.length > 0) {
-        // Extract the referral link from the first response parent
-        const referralCode = response[0]?.parent?.referral_code || '';
-        if (referralCode) {
-          setReferralLink(`https://yourdomain.com/ref/${referralCode}`);
-        }
+      setReferrals(docs); // Store the accounts in state
+      setTotalPages(totalPages);
+      setReferralLink(`https://wealthfarming.org/ref/${referral_code}`);
 
-        // Format the referrals data
-        const formattedReferrals = response.map((item: any) => ({
-          id: item.id.toString(), // Ensure ID is a string
-          name: `${item.child?.first_name || ''} ${item.child?.last_name || ''}`.trim(),
-          email: item.child?.email || 'N/A', // Default to 'N/A' if email is missing
-          date: item.referral_at
-            ? new Date(item.referral_at).toISOString().split('T')[0] // Format date to YYYY-MM-DD
-            : 'N/A',
-          status: item.child?.email_verified ? 'Completed' : 'Pending', // Use email_verified for status
-        }));
-
-        setReferrals(formattedReferrals);
-      }
       setStats({
         totalReferrals: 3,
         pendingReferrals: 1,
@@ -73,7 +67,7 @@ export default function ReferralPage() {
     }
 
     fetchReferralData()
-  }, [loading])
+  }, [loading, currentPage])
 
   const copyReferralLink = () => {
     navigator.clipboard.writeText(referralLink)
@@ -170,18 +164,17 @@ export default function ReferralPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {referrals.map((referral) => (
+                {referrals && referrals.map((referral) => (
                   <TableRow key={referral.id}>
                     <TableCell>{referral.name}</TableCell>
                     <TableCell>{referral.email}</TableCell>
                     <TableCell>{referral.date}</TableCell>
                     <TableCell>
                       <span
-                        className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                          referral.status === 'Completed'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}
+                        className={`px-2 py-1 rounded-full text-xs font-semibold ${referral.status === 'Completed'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-yellow-100 text-yellow-800'
+                          }`}
                       >
                         {referral.status}
                       </span>
@@ -190,6 +183,38 @@ export default function ReferralPage() {
                 ))}
               </TableBody>
             </Table>
+            {referrals.length > 0 ? <div className="flex justify-end mt-4">
+              <Pagination className="cursor-pointer">
+                <PaginationPrevious
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  className="text-sm font-medium rounded-lg hover:bg-gray-100"
+                >
+                  Previous
+                </PaginationPrevious>
+                <PaginationContent>
+                  {[...Array(totalPages)].map((_, index) => (
+                    <PaginationItem key={index}>
+                      <PaginationLink
+                        onClick={() => setCurrentPage(index + 1)}
+                        isActive={currentPage === index + 1}
+                        className={`text-sm font-medium rounded-lg ${currentPage === index + 1
+                          ? 'border-gray-400'
+                          : ''
+                          }`}
+                      >
+                        {index + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                </PaginationContent>
+                <PaginationNext
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  className="px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-100"
+                >
+                  Next
+                </PaginationNext>
+              </Pagination>
+            </div> : <></>}
           </CardContent>
         </Card>
       </div>

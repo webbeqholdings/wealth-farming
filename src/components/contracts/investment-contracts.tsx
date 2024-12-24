@@ -17,6 +17,14 @@ import { WithdrawDialog } from '@/components/withdraw-dialog'
 import userStatus from '@/lib/userStatus'
 import { useRouter } from 'next/navigation'
 import { getContracts, getWithdrawals } from '@/lib/contract'
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from "@/components/ui/pagination"
 
 interface Investment {
     id: string
@@ -48,20 +56,25 @@ export function InvestmentContracts() {
     const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false)
     const [investments, setInvestments] = useState<Investment[]>()
     const [withdrawals, setWithdrawals] = useState<Withdrawal[]>()
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPageInvestments, setTotalPagesInvestment] = useState(1);
+    const [totalPageWithdrawl, setTotalPagesWithdrawl] = useState(1);
     const [activeTab, setActiveTab] = useState('investment')
     // Handle tab switch and data fetching
     useEffect(() => {
         const fetchData = async () => {
             if (activeTab === 'investment') {
-                const newInvestments = await getContracts();
-                setInvestments(newInvestments);
+                const { docs, totalPages } = await getContracts(currentPage, 10);
+                setInvestments(docs);
+                setTotalPagesInvestment(totalPages);
             } else if (activeTab === 'withdraw') {
-                const newWithdrawals = await getWithdrawals();
-                setWithdrawals(newWithdrawals);
+                const { docs, totalPages } = await getWithdrawals(currentPage, 10);
+                setWithdrawals(docs);
+                setTotalPagesWithdrawl(totalPages)
             }
         };
         fetchData();
-    }, [activeTab]);
+    }, [activeTab, currentPage]);
 
     const handleWithdraw = (investment: Investment) => {
         setSelectedContract(investment)
@@ -105,19 +118,6 @@ export function InvestmentContracts() {
                     <div>
                         <h1 className="text-2xl font-bold">Investment Contracts</h1>
                         <p className="">Manage your investments and withdrawals</p>
-                    </div>
-                    <div className="flex gap-2">
-                        <div className="relative">
-                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 " />
-                            <Input
-                                placeholder="Search contracts..."
-                                className="pl-8  "
-                            />
-                        </div>
-                        <Button variant="outline" className=" ">
-                            <ArrowUpDown className="h-4 w-4 mr-2" />
-                            Sort
-                        </Button>
                     </div>
                 </div>
 
@@ -177,13 +177,13 @@ export function InvestmentContracts() {
                 <div className="flex justify-end space-x-2 mb-4">
                     <Button
                         variant={activeTab === 'investment' ? 'default' : 'outline'}
-                        onClick={() => setActiveTab('investment')}
+                        onClick={() => { setActiveTab('investment'); setCurrentPage(1) }}
                     >
                         Investment
                     </Button>
                     <Button
                         variant={activeTab === 'withdraw' ? 'default' : 'outline'}
-                        onClick={() => setActiveTab('withdraw')}
+                        onClick={() => { setActiveTab('withdraw'); setCurrentPage(1) }}
                     >
                         Withdraw
                     </Button>
@@ -192,90 +192,155 @@ export function InvestmentContracts() {
                 <Card className=" shadow-sm">
                     <CardContent className="p-0">
                         {activeTab === 'investment' ? (
-                            <Table>
-                                <TableHeader>
-                                    <TableRow className=" ">
-                                        <TableHead>Product Name</TableHead>
-                                        <TableHead>Invested Amount</TableHead>
-                                        <TableHead>Available Balance</TableHead>
-                                        <TableHead>Expected Return</TableHead>
-                                        <TableHead>Start Date</TableHead>
-                                        <TableHead>End Date</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {investments && investments.map((investment) => (
-                                        <TableRow
-                                            key={investment.id}
-                                        >
-                                            <TableCell className="font-medium ">
-                                                {investment.productName}
-                                            </TableCell>
-                                            <TableCell>{formatCurrency(investment.investedAmount)}</TableCell>
-                                            <TableCell className="text-green-500">
-                                                {formatCurrency(investment.availableBalance)}
-                                            </TableCell>
-                                            <TableCell>{formatCurrency(investment.expectedReturn)}</TableCell>
-                                            <TableCell>{new Date(investment.startDate).toLocaleDateString()}</TableCell>
-                                            <TableCell>{new Date(investment.endDate).toLocaleDateString()}</TableCell>
-                                            <TableCell>
-                                                <span
-                                                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                                                        investment.status
-                                                    )}`}
-                                                >
-                                                    {investment.status.charAt(0).toUpperCase() + investment.status.slice(1)}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => handleWithdraw(investment)}
-                                                    className=" hover:text-black"
-                                                >
-                                                    Withdraw
-                                                </Button>
-                                            </TableCell>
+                            <>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Product Name</TableHead>
+                                            <TableHead>Invested Amount</TableHead>
+                                            <TableHead>Available Balance</TableHead>
+                                            <TableHead>Expected Return</TableHead>
+                                            <TableHead>Start Date</TableHead>
+                                            <TableHead>End Date</TableHead>
+                                            <TableHead>Status</TableHead>
+                                            <TableHead className="text-right">Actions</TableHead>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {investments && investments.map((investment) => (
+                                            <TableRow key={investment.id}>
+                                                <TableCell className="font-medium">{investment.productName}</TableCell>
+                                                <TableCell>{formatCurrency(investment.investedAmount)}</TableCell>
+                                                <TableCell className="text-green-500">
+                                                    {formatCurrency(investment.availableBalance)}
+                                                </TableCell>
+                                                <TableCell>{formatCurrency(investment.expectedReturn)}</TableCell>
+                                                <TableCell>{new Date(investment.startDate).toLocaleDateString()}</TableCell>
+                                                <TableCell>{new Date(investment.endDate).toLocaleDateString()}</TableCell>
+                                                <TableCell>
+                                                    <span
+                                                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                                                            investment.status
+                                                        )}`}
+                                                    >
+                                                        {investment.status.charAt(0).toUpperCase() + investment.status.slice(1)}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => handleWithdraw(investment)}
+                                                        className="hover:text-black"
+                                                    >
+                                                        Withdraw
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                                {/* Pagination Component */}
+                                <div className="flex justify-end mt-4 mb-4">
+                                    <Pagination className="cursor-pointer">
+                                        <PaginationPrevious
+                                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                            className="text-sm font-medium rounded-lg hover:bg-gray-100"
+                                        >
+                                            Previous
+                                        </PaginationPrevious>
+                                        <PaginationContent>
+                                            {[...Array(totalPageInvestments)].map((_, index) => (
+                                                <PaginationItem key={index}>
+                                                    <PaginationLink
+                                                        onClick={() => setCurrentPage(index + 1)}
+                                                        isActive={currentPage === index + 1}
+                                                        className={`text-sm font-medium rounded-lg ${currentPage === index + 1
+                                                            ? 'border-gray-400'
+                                                            : ''
+                                                            }`}
+                                                    >
+                                                        {index + 1}
+                                                    </PaginationLink>
+                                                </PaginationItem>
+                                            ))}
+                                        </PaginationContent>
+                                        <PaginationNext
+                                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPageInvestments))}
+                                            className="px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-100"
+                                        >
+                                            Next
+                                        </PaginationNext>
+                                    </Pagination>
+                                </div>
+                            </>
                         ) : (
-                            <Table>
-                                <TableHeader>
-                                    <TableRow className=" ">
-                                        <TableHead>Product Name</TableHead>
-                                        <TableHead>Amount</TableHead>
-                                        <TableHead>Date</TableHead>
-                                        <TableHead>Status</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {withdrawals && withdrawals.map((withdrawal) => (
-                                        <TableRow
-                                            key={withdrawal.id}
-                                        >
-                                            <TableCell className="font-medium ">
-                                                {withdrawal.productName}
-                                            </TableCell>
-                                            <TableCell>{formatCurrency(withdrawal.amount)}</TableCell>
-                                            <TableCell>{new Date(withdrawal.date).toLocaleDateString()}</TableCell>
-                                            <TableCell>
-                                                <span
-                                                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                                                        withdrawal.status
-                                                    )}`}
-                                                >
-                                                    {withdrawal.status.charAt(0).toUpperCase() + withdrawal.status.slice(1)}
-                                                </span>
-                                            </TableCell>
+                            <>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow className=" ">
+                                            <TableHead>Product Name</TableHead>
+                                            <TableHead>Amount</TableHead>
+                                            <TableHead>Date</TableHead>
+                                            <TableHead>Status</TableHead>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {withdrawals && withdrawals.map((withdrawal) => (
+                                            <TableRow
+                                                key={withdrawal.id}
+                                            >
+                                                <TableCell className="font-medium ">
+                                                    {withdrawal.productName}
+                                                </TableCell>
+                                                <TableCell>{formatCurrency(withdrawal.amount)}</TableCell>
+                                                <TableCell>{new Date(withdrawal.date).toLocaleDateString()}</TableCell>
+                                                <TableCell>
+                                                    <span
+                                                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                                                            withdrawal.status
+                                                        )}`}
+                                                    >
+                                                        {withdrawal.status.charAt(0).toUpperCase() + withdrawal.status.slice(1)}
+                                                    </span>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                                {withdrawals.length > 0 ? <div className="flex justify-end mt-4 mb-4">
+                                    <Pagination className="cursor-pointer">
+                                        <PaginationPrevious
+                                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                            className="text-sm font-medium rounded-lg hover:bg-gray-100"
+                                        >
+                                            Previous
+                                        </PaginationPrevious>
+                                        <PaginationContent>
+                                            {[...Array(totalPageWithdrawl)].map((_, index) => (
+                                                <PaginationItem key={index}>
+                                                    <PaginationLink
+                                                        onClick={() => setCurrentPage(index + 1)}
+                                                        isActive={currentPage === index + 1}
+                                                        className={`text-sm font-medium rounded-lg ${currentPage === index + 1
+                                                            ? 'border-gray-400'
+                                                            : ''
+                                                            }`}
+                                                    >
+                                                        {index + 1}
+                                                    </PaginationLink>
+                                                </PaginationItem>
+                                            ))}
+                                        </PaginationContent>
+                                        <PaginationNext
+                                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPageWithdrawl))}
+                                            className="px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-100"
+                                        >
+                                            Next
+                                        </PaginationNext>
+                                    </Pagination>
+                                </div> : <></>}
+                            </>
                         )}
                     </CardContent>
                 </Card>

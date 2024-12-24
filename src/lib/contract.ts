@@ -26,75 +26,87 @@ interface Withdrawal {
 }
 
 
-// Update the function to always return a Promise<Investment[]>
-export const getContracts = async (): Promise<Investment[]> => {
+export const getContracts = async (page: number, limit: number): Promise<{ docs: Investment[]; totalPages: number; totalDocs: number }> => {
   try {
     const payload = await getPayload({
       config,
     });
-    const headers = await nextHeaders()
-    const auth = await payload.auth({ headers })
+    const headers = await nextHeaders();
+    const auth = await payload.auth({ headers });
+
     const response = await payload.find({
       collection: 'contracts',
       where: {
         user: { equals: auth.user.id },
       },
+      page, // Pass the page number
+      limit, // Pass the number of items per page
     });
 
     const contracts = response.docs;
-    // Map the contracts to the Investment interface
-    return contracts.map((contract: any) => ({
-      id: contract.id,
-      userId: contract.user.id,
-      minInvestment: contract.product_log?.min_investment,
-      productName: contract.product_log?.product_name,
-      investedAmount: contract.amount,
-      expectedReturn: contract.product_log?.expected_return,
-      availableBalance: contract.balance,
-      startDate: contract.start_date,
-      endDate: contract.end_date,
-      status: contract.status,
-      lastWithdrawal: contract.updatedAt || null,
-    }));
+
+    return {
+      docs: contracts.map((contract: any) => ({
+        id: contract.id,
+        userId: contract.user.id,
+        minInvestment: contract.product_log?.min_investment,
+        productName: contract.product_log?.product_name,
+        investedAmount: contract.amount,
+        expectedReturn: contract.product_log?.expected_return,
+        availableBalance: contract.balance,
+        startDate: contract.start_date,
+        endDate: contract.end_date,
+        status: contract.status,
+        lastWithdrawal: contract.updatedAt || null,
+      })),
+      totalPages: response.totalPages,
+      totalDocs: response.totalDocs,
+    };
   } catch (error) {
     console.error('Transaction error:', error);
 
-    // Return an empty array in case of an error
-    return [];
+    return { docs: [], totalPages: 0, totalDocs: 0 };
   }
 };
 
-export async function getWithdrawals(): Promise<Withdrawal[]> {
+
+export const getWithdrawals = async (page: number, limit: number): Promise<{ docs: Withdrawal[]; totalPages: number; totalDocs: number }> => {
   try {
     const payload = await getPayload({
       config,
     });
-    const headers = await nextHeaders()
-    const auth = await payload.auth({ headers })
+    const headers = await nextHeaders();
+    const auth = await payload.auth({ headers });
+
     const response = await payload.find({
       collection: 'withdrawals',
       where: {
         user: { equals: auth.user.id },
       },
+      page, // Pass the page number
+      limit, // Pass the number of items per page
     });
 
     const withdrawals = response.docs;
 
-    // Map the contracts to the Investment interface
-    return withdrawals.map((withdrawl: any) => ({
-      id: withdrawl.id,
-      productName: withdrawl.contract.product_log.product_name,
-      amount: withdrawl.amount,
-      date: withdrawl.createdAt,
-      status: withdrawl.status
-    }));
+    return {
+      docs: withdrawals.map((withdrawal: any) => ({
+        id: withdrawal.id,
+        productName: withdrawal.contract.product_log?.product_name,
+        amount: withdrawal.amount,
+        date: withdrawal.createdAt,
+        status: withdrawal.status,
+      })),
+      totalPages: response.totalPages,
+      totalDocs: response.totalDocs,
+    };
   } catch (error) {
     console.error('Withdraw error:', error);
 
-    // Return an empty array in case of an error
-    return [];
+    return { docs: [], totalPages: 0, totalDocs: 0 };
   }
-}
+};
+
 
 export async function withdrawInvestment(formData: FormData) {
   try {
