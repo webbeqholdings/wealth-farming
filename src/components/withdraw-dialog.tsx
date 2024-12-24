@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { withdrawInvestment } from '@/lib/contract';
 import { calculateTotalProfit } from '@/lib/profitCalculator'
+import { notifyWithdrawlContracts } from '@/lib/telegram';
 
 interface WithdrawDialogProps {
   isOpen: boolean;
@@ -65,7 +66,7 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
       formData.append('totalProfit', totalProfit.toString());
 
       const result = await withdrawInvestment(formData);
-
+      notifyWithdrawlContracts(result.data)
       if (result.success) {
         toast({
           title: 'Withdrawal Successfully',

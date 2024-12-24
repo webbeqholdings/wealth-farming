@@ -30,6 +30,7 @@ import { SiteFooter } from '@/components/site-footer'
 import { TabMenu } from '@/components/w88/TabMenu'
 import { accountConfig } from '@/config/accounts'
 import { toast } from '@/hooks/use-toast'
+import { notifyWithdrawl } from '@/lib/telegram'
 // Steps component definition
 interface StepProps {
   title: string
@@ -153,7 +154,8 @@ export default function WithdrawPage() {
           currency: currency
         }), // Convert the request body to JSON
       });
-
+      const data = await response.json()
+      await notifyWithdrawl(data.data)
       if (!response.ok) {
         // Parse the error response to retrieve the error message
         const errorResponse = await response.json();

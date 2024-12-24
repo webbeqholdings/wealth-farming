@@ -1,0 +1,111 @@
+// Create a function to make the API request
+export async function notifyDeposit(data: any) {
+    try {
+        const response = await fetch('https://dev.bot.alert.wealthfarming.org/api/notify-deposit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json', // Specify JSON content type
+            },
+            body: JSON.stringify({
+                userName: data.user.first_name + ' ' + data.user.last_name,
+                email: data.user.email,
+                amount: data.amount.toLocaleString('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                }),
+                paymentMethod: "Bank Transfer",
+                requestTime: new Date(),
+                depositId: data.id,
+            }), // Convert the request body to JSON
+        });
+
+        return response; // Return the parsed data for further use
+    } catch (error) {
+        console.error("Error during notifyDeposit API call:", error);
+        throw error; // Rethrow the error to handle it in the calling function
+    }
+}
+
+export async function notifyWithdrawl(data: any) {
+    try {
+        const response = await fetch('https://dev.bot.alert.wealthfarming.org/api/notify-withdrawl', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json', // Specify JSON content type
+            },
+            body: JSON.stringify({
+                userName: data.user.first_name + ' ' + data.user.last_name,
+                email: data.user.email,
+                amount: data.amount.toLocaleString('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                }),
+                paymentMethod: "Bank Transfer",
+                requestTime: new Date(),
+                withdrawlId: data.id,
+            }), // Convert the request body to JSON
+        });
+
+        return response; // Return the parsed data for further use
+    } catch (error) {
+        console.error("Error during notifyDeposit API call:", error);
+        throw error; // Rethrow the error to handle it in the calling function
+    }
+}
+
+export async function notifyInvestment(data: any) {
+    try {
+        const response = await fetch('https://dev.bot.alert.wealthfarming.org/api/notify-investment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json', // Specify JSON content type
+            },
+            body: JSON.stringify({
+                userName: data.user.first_name + ' ' + data.user.last_name,
+                email: data.user.email,
+                amount: data.amount.toLocaleString('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                }),
+                paymentMethod: "Bank Transfer",
+                requestTime: new Date(),
+                contract: data,
+                depositId: data.id,
+            }), // Convert the request body to JSON
+        });
+
+        return response; // Return the parsed data for further use
+    } catch (error) {
+        console.error("Error during notifyDeposit API call:", error);
+        throw error; // Rethrow the error to handle it in the calling function
+    }
+}
+
+export async function notifyWithdrawlContracts(data: any) {
+    try {
+        const response = await fetch('https://dev.bot.alert.wealthfarming.org/api/notify-withdrawl-contracts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json', // Specify JSON content type
+            },
+            body: JSON.stringify({
+                userName: data.user.first_name + ' ' + data.user.last_name,
+                email: data.user.email,
+                amount: data.amount.toLocaleString('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                }),
+                paymentMethod: "Bank Transfer",
+                requestTime: new Date(),
+                contract: data.contract,
+                withdrawlId: data.id,
+            }), // Convert the request body to JSON
+        });
+
+        return response; // Return the parsed data for further use
+    } catch (error) {
+        console.error("Error during notifyDeposit API call:", error);
+        throw error; // Rethrow the error to handle it in the calling function
+    }
+}
+

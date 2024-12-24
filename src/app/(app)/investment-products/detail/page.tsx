@@ -41,6 +41,7 @@ import { toast } from '@/hooks/use-toast'
 import { format } from 'date-fns';
 import { Document } from '@/components/report_finance'
 import { printPdf } from '@/components/printPdf';
+import { notifyInvestment } from '@/lib/telegram'
 
 // Mock data for a single financial product
 const product = {
@@ -103,7 +104,8 @@ export default function ProductDetailPage() {
           type: "investment"
         }), // Convert the request body to JSON
       });
-
+      const data = await response.json();
+      await notifyInvestment(data.data);
       if (!response.ok) {
         // Parse the error response to retrieve the error message
         const errorResponse = await response.json();

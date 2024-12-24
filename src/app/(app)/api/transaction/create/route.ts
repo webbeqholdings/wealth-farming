@@ -10,6 +10,7 @@ export async function POST(req: Request) {
     });
 
     let { to_account, from_account, bank_id, product_id, type, amount, user_id, currency } = request;
+    let response = null;
     // Handle deposit type
     if (type === 'deposit') {
       const unit = await payload.find({
@@ -18,7 +19,7 @@ export async function POST(req: Request) {
           unit_code: { equals: "USD" }
         },
       });
-      await payload.create({
+      response = await payload.create({
         collection: 'transactions',
         data: {
           user: Number(user_id),
@@ -67,7 +68,7 @@ export async function POST(req: Request) {
         data: { amount: updatedAmount },
       });
 
-      await payload.create({
+      response = await payload.create({
         collection: 'transactions',
         data: {
           user: Number(user_id),
@@ -197,7 +198,6 @@ export async function POST(req: Request) {
           type,
         },
       });
-
       // user referrals
       const userReferral = await payload.find({
         collection: 'user-referrals',
@@ -209,8 +209,7 @@ export async function POST(req: Request) {
         collection: 'investment-products',
         id: Number(product_id)
       });
-
-      if (typeof userReferral.docs[0].parent === 'object' && userReferral.docs[0].parent !== null) {
+      if (typeof userReferral.docs[0]?.parent === 'object' && userReferral.docs[0]?.parent !== null) {
         await payload.create({
           collection: 'contracts',
           data: {
@@ -230,8 +229,7 @@ export async function POST(req: Request) {
           },
         });
       }
-      
-      await payload.create({
+      response = await payload.create({
         collection: 'contracts',
         data: {
             user: user_id,
@@ -253,6 +251,7 @@ export async function POST(req: Request) {
 
     return new Response(
       JSON.stringify({
+        data: response,
         response: 'Transfer Fund Successfully',
       })
     );

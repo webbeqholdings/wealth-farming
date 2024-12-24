@@ -106,7 +106,7 @@ export async function withdrawInvestment(formData: FormData) {
     const userId = formData.get('userId')
 
 
-    await payload.create({
+    const response = await payload.create({
       collection: 'withdrawals',
       data: {
         contract: Number(contractId),
@@ -118,6 +118,7 @@ export async function withdrawInvestment(formData: FormData) {
     // Simulate API call delay
     return {
       success: true,
+      data: response,
       message: `Successfully initiated withdrawal of ${amount} from contract ${contractId}`
     }
   } catch (error) {
