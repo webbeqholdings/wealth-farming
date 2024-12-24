@@ -241,7 +241,7 @@ export function InvestmentContracts() {
                                     </TableBody>
                                 </Table>
                                 {/* Pagination Component */}
-                                <div className="flex justify-end mt-4 mb-4">
+                                {investments && investments.length > 0 ? <div className="flex justify-end mt-4 mb-4">
                                     <Pagination className="cursor-pointer">
                                         <PaginationPrevious
                                             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
@@ -272,7 +272,7 @@ export function InvestmentContracts() {
                                             Next
                                         </PaginationNext>
                                     </Pagination>
-                                </div>
+                                </div> : <></>}
                             </>
                         ) : (
                             <>
@@ -308,7 +308,7 @@ export function InvestmentContracts() {
                                         ))}
                                     </TableBody>
                                 </Table>
-                                {withdrawals.length > 0 ? <div className="flex justify-end mt-4 mb-4">
+                                {withdrawals && withdrawals.length > 0 ? <div className="flex justify-end mt-4 mb-4">
                                     <Pagination className="cursor-pointer">
                                         <PaginationPrevious
                                             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}

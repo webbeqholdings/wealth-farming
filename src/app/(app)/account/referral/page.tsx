@@ -183,7 +183,7 @@ export default function ReferralPage() {
                 ))}
               </TableBody>
             </Table>
-            {referrals.length > 0 ? <div className="flex justify-end mt-4">
+            {referrals && referrals.length > 0 ? <div className="flex justify-end mt-4">
               <Pagination className="cursor-pointer">
                 <PaginationPrevious
                   onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}

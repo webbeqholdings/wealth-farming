@@ -206,7 +206,7 @@ export function CardsChat() {
             </CommandList>
           </Command>
           <DialogFooter className="flex items-center border-t p-4 sm:justify-between">
-            {selectedUsers.length > 0 ? (
+            {selectedUsers && selectedUsers.length > 0 ? (
               <div className="flex -space-x-2 overflow-hidden">
                 {selectedUsers.map((user) => (
                   <Avatar key={user.email} className="inline-block border-2 border-background">

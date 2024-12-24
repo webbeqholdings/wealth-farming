@@ -229,7 +229,7 @@ export default function HistoryPage() {
                   ))}
               </TableBody>
             </Table>
-            {transactions.length > 0 ? <div className="flex justify-end mt-4 mb-4">
+            {transactions && transactions.length > 0 ? <div className="flex justify-end mt-4 mb-4">
               <Pagination className="cursor-pointer">
                 <PaginationPrevious
                   onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
