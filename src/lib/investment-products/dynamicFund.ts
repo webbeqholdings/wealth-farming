@@ -24,7 +24,6 @@ import {
   isStartOfMonth,
   isEndOfMonth,
 } from '@/utilities/formatDateTime'
-import { AnyActionArg } from 'node_modules_1/@types/react/ts5.0'
 
 export type Term =
   | 'partialMonth'

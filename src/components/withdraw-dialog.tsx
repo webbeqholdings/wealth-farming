@@ -5,8 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { withdrawInvestment } from '@/lib/contract';
-import { calculateTotalProfit } from '@/lib/profitCalculator'
 import { notifyWithdrawlContracts } from '@/lib/telegram';
+import { buildProfitRecordsSemester, isValidForStandardApplyCancelContract } from '@/lib/investment-products/dynamicFund';
+import { format, getYear } from 'date-fns';
 
 interface WithdrawDialogProps {
   isOpen: boolean;
@@ -39,11 +40,27 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
   };
 
   const calculateProfit = () => {
-    const startDate = new Date(contract.startDate);
     const today = new Date();
+    const startDate = new Date(contract.startDate);
     const investedAmount = contract.availableBalance;
-  
-    return calculateTotalProfit(investedAmount, startDate, today);
+
+    if(!isValidForStandardApplyCancelContract(startDate)){
+      // toast({
+      //   title: 'Date withdrawl must smaller 90 days',
+      // })
+      return 0;
+    }
+
+    const build = buildProfitRecordsSemester(investedAmount, startDate, today);
+    const year = getYear(today);
+    const month = format(today, 'MM');
+    
+    const dateProfitFilter = build[year].filter((item: any) => { return format(item.date, 'MM') == month })
+    if(!dateProfitFilter.length ){
+      return 0;
+    }
+
+    return dateProfitFilter[0]?.profit + investedAmount;
   };
 
   const handleDialogClose = () => {
