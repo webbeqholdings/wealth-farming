@@ -97,7 +97,7 @@ export function isSubArrayContained(subArray: string[], mainArray: string[]): bo
 }
 
 export function isStartOfMonth(date: Date): boolean {
-  return format(date, 'qq') == '01'
+  return format(date, 'dd') == '01'
 }
 
 export function isEndOfMonth(date: Date): boolean {
@@ -122,6 +122,49 @@ export function filterTermInvestment(startDate: Date, endDate: Date, term: strin
     listOfMonths[listOfMonths.length - 1].months.pop()
     partial_months.push(endDate)
   }
+}
+
+// return only valid Months
+export function findTermMonthly(startDate: Date, endDate: Date): boolean | object {
+  const rateMonthly = 0.0595
+  const listOfMonths = getMonthsBetweenYears(startDate, endDate)
+  const genderName = 'Monthly'
+
+  if (!isStartOfMonth(startDate)) {
+    listOfMonths[0].months.shift()
+  }
+
+  if (!isEndOfMonth(endDate)) {
+    listOfMonths[listOfMonths.length - 1].months.pop()
+  }
+
+  if (!listOfMonths.length) return false
+
+  const result = []
+
+  for (let yearItem of listOfMonths) {
+    let tradingDaysMatcher: any = []
+
+    for (let tradingMonth of yearItem.months) {
+      tradingDaysMatcher.push({
+        month: tradingMonth,
+        days: findMarketTradingDays(tradingMonth, yearItem.year),
+        rate: rateMonthly,
+        valid: true,
+        gender: genderName,
+      })
+    }
+
+    tradingDaysMatcher.sort((a, b) => a.month - b.month)
+    result.push({
+      year: yearItem.year,
+      tradingDaysLayer: tradingDaysMatcher,
+    })
+  }
+
+  if (!result.length) return false
+
+  return { result: result }
 }
 
 export function findTermQuarterly(startDate: Date, endDate: Date): boolean | object {
@@ -382,6 +425,15 @@ export function findTermAnnualy(startDate: Date, endDate: Date): boolean | objec
 export function findMarketTradingDays(_month: string, _year: string | number) {
   const data = dataMarketWorkingDays
   let monthName = format(new Date(`${_year}-${_month}-01`), 'LLL')
+
+  if (_year > 2026) {
+    _year = 2026
+  }
+
+  if (_year < 2024) {
+    _year = 2024
+  }
+
   // excute > 2026
   // @ts-ignore
   return data[_year].months[monthName]

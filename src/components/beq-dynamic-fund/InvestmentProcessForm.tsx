@@ -16,33 +16,39 @@ import { CalendarIcon } from 'lucide-react'
 import { format, differenceInDays, isBefore, addDays } from 'date-fns'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { buildProfitRecordsAnnualy } from '@/lib/profitCalculator'
+import {
+  buildProfitRecordsAnnualy,
+  buildProfitRecordsQuarterly,
+  buildProfitRecordsSemester,
+  buildProfitRecordsMonthly,
+  rateConfig,
+  contractEndAt,
+  contractMultiPeriodEndAt,
+  standardApplyProgramDays,
+  canCancelContractAt,
+  Term,
+} from '@/lib/investment-products/dynamicFund'
 
 import { useToast } from '@/hooks/use-toast'
-type Term = 'less than 1 month' | '1 month' | 'quarterly' | 'semester' | 'annually'
-
-interface Rate {
-  term: Term
-  rate: number
-}
-
-const rates: Rate[] = [
-  // { term: 'less than 1 month', rate: 0.04 },
-  // { term: '1 month', rate: 0.0595 },
-  // { term: 'quarterly', rate: 0.0615 },
-  // { term: 'semester', rate: 0.0635 },
-  { term: 'annually', rate: 0.0655 },
-]
+import { Badge } from '@/components/ui/badge'
 
 const minRangeDays = 15
 
-export function InvestmentProcessForm({ onCalculate }: { onCalculate: (data: any) => void }) {
-  const [startDate, setStartDate] = useState<Date | undefined>(undefined)
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined)
-  const [term, setTerm] = useState<Term>('less than 1 month')
-  const [depositAmount, setDepositAmount] = useState<number>(10000)
-  const [dayCount, setDayCount] = useState<number>(0)
+export function InvestmentProcessForm({
+  onCalculate,
+  onRequest,
+}: {
+  onCalculate: (data: any) => void
+  onRequest: (data: any) => void
+}) {
   const tomorrow = addDays(new Date(), 0)
+  const [startDate, setStartDate] = useState<Date | undefined>(tomorrow)
+  const [endDate, setEndDate] = useState<Date | undefined>(addDays(startDate, minRangeDays))
+  const [term, setTerm] = useState<Term>('Annually')
+  const [depositAmount, setDepositAmount] = useState<number>(10000)
+  const [periods, setPeriods] = useState<number>(1)
+  const [dayCount, setDayCount] = useState<number>(0)
+
   const { toast } = useToast()
 
   useEffect(() => {
@@ -54,7 +60,8 @@ export function InvestmentProcessForm({ onCalculate }: { onCalculate: (data: any
 
       setDayCount(daysDifference)
     }
-  }, [startDate, endDate])
+    setEndDate(contractMultiPeriodEndAt(startDate, term, periods))
+  }, [startDate, term, periods])
 
   const handleStartDateSelect = (date: Date | undefined) => {
     setStartDate(date)
@@ -78,30 +85,65 @@ export function InvestmentProcessForm({ onCalculate }: { onCalculate: (data: any
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    let profitData = []
     if (startDate && endDate && depositAmount) {
       const daysDifference = differenceInDays(endDate, startDate)
       if (daysDifference < minRangeDays) {
-        toast({
+        return toast({
           title: 'Error',
           description: `The investment period must be at least ${minRangeDays} days.`,
         })
-        return
       }
 
-      const profitData = buildProfitRecordsAnnualy(depositAmount, startDate, endDate)
+      if (term == 'Annually') {
+        profitData = buildProfitRecordsAnnualy(depositAmount, startDate, endDate)
+      }
+
+      if (term == 'Semester') {
+        profitData = buildProfitRecordsSemester(depositAmount, startDate, endDate)
+      }
+
+      if (term == 'Quarterly') {
+        profitData = buildProfitRecordsQuarterly(depositAmount, startDate, endDate)
+      }
+
+      if (term == 'Monthly') {
+        profitData = buildProfitRecordsMonthly(depositAmount, startDate, endDate)
+      }
+
       onCalculate(profitData)
+
+      console.log('... ... profitData', profitData)
+      onRequest({
+        amount: depositAmount,
+        term: term,
+        startDate: startDate,
+        endDate: endDate,
+        periods: periods,
+        dataExtra: {
+          rateConfig: rateConfig,
+          standardApplyProgramDays: standardApplyProgramDays,
+          profitData: profitData,
+          contractEndAt: contractEndAt(startDate, term),
+          canCancelContractAt: canCancelContractAt(startDate), // +90 days
+        },
+      })
     }
+  }
+
+  const onChangeTerm = (e: Term) => {
+    console.log('hello nice')
   }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Investment Process</CardTitle>
+        <CardTitle>Kế hoạch đầu tư</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="depositAmount">Deposit Amount</Label>
+            <Label htmlFor="depositAmount">Số tiền USD tham gia</Label>
             <Input
               id="depositAmount"
               type="number"
@@ -112,23 +154,26 @@ export function InvestmentProcessForm({ onCalculate }: { onCalculate: (data: any
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="term">Term</Label>
+            <Label htmlFor="term">Kì Hạn Rút Lãi</Label>
             <Select value={term} onValueChange={(value: Term) => setTerm(value)}>
               <SelectTrigger id="term">
                 <SelectValue placeholder="Select term" />
               </SelectTrigger>
               <SelectContent>
-                {rates.map((rate) => (
-                  <SelectItem key={rate.term} value={rate.term}>
-                    {rate.term} ({(rate.rate * 100).toFixed(2)}%)
-                  </SelectItem>
-                ))}
+                {rateConfig
+                  .filter((item) => item.isShowForm == true)
+                  .map((rate) => (
+                    <SelectItem key={rate.term} value={rate.term}>
+                      {rate.term}
+                      <span className="text-gray-400 mx-3">{(rate.rate * 100).toFixed(2)}%</span>
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="startDate">Start Date</Label>
+            <Label htmlFor="startDate">Ngày tham gia</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -155,7 +200,7 @@ export function InvestmentProcessForm({ onCalculate }: { onCalculate: (data: any
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="endDate">End Date</Label>
+            <Label htmlFor="endDate">Ngày kết thúc hợp đồng</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -183,10 +228,20 @@ export function InvestmentProcessForm({ onCalculate }: { onCalculate: (data: any
             </Popover>
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="periods">Số chu kì tham gia</Label>
+            <Input
+              id="periods"
+              type="number"
+              value={periods}
+              onChange={(e) => setPeriods(Number(e.target.value))}
+              required
+            />
+          </div>
+
           <Button type="submit" className="w-full">
-            Calculate Investment
+            Tính Kết Quả
           </Button>
-          <p>{dayCount} Days</p>
         </form>
       </CardContent>
     </Card>
