@@ -166,8 +166,7 @@ export async function POST(req: Request) {
       }
 
       if (
-        transactionAmount < investmentProduct.min_investment ||
-        transactionAmount > investmentProduct.max_investment
+        transactionAmount < investmentProduct.min_investment
       ) {
         const errorBody = { error: 'Amount not allowed investment' };
         return new Response(
@@ -216,8 +215,6 @@ export async function POST(req: Request) {
               user: userReferral.docs[0].parent.id,
               amount: Number(amount*0.03),
               balance: Number(amount*0.03),
-              start_date: product.start_date,
-              end_date: product.end_date,
               status: "active",
               note_log: null,
               product_log: {
@@ -235,8 +232,6 @@ export async function POST(req: Request) {
             user: user_id,
             amount: Number(amount),
             balance: Number(amount),
-            start_date: product.start_date,
-            end_date: product.end_date,
             status: "active",
             note_log: null,
             product_log: {
