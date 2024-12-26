@@ -11,7 +11,6 @@ import { Term } from '@/lib/investment-products/dynamicFund'
 export default function InvestmentProcessPage() {
   const [profitData, setProfitData] = useState([])
   const [requestFormData, setRequestFormData] = useState({})
-  console.log('requestFormData', requestFormData)
   return (
     <>
       <SiteHeader />

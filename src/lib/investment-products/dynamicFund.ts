@@ -703,8 +703,8 @@ export const contractMultiPeriodEndAt = (startDate: Date, term: Term, periods: n
 
 export const isValidForStandardApplyCancelContract = (startDate: Date): Boolean => {
   let today = new Date()
-
-  return differenceInDays(startDate, today) > standardApplyProgramDays
+  
+  return differenceInDays(today, startDate) > standardApplyProgramDays
 }
 
 export const canCancelContractAt = (startDate: Date): Date => {

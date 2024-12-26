@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { CalendarIcon } from 'lucide-react'
-import { format, differenceInDays, isBefore, addDays } from 'date-fns'
+import { format, differenceInDays, isBefore, addDays, getYear } from 'date-fns'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
@@ -21,16 +21,20 @@ import {
   buildProfitRecordsQuarterly,
   buildProfitRecordsSemester,
   buildProfitRecordsMonthly,
-  rateConfig,
+  // rateConfig,
   contractEndAt,
   contractMultiPeriodEndAt,
   standardApplyProgramDays,
   canCancelContractAt,
   Term,
 } from '@/lib/investment-products/dynamicFund'
+import { getProducts } from '@/lib/investment-products/localApi'
+import { createTransactionInvestment } from '@/lib/transaction'
 
 import { useToast } from '@/hooks/use-toast'
 import { Badge } from '@/components/ui/badge'
+import { notifyInvestment } from '@/lib/telegram'
+import { useRouter } from 'next/navigation'
 
 const minRangeDays = 15
 
@@ -41,6 +45,7 @@ export function InvestmentProcessForm({
   onCalculate: (data: any) => void
   onRequest: (data: any) => void
 }) {
+  const router = useRouter()
   const tomorrow = addDays(new Date(), 0)
   const [startDate, setStartDate] = useState<Date | undefined>(tomorrow)
   const [endDate, setEndDate] = useState<Date | undefined>(addDays(startDate, minRangeDays))
@@ -48,6 +53,7 @@ export function InvestmentProcessForm({
   const [depositAmount, setDepositAmount] = useState<number>(10000)
   const [periods, setPeriods] = useState<number>(1)
   const [dayCount, setDayCount] = useState<number>(0)
+  const [rateConfig, setRateConfig] = useState([]);
 
   const { toast } = useToast()
 
@@ -62,6 +68,19 @@ export function InvestmentProcessForm({
     }
     setEndDate(contractMultiPeriodEndAt(startDate, term, periods))
   }, [startDate, term, periods])
+
+  useEffect(() => {
+    const fetchRates = async () => {
+      try {
+        const response = await getProducts(); // Fetch rateConfig data
+        setRateConfig(response);
+      } catch (error) {
+        console.error('Failed to fetch rates:', error);
+      }
+    };
+
+    fetchRates();
+  }, []);
 
   const handleStartDateSelect = (date: Date | undefined) => {
     setStartDate(date)
@@ -131,8 +150,99 @@ export function InvestmentProcessForm({
     }
   }
 
-  const onChangeTerm = (e: Term) => {
-    console.log('hello nice')
+  const calculateBalance = (term: string) => {
+    let build;
+    if (term == 'Annually') {
+      build = buildProfitRecordsAnnualy(depositAmount, startDate, endDate)
+    }
+
+    if (term == 'Semester') {
+      build = buildProfitRecordsSemester(depositAmount, startDate, endDate)
+    }
+
+    if (term == 'Quarterly') {
+      build = buildProfitRecordsQuarterly(depositAmount, startDate, endDate)
+    }
+
+    if (term == 'Monthly') {
+      build = buildProfitRecordsMonthly(depositAmount, startDate, endDate)
+    }
+    const year = getYear(endDate);
+    const month = format(endDate, 'MM');
+
+    const dateProfitFilter = build[year].filter((item: any) => {
+      return format(item.date, 'MM') === month;
+    });
+    if (!dateProfitFilter.length) {
+      return 0;
+    }
+    return dateProfitFilter[0]?.balance;
+  };
+
+  const calculateProfit = (term: string) => {
+    let build;
+    if (term == 'Annually') {
+      build = buildProfitRecordsAnnualy(depositAmount, startDate, endDate)
+    }
+
+    if (term == 'Semester') {
+      build = buildProfitRecordsSemester(depositAmount, startDate, endDate)
+    }
+
+    if (term == 'Quarterly') {
+      build = buildProfitRecordsQuarterly(depositAmount, startDate, endDate)
+    }
+
+    if (term == 'Monthly') {
+      build = buildProfitRecordsMonthly(depositAmount, startDate, endDate)
+    }
+    const year = getYear(endDate);
+    const month = format(endDate, 'MM');
+
+    const dateProfitFilter = build[year].filter((item: any) => {
+      return format(item.date, 'MM') === month;
+    });
+    if (!dateProfitFilter.length) {
+      return 0;
+    }
+    return dateProfitFilter[0]?.profit;
+  };
+
+  const handleInvestment = async () => {
+    if (startDate && endDate && depositAmount > 0) {
+      const formData = {
+        expectedReturn: calculateBalance(term),
+        profit: calculateProfit(term),
+        amount: depositAmount,
+        term: term,
+        startDate: startDate,
+        endDate: endDate,
+        periods: periods
+      }
+      const response: any = await createTransactionInvestment(formData)
+      if (response.error) {
+        toast({
+          title: 'Error',
+          description: response.message,
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      notifyInvestment(response.data)
+      toast({
+        title: 'Success',
+        description: 'Investment request has been submitted.',
+        variant: 'default',
+      });
+      router.push('../../investment-contracts')
+    } else {
+      toast({
+        title: 'Error',
+        description: 'Please ensure all fields are filled out correctly.',
+        variant: 'destructive',
+      });
+    }
   }
 
   return (
@@ -178,9 +288,8 @@ export function InvestmentProcessForm({
               <PopoverTrigger asChild>
                 <Button
                   variant={'outline'}
-                  className={`w-full justify-start text-left font-normal ${
-                    !startDate && 'text-muted-foreground'
-                  }`}
+                  className={`w-full justify-start text-left font-normal ${!startDate && 'text-muted-foreground'
+                    }`}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {startDate ? format(startDate, 'PPP') : 'Pick a date'}
@@ -205,9 +314,8 @@ export function InvestmentProcessForm({
               <PopoverTrigger asChild>
                 <Button
                   variant={'outline'}
-                  className={`w-full justify-start text-left font-normal ${
-                    !endDate && 'text-muted-foreground'
-                  }`}
+                  className={`w-full justify-start text-left font-normal ${!endDate && 'text-muted-foreground'
+                    }`}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {endDate ? format(endDate, 'PPP') : 'Pick a date'}
@@ -241,6 +349,12 @@ export function InvestmentProcessForm({
 
           <Button type="submit" className="w-full">
             Tính Kết Quả
+          </Button>
+          <Button
+            onClick={() => handleInvestment()}
+            className="w-full mt-2 bg-green-600 text-white hover:bg-green-500"
+          >
+            Submit Investment
           </Button>
         </form>
       </CardContent>

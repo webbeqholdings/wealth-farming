@@ -8,6 +8,7 @@ import * as migration_20241216_073305_create_user_referrals_collection from './2
 import * as migration_20241220_120738_create_withdrawl_contracts_and_payload_jobs_table from './20241220_120738_create_withdrawl_contracts_and_payload_jobs_table';
 import * as migration_20241223_042430_drop_seo_and_add_enum_workflow from './20241223_042430_drop_seo_and_add_enum_workflow';
 import * as migration_20241223_121532_delete_column_expected_return_in_contracts from './20241223_121532_delete_column_expected_return_in_contracts';
+import * as migration_20241226_140744_update_fields_contracts_products_collection from './20241226_140744_update_fields_contracts_products_collection';
 
 export const migrations = [
   {
@@ -58,6 +59,11 @@ export const migrations = [
   {
     up: migration_20241223_121532_delete_column_expected_return_in_contracts.up,
     down: migration_20241223_121532_delete_column_expected_return_in_contracts.down,
-    name: '20241223_121532_delete_column_expected_return_in_contracts'
+    name: '20241223_121532_delete_column_expected_return_in_contracts',
+  },
+  {
+    up: migration_20241226_140744_update_fields_contracts_products_collection.up,
+    down: migration_20241226_140744_update_fields_contracts_products_collection.down,
+    name: '20241226_140744_update_fields_contracts_products_collection'
   },
 ];

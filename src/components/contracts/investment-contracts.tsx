@@ -14,6 +14,7 @@ import {
     TableRow,
 } from '@/components/ui/table'
 import { WithdrawDialog } from '@/components/withdraw-dialog'
+import { TerminationDialog } from '../termination-dialog'
 import userStatus from '@/lib/userStatus'
 import { useRouter } from 'next/navigation'
 import { getContracts, getWithdrawals } from '@/lib/contract'
@@ -33,9 +34,13 @@ interface Investment {
     investedAmount: number
     minInvestment: number
     expectedReturn: number
-    availableBalance: number
-    startDate: string
-    endDate: string
+    availableBalance: number,
+    rateOfReturn: number,
+    term: string,
+    periods: string,
+    profit: number,
+    startDate: Date,
+    endDate: Date,
     status: 'active' | 'completed' | 'pending'
     lastWithdrawal?: string
 }
@@ -54,6 +59,7 @@ export function InvestmentContracts() {
     const { isLoggedIn, loading, user } = userStatus();
     const [selectedContract, setSelectedContract] = useState<Investment | null>(null)
     const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false)
+    const [terminationDialogOpen, setTerminationDialogOpen] = useState(false)
     const [investments, setInvestments] = useState<Investment[]>()
     const [withdrawals, setWithdrawals] = useState<Withdrawal[]>()
     const [currentPage, setCurrentPage] = useState(1);
@@ -79,6 +85,10 @@ export function InvestmentContracts() {
     const handleWithdraw = (investment: Investment) => {
         setSelectedContract(investment)
         setWithdrawDialogOpen(true)
+    }
+    const handleTerminate = (investment: Investment) => {
+        setSelectedContract(investment)
+        setTerminationDialogOpen(true)
     }
 
     const formatCurrency = (amount: number) => {
@@ -200,6 +210,9 @@ export function InvestmentContracts() {
                                             <TableHead>Invested Amount</TableHead>
                                             <TableHead>Available Balance</TableHead>
                                             <TableHead>Expected Return</TableHead>
+                                            <TableHead>Profit</TableHead>
+                                            <TableHead>Rate</TableHead>
+                                            <TableHead>Term</TableHead>
                                             <TableHead>Start Date</TableHead>
                                             <TableHead>End Date</TableHead>
                                             <TableHead>Status</TableHead>
@@ -215,6 +228,9 @@ export function InvestmentContracts() {
                                                     {formatCurrency(investment.availableBalance)}
                                                 </TableCell>
                                                 <TableCell>{formatCurrency(investment.expectedReturn)}</TableCell>
+                                                <TableCell>{formatCurrency(investment.profit)}</TableCell>
+                                                <TableCell>{formatCurrency(investment.rateOfReturn)}</TableCell>
+                                                <TableCell>{investment.term}</TableCell>
                                                 <TableCell>{new Date(investment.startDate).toLocaleDateString()}</TableCell>
                                                 <TableCell>{new Date(investment.endDate).toLocaleDateString()}</TableCell>
                                                 <TableCell>
@@ -234,6 +250,14 @@ export function InvestmentContracts() {
                                                         className="hover:text-black"
                                                     >
                                                         Withdraw
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => handleTerminate(investment)}
+                                                        className="hover:text-red-500 ml-2"
+                                                    >
+                                                        Termination
                                                     </Button>
                                                 </TableCell>
                                             </TableRow>
@@ -354,7 +378,14 @@ export function InvestmentContracts() {
                     setActiveTab={setActiveTab}
                 />
             )}
+            {selectedContract && (
+                <TerminationDialog
+                    isOpen={terminationDialogOpen}
+                    onClose={() => setTerminationDialogOpen(false)}
+                    contract={selectedContract}
+                    setActiveTab={setActiveTab}
+                />
+            )}
         </div>
     )
 }
-

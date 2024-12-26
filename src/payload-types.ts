@@ -241,7 +241,11 @@ export interface Contract {
   id: number;
   user: number | User;
   amount?: number | null;
+  profit?: number | null;
   balance?: number | null;
+  expected_return?: number | null;
+  term?: string | null;
+  periods?: number | null;
   start_date?: string | null;
   end_date?: string | null;
   status: 'active' | 'inactive' | 'pending' | 'closed';
@@ -326,33 +330,11 @@ export interface InvestmentFund {
  */
 export interface InvestmentProduct {
   id: number;
-  fund: number | InvestmentFund;
   product_name: string;
   description?: string | null;
-  product_overview?: {
-    root: {
-      type: string;
-      children: {
-        type: string;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  min_investment: number;
-  max_investment?: number | null;
-  start_date?: string | null;
-  end_date?: string | null;
-  interest_rate_month?: number | null;
-  interest_rate_from?: number | null;
-  interest_rate_to?: number | null;
-  profit_period: 'monthly' | 'quarterly' | 'semi_annually' | 'annually';
-  status: 'available' | 'unavailable';
+  min_investment?: number | null;
+  term?: ('monthly' | 'quarterly' | 'semester' | 'annually') | null;
+  rate_of_return?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -837,7 +819,11 @@ export interface CompaniesSelect<T extends boolean = true> {
 export interface ContractsSelect<T extends boolean = true> {
   user?: T;
   amount?: T;
+  profit?: T;
   balance?: T;
+  expected_return?: T;
+  term?: T;
+  periods?: T;
   start_date?: T;
   end_date?: T;
   status?: T;
@@ -882,19 +868,11 @@ export interface InvestmentFundsSelect<T extends boolean = true> {
  * via the `definition` "investment-products_select".
  */
 export interface InvestmentProductsSelect<T extends boolean = true> {
-  fund?: T;
   product_name?: T;
   description?: T;
-  product_overview?: T;
   min_investment?: T;
-  max_investment?: T;
-  start_date?: T;
-  end_date?: T;
-  interest_rate_month?: T;
-  interest_rate_from?: T;
-  interest_rate_to?: T;
-  profit_period?: T;
-  status?: T;
+  term?: T;
+  rate_of_return?: T;
   updatedAt?: T;
   createdAt?: T;
 }

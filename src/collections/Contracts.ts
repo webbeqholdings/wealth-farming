@@ -17,9 +17,29 @@ const Contracts: CollectionConfig = {
       label: 'Investment Amount',
     },
     {
+      name: 'profit',
+      type: 'number',
+      label: 'Profit',
+    },
+    {
       name: 'balance',
       type: 'number',
       label: 'Available Balance',
+    },
+    {
+      name: 'expected_return',
+      type: 'number',
+      label: 'Expected Return',
+    },
+    {
+      name: 'term',
+      type: 'text',
+      label: 'Term',
+    },
+    {
+      name: 'periods',
+      type: 'number',
+      label: 'Periods',
     },
     {
       name: 'start_date',

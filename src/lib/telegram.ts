@@ -67,13 +67,14 @@ export async function notifyInvestment(data: any) {
                     style: 'currency',
                     currency: 'USD',
                 }),
-                paymentMethod: "Bank Transfer",
                 requestTime: new Date(),
-                contract: data,
                 depositId: data.id,
+                productLog: data.product_log,
+                startDate: data.start_date,
+                endDate: data.end_date,
+                term: data.term
             }), // Convert the request body to JSON
         });
-
         return response; // Return the parsed data for further use
     } catch (error) {
         console.error("Error during notifyDeposit API call:", error);
@@ -95,10 +96,13 @@ export async function notifyWithdrawlContracts(data: any) {
                     style: 'currency',
                     currency: 'USD',
                 }),
-                paymentMethod: "Bank Transfer",
                 requestTime: new Date(),
-                contract: data.contract,
                 withdrawlId: data.id,
+                productLog: data.contract.product_log,
+                startDate: data.contract.start_date,
+                endDate: data.contract.end_date,
+                term: data.contract.term,
+                profit: data.contract.profit
             }), // Convert the request body to JSON
         });
 

@@ -11,87 +11,50 @@ const InvestmentProducts: CollectionConfig = {
   },
   fields: [
     {
-      name: 'fund',
-      type: 'relationship',
-      relationTo: 'investment-funds',
-      label: 'Associated Fund',
-      required: true,
-    },
-    {
       name: 'product_name',
       type: 'text',
       label: 'Product Name',
       required: true,
+      localized: true,
     },
     {
       name: 'description',
       type: 'textarea',
       label: 'Product Description',
-    },
-    {
-      name: 'product_overview',
-      type: 'richText',
-      label: 'Product Overview',
+      localized: true,
     },
     {
       name: 'min_investment',
       type: 'number',
       label: 'Minimum Investment',
-      required: true,
     },
     {
-      name: 'max_investment',
-      type: 'number',
-      label: 'Maximum Investment',
-    },
-    {
-      name: 'start_date',
-      type: 'date',
-      label: 'Start Date',
-    },
-    {
-      name: 'end_date',
-      type: 'date',
-      label: 'End Date',
-    },
-    {
-      name: 'interest_rate_month',
-      type: 'number',
-      label: 'Interest Rate Month (%)',
-    },
-    {
-      name: 'interest_rate_from',
-      type: 'number',
-      label: 'Interest Rate From (%)',
-      required: false,
-    },
-    {
-      name: 'interest_rate_to',
-      type: 'number',
-      label: 'Interest Rate To (%)',
-      required: false,
-    },
-    {
-      name: 'profit_period', // Kì hạn nhận lãi (bonus)
+      name: 'term',
       type: 'select',
+      label: 'Term',
       options: [
-        { label: 'Monthly', value: 'monthly' },
-        { label: 'Quarterly', value: 'quarterly' },
-        { label: 'Semi-Annually', value: 'semi_annually' },
-        { label: 'Annually', value: 'annually' },
+        {
+          label: 'Monthly',
+          value: 'monthly',
+        },
+        {
+          label: 'Quarterly',
+          value: 'quarterly',
+        },
+        {
+          label: 'Semester',
+          value: 'semester',
+        },
+        {
+          label: 'Annually',
+          value: 'annually',
+        },
       ],
-      label: 'Profit Period',
-      required: true,
     },
     {
-      name: 'status',
-      type: 'select',
-      options: [
-        { label: 'Available', value: 'available' },
-        { label: 'Unavailable', value: 'unavailable' },
-      ],
-      label: 'Status',
-      required: true,
+      name: 'rate_of_return',
+      type: 'number',
+      label: 'Rate of Return (%)',
     },
   ],
 }

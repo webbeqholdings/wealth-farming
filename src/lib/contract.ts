@@ -2,20 +2,6 @@
 import { getPayload } from 'payload';
 import config from '@payload-config';
 import { headers as nextHeaders } from 'next/headers'
-// Define the Investment interface
-interface Investment {
-  id: string;
-  userId: string;
-  productName: string;
-  investedAmount: number;
-  minInvestment: number;
-  expectedReturn: number;
-  availableBalance: number;
-  startDate: string;
-  endDate: string;
-  status: 'active' | 'completed' | 'pending';
-  lastWithdrawal?: string;
-}
 
 interface Withdrawal {
   id: string
@@ -26,14 +12,13 @@ interface Withdrawal {
 }
 
 
-export const getContracts = async (page: number, limit: number): Promise<{ docs: Investment[]; totalPages: number; totalDocs: number }> => {
+export const getContracts = async (page: number, limit: number): Promise<{ docs: any; totalPages: number; totalDocs: number }> => {
   try {
     const payload = await getPayload({
       config,
     });
     const headers = await nextHeaders();
     const auth = await payload.auth({ headers });
-
     const response = await payload.find({
       collection: 'contracts',
       where: {
@@ -42,7 +27,6 @@ export const getContracts = async (page: number, limit: number): Promise<{ docs:
       page, // Pass the page number
       limit, // Pass the number of items per page
     });
-
     const contracts = response.docs;
 
     return {
@@ -50,10 +34,14 @@ export const getContracts = async (page: number, limit: number): Promise<{ docs:
         id: contract.id,
         userId: contract.user.id,
         minInvestment: contract.product_log?.min_investment,
-        productName: contract.product_log?.product_name,
+        productName: contract.product_log?.name,
         investedAmount: contract.amount,
-        expectedReturn: contract.product_log?.expected_return,
+        expectedReturn: contract.expected_return,
         availableBalance: contract.balance,
+        term: contract.term,
+        periods: contract.periods,
+        profit: contract.profit,
+        rateOfReturn: contract.product_log.rate_of_return,
         startDate: contract.start_date,
         endDate: contract.end_date,
         status: contract.status,
@@ -92,7 +80,7 @@ export const getWithdrawals = async (page: number, limit: number): Promise<{ doc
     return {
       docs: withdrawals.map((withdrawal: any) => ({
         id: withdrawal.id,
-        productName: withdrawal.contract.product_log?.product_name,
+        productName: withdrawal.contract.product_log?.name,
         amount: withdrawal.amount,
         date: withdrawal.createdAt,
         status: withdrawal.status,
