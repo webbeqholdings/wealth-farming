@@ -26,7 +26,6 @@ import Posts from './collections/Posts'
 import PostTags from './collections/PostTags'
 import TransferCashRequests from './collections/TransferCashRequests'
 import Units from './collections/Units'
-import InvestmentProfitLoss from './collections/InvestmentProfitLoss'
 import Telegram from './collections/Telegram'
 import Notification from './collections/Notifications'
 import EconomicCalendar from './collections/EconomicCalendar'
@@ -95,7 +94,6 @@ export default buildConfig({
     EconomicCalendar,
     InvestmentFunds,
     InvestmentProducts,
-    InvestmentProfitLoss,
     Telegram,
     Transactions,
     TransferCashRequests,

@@ -6,8 +6,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { withdrawInvestment } from '@/lib/contract';
 import { notifyWithdrawlContracts } from '@/lib/telegram';
-import { buildProfitRecordsSemester, isValidForStandardApplyCancelContract } from '@/lib/investment-products/dynamicFund';
-import { format, getYear, differenceInDays, isAfter } from 'date-fns';
+import { standardApplyProgramDays } from '@/lib/investment-products/dynamicFund';
 
 interface TerminationDialogProps {
   isOpen: boolean;
@@ -17,6 +16,7 @@ interface TerminationDialogProps {
     userId: string;
     productName: string;
     availableBalance: number;
+    investedAmount: number;
     minInvestment: number;
     startDate: Date; // ISO Date string
     endDate: Date; // ISO Date string
@@ -27,32 +27,26 @@ interface TerminationDialogProps {
 }
 
 export function TerminationDialog({ isOpen, onClose, contract, setActiveTab }: TerminationDialogProps) {
-  const [amount, setAmount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  let availableBalance: number;
 
-  const today = new Date();
+  const parsedStartDate = new Date(contract.startDate);
 
-  const calculateProfit = () => {
-    const startDate = new Date(contract.startDate);
-    const investedAmount = contract.availableBalance;
+  if (isNaN(parsedStartDate.getTime())) {
+    throw new Error('Invalid start_date provided');
+  }
 
-    const build = buildProfitRecordsSemester(investedAmount, startDate, today);
-    const year = getYear(today);
-    const month = format(today, 'MM');
+  const daysSinceStart = Math.floor((new Date().getTime() - parsedStartDate.getTime()) / (1000 * 60 * 60 * 24));
 
-    const dateProfitFilter = build[year].filter((item: any) => {
-      return format(item.date, 'MM') === month;
-    });
-    if (!dateProfitFilter.length) {
-      return 0;
-    }
-
-    return dateProfitFilter[0]?.profit + contract.availableBalance;
-  };
+  if (daysSinceStart < standardApplyProgramDays) {
+    console.log('check contract: ', contract);
+    availableBalance = ((daysSinceStart * contract.investedAmount * 20) / (255 * 100)) + contract.investedAmount;
+  } else {
+    availableBalance = contract.availableBalance;
+  }
 
   const handleDialogClose = () => {
-    setAmount('');
     onClose();
   };
 
@@ -67,21 +61,18 @@ export function TerminationDialog({ isOpen, onClose, contract, setActiveTab }: T
       return;
     }
 
-    const totalProfit = calculateProfit();
-
     try {
       const formData = new FormData();
-      formData.append('amount', calculateProfit());
+      formData.append('amount', availableBalance.toString());
       formData.append('contractId', contract.id);
       formData.append('userId', contract.userId);
-      formData.append('totalProfit', totalProfit.toString());
 
       const result = await withdrawInvestment(formData);
       notifyWithdrawlContracts(result.data);
       if (result.success) {
         toast({
-          title: 'Withdrawal Successfully',
-          description: `Total Profit: ${totalProfit.toFixed(2)} USD`,
+          title: 'Withdrawal Successful',
+          description: `Amount: $${contract.availableBalance.toFixed(2)} USD`,
         });
         setActiveTab('withdraw');
         handleDialogClose();
@@ -99,50 +90,54 @@ export function TerminationDialog({ isOpen, onClose, contract, setActiveTab }: T
 
   return (
     <Dialog open={isOpen} onOpenChange={handleDialogClose}>
-      <DialogContent className="sm:max-w-[425px] bg-white border-gray-300 shadow-md">
-        <DialogHeader>
-          <DialogTitle className="text-gray-900">Terminate Contract</DialogTitle>
-          <DialogDescription className="text-gray-600">
-            Are you sure you want to terminate the contract for {contract.productName}? This action cannot be undone.
+      <DialogContent className="sm:max-w-[500px] bg-white border border-gray-300 rounded-lg shadow-lg">
+        <DialogHeader className="mb-4">
+          <DialogTitle className="text-lg font-semibold text-gray-900">
+            Terminate Contract
+          </DialogTitle>
+          <DialogDescription className="text-sm text-gray-600">
+            You are about to terminate the contract for {contract.productName}. Please review the details below before proceeding.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleWithdraw}>
-          <div className="grid gap-4">
-            <p className="text-yellow-500 text-sm">
-              Warning: Terminating this contract will result in no further benefits. Proceed with caution.
-            </p>
+          <div className="grid gap-6">
+            {daysSinceStart < standardApplyProgramDays && (
+              <div className="bg-yellow-100 text-yellow-800 text-sm rounded-md p-3">
+                <strong>Note:</strong> Withdrawals made within the first 90 days will be subject to a profit rate of <strong>20% annually</strong>.
+              </div>
+            )}
+            <div className="bg-yellow-50 text-yellow-800 text-sm rounded-md p-3">
+              <strong>Warning:</strong> Terminating this contract will result in no further benefits. Proceed with caution.
+            </div>
             <div className="grid gap-2">
-              <Label htmlFor="amount" className="text-gray-700">
-                Amount
+              <Label htmlFor="amount" className="font-medium text-gray-800">
+                Withdrawal Amount
               </Label>
               <Input
                 id="amount"
-                value={calculateProfit().toFixed(2)}
-                onChange={(e) => setAmount(e.target.value)}
+                value={contract.availableBalance.toFixed(2)}
                 placeholder="Enter amount to withdraw"
-                className="bg-white border-gray-300"
+                className="bg-gray-100 border border-gray-300 rounded-lg p-2.5"
                 required
                 disabled
               />
-              <p className="text-sm text-gray-500 pb-4">
-                Balance Available: ${calculateProfit().toFixed(2)}
+              <p className="text-sm text-gray-600 mt-1">
+                Balance Available: <strong>${contract.availableBalance.toFixed(2)}</strong>
               </p>
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="mt-6">
             <Button
               variant="outline"
               onClick={handleDialogClose}
-              className="border-gray-300 text-gray-700"
+              className="px-4 py-2 rounded-md text-gray-700 border-gray-300"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              disabled={
-                isLoading
-              }
-              className="bg-red-500 text-white hover:bg-red-600"
+              disabled={isLoading}
+              className="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700"
             >
               {isLoading ? 'Processing...' : 'Confirm Termination'}
             </Button>
@@ -150,6 +145,5 @@ export function TerminationDialog({ isOpen, onClose, contract, setActiveTab }: T
         </form>
       </DialogContent>
     </Dialog>
-
   );
 }

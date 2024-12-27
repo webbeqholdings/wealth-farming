@@ -19,7 +19,6 @@ export interface Config {
     'economic-calendar': EconomicCalendar;
     'investment-funds': InvestmentFund;
     'investment-products': InvestmentProduct;
-    'investment-profit-loss': InvestmentProfitLoss;
     telegram: Telegram;
     transactions: Transaction;
     'transfer-cash-requests': TransferCashRequest;
@@ -46,7 +45,6 @@ export interface Config {
     'economic-calendar': EconomicCalendarSelect<false> | EconomicCalendarSelect<true>;
     'investment-funds': InvestmentFundsSelect<false> | InvestmentFundsSelect<true>;
     'investment-products': InvestmentProductsSelect<false> | InvestmentProductsSelect<true>;
-    'investment-profit-loss': InvestmentProfitLossSelect<false> | InvestmentProfitLossSelect<true>;
     telegram: TelegramSelect<false> | TelegramSelect<true>;
     transactions: TransactionsSelect<false> | TransactionsSelect<true>;
     'transfer-cash-requests': TransferCashRequestsSelect<false> | TransferCashRequestsSelect<true>;
@@ -335,19 +333,6 @@ export interface InvestmentProduct {
   min_investment?: number | null;
   term?: ('monthly' | 'quarterly' | 'semester' | 'annually') | null;
   rate_of_return?: number | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "investment-profit-loss".
- */
-export interface InvestmentProfitLoss {
-  id: number;
-  investment_product: number | InvestmentProduct;
-  profit_or_loss: number;
-  unit: number | Unit;
-  description?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -664,10 +649,6 @@ export interface PayloadLockedDocument {
         value: number | InvestmentProduct;
       } | null)
     | ({
-        relationTo: 'investment-profit-loss';
-        value: number | InvestmentProfitLoss;
-      } | null)
-    | ({
         relationTo: 'telegram';
         value: number | Telegram;
       } | null)
@@ -874,18 +855,6 @@ export interface InvestmentProductsSelect<T extends boolean = true> {
   min_investment?: T;
   term?: T;
   rate_of_return?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "investment-profit-loss_select".
- */
-export interface InvestmentProfitLossSelect<T extends boolean = true> {
-  investment_product?: T;
-  profit_or_loss?: T;
-  unit?: T;
-  description?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -5,14 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { withdrawInvestment } from '@/lib/contract';
-import { notifyWithdrawlContracts } from '@/lib/telegram';
-import { format, getYear, differenceInDays, isAfter } from 'date-fns';
-import {
-  buildProfitRecordsAnnualy,
-  buildProfitRecordsQuarterly,
-  buildProfitRecordsSemester,
-  buildProfitRecordsMonthly,
-} from '@/lib/investment-products/dynamicFund'
+import { isAfter } from 'date-fns';
 
 interface WithdrawDialogProps {
   isOpen: boolean;
@@ -27,13 +20,13 @@ interface WithdrawDialogProps {
     endDate: Date; // ISO Date string
     term: string
     status: string
+    profit: number
   };
   setActiveTab: (tab: string) => void;
 }
 
 export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: WithdrawDialogProps) {
   const [amount, setAmount] = useState('');
-  const [withdrawType, setWithdrawType] = useState<'part' | 'all'>('part');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -44,37 +37,7 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
     return isAfter(today, endDate); // Check if today is after the contract end date
   };
 
-  const calculateProfit = (term: string, today: Date) => {
-    let build;
-    if (term == 'Annually') {
-      build = buildProfitRecordsAnnualy(contract.availableBalance, contract.startDate, today)
-    }
-
-    if (term == 'Semester') {
-      build = buildProfitRecordsSemester(contract.availableBalance, contract.startDate, today)
-    }
-
-    if (term == 'Quarterly') {
-      build = buildProfitRecordsQuarterly(contract.availableBalance, contract.startDate, today)
-    }
-
-    if (term == 'Monthly') {
-      build = buildProfitRecordsMonthly(contract.availableBalance, contract.startDate, today)
-    }
-    const year = getYear(today);
-    const month = format(today, 'MM');
-
-    const dateProfitFilter = build[year].filter((item: any) => {
-      return format(item.date, 'MM') === month;
-    });
-    if (!dateProfitFilter.length) {
-      return 0;
-    }
-    return dateProfitFilter[0]?.profit;
-  };
-
   const handleDialogClose = () => {
-    setWithdrawType('part');
     setAmount('');
     onClose();
   };
@@ -101,14 +64,11 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
     
     setIsLoading(true);
 
-    const totalProfit = calculateProfit(contract.term, contract.endDate);
-
     try {
       const formData = new FormData();
       formData.append('amount', amount);
       formData.append('contractId', contract.id);
       formData.append('userId', contract.userId);
-      formData.append('totalProfit', totalProfit.toString());
 
       const result = await withdrawInvestment(formData);
       notifyWithdrawlContracts(result.data);
@@ -142,6 +102,9 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
         </DialogHeader>
         <form onSubmit={handleWithdraw}>
           <div className="grid gap-4">
+            <div className="bg-yellow-100 text-yellow-800 text-sm rounded-md p-3">
+              <strong>Note:</strong> Withdrawals profit can only be made after the contract&apos;s end date.
+            </div>
             <div className="grid gap-2">
               <Label htmlFor="amount" className="text-gray-700">
                 Amount
@@ -154,11 +117,11 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
                 placeholder="Enter amount to withdraw"
                 className="bg-white border-gray-300"
                 min={0}
-                max={calculateProfit(contract.term, new Date())}
+                max={contract.profit}
                 required
               />
               <p className="text-sm text-gray-500">
-                Profit: ${calculateProfit(contract.term, new Date()).toFixed(2)}
+                Profit: ${contract.profit.toFixed(2)}
               </p>
             </div>
           </div>
@@ -175,7 +138,7 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
               disabled={
                 isLoading ||
                 !amount ||
-                parseFloat(amount) > calculateProfit(contract.term, new Date())
+                parseFloat(amount) > contract.profit
               }
               className="bg-blue-500 text-white hover:bg-blue-600"
             >

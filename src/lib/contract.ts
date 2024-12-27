@@ -38,7 +38,7 @@ export const getContracts = async (page: number, limit: number): Promise<{ docs:
         productName: contract.product_log?.name,
         investedAmount: contract.amount,
         expectedReturn: contract.expected_return,
-        availableBalance: contract.balance,
+        availableBalance: Number(contract.balance),
         term: contract.term,
         periods: contract.periods,
         profit: contract.profit,
@@ -103,20 +103,48 @@ export async function withdrawInvestment(formData: FormData) {
     const payload = await getPayload({
       config,
     });
-    const amount = formData.get('amount')
-    const contractId = formData.get('contractId')
-    const userId = formData.get('userId')
-
+    const amount = Number(formData.get('amount'))
+    const contractId = Number(formData.get('contractId'))
+    const userId = Number(formData.get('userId'))
 
     const response = await payload.create({
       collection: 'withdrawals',
       data: {
-        contract: Number(contractId),
-        user: Number(userId),
-        amount: Number(amount),
+        contract: contractId,
+        user: userId,
+        amount: amount,
         status: 'pending',
       },
     })
+
+    const contract = await payload.findByID({
+      collection: 'contracts',
+      id: contractId
+    })
+
+    // Update contract based on withdrawal amount
+    if (amount < Number(contract.balance) && amount <= contract.profit) {
+      await payload.update({
+        collection: 'contracts',
+        id: contractId,
+        data: {
+          profit: contract.profit - amount,
+          balance: Number(contract.balance) - amount
+        },
+      });
+    } else if (amount <= Number(contract.balance)) {
+      await payload.update({
+        collection: 'contracts',
+        id: contractId,
+        data: {
+          status: 'inactive',
+          balance: 0,
+          profit: 0,
+        },
+      });
+    } else {
+      throw new Error('Invalid withdrawal amount. Amount exceeds available balance or profit.');
+    }
     // Simulate API call delay
     return {
       success: true,
