@@ -21,6 +21,7 @@ interface TerminationDialogProps {
     startDate: Date; // ISO Date string
     endDate: Date; // ISO Date string
     term: string
+    status: string
   };
   setActiveTab: (tab: string) => void;
 }
@@ -57,16 +58,14 @@ export function TerminationDialog({ isOpen, onClose, contract, setActiveTab }: T
 
   async function handleWithdraw(event: React.FormEvent) {
     event.preventDefault();
-    // const startDate = new Date(contract.startDate);
-    // if (differenceInDays(today, startDate) < 90) {
-    //   toast({
-    //     title: 'Error',
-    //     description: 'Contract termination can only occur after 90 days.',
-    //     variant: 'destructive',
-    //   });
-    //   return;
-    // }
-    // setIsLoading(true);
+    if (contract.status === 'inactive') {
+      toast({
+        title: 'Invalid Contract',
+        description: 'The selected contract is inactive and cannot be processed.',
+        variant: 'destructive',
+      });
+      return;
+    }
 
     const totalProfit = calculateProfit();
 

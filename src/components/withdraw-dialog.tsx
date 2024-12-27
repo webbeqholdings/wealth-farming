@@ -26,6 +26,7 @@ interface WithdrawDialogProps {
     startDate: Date; // ISO Date string
     endDate: Date; // ISO Date string
     term: string
+    status: string
   };
   setActiveTab: (tab: string) => void;
 }
@@ -88,6 +89,16 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
       });
       return;
     }
+
+    if (contract.status === 'inactive') {
+      toast({
+        title: 'Invalid Contract',
+        description: 'The selected contract is inactive and cannot be processed.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
     setIsLoading(true);
 
     const totalProfit = calculateProfit(contract.term, contract.endDate);

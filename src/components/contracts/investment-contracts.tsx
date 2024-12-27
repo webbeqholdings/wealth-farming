@@ -1,10 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ArrowUpDown, Search } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import {
     Table,
     TableBody,
@@ -41,7 +39,7 @@ interface Investment {
     profit: number,
     startDate: Date,
     endDate: Date,
-    status: 'active' | 'completed' | 'pending'
+    status: 'active' | 'completed' | 'pending' | 'inactive'
     lastWithdrawal?: string
 }
 
@@ -82,6 +80,18 @@ export function InvestmentContracts() {
         };
         fetchData();
     }, [activeTab, currentPage]);
+
+    // Calculate ROI
+    const calculateROI = () => {
+        if (!investments || investments.length === 0) return 0;
+
+        const totalInvested = investments.reduce((sum, inv) => sum + inv.investedAmount, 0);
+        const totalExpected = investments.reduce((sum, inv) => sum + inv.expectedReturn, 0);
+
+        if (totalInvested === 0) return 0;
+
+        return ((totalExpected - totalInvested) / totalInvested) * 100;
+    };
 
     const handleWithdraw = (investment: Investment) => {
         setSelectedContract(investment)
@@ -180,7 +190,9 @@ export function InvestmentContracts() {
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold ">25%</div>
+                        <div className="text-2xl font-bold text-green-500">
+                                {investments ? `${calculateROI().toFixed(2)}%` : '0.00%'}
+                            </div>
                         </CardContent>
                     </Card>
                 </div>
@@ -230,7 +242,7 @@ export function InvestmentContracts() {
                                                     {formatCurrency(investment.availableBalance)}
                                                 </TableCell>
                                                 <TableCell>{formatCurrency(investment.profit)}</TableCell>
-                                                <TableCell>{formatCurrency(investment.rateOfReturn)}</TableCell>
+                                                <TableCell>{investment.rateOfReturn}%</TableCell>
                                                 <TableCell>{investment.term}</TableCell>
                                                 <TableCell>{new Date(investment.startDate).toLocaleDateString()}</TableCell>
                                                 <TableCell>{new Date(investment.endDate).toLocaleDateString()}</TableCell>
