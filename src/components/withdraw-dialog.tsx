@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { withdrawInvestment } from '@/lib/contract';
+import { notifyWithdrawlContracts } from '@/lib/telegram';
 import { isAfter } from 'date-fns';
 
 interface WithdrawDialogProps {
