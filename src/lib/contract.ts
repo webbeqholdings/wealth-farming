@@ -9,6 +9,7 @@ interface Withdrawal {
   amount: number
   date: string
   status: 'completed' | 'pending' | 'failed'
+  message: string
 }
 
 
@@ -84,6 +85,7 @@ export const getWithdrawals = async (page: number, limit: number): Promise<{ doc
         amount: withdrawal.amount,
         date: withdrawal.createdAt,
         status: withdrawal.status,
+        message: withdrawal.message
       })),
       totalPages: response.totalPages,
       totalDocs: response.totalDocs,
@@ -112,7 +114,7 @@ export async function withdrawInvestment(formData: FormData) {
         contract: Number(contractId),
         user: Number(userId),
         amount: Number(amount),
-        status: 'pending'
+        status: 'pending',
       },
     })
     // Simulate API call delay

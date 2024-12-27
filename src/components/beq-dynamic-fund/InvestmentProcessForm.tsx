@@ -32,9 +32,9 @@ import { getProducts } from '@/lib/investment-products/localApi'
 import { createTransactionInvestment } from '@/lib/transaction'
 
 import { useToast } from '@/hooks/use-toast'
-import { Badge } from '@/components/ui/badge'
 import { notifyInvestment } from '@/lib/telegram'
 import { useRouter } from 'next/navigation'
+import userStatus from '@/lib/userStatus'
 
 const minRangeDays = 15
 
@@ -45,6 +45,7 @@ export function InvestmentProcessForm({
   onCalculate: (data: any) => void
   onRequest: (data: any) => void
 }) {
+  const { isLoggedIn, loading, user } = userStatus();
   const router = useRouter()
   const tomorrow = addDays(new Date(), 0)
   const [startDate, setStartDate] = useState<Date | undefined>(tomorrow)
@@ -209,6 +210,13 @@ export function InvestmentProcessForm({
   };
 
   const handleInvestment = async () => {
+
+    // If the user is not logged in, redirect to the join page
+    if (!isLoggedIn) {
+      router.push('../../join');
+      return; // Optional: Show a redirect message
+    }
+
     if (startDate && endDate && depositAmount > 0) {
       const formData = {
         expectedReturn: calculateBalance(term),
@@ -350,13 +358,14 @@ export function InvestmentProcessForm({
           <Button type="submit" className="w-full">
             Tính Kết Quả
           </Button>
-          <Button
+        </form>
+        <Button
+            type="button"
             onClick={() => handleInvestment()}
             className="w-full mt-2 bg-green-600 text-white hover:bg-green-500"
           >
             Submit Investment
           </Button>
-        </form>
       </CardContent>
     </Card>
   )

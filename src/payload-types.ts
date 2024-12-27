@@ -539,6 +539,7 @@ export interface Withdrawal {
   user?: (number | null) | User;
   amount: number;
   status: 'completed' | 'pending' | 'failed';
+  message?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1095,6 +1096,7 @@ export interface WithdrawalsSelect<T extends boolean = true> {
   user?: T;
   amount?: T;
   status?: T;
+  message?: T;
   updatedAt?: T;
   createdAt?: T;
 }

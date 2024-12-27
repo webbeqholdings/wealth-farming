@@ -51,6 +51,7 @@ interface Withdrawal {
     amount: number
     date: string
     status: 'completed' | 'pending' | 'failed'
+    message: string
 }
 
 
@@ -208,8 +209,8 @@ export function InvestmentContracts() {
                                         <TableRow>
                                             <TableHead>Product Name</TableHead>
                                             <TableHead>Invested Amount</TableHead>
-                                            <TableHead>Available Balance</TableHead>
                                             <TableHead>Expected Return</TableHead>
+                                            <TableHead>Available Balance</TableHead>
                                             <TableHead>Profit</TableHead>
                                             <TableHead>Rate</TableHead>
                                             <TableHead>Term</TableHead>
@@ -224,10 +225,10 @@ export function InvestmentContracts() {
                                             <TableRow key={investment.id}>
                                                 <TableCell className="font-medium">{investment.productName}</TableCell>
                                                 <TableCell>{formatCurrency(investment.investedAmount)}</TableCell>
+                                                <TableCell>{formatCurrency(investment.expectedReturn)}</TableCell>
                                                 <TableCell className="text-green-500">
                                                     {formatCurrency(investment.availableBalance)}
                                                 </TableCell>
-                                                <TableCell>{formatCurrency(investment.expectedReturn)}</TableCell>
                                                 <TableCell>{formatCurrency(investment.profit)}</TableCell>
                                                 <TableCell>{formatCurrency(investment.rateOfReturn)}</TableCell>
                                                 <TableCell>{investment.term}</TableCell>
@@ -307,6 +308,7 @@ export function InvestmentContracts() {
                                             <TableHead>Amount</TableHead>
                                             <TableHead>Date</TableHead>
                                             <TableHead>Status</TableHead>
+                                            <TableHead>Message</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -327,6 +329,9 @@ export function InvestmentContracts() {
                                                     >
                                                         {withdrawal.status.charAt(0).toUpperCase() + withdrawal.status.slice(1)}
                                                     </span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    {withdrawal.message}
                                                 </TableCell>
                                             </TableRow>
                                         ))}

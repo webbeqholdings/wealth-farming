@@ -102,7 +102,10 @@ export async function notifyWithdrawlContracts(data: any) {
                 startDate: data.contract.start_date,
                 endDate: data.contract.end_date,
                 term: data.contract.term,
-                profit: data.contract.profit
+                profit: data.contract.profit.toLocaleString('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                })
             }), // Convert the request body to JSON
         });
 
