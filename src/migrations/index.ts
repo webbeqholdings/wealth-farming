@@ -9,7 +9,6 @@ import * as migration_20241220_120738_create_withdrawl_contracts_and_payload_job
 import * as migration_20241223_042430_drop_seo_and_add_enum_workflow from './20241223_042430_drop_seo_and_add_enum_workflow';
 import * as migration_20241223_121532_delete_column_expected_return_in_contracts from './20241223_121532_delete_column_expected_return_in_contracts';
 import * as migration_20241226_140744_update_fields_contracts_products_collection from './20241226_140744_update_fields_contracts_products_collection';
-import * as migration_20241227_085537_add_field_message_in_withdrawl from './20241227_085537_add_field_message_in_withdrawl';
 
 export const migrations = [
   {
@@ -66,10 +65,5 @@ export const migrations = [
     up: migration_20241226_140744_update_fields_contracts_products_collection.up,
     down: migration_20241226_140744_update_fields_contracts_products_collection.down,
     name: '20241226_140744_update_fields_contracts_products_collection',
-  },
-  {
-    up: migration_20241227_085537_add_field_message_in_withdrawl.up,
-    down: migration_20241227_085537_add_field_message_in_withdrawl.down,
-    name: '20241227_085537_add_field_message_in_withdrawl'
   },
 ];
