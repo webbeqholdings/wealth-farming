@@ -67,12 +67,16 @@ export interface Config {
   };
   globals: {
     'site-settings': SiteSetting;
+    'gc-beq-dynamic-fund': GcBeqDynamicFund;
+    'gc-payment-transfer': GcPaymentTransfer;
     'main-menu': MainMenu;
     header: Header;
     footer: Footer;
   };
   globalsSelect?: {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    'gc-beq-dynamic-fund': GcBeqDynamicFundSelect<false> | GcBeqDynamicFundSelect<true>;
+    'gc-payment-transfer': GcPaymentTransferSelect<false> | GcPaymentTransferSelect<true>;
     'main-menu': MainMenuSelect<false> | MainMenuSelect<true>;
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
@@ -122,6 +126,7 @@ export interface Account {
   account_name: string;
   account_number: number;
   amount: number;
+  type: 'investment' | 'main' | 'referral_reward';
   updatedAt: string;
   createdAt: string;
 }
@@ -351,7 +356,7 @@ export interface Transaction {
   status: 'pending' | 'completed' | 'failed';
   from_account?: (number | null) | Account;
   to_account?: (number | null) | Account;
-  type: 'deposit' | 'withdraw' | 'bonus' | 'transfer' | 'investment';
+  type: 'deposit' | 'withdraw' | 'bonus' | 'transfer' | 'investment' | 'referral_reward';
   updatedAt: string;
   createdAt: string;
 }
@@ -751,6 +756,7 @@ export interface AccountsSelect<T extends boolean = true> {
   account_name?: T;
   account_number?: T;
   amount?: T;
+  type?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1157,6 +1163,48 @@ export interface SiteSetting {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gc-beq-dynamic-fund".
+ */
+export interface GcBeqDynamicFund {
+  id: number;
+  public_products: (number | InvestmentProduct)[];
+  employee_plus_products?: (number | InvestmentProduct)[] | null;
+  employee_users?: (number | User)[] | null;
+  'before-standard-product'?: (number | null) | InvestmentProduct;
+  referral_products?: (number | InvestmentProduct)[] | null;
+  standard_days?: number | null;
+  referral_config_rates?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gc-payment-transfer".
+ */
+export interface GcPaymentTransfer {
+  id: number;
+  bank_qr_code?: (number | null) | Media;
+  bank_account_number?: string | null;
+  bank_account_description?: string | null;
+  crypto_wallet_qr_code?: (number | null) | Media;
+  crypto_wallet_address?: string | null;
+  crypto_wallet_network?: 'TRC20' | null;
+  usd_to_vnd?: number | null;
+  usdt_to_vnd?: number | null;
+  usd_to_usdt?: number | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "main-menu".
  */
 export interface MainMenu {
@@ -1243,6 +1291,40 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         id?: T;
       };
   business_hours?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gc-beq-dynamic-fund_select".
+ */
+export interface GcBeqDynamicFundSelect<T extends boolean = true> {
+  public_products?: T;
+  employee_plus_products?: T;
+  employee_users?: T;
+  'before-standard-product'?: T;
+  referral_products?: T;
+  standard_days?: T;
+  referral_config_rates?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gc-payment-transfer_select".
+ */
+export interface GcPaymentTransferSelect<T extends boolean = true> {
+  bank_qr_code?: T;
+  bank_account_number?: T;
+  bank_account_description?: T;
+  crypto_wallet_qr_code?: T;
+  crypto_wallet_address?: T;
+  crypto_wallet_network?: T;
+  usd_to_vnd?: T;
+  usdt_to_vnd?: T;
+  usd_to_usdt?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

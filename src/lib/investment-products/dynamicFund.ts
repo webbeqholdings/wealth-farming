@@ -682,20 +682,22 @@ export const contractMultiPeriodEndAt = (startDate: Date, term: Term, periods: n
     return endByTerm
   }
 
+  const _periods = periods - 1
+
   if (term == 'Monthly') {
-    periodsEndAt = addMonths(endByTerm, periods)
+    periodsEndAt = addMonths(endByTerm, _periods)
   }
 
   if (term == 'Annually') {
-    periodsEndAt = addMonths(endByTerm, periods * 12)
+    periodsEndAt = addMonths(endByTerm, _periods * 12)
   }
 
   if (term == 'Semester') {
-    periodsEndAt = addMonths(endByTerm, periods * 6)
+    periodsEndAt = addMonths(endByTerm, _periods * 6)
   }
 
   if (term == 'Quarterly') {
-    periodsEndAt = addMonths(endByTerm, periods * 4)
+    periodsEndAt = addMonths(endByTerm, _periods * 4)
   }
 
   return periodsEndAt
@@ -703,10 +705,23 @@ export const contractMultiPeriodEndAt = (startDate: Date, term: Term, periods: n
 
 export const isValidForStandardApplyCancelContract = (startDate: Date): Boolean => {
   let today = new Date()
-  
+
   return differenceInDays(today, startDate) > standardApplyProgramDays
 }
 
 export const canCancelContractAt = (startDate: Date): Date => {
   return addDays(startDate, standardApplyProgramDays)
+}
+
+export const terminateNonStandardContractRecords = (
+  startDate: Date,
+  endDate: Date,
+  term: Term,
+  dataContract: object,
+) => {
+  // get all transaction bonus --> sum = X , count = N
+  // (N x 1.67) - X + root = result ; return result[]
+  // t{} --> amount = sum(bonus[])
+  // t{} --> amount = sum(penalty[])
+  // t{} --> amount = Root - sum(bonus[]) + sum(penalty[])
 }
