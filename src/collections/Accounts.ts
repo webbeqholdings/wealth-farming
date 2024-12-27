@@ -6,7 +6,7 @@ const Accounts: CollectionConfig = {
     useAsTitle: 'account_number',
   },
   access: {
-    read: () => true
+    read: () => true,
   },
   fields: [
     {
@@ -33,6 +33,18 @@ const Accounts: CollectionConfig = {
       type: 'number',
       label: 'Amount',
       defaultValue: 0,
+      required: true,
+    },
+    {
+      name: 'type',
+      type: 'select',
+      options: [
+        { label: 'Investment', value: 'investment' },
+        { label: 'Main', value: 'main' },
+        { label: 'Referral Reward', value: 'referral_reward' },
+      ],
+      label: 'Amount',
+      defaultValue: 'investment',
       required: true,
     },
   ],

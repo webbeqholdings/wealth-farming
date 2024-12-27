@@ -1,0 +1,93 @@
+[
+  {
+    "product_name": "BeQ Dynamic Fund Monthly",
+    "description": "...",
+    "min_investment": 50,
+    "term": "Monthly",
+    "rate_of_return": 0.0595
+  },
+  {
+    "product_name": "BeQ Dynamic Fund Quarterly",
+    "description": "...",
+    "min_investment": 50,
+    "term": "Quarterly",
+    "rate_of_return": 0.0615
+  },
+  {
+    "product_name": "BeQ Dynamic Fund Semester",
+    "description": "...",
+    "min_investment": 50,
+    "term": "Semester",
+    "rate_of_return": 0.0635
+  },
+  {
+    "product_name": "BeQ Dynamic Fund Annually",
+    "description": "...",
+    "min_investment": 50,
+    "term": "Annually",
+    "rate_of_return": 0.0655
+  },
+  {
+    "product_name": "Employee Plus Monthly",
+    "description": "...",
+    "min_investment": 1,
+    "term": "Monthly",
+    "rate_of_return": 0.01
+  },
+  {
+    "product_name": "Employee Plus Quarterly",
+    "description": "...",
+    "min_investment": 1,
+    "term": "Quarterly",
+    "rate_of_return": 0.01
+  },
+  {
+    "product_name": "Employee Plus Semester",
+    "description": "...",
+    "min_investment": 1,
+    "term": "Semester",
+    "rate_of_return": 0.01
+  },
+  {
+    "product_name": "Employee Plus Annually",
+    "description": "...",
+    "min_investment": 1,
+    "term": "Annually",
+    "rate_of_return": 0.01
+  },
+  {
+    "product_name": "Referral Reward Monthly",
+    "description": "...",
+    "min_investment": 1,
+    "term": "Monthly",
+    "rate_of_return": 0.01
+  },
+  {
+    "product_name": "Referral Reward Quarterly",
+    "description": "...",
+    "min_investment": 1,
+    "term": "Quarterly",
+    "rate_of_return": 0.01
+  },
+  {
+    "product_name": "Referral Reward Semester",
+    "description": "...",
+    "min_investment": 1,
+    "term": "Semester",
+    "rate_of_return": 0.01
+  },
+  {
+    "product_name": "Referral Reward Annually",
+    "description": "...",
+    "min_investment": 1,
+    "term": "Annually",
+    "rate_of_return": 0.01
+  },
+  {
+    "product_name": "Cancel Before Standard Penalty Fee",
+    "description": "...",
+    "min_investment": 1,
+    "term": "Monthly",
+    "rate_of_return": 0.01667
+  }
+]
