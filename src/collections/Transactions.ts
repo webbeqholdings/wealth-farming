@@ -1,7 +1,7 @@
 // transactions.collection.js
 import type { CollectionConfig } from 'payload'
 import { getPayload } from 'payload'
-import config from '@payload-config';
+import config from '@payload-config'
 import { isAdmin } from '../access/isAdmin'
 
 const Transactions: CollectionConfig = {
@@ -35,10 +35,10 @@ const Transactions: CollectionConfig = {
       },
     },
     {
-        name: 'unit',
-        type: 'relationship',
-        relationTo: 'units',
-        label: 'Unit',
+      name: 'unit',
+      type: 'relationship',
+      relationTo: 'units',
+      label: 'Unit',
     },
     {
       name: 'bank',
@@ -84,6 +84,7 @@ const Transactions: CollectionConfig = {
         { label: 'Bonus', value: 'bonus' },
         { label: 'Transfer', value: 'transfer' },
         { label: 'Investment', value: 'investment' },
+        { label: 'Referral Reward', value: 'referral_reward' },
       ],
       label: 'Transaction Type',
       required: true,
@@ -94,19 +95,19 @@ const Transactions: CollectionConfig = {
       async ({ doc, req, operation }) => {
         const payload = await getPayload({
           config,
-        });
+        })
         if (operation === 'update' && doc.type === 'deposit' && doc.status === 'completed') {
-          const fromAccountId = doc.from_account;
-          const transactionAmount = doc.amount;
+          const fromAccountId = doc.from_account
+          const transactionAmount = doc.amount
           // Fetch the existing account details
           const fromAccount = await payload.findByID({
             collection: 'accounts',
             id: fromAccountId,
-          });
+          })
 
           if (fromAccount) {
             // Update the account amount
-            const updatedAmount = fromAccount.amount + transactionAmount;
+            const updatedAmount = fromAccount.amount + transactionAmount
 
             // Save the updated account data
             await payload.update({
@@ -115,20 +116,20 @@ const Transactions: CollectionConfig = {
               data: {
                 amount: updatedAmount,
               },
-            });
+            })
           }
         }
         if (operation === 'update' && doc.type === 'withdraw' && doc.status === 'failed') {
-          const fromAccountId = doc.from_account;
-          const transactionAmount = doc.amount;
+          const fromAccountId = doc.from_account
+          const transactionAmount = doc.amount
           // Fetch the existing account details
           const fromAccount = await payload.findByID({
             collection: 'accounts',
             id: fromAccountId,
-          });
+          })
           if (fromAccount) {
             // Update the account amount
-            const updatedAmount = fromAccount.amount - transactionAmount;
+            const updatedAmount = fromAccount.amount - transactionAmount
 
             // Save the updated account data
             await payload.update({
@@ -137,7 +138,7 @@ const Transactions: CollectionConfig = {
               data: {
                 amount: updatedAmount,
               },
-            });
+            })
           }
         }
       },

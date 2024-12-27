@@ -27,7 +27,7 @@ import {
   Copy,
   Share2,
   Bell,
-  AlertTriangle
+  AlertTriangle,
 } from 'lucide-react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
@@ -38,9 +38,9 @@ import UserStatus from '@/lib/userStatus'
 import TelegramButton from '@/components/TelegramButton'
 
 export default function UserProfile() {
-  const { isLoggedIn, loading, user } = UserStatus();
-  const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { isLoggedIn, loading, user } = UserStatus()
+  const router = useRouter()
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [userInfo, setUserInfo] = useState({
     firstName: '',
     lastName: '',
@@ -50,14 +50,14 @@ export default function UserProfile() {
     avatar: '/placeholder.svg?height=100&width=100',
     accountNumber: '****',
     balance: 0,
-  });
+  })
 
   const [transactions, setTransactions] = useState([
     { id: 1, type: 'Deposit', amount: 0, date: '2024-03-01' },
     { id: 2, type: 'Withdraw', amount: 0, date: '2024-03-02' },
     { id: 3, type: 'Transfer', amount: 0, date: '2024-03-03' },
     { id: 4, type: 'Investment', amount: 0, date: '2024-03-05' },
-  ]);
+  ])
 
   const [referralInfo, setReferralInfo] = useState({
     referralCode: 'ALICE2024',
@@ -67,7 +67,7 @@ export default function UserProfile() {
       { name: 'David Jones', status: 'Active' },
     ],
     referralProgress: 60,
-  });
+  })
 
   const [telegramNotifications, setTelegramNotifications] = useState({
     id: null,
@@ -76,17 +76,17 @@ export default function UserProfile() {
     settings: {
       transactions: true,
     },
-  });
+  })
 
   useEffect(() => {
     // Fetch data from your API
     const fetchData = async () => {
       try {
         // Delete the cookies stel_ssid and stel_token
-        const totalAmount = localStorage.getItem('total_amount');
-        const accountNumber = localStorage.getItem('account_number');
-        const response = await fetch(`/api/users/${user.id}`);
-        const data = await response.json();
+        const totalAmount = localStorage.getItem('total_amount')
+        const accountNumber = localStorage.getItem('account_number')
+        const response = await fetch(`/api/users/${user.id}`)
+        const data = await response.json()
 
         // Update the userInfo state based on the response
         setUserInfo({
@@ -98,42 +98,44 @@ export default function UserProfile() {
           avatar: data.avatar?.url || '/placeholder.svg?height=100&width=100', // Fallback to placeholder if avatar is missing
           accountNumber: accountNumber, // You can replace this with actual data if available
           balance: Number(totalAmount), // Replace with actual balance if provided by the API
-        });
+        })
+
+        console.log('data', data)
 
         if (data.telegram) {
           setTelegramNotifications((prevUser) => ({
             ...prevUser,
             connected: true,
             id: data.telegram.id,
-            username: `${data.telegram.first_name} ${data.telegram.last_name}`
+            username: `${data.telegram.first_name} ${data.telegram.last_name}`,
           }))
         }
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error('Error fetching user data:', error)
       }
-    };
+    }
 
-    fetchData();
-  }, [loading]);
+    fetchData()
+  }, [loading])
 
   useEffect(() => {
     const fetchTransactions = async () => {
-      const response = await fetch(`/api/transaction/recent?user_id=${user.id}`);
-      const data = await response.json();
-      setTransactions(data.data);
-    };
+      const response = await fetch(`/api/transaction/recent?user_id=${user.id}`)
+      const data = await response.json()
+      setTransactions(data.data)
+    }
 
-    fetchTransactions();
-  }, [loading]);
+    fetchTransactions()
+  }, [loading])
 
   const handleUpdateProfile = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     // Collect form data
-    const formData = new FormData(event.currentTarget);
-    const firstName = formData.get('first_name') as string;
-    const lastName = formData.get('last_name') as string;
-    const email = formData.get('email') as string;
-    const phone = formData.get('phone') as string;
+    const formData = new FormData(event.currentTarget)
+    const firstName = formData.get('first_name') as string
+    const lastName = formData.get('last_name') as string
+    const email = formData.get('email') as string
+    const phone = formData.get('phone') as string
 
     // Create an object to send in the PATCH request
     const updatedData = {
@@ -141,7 +143,7 @@ export default function UserProfile() {
       last_name: lastName,
       email: email,
       phone_contact: phone,
-    };
+    }
 
     try {
       const response = await fetch(`/api/users/${user.id}`, {
@@ -150,14 +152,14 @@ export default function UserProfile() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(updatedData),
-      });
+      })
 
       if (!response.ok) {
-        throw new Error('Failed to update profile');
+        throw new Error('Failed to update profile')
       }
 
       // Handle the successful response
-      const updatedUser = await response.json();
+      const updatedUser = await response.json()
 
       // Optionally, update your local state (e.g., userInfo) with the updated data
       setUserInfo({
@@ -166,13 +168,13 @@ export default function UserProfile() {
         lastName: updatedUser.last_name,
         email: updatedUser.email,
         phone: updatedUser.phone_contact,
-      });
+      })
 
       toast({
         title: 'Update profile successfully',
       })
     } catch (error) {
-      console.error('Error updating profile:', error);
+      console.error('Error updating profile:', error)
       toast({
         title: `${error}`,
       })
@@ -182,36 +184,35 @@ export default function UserProfile() {
   const uploadAvatar = async (formData: FormData, avatarId?: string) => {
     try {
       // Define the appropriate URL for media upload and PATCH request
-      const mediaUrl = avatarId ? `/api/media/${avatarId}` : '/api/media';
+      const mediaUrl = avatarId ? `/api/media/${avatarId}` : '/api/media'
       const response = await fetch(mediaUrl, {
         method: avatarId ? 'PATCH' : 'POST', // Use PATCH for updating, POST for new uploads
         body: formData,
-      });
-  
+      })
+
       if (!response.ok) {
-        throw new Error('Avatar upload failed');
+        throw new Error('Avatar upload failed')
       }
-  
-      const data = await response.json();
-      return data.doc; // Return the updated avatar URL
-  
+
+      const data = await response.json()
+      return data.doc // Return the updated avatar URL
     } catch (error) {
-      console.error('Error uploading avatar:', error);
-      throw error; // Re-throw to allow further handling in the caller function
+      console.error('Error uploading avatar:', error)
+      throw error // Re-throw to allow further handling in the caller function
     }
-  };
+  }
 
   const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files[0];
+    const file = event.target.files[0]
     if (file) {
-      const formData = new FormData();
-      formData.append('file', file);
+      const formData = new FormData()
+      formData.append('file', file)
 
       try {
         if (userInfo.avatar === '/placeholder.svg?height=100&width=100') {
           // Upload a new avatar
-          const uploadedAvatar = await uploadAvatar(formData); // Upload new avatar
-    
+          const uploadedAvatar = await uploadAvatar(formData) // Upload new avatar
+
           // Update user info with the new avatar
           const updateUserResponse = await fetch(`/api/users/${user.id}`, {
             method: 'PATCH',
@@ -219,36 +220,36 @@ export default function UserProfile() {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({ avatar: uploadedAvatar.id }),
-          });
-    
+          })
+
           if (!updateUserResponse.ok) {
-            throw new Error('User update failed');
+            throw new Error('User update failed')
           }
-    
-          const updatedUserInfo = await updateUserResponse.json();
+
+          const updatedUserInfo = await updateUserResponse.json()
           setUserInfo((prev) => ({
             ...prev,
             avatar: uploadedAvatar.url,
-          }));
+          }))
         } else {
           // Update existing avatar
-          const uploadedAvatar = await uploadAvatar(formData, userInfo.avatar_id);
-    
+          const uploadedAvatar = await uploadAvatar(formData, userInfo.avatar_id)
+
           setUserInfo((prev) => ({
             ...prev,
             avatar: uploadedAvatar.url,
-          }));
+          }))
         }
       } catch (error) {
-        console.error('Error during avatar update process:', error);
+        console.error('Error during avatar update process:', error)
       }
     }
-  };
+  }
 
   // Trigger file input click on button click
   const handleButtonClick = () => {
-    fileInputRef.current?.click(); // Programmatically click the hidden file input
-  };
+    fileInputRef.current?.click() // Programmatically click the hidden file input
+  }
 
   const copyReferralCode = () => {
     navigator.clipboard.writeText(referralInfo.referralCode)
@@ -260,9 +261,7 @@ export default function UserProfile() {
     alert('Opening share dialog...')
   }
 
-  const toggleTelegramNotification = (
-    setting: keyof typeof telegramNotifications.settings,
-  ) => {
+  const toggleTelegramNotification = (setting: keyof typeof telegramNotifications.settings) => {
     setTelegramNotifications((prevUser) => ({
       ...prevUser,
       settings: {
@@ -274,13 +273,13 @@ export default function UserProfile() {
 
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
-    return <div>Loading...</div>; // You can replace this with a loading spinner component if desired
+    return <div>Loading...</div> // You can replace this with a loading spinner component if desired
   }
 
   // If the user is not logged in, redirect to the join page
   if (!isLoggedIn) {
-    router.push('/join');
-    return <div>Redirecting...</div>; // Optional: Show a redirect message
+    router.push('/join')
+    return <div>Redirecting...</div> // Optional: Show a redirect message
   }
 
   // Placeholder for disconnect logic (unchanged)
@@ -291,7 +290,7 @@ export default function UserProfile() {
         headers: {
           'Content-Type': 'application/json',
         },
-      });
+      })
 
       setTelegramNotifications({
         id: null,
@@ -300,11 +299,11 @@ export default function UserProfile() {
         settings: {
           transactions: true,
         },
-      });
+      })
     } catch (error) {
-      console.error('Error during avatar update process:', error);
+      console.error('Error during avatar update process:', error)
     }
-  };
+  }
 
   return (
     <>
@@ -322,9 +321,7 @@ export default function UserProfile() {
                 <div className="flex items-center space-x-4">
                   <Avatar className="w-20 h-20">
                     <AvatarImage src={userInfo.avatar} alt={userInfo.firstName} />
-                    <AvatarFallback>
-                      {userInfo.firstName + ' ' + userInfo.lastName}
-                    </AvatarFallback>
+                    <AvatarFallback>{userInfo.firstName + ' ' + userInfo.lastName}</AvatarFallback>
                   </Avatar>
                   <Button variant="outline" onClick={handleButtonClick}>
                     Change Avatar
@@ -344,9 +341,7 @@ export default function UserProfile() {
                         id="first_name"
                         name="first_name"
                         value={userInfo.firstName}
-                        onChange={(e) =>
-                          setUserInfo({ ...userInfo, firstName: e.target.value })
-                        }
+                        onChange={(e) => setUserInfo({ ...userInfo, firstName: e.target.value })}
                       />
                     </div>
                     <div className="space-y-2 flex-1">
@@ -355,9 +350,7 @@ export default function UserProfile() {
                         id="last_name"
                         name="last_name"
                         value={userInfo.lastName}
-                        onChange={(e) =>
-                          setUserInfo({ ...userInfo, lastName: e.target.value })
-                        }
+                        onChange={(e) => setUserInfo({ ...userInfo, lastName: e.target.value })}
                       />
                     </div>
                   </div>
@@ -369,7 +362,7 @@ export default function UserProfile() {
                       name="email"
                       type="email"
                       value={userInfo.email}
-                      onChange={(e) => setUserInfo({ ...userInfo, email: e.target.value })}
+                      readOnly={true}
                     />
                   </div>
                   <div className="space-y-2">
@@ -382,10 +375,11 @@ export default function UserProfile() {
                       onChange={(e) => setUserInfo({ ...userInfo, phone: e.target.value })}
                     />
                   </div>
-                  <Button type="submit" className='mt-5'>Update Profile</Button>
+                  <Button type="submit" className="mt-5">
+                    Update Profile
+                  </Button>
                 </form>
               </div>
-
             </CardContent>
           </Card>
 
@@ -407,30 +401,44 @@ export default function UserProfile() {
                   </div>
                   <div className="flex items-center space-x-4">
                     <DollarSign className="h-5 w-5 text-muted-foreground" />
-                    <span>Current Balance: {userInfo.balance.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</span>
+                    <span>
+                      Current Balance:{' '}
+                      {userInfo.balance.toLocaleString('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                      })}
+                    </span>
                   </div>
                 </TabsContent>
                 <TabsContent value="transactions">
                   <ul className="space-y-2">
-                    {transactions && transactions.map((transaction) => (
-                      <li key={transaction.id} className="flex justify-between items-center">
-                        <span>{transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1).toLowerCase()}</span>
-                        <span
-                          className={transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'}
-                        >
-                          {transaction.amount.toLocaleString('en-US', {
-                            style: 'currency',
-                            currency: 'USD',
-                          })}
-                        </span>
-                      </li>
-                    ))}
+                    {transactions &&
+                      transactions.map((transaction) => (
+                        <li key={transaction.id} className="flex justify-between items-center">
+                          <span>
+                            {transaction.type.charAt(0).toUpperCase() +
+                              transaction.type.slice(1).toLowerCase()}
+                          </span>
+                          <span
+                            className={transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'}
+                          >
+                            {transaction.amount.toLocaleString('en-US', {
+                              style: 'currency',
+                              currency: 'USD',
+                            })}
+                          </span>
+                        </li>
+                      ))}
                   </ul>
                 </TabsContent>
               </Tabs>
             </CardContent>
             <CardFooter>
-              <Button onClick={() => router.push('/account/history')} variant="outline" className="w-full">
+              <Button
+                onClick={() => router.push('/account/history')}
+                variant="outline"
+                className="w-full"
+              >
                 View Full Statement
               </Button>
             </CardFooter>

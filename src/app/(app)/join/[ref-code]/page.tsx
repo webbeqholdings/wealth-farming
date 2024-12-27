@@ -44,7 +44,7 @@ export default function Page() {
   const [showPassword, setShowPassword] = useState(false)
 
   const params = useParams()
-  const urlReferralCode = params['ref-code'];
+  const urlReferralCode = params['ref-code']
   // Click Submit
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>, type: '/login' | '') => {
     event.preventDefault()
@@ -57,6 +57,7 @@ export default function Page() {
     const first_name = formData.get('first_name') as string
     const last_name = formData.get('last_name') as string
     const referral_code = formData.get('referral_code') as string
+    const phone_contact = formData.get('phone_contact') as string
 
     // Select schema based on form type
     const schema = type === '/login' ? loginSchema : registerSchema
@@ -112,6 +113,7 @@ export default function Page() {
             first_name: first_name,
             last_name: last_name,
             parent_referral_code: referral_code,
+            phone_contact: phone_contact,
           }),
         })
         const data = await res.json()
@@ -245,12 +247,12 @@ export default function Page() {
                   </div>
 
                   <div className="space-y-1 py-1">
-                    <Label htmlFor="phone_number">Phone Number</Label>
+                    <Label htmlFor="phone_contact">Phone Number</Label>
                     <div className="relative">
                       <PhoneCall className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
                       <Input
-                        id="phone_number"
-                        name="phone_number"
+                        id="phone_contact"
+                        name="phone_contact"
                         placeholder="Enter your phone"
                         type="text"
                         className="pl-10"
