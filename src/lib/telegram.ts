@@ -72,7 +72,11 @@ export async function notifyInvestment(data: any) {
                 productLog: data.product_log,
                 startDate: data.start_date,
                 endDate: data.end_date,
-                term: data.term
+                term: data.term,
+                expectedReturn: data.expected_return.toLocaleString('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                })
             }), // Convert the request body to JSON
         });
         return response; // Return the parsed data for further use
@@ -103,6 +107,14 @@ export async function notifyWithdrawlContracts(data: any) {
                 endDate: data.contract.end_date,
                 term: data.contract.term,
                 profit: data.contract.profit.toLocaleString('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                }),
+                balance: data.contract.balance.toLocaleString('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                }),
+                investmentAmount: data.contract.amount.toLocaleString('en-US', {
                     style: 'currency',
                     currency: 'USD',
                 })
