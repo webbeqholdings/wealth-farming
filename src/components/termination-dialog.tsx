@@ -86,7 +86,7 @@ export function TerminationDialog({ isOpen, onClose, contract, setActiveTab }: T
     } finally {
       setIsLoading(false);
     }
-  }
+  } 
 
   return (
     <Dialog open={isOpen} onOpenChange={handleDialogClose}>
