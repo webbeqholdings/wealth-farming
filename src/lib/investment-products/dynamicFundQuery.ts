@@ -15,7 +15,7 @@ export const gcDynamicFund = async () => {
     },
   })
   const data = await req.json()
-  console.log('data', data)
+  console.log('....data', data)
 
   // const response = await payload.findGlobal({
   //   slug: 'gc-beq-dynamic-fund',
