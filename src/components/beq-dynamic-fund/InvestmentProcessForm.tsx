@@ -46,7 +46,6 @@ export function InvestmentProcessForm({
   onCalculate: (data: any) => void
   onRequest: (data: any) => void
 }) {
-  const { isLoggedIn, loading, user } = userStatus()
   const router = useRouter()
   const tomorrow = addDays(new Date(), 0)
   const [startDate, setStartDate] = useState<Date | undefined>(tomorrow)
@@ -56,16 +55,29 @@ export function InvestmentProcessForm({
   const [periods, setPeriods] = useState<number>(1)
   const [dayCount, setDayCount] = useState<number>(0)
   const [rateConfig, setRateConfig] = useState([])
+  const [isSiteLoading, setIsSiteLoading] = useState(true)
 
   const { toast } = useToast()
 
   useEffect(() => {
     const fetchRates = async () => {
-      const response = await getPublicProducts()
-      setRateConfig(response)
+      try {
+        setIsSiteLoading(true)
+        const response: any = await getPublicProducts()
+        setRateConfig(response)
+      } finally {
+        setIsSiteLoading(false)
+      }
     }
 
     fetchRates()
+
+    // const fetchRates = async () => {
+    //   const response = await getPublicProducts()
+    //   setRateConfig(response)
+    // }
+
+    // fetchRates()
 
     if (startDate && endDate) {
       const daysDifference = differenceInDays(endDate, startDate)
@@ -101,9 +113,7 @@ export function InvestmentProcessForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     let profitData = []
-    console.log('...startDate', startDate)
-    console.log('...endDate', endDate)
-    console.log('...depositAmount', depositAmount)
+
     if (startDate && endDate && depositAmount) {
       const daysDifference = differenceInDays(endDate, startDate)
       if (daysDifference < minRangeDays) {
@@ -208,6 +218,7 @@ export function InvestmentProcessForm({
   }
 
   const handleInvestment = async () => {
+    const { isLoggedIn, loading, user } = userStatus()
     // If the user is not logged in, redirect to the join page
     if (!isLoggedIn) {
       router.push('../../join')
@@ -250,6 +261,8 @@ export function InvestmentProcessForm({
     }
   }
 
+  if (isSiteLoading) return <div>Loading rate configurations...</div>
+
   return (
     <Card>
       <CardHeader>
@@ -275,14 +288,15 @@ export function InvestmentProcessForm({
                 <SelectValue placeholder="Select term" />
               </SelectTrigger>
               <SelectContent>
-                {rateConfig && rateConfig.map((rate) => (
-                  <SelectItem key={rate.term} value={rate.term}>
-                    {rate.product_name}
-                    <span className="text-gray-400 mx-3">
-                      {(rate.rate_of_return * 100).toFixed(2)}% / Tháng
-                    </span>
-                  </SelectItem>
-                ))}
+                {rateConfig &&
+                  rateConfig.map((rate) => (
+                    <SelectItem key={rate.term} value={rate.term}>
+                      {rate.product_name}
+                      <span className="text-gray-400 mx-3">
+                        {(rate.rate_of_return * 100).toFixed(2)}% / Tháng
+                      </span>
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>
