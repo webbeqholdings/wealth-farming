@@ -43,9 +43,8 @@ const Accounts: CollectionConfig = {
         { label: 'Main', value: 'main' },
         { label: 'Referral Reward', value: 'referral_reward' },
       ],
-      label: 'Amount',
+      label: 'type',
       defaultValue: 'investment',
-      required: true,
     },
   ],
 }
