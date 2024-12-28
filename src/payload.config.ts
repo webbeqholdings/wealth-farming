@@ -34,7 +34,7 @@ import UserReferrals from './collections/UserReferrals'
 import Withdrawals from './collections/Withdrawls'
 import { s3Storage } from '@payloadcms/storage-s3'
 import GcBeQDynamicFund from './global-configs/beq-dynamic-fund'
-import GcPaymentTransfer from './global-configs/payment-transfer'
+// import GcPaymentTransfer from './global-configs/payment-transfer'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -109,7 +109,7 @@ export default buildConfig({
     Media,
     Withdrawals,
   ],
-  globals: [SiteSettings, GcBeQDynamicFund, GcPaymentTransfer, MainMenu, Header, Footer],
+  globals: [SiteSettings, GcBeQDynamicFund, MainMenu, Header, Footer],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

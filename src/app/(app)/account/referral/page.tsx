@@ -52,7 +52,7 @@ export default function ReferralPage() {
   useEffect(() => {
     // Simulating API call to fetch referral data
     const fetchReferralData = async () => {
-      const { docs, totalPages, referral_code } = await getReferralsByParentId(currentPage, 10);
+      const { docs, totalPages, referral_code } = await getReferralsByParentId(user.id, currentPage, 10);
 
       setReferrals(docs); // Store the accounts in state
       setTotalPages(totalPages);
