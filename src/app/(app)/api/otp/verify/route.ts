@@ -57,7 +57,7 @@ export async function POST(req: Request) {
           collection: 'accounts',
           data: {
             user: user.id,
-            account_name: accountName[index], // Match account_name with the corresponding accountName
+            account_name: accountName[index],
             account_number: Math.floor(Math.random() * 1000000),
             amount: 0,
             type: type,
