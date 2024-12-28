@@ -1,0 +1,259 @@
+'use client'
+
+import * as React from 'react'
+import { useEffect, useState } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
+
+import { Button } from '@/components/ui/button'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { BankCombobox } from './bank-combobox'
+import { Separator } from '@radix-ui/react-dropdown-menu'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { useToast } from '@/hooks/use-toast'
+import { Trash2 } from 'lucide-react'
+import UserStatus from '@/lib/userStatus'
+import { CryptoWalletCombobox } from './crypto-wallet-combobox'
+
+const formSchema = z.object({
+  walletAddress: z.string().min(5, {
+    message: 'Wallet address must be at least 5 characters.',
+  }),
+  network: z.string().min(1, {
+    message: 'Please select a network.',
+  }),
+})
+
+export function CryptoWalletForm({
+  accounts,
+  setAccounts,
+}: {
+  accounts: any[]
+  setAccounts: React.Dispatch<React.SetStateAction<any[]>>
+}) {
+  const [cryptoWalletId, setCryptoWalletId] = useState('')
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const { toast } = useToast()
+
+  const { user } = UserStatus()
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      walletAddress: '',
+      network: '',
+    },
+  })
+
+  async function handleDelete(accountId: string) {
+    try {
+      // Send a DELETE request to the API to delete the bank account
+      const response = await fetch(`/api/crypto_wallets/${Number(accountId)}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json', // Ensure we send JSON
+        },
+      })
+
+      if (response.ok) {
+        setIsDialogOpen(false)
+
+        // Remove the deleted account from local state
+        setAccounts((prevAccounts) => prevAccounts.filter((account) => account.id !== accountId))
+
+        // Show success toast message
+        toast({
+          title: 'Crypto Wallet Deleted',
+          description: 'The crypto wallet has been successfully deleted.',
+        })
+      } else {
+        throw new Error('Failed to delete crypto wallet')
+      }
+    } catch (error) {
+      console.error('Error:', error)
+      setIsDialogOpen(false)
+      toast({
+        title: 'Error',
+        description: 'Failed to delete the crypto wallet. Please try again later.',
+      })
+    }
+  }
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values)
+    const newCryptoWallet = {
+      user: Number(user.id),
+      wallet_address: values.walletAddress,
+      network: values.network,
+    }
+    try {
+      // Send the data to the API
+      const response = await fetch('/api/crypto-wallets', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json', // Set the content type to JSON
+        },
+        body: JSON.stringify(newCryptoWallet), // Convert the object to a JSON string
+      })
+
+      // Check if the response is ok (status 200-299)
+      if (response.ok) {
+        const data = await response.json() // Parse the response data if needed
+
+        // Update local state with the new account if necessary
+        setAccounts((prevAccounts) => [...prevAccounts, newCryptoWallet])
+
+        // Reset the form and show success message
+        form.reset()
+        toast({
+          title: 'Crypto Wallet Added',
+          description: 'Your crypto wallet has been successfully added.',
+        })
+      } else {
+        throw new Error('Failed to add crypto wallet')
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to add crypto wallet. Please try again later.',
+      })
+      console.error('Error:', error)
+    }
+  }
+
+  const handleDeleteClick = (accountId: string) => {
+    setIsDialogOpen(true) // Open the dialog
+    setCryptoWalletId(accountId)
+  }
+
+  // Handle cancel action in dialog
+  const handleCancel = () => {
+    setIsDialogOpen(false) // Close dialog without deleting
+  }
+
+  return (
+    <div>
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Add Crypto Wallet</CardTitle>
+          <CardDescription>
+            Enter your bank account details for deposits and withdrawals.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <FormField
+                control={form.control}
+                name="walletAddress"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Wallet Address</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter wallet address" {...field} />
+                    </FormControl>
+                    <FormDescription>Your crypto wallet address.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="network"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Network</FormLabel>
+                    <FormControl>
+                      <CryptoWalletCombobox value={field.value} onChange={field.onChange} />
+                    </FormControl>
+                    <FormDescription>The blockchain network of your wallet.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className="bg-[#F5B014] text-black hover:bg-[#F5B014]/90">
+                Add Crypto Wallet
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+        <Separator />
+        <CardHeader>
+          <CardTitle>Your Crypto Wallets</CardTitle>
+          <CardDescription>Manage your registered crypto wallets.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Wallet Address</TableHead>
+                <TableHead>Network</TableHead>
+                <TableHead>Action</TableHead> {/* Add action column */}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {accounts.map((account) => (
+                <TableRow key={account.id}>
+                  <TableCell>{account.wallet_address}</TableCell>
+                  <TableCell>{account.network}</TableCell>
+                  <TableCell>
+                    {/* Delete button */}
+                    <Button onClick={() => handleDeleteClick(account.id)} color="red" size="sm">
+                      <Trash2 /> {/* Icon inside the button */}
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Are you sure?</DialogTitle>
+            <DialogDescription>
+              This action will permanently delete the bank account. Do you want to proceed?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={handleCancel} color="gray" size="sm">
+              Cancel
+            </Button>
+            <Button onClick={() => handleDelete(cryptoWalletId)} color="red" size="sm">
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
+}

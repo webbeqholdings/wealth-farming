@@ -14,6 +14,7 @@ export interface Config {
     accounts: Account;
     address: Address;
     banks: Bank;
+    'crypto-wallets': CryptoWallet;
     companies: Company;
     contracts: Contract;
     'economic-calendar': EconomicCalendar;
@@ -40,6 +41,7 @@ export interface Config {
     accounts: AccountsSelect<false> | AccountsSelect<true>;
     address: AddressSelect<false> | AddressSelect<true>;
     banks: BanksSelect<false> | BanksSelect<true>;
+    'crypto-wallets': CryptoWalletsSelect<false> | CryptoWalletsSelect<true>;
     companies: CompaniesSelect<false> | CompaniesSelect<true>;
     contracts: ContractsSelect<false> | ContractsSelect<true>;
     'economic-calendar': EconomicCalendarSelect<false> | EconomicCalendarSelect<true>;
@@ -216,6 +218,18 @@ export interface Bank {
   account_number?: string | null;
   bank_name?: string | null;
   branch?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "crypto-wallets".
+ */
+export interface CryptoWallet {
+  id: number;
+  user?: (number | null) | User;
+  wallet_address?: string | null;
+  network?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -630,6 +644,10 @@ export interface PayloadLockedDocument {
         value: number | Bank;
       } | null)
     | ({
+        relationTo: 'crypto-wallets';
+        value: number | CryptoWallet;
+      } | null)
+    | ({
         relationTo: 'companies';
         value: number | Company;
       } | null)
@@ -781,6 +799,17 @@ export interface BanksSelect<T extends boolean = true> {
   account_number?: T;
   bank_name?: T;
   branch?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "crypto-wallets_select".
+ */
+export interface CryptoWalletsSelect<T extends boolean = true> {
+  user?: T;
+  wallet_address?: T;
+  network?: T;
   updatedAt?: T;
   createdAt?: T;
 }
