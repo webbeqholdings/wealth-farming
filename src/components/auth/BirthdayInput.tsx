@@ -26,8 +26,9 @@ export function BirthdayInput({
 
     const day = parseInt(match[1], 10)
     const month = parseInt(match[2], 10) - 1 // JS months are 0-indexed
-    let year = parseInt(match[3], 10) // Changed from const to let
+    let year = parseInt(match[3], 10) //
     const currentYear = new Date().getFullYear()
+
     if (year > currentYear) {
       year = currentYear // Now this assignment is valid
       dateString = `${String(day).padStart(2, '0')}-${String(month + 1).padStart(2, '0')}-${year}`
@@ -35,6 +36,7 @@ export function BirthdayInput({
     }
 
     const date = new Date(year, month, day)
+    console.log(date.getFullYear())
 
     return (
       date.getDate() === day &&
@@ -55,6 +57,7 @@ export function BirthdayInput({
       <Label htmlFor="birthday">{label}</Label>
       <Cleave
         id="birthday"
+        name={props.name}
         placeholder="DD-MM-YYYY"
         options={{
           date: true,

@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { BirthdayInput } from '@/components/auth/BirthdayInput'
-
 import { Mail, Lock, Eye, EyeOff, PhoneCall } from 'lucide-react'
 import {
   Card,
@@ -36,6 +35,11 @@ const registerSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
 })
+
+export const formatToISODate = (dateString: string): string => {
+  const [day, month, year] = dateString.split('-')
+  return `${year}-${month}-${day}`
+}
 
 export default function Page() {
   const { toast } = useToast()
@@ -107,6 +111,7 @@ export default function Page() {
 
       // NextJS Api Custom
       if (actionAuth === 'register') {
+        const formattedDateOfBirth = formatToISODate(date_of_birth)
         res = await fetch(`/api/auth/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -116,6 +121,7 @@ export default function Page() {
             first_name: first_name,
             last_name: last_name,
             parent_referral_code: referral_code,
+            date_of_birth: formattedDateOfBirth,
           }),
         })
         const data = await res.json()
@@ -303,7 +309,7 @@ export default function Page() {
                   </div>
 
                   <div className="space-y-1">
-                    <BirthdayInput />
+                    <BirthdayInput name="date_of_birth" />
                   </div>
 
                   <div className="space-y-1">
