@@ -1,6 +1,7 @@
 import { Term } from '@/lib/investment-products/dynamicFund'
 import { format } from 'date-fns'
-import { Info } from 'lucide-react'
+import { Bird } from 'lucide-react'
+import { Separator } from '../ui/separator'
 
 const ReportBack = ({
   amount,
@@ -19,23 +20,23 @@ const ReportBack = ({
 }) => {
   let termDescriptionConfig = [
     {
-      termKey: 'Monthly',
+      termKey: 'monthly',
       note: 'Mỗi cuối tháng dương lịch',
       termName: 'Hàng Tháng',
     },
     {
-      termKey: 'Quarterly',
+      termKey: 'quarterly',
       note: 'Kết thúc mỗi quý dương lịch, ví dụ Quý 2 (01/04 đến hết 30/6)',
       termName: 'Hàng Quý',
     },
     {
-      termKey: 'Semester',
+      termKey: 'semester',
       note: 'Kết thúc kì hạn nửa năm dương lịch (01/01 đến 31/05 & 01/06 đến hết 31/12)',
       termName: 'Nửa Năm Dương Lịch',
     },
 
     {
-      termKey: 'Annually',
+      termKey: 'annually',
       note: 'Kết thúc kì hạn 1 năm dương lịch (01/01 đến 31/12)',
       termName: 'Hàng Năm',
     },
@@ -43,7 +44,7 @@ const ReportBack = ({
     {
       termKey: 'BeforeStandard',
       note: '20% / năm',
-      termName: 'Trước Số Ngày Tham Gia Tối Thiểu',
+      termName: 'Khi kết thúc hợp đồng trước 90 ngày',
     },
     {
       termKey: 'partialMonth',
@@ -52,15 +53,11 @@ const ReportBack = ({
     },
   ]
 
-  console.log('term', term)
-
   let termDescription: any = termDescriptionConfig.filter((item) => {
     return item.termKey == term
   })[0]
 
   if (!startDate || !endDate) return '...'
-
-  console.log('termDescription', termDescription)
 
   let yearsObject = (dataExtra as { profitData: any })?.profitData
   let years = Object.keys(yearsObject).length
@@ -88,6 +85,7 @@ const ReportBack = ({
           <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
             {rateConfig.map((item: any) => {
               let _termDescription: any = termDescriptionConfig.filter((x) => {
+                console.log('report back item', item)
                 return x.termKey == item.term
               })[0]
 
@@ -95,10 +93,10 @@ const ReportBack = ({
                 <li key={item.term}>
                   {_termDescription.termName}{' '}
                   <span className=" mx-1 font-semibold">
-                    {(item.rate * 100).toFixed(2)}% / tháng trọn vẹn
+                    {(item.rate_of_return * 100).toFixed(2)}% / tháng trọn vẹn
                   </span>
                   <div className="text-gray-400">
-                    <Info className="inline" /> {_termDescription.note}
+                    <Bird className="inline" /> {_termDescription.note}
                   </div>
                 </li>
               )
@@ -118,11 +116,11 @@ const ReportBack = ({
           gian kéo dài trong vòng <span className="text-primary mx-1 font-bold">{years} năm</span>
         </li>
         <li>
-          Tôi có thể chấm dứt hợp đồng khi đủ điều kiện tham gia tối thiểu{' '}
-          <span className="text-primary mx-1 font-semibold">{standardApplyProgramDays} ngày</span>{' '}
+          Lãi suất của kì hạn được áp dụng khi tham gia tối thiểu{' '}
+          <span className="text-primary mx-1 font-bold">{90}</span> ngày
         </li>
         <li>
-          Cụ thể, tôi có thể tiến hành rút lãi và gốc vào ngày
+          Lãi suất của kì hạn được áp dụng vào ngày
           <span className="text-primary mx-1 font-semibold">
             (thứ {standardApplyProgramDays + 1})
           </span>

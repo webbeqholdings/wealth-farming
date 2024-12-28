@@ -30,6 +30,7 @@ import {
 } from '@/lib/investment-products/dynamicFund'
 import { getProducts } from '@/lib/investment-products/localApi'
 import { createTransactionInvestment } from '@/lib/transaction'
+import { getPublicProducts } from '@/lib/investment-products/dynamicFundQuery'
 
 import { useToast } from '@/hooks/use-toast'
 import { notifyInvestment } from '@/lib/telegram'
@@ -45,20 +46,27 @@ export function InvestmentProcessForm({
   onCalculate: (data: any) => void
   onRequest: (data: any) => void
 }) {
-  const { isLoggedIn, loading, user } = userStatus();
+  const { isLoggedIn, loading, user } = userStatus()
   const router = useRouter()
   const tomorrow = addDays(new Date(), 0)
   const [startDate, setStartDate] = useState<Date | undefined>(tomorrow)
   const [endDate, setEndDate] = useState<Date | undefined>(addDays(startDate, minRangeDays))
-  const [term, setTerm] = useState<Term>('Annually')
+  const [term, setTerm] = useState<Term>('annually')
   const [depositAmount, setDepositAmount] = useState<number>(10000)
   const [periods, setPeriods] = useState<number>(1)
   const [dayCount, setDayCount] = useState<number>(0)
-  const [rateConfig, setRateConfig] = useState([]);
+  const [rateConfig, setRateConfig] = useState([])
 
   const { toast } = useToast()
 
   useEffect(() => {
+    const fetchRates = async () => {
+      const response = await getPublicProducts()
+      setRateConfig(response)
+    }
+
+    fetchRates()
+
     if (startDate && endDate) {
       const daysDifference = differenceInDays(endDate, startDate)
       if (daysDifference < minRangeDays) {
@@ -69,19 +77,6 @@ export function InvestmentProcessForm({
     }
     setEndDate(contractMultiPeriodEndAt(startDate, term, periods))
   }, [startDate, term, periods])
-
-  useEffect(() => {
-    const fetchRates = async () => {
-      try {
-        const response = await getProducts(); // Fetch rateConfig data
-        setRateConfig(response);
-      } catch (error) {
-        console.error('Failed to fetch rates:', error);
-      }
-    };
-
-    fetchRates();
-  }, []);
 
   const handleStartDateSelect = (date: Date | undefined) => {
     setStartDate(date)
@@ -106,6 +101,9 @@ export function InvestmentProcessForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     let profitData = []
+    console.log('...startDate', startDate)
+    console.log('...endDate', endDate)
+    console.log('...depositAmount', depositAmount)
     if (startDate && endDate && depositAmount) {
       const daysDifference = differenceInDays(endDate, startDate)
       if (daysDifference < minRangeDays) {
@@ -115,19 +113,19 @@ export function InvestmentProcessForm({
         })
       }
 
-      if (term == 'Annually') {
+      if (term == 'annually') {
         profitData = buildProfitRecordsAnnualy(depositAmount, startDate, endDate)
       }
 
-      if (term == 'Semester') {
+      if (term == 'semester') {
         profitData = buildProfitRecordsSemester(depositAmount, startDate, endDate)
       }
 
-      if (term == 'Quarterly') {
+      if (term == 'quarterly') {
         profitData = buildProfitRecordsQuarterly(depositAmount, startDate, endDate)
       }
 
-      if (term == 'Monthly') {
+      if (term == 'monthly') {
         profitData = buildProfitRecordsMonthly(depositAmount, startDate, endDate)
       }
 
@@ -152,7 +150,7 @@ export function InvestmentProcessForm({
   }
 
   const calculateBalance = (term: string) => {
-    let build;
+    let build
     if (term == 'Annually') {
       build = buildProfitRecordsAnnualy(depositAmount, startDate, endDate)
     }
@@ -168,20 +166,20 @@ export function InvestmentProcessForm({
     if (term == 'Monthly') {
       build = buildProfitRecordsMonthly(depositAmount, startDate, endDate)
     }
-    const year = getYear(endDate);
-    const month = format(endDate, 'MM');
+    const year = getYear(endDate)
+    const month = format(endDate, 'MM')
 
     const dateProfitFilter = build[year].filter((item: any) => {
-      return format(item.date, 'MM') === month;
-    });
+      return format(item.date, 'MM') === month
+    })
     if (!dateProfitFilter.length) {
-      return 0;
+      return 0
     }
-    return dateProfitFilter[0]?.balance;
-  };
+    return dateProfitFilter[0]?.balance
+  }
 
   const calculateProfit = (term: string) => {
-    let build;
+    let build
     if (term == 'Annually') {
       build = buildProfitRecordsAnnualy(depositAmount, startDate, endDate)
     }
@@ -197,24 +195,23 @@ export function InvestmentProcessForm({
     if (term == 'Monthly') {
       build = buildProfitRecordsMonthly(depositAmount, startDate, endDate)
     }
-    const year = getYear(endDate);
-    const month = format(endDate, 'MM');
+    const year = getYear(endDate)
+    const month = format(endDate, 'MM')
 
     const dateProfitFilter = build[year].filter((item: any) => {
-      return format(item.date, 'MM') === month;
-    });
+      return format(item.date, 'MM') === month
+    })
     if (!dateProfitFilter.length) {
-      return 0;
+      return 0
     }
-    return dateProfitFilter[0]?.profit;
-  };
+    return dateProfitFilter[0]?.profit
+  }
 
   const handleInvestment = async () => {
-
     // If the user is not logged in, redirect to the join page
     if (!isLoggedIn) {
-      router.push('../../join');
-      return; // Optional: Show a redirect message
+      router.push('../../join')
+      return // Optional: Show a redirect message
     }
 
     if (startDate && endDate && depositAmount > 0) {
@@ -225,7 +222,7 @@ export function InvestmentProcessForm({
         term: term,
         startDate: startDate,
         endDate: endDate,
-        periods: periods
+        periods: periods,
       }
       const response: any = await createTransactionInvestment(formData)
       if (response.error) {
@@ -233,8 +230,8 @@ export function InvestmentProcessForm({
           title: 'Error',
           description: response.message,
           variant: 'destructive',
-        });
-        return;
+        })
+        return
       }
 
       notifyInvestment(response.data)
@@ -242,14 +239,14 @@ export function InvestmentProcessForm({
         title: 'Success',
         description: 'Investment request has been submitted.',
         variant: 'default',
-      });
+      })
       router.push('../../investment-contracts')
     } else {
       toast({
         title: 'Error',
         description: 'Please ensure all fields are filled out correctly.',
         variant: 'destructive',
-      });
+      })
     }
   }
 
@@ -278,14 +275,14 @@ export function InvestmentProcessForm({
                 <SelectValue placeholder="Select term" />
               </SelectTrigger>
               <SelectContent>
-                {rateConfig
-                  .filter((item) => item.isShowForm == true)
-                  .map((rate) => (
-                    <SelectItem key={rate.term} value={rate.term}>
-                      {rate.term}
-                      <span className="text-gray-400 mx-3">{(rate.rate * 100).toFixed(2)}%</span>
-                    </SelectItem>
-                  ))}
+                {rateConfig.map((rate) => (
+                  <SelectItem key={rate.term} value={rate.term}>
+                    {rate.product_name}
+                    <span className="text-gray-400 mx-3">
+                      {(rate.rate_of_return * 100).toFixed(2)}% / Tháng
+                    </span>
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -296,8 +293,9 @@ export function InvestmentProcessForm({
               <PopoverTrigger asChild>
                 <Button
                   variant={'outline'}
-                  className={`w-full justify-start text-left font-normal ${!startDate && 'text-muted-foreground'
-                    }`}
+                  className={`w-full justify-start text-left font-normal ${
+                    !startDate && 'text-muted-foreground'
+                  }`}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {startDate ? format(startDate, 'PPP') : 'Pick a date'}
@@ -322,8 +320,9 @@ export function InvestmentProcessForm({
               <PopoverTrigger asChild>
                 <Button
                   variant={'outline'}
-                  className={`w-full justify-start text-left font-normal ${!endDate && 'text-muted-foreground'
-                    }`}
+                  className={`w-full justify-start text-left font-normal ${
+                    !endDate && 'text-muted-foreground'
+                  }`}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {endDate ? format(endDate, 'PPP') : 'Pick a date'}
@@ -360,12 +359,12 @@ export function InvestmentProcessForm({
           </Button>
         </form>
         <Button
-            type="button"
-            onClick={() => handleInvestment()}
-            className="w-full mt-2 bg-green-600 text-white hover:bg-green-500"
-          >
-            Submit Investment
-          </Button>
+          type="button"
+          onClick={() => handleInvestment()}
+          className="w-full mt-2 bg-green-600 text-white hover:bg-green-500"
+        >
+          Submit Investment
+        </Button>
       </CardContent>
     </Card>
   )

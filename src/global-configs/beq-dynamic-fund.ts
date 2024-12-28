@@ -50,7 +50,7 @@ const GcBeQDynamicFund: GlobalConfig = {
     {
       name: 'referral_config_rates',
       type: 'json',
-      label: 'Standard Days',
+      label: 'Referral Config Rates',
       defaultValue: [
         {
           name: 'Level 1',

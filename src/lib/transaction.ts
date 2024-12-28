@@ -201,3 +201,53 @@ export const IsInvest = async (user_id: number): Promise<Boolean> => {
 
   return !!res.totalDocs
 }
+
+export const getTotalBonusByProduct = async (
+  product_id: number,
+  user_id: number,
+): Promise<number> => {
+  let total = 0
+
+  const account_id = await getAccountIdInvestmentByUser(user_id)
+
+  const res = await payload.find({
+    collection: 'transactions',
+    where: {
+      investment_product: { equals: product_id },
+      status: { equals: 'completed' },
+      type: { equals: 'bonus' },
+      from_account: { equals: account_id },
+    },
+  })
+
+  if (!res.totalDocs) return 0
+
+  res.docs.forEach((t: any) => {
+    total += t.amount
+  })
+
+  return total
+}
+
+export const getTransactionsBonusByProduct = async (
+  product_id: number,
+  user_id: number,
+): Promise<any[]> => {
+  let total = 0
+
+  const account_id = await getAccountIdInvestmentByUser(user_id)
+
+  const res = await payload.find({
+    collection: 'transactions',
+    where: {
+      investment_product: { equals: product_id },
+      status: { equals: 'completed' },
+      type: { equals: 'bonus' },
+      from_account: { equals: account_id },
+    },
+  })
+
+  if (!res.totalDocs) return []
+
+  return res.docs
+}

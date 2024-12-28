@@ -11,7 +11,6 @@ export const gcDynamicFund = async () => {
   const response = await payload.findGlobal({
     slug: 'gc-beq-dynamic-fund',
   })
-  console.log('gc-beq-dynamic-fund', response)
 
   return response
 }
