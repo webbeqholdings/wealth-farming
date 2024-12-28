@@ -8,11 +8,20 @@ const payload = await getPayload({
 })
 
 export const gcDynamicFund = async () => {
-  const response = await payload.findGlobal({
-    slug: 'gc-beq-dynamic-fund',
+  const req = await fetch('http://localhost:3000/api/globals/gc-beq-dynamic-fund', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
   })
+  const data = await req.json()
+  console.log('data', data)
 
-  return response
+  // const response = await payload.findGlobal({
+  //   slug: 'gc-beq-dynamic-fund',
+  // })
+
+  return data
 }
 
 // ::: PUBLIC PRODUCTS :::
@@ -23,7 +32,7 @@ export const getPublicProducts = async () => {
 
 export const getPublicProductsIDs = async () => {
   const data = await getPublicProducts()
-  return data.map((prod) => {
+  return data.map((prod: any) => {
     console.log('product id', (prod as { id: number }).id)
     return (prod as { id: number }).id
   })
@@ -42,7 +51,7 @@ export const getEmployeePlusProducts = async () => {
 
 export const getEmployeePlusProductsIDs = async () => {
   const data = await getEmployeePlusProducts()
-  return data.map((prod) => {
+  return data.map((prod: any) => {
     return (prod as { id: number }).id
   })
 }
@@ -59,7 +68,7 @@ export const getEmployeePlusUsers = async () => {
 
 export const getEmployeePlusUsersIDs = async () => {
   const data = await getEmployeePlusUsers()
-  return data.map((prod) => {
+  return data.map((prod: any) => {
     return (prod as { id: number }).id
   })
 }
@@ -77,7 +86,7 @@ export const getReferralProducts = async () => {
 
 export const getReferralProductsIDs = async () => {
   const data = await getReferralProducts()
-  return data.map((prod) => {
+  return data.map((prod: any) => {
     return (prod as { id: number }).id
   })
 }

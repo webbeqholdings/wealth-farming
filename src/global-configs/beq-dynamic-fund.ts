@@ -4,6 +4,9 @@ import { GlobalConfig } from 'payload'
 const GcBeQDynamicFund: GlobalConfig = {
   slug: 'gc-beq-dynamic-fund',
   label: 'BeQ Dynamic Fund Config',
+  access: {
+    read: () => true,
+  },
 
   fields: [
     {

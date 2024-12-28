@@ -65,6 +65,14 @@ export function InvestmentProcessForm({
         setIsSiteLoading(true)
         const response: any = await getPublicProducts()
         setRateConfig(response)
+        // const req = await fetch('http://localhost:3000/api/globals/gc-beq-dynamic-fund', {
+        //   method: 'GET',
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //   },
+        // })
+        // const data = await req.json()
+        // console.log('...data', data)
       } finally {
         setIsSiteLoading(false)
       }
