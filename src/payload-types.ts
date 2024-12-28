@@ -126,7 +126,7 @@ export interface Account {
   account_name: string;
   account_number: number;
   amount: number;
-  type: 'investment' | 'main' | 'referral_reward';
+  type?: ('investment' | 'main' | 'referral_reward') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1170,7 +1170,7 @@ export interface GcBeqDynamicFund {
   public_products: (number | InvestmentProduct)[];
   employee_plus_products?: (number | InvestmentProduct)[] | null;
   employee_users?: (number | User)[] | null;
-  'before-standard-product'?: (number | null) | InvestmentProduct;
+  'Before Standard Product'?: (number | null) | InvestmentProduct;
   referral_products?: (number | InvestmentProduct)[] | null;
   standard_days?: number | null;
   referral_config_rates?:
@@ -1303,7 +1303,7 @@ export interface GcBeqDynamicFundSelect<T extends boolean = true> {
   public_products?: T;
   employee_plus_products?: T;
   employee_users?: T;
-  'before-standard-product'?: T;
+  'Before Standard Product'?: T;
   referral_products?: T;
   standard_days?: T;
   referral_config_rates?: T;

@@ -9,7 +9,7 @@ import {
 } from '@/lib/investment-products/dynamicFund'
 import { format, getYear } from 'date-fns';
 
-const calculateProfit = (term: string, availableBalance: number, startDate: Date) => {
+const calculateProfit = (term: string, availableBalance: number, startDate: Date, type: string) => {
     const today = new Date();
     let build;
     if (term == 'Annually') {
@@ -36,7 +36,13 @@ const calculateProfit = (term: string, availableBalance: number, startDate: Date
     if (!dateProfitFilter.length) {
         return 0;
     }
-    return dateProfitFilter[0]?.profit;
+
+    if(type == 'profit'){
+        return dateProfitFilter[0]?.profit;
+    }
+    if(type == 'balance'){
+        return dateProfitFilter[0]?.balance;
+    }
 };
 
 export const updateProfitHandler: TaskHandler<{
@@ -80,8 +86,8 @@ export const updateProfitHandler: TaskHandler<{
             profitToday = (daysSinceStart * amount * 20) / (255 * 100); // Adjust calculation as necessary
             balanceToday = amount
         } else {
-            profitToday = calculateProfit(term, balance, new Date(start_date));
-            balanceToday = balance
+            profitToday = calculateProfit(term, amount, new Date(start_date), 'profit');
+            balanceToday = calculateProfit(term, amount, new Date(start_date), 'balance');
         }
 
         await payload.update({
@@ -89,7 +95,7 @@ export const updateProfitHandler: TaskHandler<{
             id: contract.id,
             data: {
                 profit: profitToday,
-                balance: profitToday + balanceToday,
+                balance: balanceToday,
             },
         });
 
