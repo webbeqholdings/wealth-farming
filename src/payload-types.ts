@@ -122,7 +122,7 @@ export interface Account {
   account_name: string;
   account_number: number;
   amount: number;
-  type: 'investment' | 'main' | 'referral_reward';
+  type?: ('investment' | 'main' | 'referral_reward') | null;
   updatedAt: string;
   createdAt: string;
 }
