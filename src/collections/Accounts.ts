@@ -45,7 +45,6 @@ const Accounts: CollectionConfig = {
       ],
       label: 'Amount',
       defaultValue: 'investment',
-      required: true,
     },
   ],
 }
