@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { BirthdayInput } from '@/components/auth/BirthdayInput'
 
 import { Mail, Lock, Eye, EyeOff, PhoneCall } from 'lucide-react'
 import {
@@ -21,6 +22,7 @@ import { SiteFooter } from '@/components/site-footer'
 import { z } from 'zod'
 import { useToast } from '@/hooks/use-toast'
 import { useParams } from 'next/navigation'
+import { DateField } from 'payload'
 
 // Define Zod schemas
 const loginSchema = z.object({
@@ -44,7 +46,7 @@ export default function Page() {
   const [showPassword, setShowPassword] = useState(false)
 
   const params = useParams()
-  const urlReferralCode = params.ref;
+  const urlReferralCode = params.ref
 
   // Click Submit
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>, type: '/login' | '') => {
@@ -58,13 +60,14 @@ export default function Page() {
     const first_name = formData.get('first_name') as string
     const last_name = formData.get('last_name') as string
     const referral_code = formData.get('referral_code') as string
+    const date_of_birth = formData.get('date_of_birth') as string
 
     // Select schema based on form type
     const schema = type === '/login' ? loginSchema : registerSchema
     const actionAuth = type === '/login' ? 'login' : 'register'
 
     // Parse and validate data with Zod
-    const result = schema.safeParse({ email, password, first_name, last_name })
+    const result = schema.safeParse({ email, password, first_name, last_name, date_of_birth })
     if (!result.success) {
       const errorMessages = result.error.errors.reduce(
         (acc, error) => {
@@ -297,6 +300,10 @@ export default function Page() {
                         )}
                       </button>
                     </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <BirthdayInput />
                   </div>
 
                   <div className="space-y-1">
