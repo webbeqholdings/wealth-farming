@@ -8,7 +8,7 @@ const payload = await getPayload({
 })
 
 export const gcDynamicFund = async () => {
-  const req = await fetch('http://localhost:3000/api/globals/gc-beq-dynamic-fund', {
+  const req = await fetch('/api/globals/gc-beq-dynamic-fund', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
