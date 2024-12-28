@@ -275,7 +275,7 @@ export function InvestmentProcessForm({
                 <SelectValue placeholder="Select term" />
               </SelectTrigger>
               <SelectContent>
-                {rateConfig.map((rate) => (
+                {rateConfig && rateConfig.map((rate) => (
                   <SelectItem key={rate.term} value={rate.term}>
                     {rate.product_name}
                     <span className="text-gray-400 mx-3">
