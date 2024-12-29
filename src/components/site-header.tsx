@@ -108,9 +108,9 @@ export function SiteHeader() {
                       <span>Referral Reward</span>
                     </DropdownMenuItem>
 
-                    <DropdownMenuItem>
-                      <Settings className="mr-2 h-4 w-4" />
-                      <span>Settings</span>
+                    <DropdownMenuItem onClick={() => router.push('/investment-contracts')}>
+                      <DollarSign className="mr-2 h-4 w-4" />
+                      <span>Contract</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleLogout}>
                       <LogOut className="mr-2 h-4 w-4" />
