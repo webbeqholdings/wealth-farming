@@ -66,7 +66,7 @@ const Withdrawals: CollectionConfig = {
                         collection: 'accounts',
                         where: {
                             user: { equals: data.user }, // Match the user
-                            account_name: { equals: 'Investment Account' }, // Match the account name
+                            type: { equals: 'investment' }, // Match the account name
                         },
                     });
 
