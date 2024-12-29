@@ -255,7 +255,7 @@ export default function DepositPage() {
       });
 
       const data = await response.json();
-      await notifyDeposit(data.data); // Call notifyDeposit and get its response
+      notifyDeposit(data.data); // Call notifyDeposit and get its response
       if (!response.ok) {
         // Parse the error response to retrieve the error message
         const errorResponse = await response.json();
