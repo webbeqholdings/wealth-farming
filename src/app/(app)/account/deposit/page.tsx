@@ -93,6 +93,7 @@ export default function DepositPage() {
   const [fromAccount, setFromAccount] = useState(null);
   const [selectedBalance, setSelectedBalance] = useState(0)
   const [exchangeRate, setExchangeRate] = useState(1); // Default exchange rate
+  const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const quickAmounts = [
     { label: '500K', value: 500000 },
     { label: '1M', value: 1000000 },
@@ -104,7 +105,14 @@ export default function DepositPage() {
   const [convertedQuickAmounts, setConvertedQuickAmounts] = useState(quickAmounts);
 
   const handleNextStep = () => {
-    if (step < 3) setStep(step + 1)
+    if (validateStep()) {
+      if (step < 3) setStep(step + 1)
+    } else {
+      toast({
+        title: 'Please correct the highlighted errors.',
+        description: 'Some fields are missing or invalid.',
+      })
+    }
   }
 
   const handlePreviousStep = () => {
@@ -122,8 +130,27 @@ export default function DepositPage() {
     setSelectBank(bankId.toString()); // Convert the string to a number
   };
 
-   // Fetch exchange rate when the currency changes
-   useEffect(() => {
+  const validateStep = () => {
+    const newErrors: { [key: string]: string } = {}
+
+    if (step === 1) {
+      if (!fromAccount) newErrors.fromAccount = 'Please select an account.'
+      if (!amount || Number(amount) <= 0) newErrors.amount = 'Please enter a valid deposit amount.'
+      if (!selectBank) newErrors.selectBank = 'Please select a bank.'
+    }
+
+    if (step === 3) {
+      if (!amount || Number(amount) <= 0) newErrors.amount = 'Amount is required for confirmation.'
+      if (!fromAccount) newErrors.fromAccount = 'Account selection is missing for confirmation.'
+      if (!selectBank) newErrors.selectBank = 'Bank selection is missing for confirmation.'
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  // Fetch exchange rate when the currency changes
+  useEffect(() => {
     const fetchExchangeRate = async () => {
       if (currency === 'USD') {
         try {
@@ -202,7 +229,14 @@ export default function DepositPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // In a real application, this would process the deposit
+    if (!validateStep()) {
+      toast({
+        title: 'Form validation failed',
+        description: 'Please review the form and fix errors before submitting.'
+      })
+      return
+    }
+
     try {
       const response = await fetch('/api/transaction/create', {
         method: 'POST',
@@ -230,11 +264,13 @@ export default function DepositPage() {
       }
       toast({
         title: 'Transaction created successfully',
+        description: 'Your deposit is being processed.',
       })
     } catch (error) {
       console.error('Error creating transaction:', error);
       toast({
-        title: `${error}`,
+        title: 'Transaction failed',
+        description: String(error),
       })
     }
     router.push('/account/history') // Assuming there's a dashboard page to redirect to
@@ -242,6 +278,7 @@ export default function DepositPage() {
 
   return (
     <>
+      {/* Render Steps and Errors */}
       <SiteHeader />
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">My Deposit</h1>
@@ -261,7 +298,7 @@ export default function DepositPage() {
               {step === 1 && (
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="fromAccount">From Account</Label>
+                    <Label htmlFor="fromAccount">Account</Label>
                     <Select value={fromAccount} onValueChange={handleFromAccountChange}>
                       <SelectTrigger id="fromAccount">
                         <SelectValue placeholder="Select account" />
@@ -275,10 +312,12 @@ export default function DepositPage() {
                       </SelectContent>
                     </Select>
                     <p className="text-sm text-muted-foreground">Balance: {selectedBalance.toLocaleString('en-US', {
-                              style: 'currency',
-                              currency: 'USD',
-                            })}</p>
+                      style: 'currency',
+                      currency: 'USD',
+                    })}</p>
+                    {errors.fromAccount && <p className="text-red-500 text-sm">{errors.fromAccount}</p>}
                   </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="amount">Deposit Amount</Label>
                     <div className="flex space-x-2">
@@ -300,6 +339,7 @@ export default function DepositPage() {
                         className="flex-1"
                       />
                     </div>
+                    {errors.amount && <p className="text-red-500 text-sm">{errors.amount}</p>}
                   </div>
                   <div className="space-y-2">
                     <Label>Quick Amount</Label>
@@ -341,6 +381,7 @@ export default function DepositPage() {
                       </div>
                     </div> : ''
                     }
+                    {errors.selectBank && <p className="text-red-500 text-sm">{errors.selectBank}</p>}
                   </div>
                 </div>
               )}

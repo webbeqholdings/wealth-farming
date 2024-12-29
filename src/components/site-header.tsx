@@ -110,7 +110,7 @@ export function SiteHeader() {
 
                     <DropdownMenuItem onClick={() => router.push('/investment-contracts')}>
                       <DollarSign className="mr-2 h-4 w-4" />
-                      <span>Contract</span>
+                      <span>Portfolio</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleLogout}>
                       <LogOut className="mr-2 h-4 w-4" />
