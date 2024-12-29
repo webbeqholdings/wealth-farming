@@ -37,10 +37,10 @@ const calculateProfit = (term: string, availableBalance: number, startDate: Date
         return 0;
     }
 
-    if(type == 'profit'){
+    if (type == 'profit') {
         return dateProfitFilter[0]?.profit;
     }
-    if(type == 'balance'){
+    if (type == 'balance') {
         return dateProfitFilter[0]?.balance;
     }
 };
@@ -68,8 +68,8 @@ export const updateProfitHandler: TaskHandler<{
     // Iterate through each contract to update profit and balance
     for (const contract of contracts) {
         const { product_log, amount, balance, term, start_date } = contract;
-        let profitToday;
-        let balanceToday;
+        let profitToday = 0;
+        let balanceToday = 0;
         // Ensure product_log is an object and has rate_of_return
         if (typeof product_log !== 'object' || product_log === null || !('rate_of_return' in product_log) || typeof product_log.rate_of_return !== 'number' || amount === undefined) {
             console.warn(`Skipping contract ID: ${contract.id} due to missing or invalid product_log`);
@@ -82,10 +82,11 @@ export const updateProfitHandler: TaskHandler<{
         }
 
         const daysSinceStart = Math.floor((new Date().getTime() - parsedStartDate.getTime()) / (1000 * 60 * 60 * 24));
-        if (daysSinceStart <= 30) {
+        if (daysSinceStart <= 30 && daysSinceStart >= 0) {
             profitToday = (daysSinceStart * amount * 20) / (255 * 100); // Adjust calculation as necessary
             balanceToday = amount
-        } else {
+        }
+        if (daysSinceStart > 30) {
             profitToday = calculateProfit(term, amount, new Date(start_date), 'profit');
             balanceToday = calculateProfit(term, amount, new Date(start_date), 'balance');
         }

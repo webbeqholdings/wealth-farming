@@ -46,11 +46,13 @@ export function InvestmentProcessForm({
   onCalculate: (data: any) => void
   onRequest: (data: any) => void
 }) {
+  const { isLoggedIn, loading, user } = userStatus()
   const router = useRouter()
   const tomorrow = addDays(new Date(), 0)
   const [startDate, setStartDate] = useState<Date | undefined>(tomorrow)
   const [endDate, setEndDate] = useState<Date | undefined>(addDays(startDate, minRangeDays))
-  const [term, setTerm] = useState<Term>('annually')
+  const [term, setTerm] = useState<any>('annually')
+  const [productName, setProductName] = useState()
   const [depositAmount, setDepositAmount] = useState<number>(10000)
   const [periods, setPeriods] = useState<number>(1)
   const [dayCount, setDayCount] = useState<number>(0)
@@ -161,19 +163,19 @@ export function InvestmentProcessForm({
 
   const calculateBalance = (term: string) => {
     let build
-    if (term == 'Annually') {
+    if (term == 'annually') {
       build = buildProfitRecordsAnnualy(depositAmount, startDate, endDate)
     }
 
-    if (term == 'Semester') {
+    if (term == 'semester') {
       build = buildProfitRecordsSemester(depositAmount, startDate, endDate)
     }
 
-    if (term == 'Quarterly') {
+    if (term == 'quarterly') {
       build = buildProfitRecordsQuarterly(depositAmount, startDate, endDate)
     }
 
-    if (term == 'Monthly') {
+    if (term == 'monthly') {
       build = buildProfitRecordsMonthly(depositAmount, startDate, endDate)
     }
     const year = getYear(endDate)
@@ -190,19 +192,19 @@ export function InvestmentProcessForm({
 
   const calculateProfit = (term: string) => {
     let build
-    if (term == 'Annually') {
+    if (term == 'annually') {
       build = buildProfitRecordsAnnualy(depositAmount, startDate, endDate)
     }
 
-    if (term == 'Semester') {
+    if (term == 'semester') {
       build = buildProfitRecordsSemester(depositAmount, startDate, endDate)
     }
 
-    if (term == 'Quarterly') {
+    if (term == 'quarterly') {
       build = buildProfitRecordsQuarterly(depositAmount, startDate, endDate)
     }
 
-    if (term == 'Monthly') {
+    if (term == 'monthly') {
       build = buildProfitRecordsMonthly(depositAmount, startDate, endDate)
     }
     const year = getYear(endDate)
@@ -218,7 +220,6 @@ export function InvestmentProcessForm({
   }
 
   const handleInvestment = async () => {
-    const { isLoggedIn, loading, user } = userStatus()
     // If the user is not logged in, redirect to the join page
     if (!isLoggedIn) {
       router.push('../../join')
@@ -227,8 +228,8 @@ export function InvestmentProcessForm({
 
     if (startDate && endDate && depositAmount > 0) {
       const formData = {
+        productName: productName,
         expectedReturn: calculateBalance(term),
-        profit: calculateProfit(term),
         amount: depositAmount,
         term: term,
         startDate: startDate,
@@ -283,7 +284,16 @@ export function InvestmentProcessForm({
 
           <div className="space-y-2">
             <Label htmlFor="term">Kì Hạn Rút Lãi</Label>
-            <Select value={term} onValueChange={(value: Term) => setTerm(value)}>
+            <Select
+              value={term}
+              onValueChange={(value: string) => {
+                const selectedRate = rateConfig.find((rate) => rate.term === value);
+                if (selectedRate) {
+                  setTerm(selectedRate.term);
+                  setProductName(selectedRate.product_name); // Update the product ID here
+                }
+              }}
+            >
               <SelectTrigger id="term">
                 <SelectValue placeholder="Select term" />
               </SelectTrigger>
@@ -301,15 +311,15 @@ export function InvestmentProcessForm({
             </Select>
           </div>
 
+
           <div className="space-y-2">
             <Label htmlFor="startDate">Ngày tham gia</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant={'outline'}
-                  className={`w-full justify-start text-left font-normal ${
-                    !startDate && 'text-muted-foreground'
-                  }`}
+                  className={`w-full justify-start text-left font-normal ${!startDate && 'text-muted-foreground'
+                    }`}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {startDate ? format(startDate, 'PPP') : 'Pick a date'}
@@ -334,9 +344,8 @@ export function InvestmentProcessForm({
               <PopoverTrigger asChild>
                 <Button
                   variant={'outline'}
-                  className={`w-full justify-start text-left font-normal ${
-                    !endDate && 'text-muted-foreground'
-                  }`}
+                  className={`w-full justify-start text-left font-normal ${!endDate && 'text-muted-foreground'
+                    }`}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {endDate ? format(endDate, 'PPP') : 'Pick a date'}
