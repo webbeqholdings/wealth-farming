@@ -42,6 +42,6 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
 
 export async function down({ payload, req }: MigrateDownArgs): Promise<void> {
   await payload.db.drizzle.execute(sql`
-   DROP TABLE "gc_payment_transfer";
-  DROP TYPE "public"."enum_gc_payment_transfer_crypto_wallet_network";`)
+   DROP CASCADE TABLE "gc_payment_transfer";
+  DROP CASCADE TYPE "public"."enum_gc_payment_transfer_crypto_wallet_network";`)
 }

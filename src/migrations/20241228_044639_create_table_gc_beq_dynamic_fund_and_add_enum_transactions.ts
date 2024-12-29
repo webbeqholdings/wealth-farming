@@ -57,12 +57,12 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
 
 export async function down({ payload, req }: MigrateDownArgs): Promise<void> {
   await payload.db.drizzle.execute(sql`
-   DROP TABLE "gc_beq_dynamic_fund";
-  DROP TABLE "gc_beq_dynamic_fund_rels";
+   DROP CASCADE TABLE "gc_beq_dynamic_fund";
+  DROP CASCADE TABLE "gc_beq_dynamic_fund_rels";
   ALTER TABLE "accounts" DROP COLUMN IF EXISTS "type";
   ALTER TABLE "public"."transactions" ALTER COLUMN "type" SET DATA TYPE text;
-  DROP TYPE "public"."enum_transactions_type";
+  DROP CASCADE TYPE "public"."enum_transactions_type";
   CREATE TYPE "public"."enum_transactions_type" AS ENUM('deposit', 'withdraw', 'bonus', 'transfer', 'investment');
   ALTER TABLE "public"."transactions" ALTER COLUMN "type" SET DATA TYPE "public"."enum_transactions_type" USING "type"::"public"."enum_transactions_type";
-  DROP TYPE "public"."enum_accounts_type";`)
+  DROP CASCADE TYPE "public"."enum_accounts_type";`)
 }
