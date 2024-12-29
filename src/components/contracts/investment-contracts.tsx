@@ -242,7 +242,7 @@ export function InvestmentContracts() {
                                                     {formatCurrency(investment.availableBalance)}
                                                 </TableCell>
                                                 <TableCell>{formatCurrency(investment.profit)}</TableCell>
-                                                <TableCell>{investment.rateOfReturn * 100}%</TableCell>
+                                                <TableCell>{(investment.rateOfReturn * 100).toFixed(2)}%</TableCell>
                                                 <TableCell>{investment.term}</TableCell>
                                                 <TableCell>{new Date(investment.startDate).toLocaleDateString()}</TableCell>
                                                 <TableCell>{new Date(investment.endDate).toLocaleDateString()}</TableCell>
