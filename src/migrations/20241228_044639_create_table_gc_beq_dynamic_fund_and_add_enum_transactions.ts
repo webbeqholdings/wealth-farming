@@ -57,12 +57,31 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
 
 export async function down({ payload, req }: MigrateDownArgs): Promise<void> {
   await payload.db.drizzle.execute(sql`
-   DROP TABLE "gc_beq_dynamic_fund";
-  DROP TABLE "gc_beq_dynamic_fund_rels";
-  ALTER TABLE "accounts" DROP COLUMN IF EXISTS "type";
-  ALTER TABLE "public"."transactions" ALTER COLUMN "type" SET DATA TYPE text;
-  DROP TYPE "public"."enum_transactions_type";
-  CREATE TYPE "public"."enum_transactions_type" AS ENUM('deposit', 'withdraw', 'bonus', 'transfer', 'investment');
-  ALTER TABLE "public"."transactions" ALTER COLUMN "type" SET DATA TYPE "public"."enum_transactions_type" USING "type"::"public"."enum_transactions_type";
-  DROP TYPE "public"."enum_accounts_type";`)
+    -- Drop tables with cascade
+    DROP TABLE IF EXISTS "gc_beq_dynamic_fund_rels" CASCADE;
+    DROP TABLE IF EXISTS "gc_beq_dynamic_fund" CASCADE;
+
+    -- Alter 'accounts' table
+    ALTER TABLE "accounts" DROP COLUMN IF EXISTS "type";
+
+    -- Alter 'transactions' table type safely
+    ALTER TABLE "public"."transactions" ALTER COLUMN "type" SET DATA TYPE text;
+
+    -- Drop and recreate 'enum_transactions_type' with cascade
+    DO $$ BEGIN
+      IF EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_transactions_type') THEN
+        DROP TYPE "public"."enum_transactions_type" CASCADE;
+      END IF;
+    END $$;
+    CREATE TYPE "public"."enum_transactions_type" AS ENUM('deposit', 'withdraw', 'bonus', 'transfer', 'investment');
+    ALTER TABLE "public"."transactions" ALTER COLUMN "type" SET DATA TYPE "public"."enum_transactions_type" USING "type"::"public"."enum_transactions_type";
+
+    -- Drop 'enum_accounts_type' safely with cascade
+    DO $$ BEGIN
+      IF EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_accounts_type') THEN
+        DROP TYPE "public"."enum_accounts_type" CASCADE;
+      END IF;
+    END $$;
+  `);
 }
+
