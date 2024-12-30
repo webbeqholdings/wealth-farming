@@ -39,6 +39,24 @@ const GcPaymentTransfer: GlobalConfig = {
       defaultValue: 'TRC20',
     },
     {
+      name: 'min_deposit',
+      type: 'number',
+      label: 'Min Deposit',
+      defaultValue: 1000,
+    },
+    {
+      name: 'min_withdrawal',
+      type: 'number',
+      label: 'Min Withdrawal',
+      defaultValue: 10,
+    },
+    {
+      name: 'min_transfer',
+      type: 'number',
+      label: 'Min Transfer',
+      defaultValue: 1,
+    },
+    {
       name: 'usd_to_vnd',
       type: 'number',
       label: 'USD to VND',
