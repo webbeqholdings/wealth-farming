@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { CalendarIcon } from 'lucide-react'
-import { format, differenceInDays, isBefore, addDays, getYear } from 'date-fns'
+import { format, differenceInDays, isBefore, isEqual, addDays, getYear } from 'date-fns'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
@@ -37,7 +37,10 @@ import { notifyInvestment } from '@/lib/telegram'
 import { useRouter } from 'next/navigation'
 import userStatus from '@/lib/userStatus'
 
-const minRangeDays = 15
+const minRangeDays = 5
+const now = new Date()
+const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0)
+const tomorrow = addDays(startOfDay, 1)
 
 export function InvestmentProcessForm({
   onCalculate,
@@ -46,9 +49,9 @@ export function InvestmentProcessForm({
   onCalculate: (data: any) => void
   onRequest: (data: any) => void
 }) {
-  const { isLoggedIn, loading, user } = userStatus()
+  const { isLoggedIn } = userStatus()
   const router = useRouter()
-  const tomorrow = addDays(new Date(), 0)
+
   const [startDate, setStartDate] = useState<Date | undefined>(tomorrow)
   const [endDate, setEndDate] = useState<Date | undefined>(addDays(startDate, minRangeDays))
   const [term, setTerm] = useState<any>('annually')
@@ -62,24 +65,23 @@ export function InvestmentProcessForm({
   const { toast } = useToast()
 
   useEffect(() => {
-    const fetchRates = async () => {
-      try {
-        setIsSiteLoading(true)
-        const response: any = await getPublicProducts()
-        setRateConfig(response)
-      } finally {
-        setIsSiteLoading(false)
-      }
+    if (startDate === undefined) {
+      setStartDate(tomorrow)
     }
 
-    fetchRates()
+    if (isSiteLoading) {
+      const fetchRates = async () => {
+        try {
+          setIsSiteLoading(true)
+          const response: any = await getPublicProducts()
+          setRateConfig(response)
+        } finally {
+          setIsSiteLoading(false)
+        }
+      }
 
-    // const fetchRates = async () => {
-    //   const response = await getPublicProducts()
-    //   setRateConfig(response)
-    // }
-
-    // fetchRates()
+      fetchRates()
+    }
 
     if (startDate && endDate) {
       const daysDifference = differenceInDays(endDate, startDate)
@@ -93,6 +95,10 @@ export function InvestmentProcessForm({
   }, [startDate, term, periods])
 
   const handleStartDateSelect = (date: Date | undefined) => {
+    if (date === undefined) {
+      date = tomorrow
+    }
+
     setStartDate(date)
     if (endDate && date) {
       const daysDifference = differenceInDays(endDate, date)
@@ -143,7 +149,6 @@ export function InvestmentProcessForm({
 
       onCalculate(profitData)
 
-      console.log('... ... profitData', profitData)
       onRequest({
         amount: depositAmount,
         term: term,
@@ -262,7 +267,7 @@ export function InvestmentProcessForm({
     }
   }
 
-  if (isSiteLoading) return <div>Loading rate configurations...</div>
+  if (isSiteLoading) return <div className="text-center">Loading rate configurations...</div>
 
   return (
     <Card>
@@ -287,10 +292,10 @@ export function InvestmentProcessForm({
             <Select
               value={term}
               onValueChange={(value: string) => {
-                const selectedRate = rateConfig.find((rate) => rate.term === value);
+                const selectedRate = rateConfig.find((rate) => rate.term === value)
                 if (selectedRate) {
-                  setTerm(selectedRate.term);
-                  setProductName(selectedRate.product_name); // Update the product ID here
+                  setTerm(selectedRate.term)
+                  setProductName(selectedRate.product_name) // Update the product ID here
                 }
               }}
             >
@@ -311,15 +316,15 @@ export function InvestmentProcessForm({
             </Select>
           </div>
 
-
           <div className="space-y-2">
             <Label htmlFor="startDate">Ngày tham gia</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant={'outline'}
-                  className={`w-full justify-start text-left font-normal ${!startDate && 'text-muted-foreground'
-                    }`}
+                  className={`w-full justify-start text-left font-normal ${
+                    !startDate && 'text-muted-foreground'
+                  }`}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {startDate ? format(startDate, 'PPP') : 'Pick a date'}
@@ -330,7 +335,9 @@ export function InvestmentProcessForm({
                   mode="single"
                   selected={startDate}
                   onSelect={handleStartDateSelect}
-                  disabled={(date) => isBefore(date, tomorrow)}
+                  disabled={(date) => {
+                    return isBefore(date, tomorrow)
+                  }}
                   defaultMonth={startDate || tomorrow}
                   initialFocus
                 />
@@ -344,8 +351,9 @@ export function InvestmentProcessForm({
               <PopoverTrigger asChild>
                 <Button
                   variant={'outline'}
-                  className={`w-full justify-start text-left font-normal ${!endDate && 'text-muted-foreground'
-                    }`}
+                  className={`w-full justify-start text-left font-normal ${
+                    !endDate && 'text-muted-foreground'
+                  }`}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {endDate ? format(endDate, 'PPP') : 'Pick a date'}
