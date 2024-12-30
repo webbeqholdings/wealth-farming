@@ -1,3 +1,4 @@
+import { formatDateTime } from "@/utilities/formatDateTime";
 // Create a function to make the API request
 export async function notifyDeposit(data: any) {
     try {
@@ -14,7 +15,7 @@ export async function notifyDeposit(data: any) {
                     currency: 'USD',
                 }),
                 paymentMethod: "Bank Transfer",
-                requestTime: new Date(),
+                requestTime: formatDateTime(`${new Date()}`),
                 depositId: data.id,
             }), // Convert the request body to JSON
         });
@@ -41,7 +42,7 @@ export async function notifyWithdrawl(data: any) {
                     currency: 'USD',
                 }),
                 paymentMethod: "Bank Transfer",
-                requestTime: new Date(),
+                requestTime: formatDateTime(`${new Date()}`),
                 withdrawlId: data.id,
             }), // Convert the request body to JSON
         });
@@ -67,7 +68,7 @@ export async function notifyInvestment(data: any) {
                     style: 'currency',
                     currency: 'USD',
                 }),
-                requestTime: new Date(),
+                requestTime: formatDateTime(`${new Date()}`),
                 depositId: data.id,
                 productLog: data.product_log,
                 startDate: data.start_date,
@@ -100,7 +101,7 @@ export async function notifyWithdrawlContracts(data: any) {
                     style: 'currency',
                     currency: 'USD',
                 }),
-                requestTime: new Date(),
+                requestTime: formatDateTime(`${new Date()}`),
                 withdrawlId: data.id,
                 productLog: data.contract.product_log,
                 startDate: data.contract.start_date,
