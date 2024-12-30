@@ -135,7 +135,6 @@ export default function DepositPage() {
     const newErrors: { [key: string]: string } = {}
 
     if (step === 1) {
-      console.log(USDCurrency)
       if (!fromAccount) newErrors.fromAccount = 'Please select an account.'
       if (!USDCurrency || Number(USDCurrency) <= 0)
         newErrors.USDCurrency = 'Please enter a valid deposit amount.'
