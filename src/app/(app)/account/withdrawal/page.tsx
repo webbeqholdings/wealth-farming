@@ -155,7 +155,7 @@ export default function WithdrawPage() {
         }), // Convert the request body to JSON
       });
       const data = await response.json()
-      await notifyWithdrawl(data.data)
+      notifyWithdrawl(data.data)
       if (!response.ok) {
         // Parse the error response to retrieve the error message
         const errorResponse = await response.json();
