@@ -74,7 +74,7 @@ export function CryptoWalletForm({
   async function handleDelete(accountId: string) {
     try {
       // Send a DELETE request to the API to delete the bank account
-      const response = await fetch(`/api/crypto_wallets/${Number(accountId)}`, {
+      const response = await fetch(`/api/crypto-wallets/${Number(accountId)}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json', // Ensure we send JSON
