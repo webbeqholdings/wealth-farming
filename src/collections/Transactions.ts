@@ -76,6 +76,12 @@ const Transactions: CollectionConfig = {
       label: 'To Account',
     },
     {
+      name: 'deposit_screenshot',
+      type: 'upload',
+      relationTo: 'media',
+      label: 'Deposit Screenshot',
+    },
+    {
       name: 'type',
       type: 'select',
       options: [
