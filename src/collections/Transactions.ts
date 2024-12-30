@@ -3,6 +3,12 @@ import type { CollectionConfig } from 'payload'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { isAdmin } from '../access/isAdmin'
+import {
+  getCurrentLevelRate,
+  getParentIdByUser,
+  getReferralProducts,
+} from '@/lib/admin-side/referrals'
+import { format } from 'date-fns'
 
 const Transactions: CollectionConfig = {
   slug: 'transactions',
@@ -76,6 +82,12 @@ const Transactions: CollectionConfig = {
       label: 'To Account',
     },
     {
+      name: 'deposit_screenshot',
+      type: 'upload',
+      relationTo: 'media',
+      label: 'Deposit Screenshot',
+    },
+    {
       name: 'type',
       type: 'select',
       options: [
@@ -96,25 +108,70 @@ const Transactions: CollectionConfig = {
         const payload = await getPayload({
           config,
         })
-        if (operation === 'update' && doc.type === 'deposit' && doc.status === 'completed') {
-          const fromAccountId = doc.from_account
-          const transactionAmount = doc.amount
+
+        const { amount, from_account, type, status } = doc
+
+        if (operation === 'update' && type === 'deposit' && status === 'completed') {
           // Fetch the existing account details
           const fromAccount = await payload.findByID({
             collection: 'accounts',
-            id: fromAccountId,
+            id: from_account,
           })
 
           if (fromAccount) {
             // Update the account amount
-            const updatedAmount = fromAccount.amount + transactionAmount
+            const updatedAmount = fromAccount.amount + amount
 
             // Save the updated account data
             await payload.update({
               collection: 'accounts',
-              id: fromAccountId,
+              id: from_account,
               data: {
                 amount: updatedAmount,
+              },
+            })
+
+            // ... Update Referral Process
+            const parentUser = await getParentIdByUser(payload, doc.user)
+            const referralRate = await getCurrentLevelRate(payload, amount)
+            const parentId = (parentUser as { id: number }).id
+            const referralAmount = amount * referralRate
+            const referralProducts = await getReferralProducts(payload)
+            const referralProduct = referralProducts.filter((prod) => {
+              return prod.term == 'annually'
+            })[0]
+
+            if (!referralProduct) return
+
+            await payload.create({
+              collection: 'transactions',
+              data: {
+                amount: Number(referralAmount),
+                user: Number(parentId),
+                investment_product: referralProduct.id,
+                status: 'completed',
+                from_account: from_account,
+                type: 'investment',
+              },
+            })
+
+            await payload.create({
+              collection: 'contracts',
+              data: {
+                user: Number(parentId),
+                amount: Number(referralAmount),
+                balance: Number(referralAmount),
+                expected_return: referralProduct.rate_of_return,
+                status: 'active',
+                term: referralProduct.term,
+                profit: 0,
+                periods: 1,
+                start_date: new Date().toISOString(),
+                end_date: null,
+                product_log: {
+                  data: referralProduct,
+                },
+                note_log: ['Contract by Referral'],
               },
             })
           }
