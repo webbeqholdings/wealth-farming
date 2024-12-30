@@ -21,7 +21,6 @@ import { SiteFooter } from '@/components/site-footer'
 import { z } from 'zod'
 import { useToast } from '@/hooks/use-toast'
 import { useParams } from 'next/navigation'
-import { formatToISODate } from '../page'
 
 // Define Zod schemas
 const loginSchema = z.object({
@@ -141,6 +140,11 @@ export default function Page() {
         description: 'An error occurred. Please try again!',
       })
     }
+  }
+
+  const formatToISODate = (dateString: string) => {
+    const [day, month, year] = dateString.split('-')
+    return `${year}-${month}-${day}`
   }
 
   const togglePasswordVisibility = () => {
