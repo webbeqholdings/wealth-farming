@@ -21,7 +21,6 @@ import { SiteFooter } from '@/components/site-footer'
 import { z } from 'zod'
 import { useToast } from '@/hooks/use-toast'
 import { useParams } from 'next/navigation'
-import { DateField } from 'payload'
 
 // Define Zod schemas
 const loginSchema = z.object({
