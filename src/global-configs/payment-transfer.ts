@@ -34,7 +34,10 @@ const GcPaymentTransfer: GlobalConfig = {
     {
       name: 'crypto_wallet_network',
       type: 'select',
-      options: [{ label: 'TRC20', value: 'TRC20' }],
+      options: [
+        { label: 'TRC20', value: 'TRC20' },
+        { label: 'BNB Smart Chain (BEP20)', value: 'BEP20' },
+      ],
       label: 'Crypto Wallet Network',
       defaultValue: 'TRC20',
     },
