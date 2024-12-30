@@ -32,9 +32,9 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
 
 export async function down({ payload, req }: MigrateDownArgs): Promise<void> {
   await payload.db.drizzle.execute(sql`
-   DROP TABLE "crypto_wallets";
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_crypto_wallets_fk";
-  
-  DROP INDEX IF EXISTS "payload_locked_documents_rels_crypto_wallets_id_idx";
-  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN IF EXISTS "crypto_wallets_id";`)
+    ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_crypto_wallets_fk";
+    ALTER TABLE "payload_locked_documents_rels" DROP COLUMN IF EXISTS "crypto_wallets_id";
+    DROP INDEX IF EXISTS "payload_locked_documents_rels_crypto_wallets_id_idx";
+    DROP TABLE "crypto_wallets";
+ `)
 }
