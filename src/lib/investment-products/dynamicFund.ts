@@ -25,12 +25,14 @@ import {
   isEndOfMonth,
 } from '@/utilities/formatDateTime'
 
+import { getTotalBonusByProduct, getTransactionsBonusByProduct } from '../transaction'
+
 export type Term =
   | 'partialMonth'
-  | 'Monthly'
-  | 'Quarterly'
-  | 'Semester'
-  | 'Annually'
+  | 'monthly'
+  | 'quarterly'
+  | 'semester'
+  | 'annually'
   | 'BeforeStandard'
 export const standardApplyProgramDays = 90
 interface Rate {
@@ -42,10 +44,10 @@ interface Rate {
 
 export const rateConfig: Rate[] = [
   { term: 'partialMonth', rate: 0.04, text: 'Partial Month', isShowForm: false },
-  { term: 'Monthly', rate: 0.0595, text: 'Monthly', isShowForm: true },
-  { term: 'Quarterly', rate: 0.0615, text: 'Quarterly', isShowForm: true },
-  { term: 'Semester', rate: 0.0635, text: 'Quarterly', isShowForm: true },
-  { term: 'Annually', rate: 0.0655, text: 'Annually', isShowForm: true },
+  { term: 'monthly', rate: 0.0595, text: 'Monthly', isShowForm: true },
+  { term: 'quarterly', rate: 0.0615, text: 'Quarterly', isShowForm: true },
+  { term: 'semester', rate: 0.0635, text: 'Semester', isShowForm: true },
+  { term: 'annually', rate: 0.0655, text: 'Annually', isShowForm: true },
   {
     term: 'BeforeStandard',
     rate: 0.2 / 12,
@@ -84,7 +86,7 @@ export const buildProfitRecordsAnnualy = (
   const dataQuarterly = (findTermQuarterly(startDate, endDate) as { result: any }).result
 
   // Rates
-  const rateMonthly = rateConfig.find((r) => r.term === 'Monthly').rate
+  const rateMonthly = rateConfig.find((r) => r.term === 'monthly').rate
 
   // Final Result by Timeline
   let masterTimeline = dataAnnualy.filter((item: any) => {
@@ -214,7 +216,7 @@ export const buildProfitRecordsSemester = (
   const dataQuarterly = (findTermQuarterly(startDate, endDate) as { result: any }).result
 
   // Rates
-  const rateMonthly = rateConfig.find((r) => r.term === 'Monthly').rate
+  const rateMonthly = rateConfig.find((r) => r.term === 'monthly').rate
 
   // Final Result by Timeline
   let masterTimeline = []
@@ -329,7 +331,7 @@ export const buildProfitRecordsQuarterly = (
   const dataQuarterly = (findTermQuarterly(startDate, endDate) as { result: any }).result
 
   // Rates
-  const rateMonthly = rateConfig.find((r) => r.term === 'Monthly').rate
+  const rateMonthly = rateConfig.find((r) => r.term === 'monthly').rate
 
   // Final Result by Timeline
   let masterTimeline = []
@@ -424,7 +426,7 @@ export const buildProfitRecordsMonthly = (
   const dataMonthly = (findTermMonthly(startDate, endDate) as { result: any }).result
 
   // Rates
-  const rateMonthly = rateConfig.find((r) => r.term === 'Monthly').rate
+  const rateMonthly = rateConfig.find((r) => r.term === 'monthly').rate
 
   // Final Result by Timeline
   let masterTimeline = []
@@ -507,7 +509,7 @@ export const buildProfitRecordsMonthly = (
 
 export const contractEndAt = (startDate: Date, term: Term): Date => {
   let endDate
-  if (term == 'Monthly') {
+  if (term == 'monthly') {
     if (isStartOfMonth(startDate)) {
       endDate = endOfMonth(startDate)
     }
@@ -521,7 +523,7 @@ export const contractEndAt = (startDate: Date, term: Term): Date => {
     }
   }
 
-  if (term == 'Semester') {
+  if (term == 'semester') {
     const defineSemester = [
       ['01', '02', '03', '04', '05', '06'],
       ['07', '08', '09', '10', '11', '12'],
@@ -557,9 +559,6 @@ export const contractEndAt = (startDate: Date, term: Term): Date => {
       }
     }
 
-    console.log('Semester')
-    console.log('isStartOfMonth(startDate)', isStartOfMonth(startDate))
-
     if (!isStartOfMonth(startDate)) {
       console.log('!isStartOfMonth(startDate)')
       if (['01', '02', '03', '04', '05', '06'].includes(month)) {
@@ -574,7 +573,7 @@ export const contractEndAt = (startDate: Date, term: Term): Date => {
     }
   }
 
-  if (term == 'Quarterly') {
+  if (term == 'quarterly') {
     const defineQuarterly = [
       ['01', '02', '03'],
       ['04', '05', '06'],
@@ -591,7 +590,7 @@ export const contractEndAt = (startDate: Date, term: Term): Date => {
         let endMonth = defineQuarterly.filter((item) => {
           return item.includes(month)
         })[0][2]
-        console.log('endMonth', endMonth)
+
         let year = getYear(startDate)
         let endMonthdd = format(endOfMonth(new Date(`${year}-${endMonth}-01`)), 'dd')
         endDate = new Date(`${year}-${endMonth}-${endMonthdd}`)
@@ -647,15 +646,13 @@ export const contractEndAt = (startDate: Date, term: Term): Date => {
           }
         }
 
-        console.log('nextQuarterLastMonth', nextQuarterLastMonth)
-
         let endMonthdd = format(endOfMonth(new Date(`${year}-${nextQuarterLastMonth}-01`)), 'dd')
         endDate = new Date(`${year}-${nextQuarterLastMonth}-${endMonthdd}`)
       }
     }
   }
 
-  if (term == 'Annually') {
+  if (term == 'annually') {
     const dd = format(startDate, 'dd')
 
     console.log('dd', dd)
@@ -684,19 +681,19 @@ export const contractMultiPeriodEndAt = (startDate: Date, term: Term, periods: n
 
   const _periods = periods - 1
 
-  if (term == 'Monthly') {
+  if (term == 'monthly') {
     periodsEndAt = addMonths(endByTerm, _periods)
   }
 
-  if (term == 'Annually') {
+  if (term == 'annually') {
     periodsEndAt = addMonths(endByTerm, _periods * 12)
   }
 
-  if (term == 'Semester') {
+  if (term == 'semester') {
     periodsEndAt = addMonths(endByTerm, _periods * 6)
   }
 
-  if (term == 'Quarterly') {
+  if (term == 'quarterly') {
     periodsEndAt = addMonths(endByTerm, _periods * 4)
   }
 
@@ -713,15 +710,20 @@ export const canCancelContractAt = (startDate: Date): Date => {
   return addDays(startDate, standardApplyProgramDays)
 }
 
-export const terminateNonStandardContractRecords = (
-  startDate: Date,
-  endDate: Date,
-  term: Term,
-  dataContract: object,
+export const calculatePenaltyContractRecords = async (
+  product_id: number,
+  user_id: number,
+  root_amount: number,
 ) => {
   // get all transaction bonus --> sum = X , count = N
   // (N x 1.67) - X + root = result ; return result[]
   // t{} --> amount = sum(bonus[])
   // t{} --> amount = sum(penalty[])
   // t{} --> amount = Root - sum(bonus[]) + sum(penalty[])
+
+  const total_bonus = await getTotalBonusByProduct(product_id, user_id)
+  const months = (await getTransactionsBonusByProduct(product_id, user_id)).length
+  if (!months) return false
+
+  return root_amount - total_bonus + 0.0167 * 12
 }

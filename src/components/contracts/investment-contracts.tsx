@@ -137,7 +137,7 @@ export function InvestmentContracts() {
             <div className="max-w-7xl mx-auto space-y-6">
                 <div className="flex flex-col md:flex-row justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold">Investment Contracts</h1>
+                        <h1 className="text-2xl font-bold">Portfolio</h1>
                         <p className="">Manage your investments and withdrawals</p>
                     </div>
                 </div>
@@ -190,7 +190,7 @@ export function InvestmentContracts() {
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                        <div className="text-2xl font-bold text-green-500">
+                            <div className="text-2xl font-bold text-green-500">
                                 {investments ? `${calculateROI().toFixed(2)}%` : '0.00%'}
                             </div>
                         </CardContent>
@@ -242,7 +242,7 @@ export function InvestmentContracts() {
                                                     {formatCurrency(investment.availableBalance)}
                                                 </TableCell>
                                                 <TableCell>{formatCurrency(investment.profit)}</TableCell>
-                                                <TableCell>{investment.rateOfReturn}%</TableCell>
+                                                <TableCell>{(investment.rateOfReturn * 100).toFixed(2)}%</TableCell>
                                                 <TableCell>{investment.term}</TableCell>
                                                 <TableCell>{new Date(investment.startDate).toLocaleDateString()}</TableCell>
                                                 <TableCell>{new Date(investment.endDate).toLocaleDateString()}</TableCell>
@@ -309,7 +309,13 @@ export function InvestmentContracts() {
                                             Next
                                         </PaginationNext>
                                     </Pagination>
-                                </div> : <></>}
+                                </div> : (
+                                    <TableRow>
+                                        <TableCell colSpan={11} className="text-center py-4">
+                                            There are no contracts in your portfolio.
+                                        </TableCell>
+                                    </TableRow>
+                                )}
                             </>
                         ) : (
                             <>
@@ -380,7 +386,11 @@ export function InvestmentContracts() {
                                             Next
                                         </PaginationNext>
                                     </Pagination>
-                                </div> : <></>}
+                                </div> : <TableRow>
+                                    <TableCell colSpan={11} className="text-center py-4">
+                                        There are no withdrawal contracts in your portfolio.
+                                    </TableCell>
+                                </TableRow>}
                             </>
                         )}
                     </CardContent>

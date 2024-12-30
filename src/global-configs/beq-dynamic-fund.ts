@@ -4,6 +4,9 @@ import { GlobalConfig } from 'payload'
 const GcBeQDynamicFund: GlobalConfig = {
   slug: 'gc-beq-dynamic-fund',
   label: 'BeQ Dynamic Fund Config',
+  access: {
+    read: () => true,
+  },
 
   fields: [
     {
@@ -50,7 +53,7 @@ const GcBeQDynamicFund: GlobalConfig = {
     {
       name: 'referral_config_rates',
       type: 'json',
-      label: 'Standard Days',
+      label: 'Referral Config Rates',
       defaultValue: [
         {
           name: 'Level 1',

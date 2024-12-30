@@ -13,7 +13,7 @@ const payload = await getPayload({
 // export const PRODUCT_ID_REFERRAL = 5
 
 export const getReferralsByParentId = async (
-  parent_id: number,
+  parentId: number,
   page: number,
   limit: number,
 ): Promise<{ docs: any; referral_code: string; totalPages: number; totalDocs: number }> => {
@@ -21,7 +21,7 @@ export const getReferralsByParentId = async (
     const response = await payload.find({
       collection: 'user-referrals',
       where: {
-        parent: { equals: parent_id },
+        parent: { equals: parentId },
       },
       page, // Pass the page number
       limit, // Pass the number of items per page

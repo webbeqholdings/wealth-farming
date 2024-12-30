@@ -11,6 +11,8 @@ import * as migration_20241223_121532_delete_column_expected_return_in_contracts
 import * as migration_20241226_140744_update_fields_contracts_products_collection from './20241226_140744_update_fields_contracts_products_collection';
 import * as migration_20241227_092241_add_field_message_in_withdrawl from './20241227_092241_add_field_message_in_withdrawl';
 import * as migration_20241227_145926_detele_investment_profit_losses from './20241227_145926_detele_investment_profit_losses';
+import * as migration_20241228_044639_create_table_gc_beq_dynamic_fund_and_add_enum_transactions from './20241228_044639_create_table_gc_beq_dynamic_fund_and_add_enum_transactions';
+import * as migration_20241229_054012_create_payment_transfer_global from './20241229_054012_create_payment_transfer_global';
 
 export const migrations = [
   {
@@ -76,6 +78,16 @@ export const migrations = [
   {
     up: migration_20241227_145926_detele_investment_profit_losses.up,
     down: migration_20241227_145926_detele_investment_profit_losses.down,
-    name: '20241227_145926_detele_investment_profit_losses'
+    name: '20241227_145926_detele_investment_profit_losses',
+  },
+  {
+    up: migration_20241228_044639_create_table_gc_beq_dynamic_fund_and_add_enum_transactions.up,
+    down: migration_20241228_044639_create_table_gc_beq_dynamic_fund_and_add_enum_transactions.down,
+    name: '20241228_044639_create_table_gc_beq_dynamic_fund_and_add_enum_transactions',
+  },
+  {
+    up: migration_20241229_054012_create_payment_transfer_global.up,
+    down: migration_20241229_054012_create_payment_transfer_global.down,
+    name: '20241229_054012_create_payment_transfer_global'
   },
 ];

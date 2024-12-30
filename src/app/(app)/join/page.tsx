@@ -111,38 +111,55 @@ export default function Page() {
 
       // NextJS Api Custom
       if (actionAuth === 'register') {
-        const formattedDateOfBirth = formatToISODate(date_of_birth)
-        res = await fetch(`/api/auth/register`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: email,
-            password: password,
-            first_name: first_name,
-            last_name: last_name,
-            parent_referral_code: referral_code,
-            date_of_birth: formattedDateOfBirth,
-          }),
-        })
-        const data = await res.json()
+        try {
+          const formattedDateOfBirth = formatToISODate(date_of_birth)
+          const res = await fetch(`/api/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: email,
+              password: password,
+              first_name: first_name,
+              last_name: last_name,
+              parent_referral_code: referral_code,
+              date_of_birth: formattedDateOfBirth,
+            }),
+          })
 
-        setIsLoading(false)
+          const data = await res.json()
 
-        if (data.status) {
-          localStorage.setItem('wait_otp_confirm', 'true')
-          localStorage.setItem('user_id', data.user_id)
-          return router.replace('/verify-otp')
+          setIsLoading(false)
+
+          if (data.status) {
+            localStorage.setItem('wait_otp_confirm', 'true')
+            localStorage.setItem('user_id', data.user_id)
+            return router.replace('/verify-otp')
+          }
+
+          // Ensure data.error is a string
+          const errorMessage =
+            typeof data.error === 'string'
+              ? data.error
+              : (data.error as any).data.errors[0].message || 'An unknown error occurred.'
+
+          return toast({
+            title: 'Error',
+            description: errorMessage,
+          })
+        } catch (error) {
+          console.error('Registration error:', error)
+
+          return toast({
+            title: 'Error',
+            description:
+              (error as any).data.errors[0].message || 'An error occurred during registration.',
+          })
         }
-
-        return toast({
-          title: 'Error',
-          description: 'An error occurred. Please try again!',
-        })
       }
     } catch (error) {
       toast({
         title: 'Error',
-        description: 'An error occurred. Please try again!',
+        description: `${error}`,
       })
     }
   }
