@@ -104,10 +104,7 @@ export default function IndexPage() {
         />
 
         <div className="container mx-auto px-0 md:py-14">
-          <CryptoDashboard />
-        </div>
-        <div className="container mx-auto px-0 md:py-14">
-          <WorldIndicesDashboard />
+          <CTASection />
         </div>
 
         <div className="container mx-auto px-0 md:py-14">
@@ -165,10 +162,6 @@ export default function IndexPage() {
 
         <div className="container mx-auto px-0 md:py-14">
           <BreakingNewsCarousel />
-        </div>
-
-        <div className="container mx-auto px-0 md:py-14">
-          <CTASection />
         </div>
       </div>
       <SiteFooter />

@@ -7,8 +7,16 @@ const payload = await getPayload({ config })
 
 export async function POST(req: Request) {
   try {
-    const { email, password, first_name, last_name, role, parent_referral_code, phone_contact } =
-      await req.json()
+    const {
+      email,
+      password,
+      first_name,
+      last_name,
+      role,
+      parent_referral_code,
+      phone_contact,
+      date_of_birth,
+    } = await req.json()
 
     let parentUser = null
 
@@ -38,6 +46,7 @@ export async function POST(req: Request) {
         phone_contact: phone_contact,
         role: role,
         referral_code: generateReferralCode(),
+        date_of_birth: date_of_birth,
       },
     })
 

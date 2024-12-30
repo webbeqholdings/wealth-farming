@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-
+import { BirthdayInput } from '@/components/auth/BirthdayInput'
 import { Mail, Lock, Eye, EyeOff, PhoneCall } from 'lucide-react'
 import {
   Card,
@@ -21,6 +21,7 @@ import { SiteFooter } from '@/components/site-footer'
 import { z } from 'zod'
 import { useToast } from '@/hooks/use-toast'
 import { useParams } from 'next/navigation'
+import { formatToISODate } from '../page'
 
 // Define Zod schemas
 const loginSchema = z.object({
@@ -39,7 +40,7 @@ export default function Page() {
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
-  const [activeTab, setActiveTab] = useState('login') // State to track the active tab
+  const [activeTab, setActiveTab] = useState('register') // State to track the active tab
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
 
@@ -58,6 +59,7 @@ export default function Page() {
     const last_name = formData.get('last_name') as string
     const referral_code = formData.get('referral_code') as string
     const phone_contact = formData.get('phone_contact') as string
+    const date_of_birth = formData.get('date_of_birth') as string
 
     // Select schema based on form type
     const schema = type === '/login' ? loginSchema : registerSchema
@@ -104,6 +106,7 @@ export default function Page() {
 
       // NextJS Api Custom
       if (actionAuth === 'register') {
+        const formattedDateOfBirth = formatToISODate(date_of_birth)
         res = await fetch(`/api/auth/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -114,6 +117,7 @@ export default function Page() {
             last_name: last_name,
             parent_referral_code: referral_code,
             phone_contact: phone_contact,
+            date_of_birth: formattedDateOfBirth,
           }),
         })
         const data = await res.json()
@@ -298,6 +302,10 @@ export default function Page() {
                         )}
                       </button>
                     </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <BirthdayInput name="date_of_birth" />
                   </div>
 
                   <div className="space-y-1">
