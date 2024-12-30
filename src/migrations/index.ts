@@ -13,6 +13,7 @@ import * as migration_20241227_092241_add_field_message_in_withdrawl from './202
 import * as migration_20241227_145926_detele_investment_profit_losses from './20241227_145926_detele_investment_profit_losses';
 import * as migration_20241228_044639_create_table_gc_beq_dynamic_fund_and_add_enum_transactions from './20241228_044639_create_table_gc_beq_dynamic_fund_and_add_enum_transactions';
 import * as migration_20241229_054012_create_payment_transfer_global from './20241229_054012_create_payment_transfer_global';
+import * as migration_20241230_075829_create_crypto_wallets from './20241230_075829_create_crypto_wallets';
 
 export const migrations = [
   {
@@ -88,6 +89,11 @@ export const migrations = [
   {
     up: migration_20241229_054012_create_payment_transfer_global.up,
     down: migration_20241229_054012_create_payment_transfer_global.down,
-    name: '20241229_054012_create_payment_transfer_global'
+    name: '20241229_054012_create_payment_transfer_global',
+  },
+  {
+    up: migration_20241230_075829_create_crypto_wallets.up,
+    down: migration_20241230_075829_create_crypto_wallets.down,
+    name: '20241230_075829_create_crypto_wallets'
   },
 ];
