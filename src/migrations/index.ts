@@ -14,6 +14,7 @@ import * as migration_20241227_145926_detele_investment_profit_losses from './20
 import * as migration_20241228_044639_create_table_gc_beq_dynamic_fund_and_add_enum_transactions from './20241228_044639_create_table_gc_beq_dynamic_fund_and_add_enum_transactions';
 import * as migration_20241229_054012_create_payment_transfer_global from './20241229_054012_create_payment_transfer_global';
 import * as migration_20241230_075829_create_crypto_wallets from './20241230_075829_create_crypto_wallets';
+import * as migration_20241230_100602_add_fields_min_to_paymant_config from './20241230_100602_add_fields_min_to_paymant_config';
 
 export const migrations = [
   {
@@ -94,6 +95,11 @@ export const migrations = [
   {
     up: migration_20241230_075829_create_crypto_wallets.up,
     down: migration_20241230_075829_create_crypto_wallets.down,
-    name: '20241230_075829_create_crypto_wallets'
+    name: '20241230_075829_create_crypto_wallets',
+  },
+  {
+    up: migration_20241230_100602_add_fields_min_to_paymant_config.up,
+    down: migration_20241230_100602_add_fields_min_to_paymant_config.down,
+    name: '20241230_100602_add_fields_min_to_paymant_config'
   },
 ];
