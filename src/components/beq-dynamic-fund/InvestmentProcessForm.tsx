@@ -55,7 +55,7 @@ export function InvestmentProcessForm({
   const [startDate, setStartDate] = useState<Date | undefined>(tomorrow)
   const [endDate, setEndDate] = useState<Date | undefined>(addDays(startDate, minRangeDays))
   const [term, setTerm] = useState<any>('annually')
-  const [productName, setProductName] = useState()
+  const [productName, setProductName] = useState('BeQ Dynamic Fund Annually')
   const [depositAmount, setDepositAmount] = useState<number>(10000)
   const [periods, setPeriods] = useState<number>(1)
   const [dayCount, setDayCount] = useState<number>(0)
@@ -193,35 +193,6 @@ export function InvestmentProcessForm({
       return 0
     }
     return dateProfitFilter[0]?.balance
-  }
-
-  const calculateProfit = (term: string) => {
-    let build
-    if (term == 'annually') {
-      build = buildProfitRecordsAnnualy(depositAmount, startDate, endDate)
-    }
-
-    if (term == 'semester') {
-      build = buildProfitRecordsSemester(depositAmount, startDate, endDate)
-    }
-
-    if (term == 'quarterly') {
-      build = buildProfitRecordsQuarterly(depositAmount, startDate, endDate)
-    }
-
-    if (term == 'monthly') {
-      build = buildProfitRecordsMonthly(depositAmount, startDate, endDate)
-    }
-    const year = getYear(endDate)
-    const month = format(endDate, 'MM')
-
-    const dateProfitFilter = build[year].filter((item: any) => {
-      return format(item.date, 'MM') === month
-    })
-    if (!dateProfitFilter.length) {
-      return 0
-    }
-    return dateProfitFilter[0]?.profit
   }
 
   const handleInvestment = async () => {
