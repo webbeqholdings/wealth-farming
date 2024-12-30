@@ -36,11 +36,6 @@ const registerSchema = z.object({
   password: z.string().min(6, 'Password must be at least 6 characters'),
 })
 
-export const formatToISODate = (dateString: string): string => {
-  const [day, month, year] = dateString.split('-')
-  return `${year}-${month}-${day}`
-}
-
 export default function Page() {
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
@@ -166,6 +161,11 @@ export default function Page() {
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev)
+  }
+
+  const formatToISODate = (dateString: string) => {
+    const [day, month, year] = dateString.split('-')
+    return `${year}-${month}-${day}`
   }
 
   return (
