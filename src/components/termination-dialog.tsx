@@ -29,7 +29,6 @@ interface TerminationDialogProps {
 export function TerminationDialog({ isOpen, onClose, contract, setActiveTab }: TerminationDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  let availableBalance: number;
 
   const parsedStartDate = new Date(contract.startDate);
 
@@ -37,14 +36,7 @@ export function TerminationDialog({ isOpen, onClose, contract, setActiveTab }: T
     throw new Error('Invalid start_date provided');
   }
 
-  const daysSinceStart = Math.floor((new Date().getTime() - parsedStartDate.getTime()) / (1000 * 60 * 60 * 24));
-
-  if (daysSinceStart < standardApplyProgramDays) {
-    console.log('check contract: ', contract);
-    availableBalance = ((daysSinceStart * contract.investedAmount * 20) / (255 * 100)) + contract.investedAmount;
-  } else {
-    availableBalance = contract.availableBalance;
-  }
+  const daysSinceStart = Math.abs(Math.floor((new Date().getTime() - parsedStartDate.getTime()) / (1000 * 60 * 60 * 24)));
 
   const handleDialogClose = () => {
     onClose();
@@ -62,21 +54,28 @@ export function TerminationDialog({ isOpen, onClose, contract, setActiveTab }: T
     }
 
     try {
-      const formData = new FormData();
-      formData.append('amount', availableBalance.toString());
-      formData.append('contractId', contract.id);
-      formData.append('userId', contract.userId);
+      const formData = {
+        amount: contract.availableBalance,
+        contractId: contract.id,
+        userId: contract.userId
+      }
 
       const result = await withdrawInvestment(formData);
-      notifyWithdrawlContracts(result.data);
       if (result.success) {
+        notifyWithdrawlContracts(result.data);
         toast({
           title: 'Withdrawal Successful',
           description: `Amount: $${contract.availableBalance.toFixed(2)} USD`,
         });
         setActiveTab('withdraw');
         handleDialogClose();
+      } else {
+        toast({
+          title: 'Withdrawal Fail',
+          description: `${result.message}`,
+        });
       }
+
     } catch (error) {
       toast({
         title: 'Error',
@@ -86,7 +85,7 @@ export function TerminationDialog({ isOpen, onClose, contract, setActiveTab }: T
     } finally {
       setIsLoading(false);
     }
-  } 
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleDialogClose}>

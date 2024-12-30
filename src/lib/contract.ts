@@ -98,14 +98,14 @@ export const getWithdrawals = async (page: number, limit: number): Promise<{ doc
 };
 
 
-export async function withdrawInvestment(formData: FormData) {
+export async function withdrawInvestment(formData: any) {
   try {
     const payload = await getPayload({
       config,
     });
-    const amount = Number(formData.get('amount'))
-    const contractId = Number(formData.get('contractId'))
-    const userId = Number(formData.get('userId'))
+    const amount = formData.amount
+    const contractId = formData.contractId
+    const userId = formData.userId
 
     const response = await payload.create({
       collection: 'withdrawals',

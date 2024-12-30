@@ -1,5 +1,5 @@
-import type { CollectionConfig } from 'payload'
-import { getPayload } from 'payload'
+import type { CollectionConfig } from 'payload';
+import { getPayload } from 'payload';
 import config from '@payload-config';
 
 const Withdrawals: CollectionConfig = {
@@ -56,11 +56,11 @@ const Withdrawals: CollectionConfig = {
         beforeChange: [
             async ({ data }) => {
                 const payload = await getPayload({ config });
+
                 if (data.status === 'pending') {
                     // Set message for pending status
                     data.message = 'Withdrawal request submitted successfully. Awaiting admin approval.';
                 } else if (data.status === 'completed') {
-
                     // Find user's investment account
                     const accountsResponse = await payload.find({
                         collection: 'accounts',
@@ -87,7 +87,7 @@ const Withdrawals: CollectionConfig = {
 
                     // Set message for completed status
                     data.message = 'Withdrawal completed successfully.';
-                } else if (data.status == 'failed') {
+                } else if (data.status === 'failed') {
                     // Validate contract data
                     const contract = await payload.findByID({
                         collection: 'contracts',
@@ -101,6 +101,7 @@ const Withdrawals: CollectionConfig = {
                     if (data.amount <= 0) {
                         throw new Error('Invalid withdrawal amount. Amount must be greater than zero.');
                     }
+
                     await payload.update({
                         collection: 'contracts',
                         id: data.contract,
@@ -110,6 +111,9 @@ const Withdrawals: CollectionConfig = {
                             profit: 0,
                         },
                     });
+
+                    // Set custom message for failed status
+                    data.message = `Withdrawal failed. The contract has been reactivated with a balance of ${data.amount}.`;
                 }
             },
         ],
