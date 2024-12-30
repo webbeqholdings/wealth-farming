@@ -206,35 +206,39 @@ export function BankAccountForm({
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="bankName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Bank Name</FormLabel>
-                    <FormControl>
-                      <BankCombobox value={field.value} onChange={field.onChange} />
-                    </FormControl>
-                    <FormDescription>Your bank name.</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="branch"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Branch</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter branch name" {...field} />
-                    </FormControl>
-                    <FormDescription>Your branch.</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="bg-[#F5B014] text-black hover:bg-[#F5B014]/90">
+
+              {/* Bank Name and Branch on the Same Line */}
+              <div className="flex space-x-4">
+                <FormField
+                  control={form.control}
+                  name="bankName"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Bank Name</FormLabel>
+                      <FormControl>
+                        <BankCombobox value={field.value} onChange={field.onChange} />
+                      </FormControl>
+                      <FormDescription>Your bank name.</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="branch"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Branch</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter branch name" {...field} />
+                      </FormControl>
+                      <FormDescription>Your branch.</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <Button type="submit" className="bg-primary hover:bg-primary/90 text-black">
                 Add Bank Account
               </Button>
             </form>
