@@ -45,3 +45,8 @@ next-env.d.ts
 /src/payload-types.ts
 pnpm-lock.yaml
 package-lock.json
+/src/app/(app)/tuan
+src/payload-types.ts
+src/payload-types.ts
+src/app/(app)/account/deposit/bk-page.tsx
+src/app/(app)/bk-page.tsx

@@ -32,6 +32,7 @@ import { TabMenu } from '@/components/w88/TabMenu'
 import { accountConfig } from '@/config/accounts'
 import { toast } from '@/hooks/use-toast'
 import { notifyDeposit } from '@/lib/telegram'
+import CurrencyConverter from '@/components/CurrencyConverter'
 
 // Steps component definition
 interface StepProps {
@@ -80,19 +81,19 @@ function Steps({ currentStep, className, children }: StepsProps) {
 }
 
 export default function DepositPage() {
-  const { isLoggedIn, loading, user } = userStatus();
+  const { isLoggedIn, loading, user } = userStatus()
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [amount, setAmount] = useState('')
-  const [currency, setCurrency] = useState('VND')
+  const [currency, setCurrency] = useState('USD')
   const [method, setMethod] = useState('bank')
   const [accountNumber, setAccountNumber] = useState('')
-  const [accounts, setAccounts] = useState([]);
-  const [banks, setBanks] = useState([]);
-  const [selectBank, setSelectBank] = useState(null);
-  const [fromAccount, setFromAccount] = useState(null);
+  const [accounts, setAccounts] = useState([])
+  const [banks, setBanks] = useState([])
+  const [selectBank, setSelectBank] = useState(null)
+  const [fromAccount, setFromAccount] = useState(null)
   const [selectedBalance, setSelectedBalance] = useState(0)
-  const [exchangeRate, setExchangeRate] = useState(1); // Default exchange rate
+  const [exchangeRate, setExchangeRate] = useState(1) // Default exchange rate
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const quickAmounts = [
     { label: '500K', value: 500000 },
@@ -100,10 +101,10 @@ export default function DepositPage() {
     { label: '10M', value: 10000000 },
     { label: '50M', value: 50000000 },
     { label: '100M', value: 100000000 },
-  ];
+  ]
 
-  const [convertedQuickAmounts, setConvertedQuickAmounts] = useState(quickAmounts);
-
+  const [convertedQuickAmounts, setConvertedQuickAmounts] = useState(quickAmounts)
+  const [USDCurrency, setUSDCurrency] = useState<number>(0)
   const handleNextStep = () => {
     if (validateStep()) {
       if (step < 3) setStep(step + 1)
@@ -120,27 +121,29 @@ export default function DepositPage() {
   }
 
   const handleFromAccountChange = (accountId: string) => {
-    const numericAccountId = Number(accountId); // Convert the string to a number
-    const selectedAccount = accounts.find((account) => account.id === numericAccountId);
-    setFromAccount(numericAccountId.toString()); // Store the numeric ID in state
-    setSelectedBalance(selectedAccount?.amount || 0);
-  };
+    const numericAccountId = Number(accountId) // Convert the string to a number
+    const selectedAccount = accounts.find((account) => account.id === numericAccountId)
+    setFromAccount(numericAccountId.toString()) // Store the numeric ID in state
+    setSelectedBalance(selectedAccount?.amount || 0)
+  }
 
   const handleBankChange = (bankId: string) => {
-    setSelectBank(bankId.toString()); // Convert the string to a number
-  };
+    setSelectBank(bankId.toString()) // Convert the string to a number
+  }
 
   const validateStep = () => {
     const newErrors: { [key: string]: string } = {}
 
     if (step === 1) {
       if (!fromAccount) newErrors.fromAccount = 'Please select an account.'
-      if (!amount || Number(amount) <= 0) newErrors.amount = 'Please enter a valid deposit amount.'
+      if (!USDCurrency || Number(USDCurrency) <= 0)
+        newErrors.USDCurrency = 'Please enter a valid deposit amount.'
       if (!selectBank) newErrors.selectBank = 'Please select a bank.'
     }
 
     if (step === 3) {
-      if (!amount || Number(amount) <= 0) newErrors.amount = 'Amount is required for confirmation.'
+      if (!USDCurrency || Number(USDCurrency) <= 0)
+        newErrors.USDCurrency = 'Amount is required for confirmation.'
       if (!fromAccount) newErrors.fromAccount = 'Account selection is missing for confirmation.'
       if (!selectBank) newErrors.selectBank = 'Bank selection is missing for confirmation.'
     }
@@ -154,85 +157,86 @@ export default function DepositPage() {
     const fetchExchangeRate = async () => {
       if (currency === 'USD') {
         try {
-          const response = await fetch('/api/units?where[unit_code][equals]=USD');
-          const data = await response.json();
-          setExchangeRate(1 / data.docs[0].amount); // Convert VND to USD
+          const response = await fetch('/api/units?where[unit_code][equals]=USD')
+          const data = await response.json()
+          setExchangeRate(1 / data.docs[0].amount) // Convert VND to USD
         } catch (error) {
-          console.error('Error fetching exchange rate:', error);
-          setExchangeRate(1); // Default to 1 if the fetch fails
+          console.error('Error fetching exchange rate:', error)
+          setExchangeRate(1) // Default to 1 if the fetch fails
         }
       } else {
-        setExchangeRate(1); // Default to 1 for VND
+        setExchangeRate(1) // Default to 1 for VND
       }
-    };
+    }
 
-    fetchExchangeRate();
-  }, [currency]);
+    fetchExchangeRate()
+  }, [currency])
 
   // Update the displayed quickAmounts when the currency or exchange rate changes
   useEffect(() => {
     const updatedQuickAmounts = quickAmounts.map((item) => ({
       ...item,
       value: currency === 'USD' ? parseFloat((item.value * exchangeRate).toFixed(2)) : item.value,
-    }));
-    setConvertedQuickAmounts(updatedQuickAmounts);
-  }, [currency, exchangeRate]);
+    }))
+    setConvertedQuickAmounts(updatedQuickAmounts)
+  }, [currency, exchangeRate])
 
   const handleQuickAmount = (value: any) => {
     setAmount(value.toString())
-  };
+  }
 
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
-        const response = await fetch(`/api/accounts?where[user][equals]=${user.id}`); // Replace with dynamic user ID if necessary
+        const response = await fetch(`/api/accounts?where[user][equals]=${user.id}`) // Replace with dynamic user ID if necessary
         if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+          throw new Error(`HTTP error! Status: ${response.status}`)
         }
-        const data = await response.json();
-        setAccounts(data.docs); // Store the accounts in state
+        const data = await response.json()
+        setAccounts(data.docs) // Store the accounts in state
       } catch (error) {
-        console.error('Failed to fetch accounts:', error);
+        console.error('Failed to fetch accounts:', error)
       }
-    };
+    }
 
-    fetchAccounts();
-  }, [loading]);
+    fetchAccounts()
+  }, [loading])
 
   useEffect(() => {
     const fetchBanks = async () => {
       try {
-        const response = await fetch(`/api/banks?where[user][equals]=${user.id}`); // Replace with dynamic user ID if necessary
+        const response = await fetch(`/api/banks?where[user][equals]=${user.id}`) // Replace with dynamic user ID if necessary
         if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+          throw new Error(`HTTP error! Status: ${response.status}`)
         }
-        const data = await response.json();
-        setBanks(data.docs); // Store the accounts in state
+        const data = await response.json()
+        setBanks(data.docs) // Store the accounts in state
       } catch (error) {
-        console.error('Failed to fetch accounts:', error);
+        console.error('Failed to fetch accounts:', error)
       }
-    };
+    }
 
-    fetchBanks();
-  }, [loading]);
+    fetchBanks()
+  }, [loading])
 
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
-    return <div>Loading...</div>; // You can replace this with a loading spinner component if desired
+    return <div>Loading...</div> // You can replace this with a loading spinner component if desired
   }
 
   // If the user is not logged in, redirect to the join page
   if (!isLoggedIn) {
-    router.push('/join');
-    return <div>Redirecting...</div>; // Optional: Show a redirect message
+    router.push('/join')
+    return <div>Redirecting...</div> // Optional: Show a redirect message
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
     if (!validateStep()) {
       toast({
         title: 'Form validation failed',
-        description: 'Please review the form and fix errors before submitting.'
+        description: 'Please review the form and fix errors before submitting.',
       })
       return
     }
@@ -244,30 +248,30 @@ export default function DepositPage() {
           'Content-Type': 'application/json', // Specify JSON content type
         },
         body: JSON.stringify({
-          user_id: user.id,
-          bank_id: selectBank,
-          amount: amount,
-          status: "pending",
-          from_account: fromAccount,
-          type: "deposit",
-          currency: currency
+          user_id: Number(user.id),
+          bank_id: Number(selectBank),
+          amount: Number(USDCurrency),
+          status: 'pending',
+          from_account: Number(fromAccount),
+          type: 'deposit',
+          currency: currency,
         }), // Convert the request body to JSON
-      });
+      })
 
-      const data = await response.json();
-      notifyDeposit(data.data); // Call notifyDeposit and get its response
+      const data = await response.json()
+      notifyDeposit(data.data) // Call notifyDeposit and get its response
       if (!response.ok) {
         // Parse the error response to retrieve the error message
-        const errorResponse = await response.json();
-        const errorMessage = errorResponse.response?.error || 'An unknown error occurred';
-        throw new Error(errorMessage);
+        const errorResponse = await response.json()
+        const errorMessage = errorResponse.response?.error || 'An unknown error occurred'
+        throw new Error(errorMessage)
       }
       toast({
         title: 'Transaction created successfully',
         description: 'Your deposit is being processed.',
       })
     } catch (error) {
-      console.error('Error creating transaction:', error);
+      console.error('Error creating transaction:', error)
       toast({
         title: 'Transaction failed',
         description: String(error),
@@ -311,53 +315,22 @@ export default function DepositPage() {
                         ))}
                       </SelectContent>
                     </Select>
-                    <p className="text-sm text-muted-foreground">Balance: {selectedBalance.toLocaleString('en-US', {
-                      style: 'currency',
-                      currency: 'USD',
-                    })}</p>
-                    {errors.fromAccount && <p className="text-red-500 text-sm">{errors.fromAccount}</p>}
+                    <p className="text-sm text-muted-foreground">
+                      Balance:{' '}
+                      {selectedBalance.toLocaleString('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                      })}
+                    </p>
+                    {errors.fromAccount && (
+                      <p className="text-red-500 text-sm">{errors.fromAccount}</p>
+                    )}
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="amount">Deposit Amount</Label>
-                    <div className="flex space-x-2">
-                      <Select value={currency} onValueChange={setCurrency}>
-                        <SelectTrigger className="w-[100px]">
-                          <SelectValue placeholder="Currency" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="VND">VND</SelectItem>
-                          <SelectItem value="USD">USD</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Input
-                        id="amount"
-                        type="number"
-                        placeholder="0.00"
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                        className="flex-1"
-                      />
-                    </div>
-                    {errors.amount && <p className="text-red-500 text-sm">{errors.amount}</p>}
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Quick Amount</Label>
-                    <div className="flex flex-wrap gap-2">
-                      {convertedQuickAmounts.map((quickAmount) => (
-                        <Button
-                          key={quickAmount.label}
-                          variant="outline"
-                          type="button"
-                          onClick={() => handleQuickAmount(quickAmount.value)}
-                        >
-                          {currency === 'USD'
-                            ? `$${quickAmount.value}` // Display in USD
-                            : `${quickAmount.label}`} {/* Display in VND */}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
+                  <CurrencyConverter setUSDCurrency={setUSDCurrency} />
+                  {errors.USDCurrency && (
+                    <p className="text-red-500 text-sm">{errors.USDCurrency}</p>
+                  )}
                   <div className="space-y-2">
                     <Label htmlFor="fromAccount">Your Bank Account</Label>
                     <Select value={selectBank} onValueChange={handleBankChange}>
@@ -372,16 +345,23 @@ export default function DepositPage() {
                         ))}
                       </SelectContent>
                     </Select>
-                    {banks.length <= 0 ? <div className="mt-4">
-                      <div
-                        onClick={() => { router.push('/user-profile') }}
-                        className="text-blue-600 hover:text-blue-800 cursor-pointer"
-                      >
-                        Don&apos;t see your bank? Register
+                    {banks.length <= 0 ? (
+                      <div className="mt-4">
+                        <div
+                          onClick={() => {
+                            router.push('/user-profile')
+                          }}
+                          className="text-blue-600 hover:text-blue-800 cursor-pointer"
+                        >
+                          Don&apos;t see your bank? Register
+                        </div>
                       </div>
-                    </div> : ''
-                    }
-                    {errors.selectBank && <p className="text-red-500 text-sm">{errors.selectBank}</p>}
+                    ) : (
+                      ''
+                    )}
+                    {errors.selectBank && (
+                      <p className="text-red-500 text-sm">{errors.selectBank}</p>
+                    )}
                   </div>
                 </div>
               )}
@@ -453,7 +433,7 @@ export default function DepositPage() {
                     <div className="flex justify-between">
                       <span>Amount:</span>
                       <span className="font-semibold">
-                        {currency} {Number(amount).toLocaleString()}
+                        {currency} {Number(USDCurrency).toLocaleString()}
                       </span>
                     </div>
                     <div className="flex justify-between">

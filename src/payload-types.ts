@@ -14,6 +14,7 @@ export interface Config {
     accounts: Account;
     address: Address;
     banks: Bank;
+    'crypto-wallets': CryptoWallet;
     companies: Company;
     contracts: Contract;
     'economic-calendar': EconomicCalendar;
@@ -40,6 +41,7 @@ export interface Config {
     accounts: AccountsSelect<false> | AccountsSelect<true>;
     address: AddressSelect<false> | AddressSelect<true>;
     banks: BanksSelect<false> | BanksSelect<true>;
+    'crypto-wallets': CryptoWalletsSelect<false> | CryptoWalletsSelect<true>;
     companies: CompaniesSelect<false> | CompaniesSelect<true>;
     contracts: ContractsSelect<false> | ContractsSelect<true>;
     'economic-calendar': EconomicCalendarSelect<false> | EconomicCalendarSelect<true>;
@@ -67,17 +69,17 @@ export interface Config {
   };
   globals: {
     'site-settings': SiteSetting;
-    'gc-beq-dynamic-fund': GcBeqDynamicFund;
-    'gc-payment-transfer': GcPaymentTransfer;
     'main-menu': MainMenu;
+    'gc-payment-transfer': GcPaymentTransfer;
+    'gc-beq-dynamic-fund': GcBeqDynamicFund;
     header: Header;
     footer: Footer;
   };
   globalsSelect?: {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
-    'gc-beq-dynamic-fund': GcBeqDynamicFundSelect<false> | GcBeqDynamicFundSelect<true>;
-    'gc-payment-transfer': GcPaymentTransferSelect<false> | GcPaymentTransferSelect<true>;
     'main-menu': MainMenuSelect<false> | MainMenuSelect<true>;
+    'gc-payment-transfer': GcPaymentTransferSelect<false> | GcPaymentTransferSelect<true>;
+    'gc-beq-dynamic-fund': GcBeqDynamicFundSelect<false> | GcBeqDynamicFundSelect<true>;
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
   };
@@ -220,6 +222,18 @@ export interface Bank {
   account_number?: string | null;
   bank_name?: string | null;
   branch?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "crypto-wallets".
+ */
+export interface CryptoWallet {
+  id: number;
+  user?: (number | null) | User;
+  wallet_address?: string | null;
+  network?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -634,6 +648,10 @@ export interface PayloadLockedDocument {
         value: number | Bank;
       } | null)
     | ({
+        relationTo: 'crypto-wallets';
+        value: number | CryptoWallet;
+      } | null)
+    | ({
         relationTo: 'companies';
         value: number | Company;
       } | null)
@@ -785,6 +803,17 @@ export interface BanksSelect<T extends boolean = true> {
   account_number?: T;
   bank_name?: T;
   branch?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "crypto-wallets_select".
+ */
+export interface CryptoWalletsSelect<T extends boolean = true> {
+  user?: T;
+  wallet_address?: T;
+  network?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1163,24 +1192,24 @@ export interface SiteSetting {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "gc-beq-dynamic-fund".
+ * via the `definition` "main-menu".
  */
-export interface GcBeqDynamicFund {
+export interface MainMenu {
   id: number;
-  public_products: (number | InvestmentProduct)[];
-  employee_plus_products?: (number | InvestmentProduct)[] | null;
-  employee_users?: (number | User)[] | null;
-  'Before Standard Product'?: (number | null) | InvestmentProduct;
-  referral_products?: (number | InvestmentProduct)[] | null;
-  standard_days?: number | null;
-  referral_config_rates?:
+  menuItems?:
     | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
+        title: string;
+        url: string;
+        children?:
+          | {
+              title: string;
+              url: string;
+              description?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
     | null;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -1205,24 +1234,24 @@ export interface GcPaymentTransfer {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "main-menu".
+ * via the `definition` "gc-beq-dynamic-fund".
  */
-export interface MainMenu {
+export interface GcBeqDynamicFund {
   id: number;
-  menuItems?:
+  public_products: (number | InvestmentProduct)[];
+  employee_plus_products?: (number | InvestmentProduct)[] | null;
+  employee_users?: (number | User)[] | null;
+  'Before Standard Product'?: (number | null) | InvestmentProduct;
+  referral_products?: (number | InvestmentProduct)[] | null;
+  standard_days?: number | null;
+  referral_config_rates?:
     | {
-        title: string;
-        url: string;
-        children?:
-          | {
-              title: string;
-              url: string;
-              description?: string | null;
-              id?: string | null;
-            }[]
-          | null;
-        id?: string | null;
-      }[]
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
     | null;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -1297,16 +1326,24 @@ export interface SiteSettingsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "gc-beq-dynamic-fund_select".
+ * via the `definition` "main-menu_select".
  */
-export interface GcBeqDynamicFundSelect<T extends boolean = true> {
-  public_products?: T;
-  employee_plus_products?: T;
-  employee_users?: T;
-  'Before Standard Product'?: T;
-  referral_products?: T;
-  standard_days?: T;
-  referral_config_rates?: T;
+export interface MainMenuSelect<T extends boolean = true> {
+  menuItems?:
+    | T
+    | {
+        title?: T;
+        url?: T;
+        children?:
+          | T
+          | {
+              title?: T;
+              url?: T;
+              description?: T;
+              id?: T;
+            };
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -1331,24 +1368,16 @@ export interface GcPaymentTransferSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "main-menu_select".
+ * via the `definition` "gc-beq-dynamic-fund_select".
  */
-export interface MainMenuSelect<T extends boolean = true> {
-  menuItems?:
-    | T
-    | {
-        title?: T;
-        url?: T;
-        children?:
-          | T
-          | {
-              title?: T;
-              url?: T;
-              description?: T;
-              id?: T;
-            };
-        id?: T;
-      };
+export interface GcBeqDynamicFundSelect<T extends boolean = true> {
+  public_products?: T;
+  employee_plus_products?: T;
+  employee_users?: T;
+  'Before Standard Product'?: T;
+  referral_products?: T;
+  standard_days?: T;
+  referral_config_rates?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

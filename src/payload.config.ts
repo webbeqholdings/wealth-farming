@@ -9,6 +9,7 @@ import { seoPlugin } from '@payloadcms/plugin-seo'
 
 import { Users } from './collections/Users'
 import { Banks } from './collections/Banks'
+import { CryptoWallets } from './collections/CryptoWallets'
 import { Address } from './collections/Address'
 import { Media } from './collections/Media'
 import Companies from './collections/Companies'
@@ -91,6 +92,7 @@ export default buildConfig({
     Accounts,
     Address,
     Banks,
+    CryptoWallets,
     Companies,
     Contracts,
     EconomicCalendar,
@@ -109,7 +111,7 @@ export default buildConfig({
     Media,
     Withdrawals,
   ],
-  globals: [SiteSettings, GcBeQDynamicFund, GcPaymentTransfer, MainMenu, Header, Footer],
+  globals: [SiteSettings, MainMenu, GcPaymentTransfer, GcBeQDynamicFund, Header, Footer],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
