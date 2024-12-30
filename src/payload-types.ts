@@ -1225,7 +1225,10 @@ export interface GcPaymentTransfer {
   bank_account_description?: string | null;
   crypto_wallet_qr_code?: (number | null) | Media;
   crypto_wallet_address?: string | null;
-  crypto_wallet_network?: 'TRC20' | null;
+  crypto_wallet_network?: ('TRC20' | 'BEP20') | null;
+  min_deposit?: number | null;
+  min_withdrawal?: number | null;
+  min_transfer?: number | null;
   usd_to_vnd?: number | null;
   usdt_to_vnd?: number | null;
   usd_to_usdt?: number | null;
@@ -1359,6 +1362,9 @@ export interface GcPaymentTransferSelect<T extends boolean = true> {
   crypto_wallet_qr_code?: T;
   crypto_wallet_address?: T;
   crypto_wallet_network?: T;
+  min_deposit?: T;
+  min_withdrawal?: T;
+  min_transfer?: T;
   usd_to_vnd?: T;
   usdt_to_vnd?: T;
   usd_to_usdt?: T;

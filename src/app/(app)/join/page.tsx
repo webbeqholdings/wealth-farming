@@ -21,7 +21,6 @@ import { SiteFooter } from '@/components/site-footer'
 import { z } from 'zod'
 import { useToast } from '@/hooks/use-toast'
 import { useParams } from 'next/navigation'
-import { DateField } from 'payload'
 
 // Define Zod schemas
 const loginSchema = z.object({
@@ -35,11 +34,6 @@ const registerSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
 })
-
-export const formatToISODate = (dateString: string): string => {
-  const [day, month, year] = dateString.split('-')
-  return `${year}-${month}-${day}`
-}
 
 export default function Page() {
   const { toast } = useToast()
@@ -166,6 +160,11 @@ export default function Page() {
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev)
+  }
+
+  const formatToISODate = (dateString: string) => {
+    const [day, month, year] = dateString.split('-')
+    return `${year}-${month}-${day}`
   }
 
   return (
