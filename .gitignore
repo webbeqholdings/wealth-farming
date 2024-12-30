@@ -42,6 +42,5 @@ next-env.d.ts
 
 /media
 /.vscode
-src/payload-types.ts
 pnpm-lock.yaml
 package-lock.json
