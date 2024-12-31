@@ -84,7 +84,7 @@ export const updateProfitHandler: TaskHandler<{
         const daysSinceStart = Math.abs(Math.floor((new Date().getTime() - parsedStartDate.getTime()) / (1000 * 60 * 60 * 24)));
         if (daysSinceStart <= 30 && daysSinceStart >= 0) {
             profitToday = (daysSinceStart * amount * 20) / (255 * 100); // Adjust calculation as necessary
-            balanceToday = amount
+            balanceToday = amount + profitToday
         }
         if (daysSinceStart > 30) {
             profitToday = calculateProfit(term, amount, new Date(start_date), 'profit');
