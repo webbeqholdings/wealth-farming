@@ -74,7 +74,7 @@ export function CryptoWalletForm({
   async function handleDelete(accountId: string) {
     try {
       // Send a DELETE request to the API to delete the bank account
-      const response = await fetch(`/api/crypto_wallets/${Number(accountId)}`, {
+      const response = await fetch(`/api/crypto-wallets/${Number(accountId)}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json', // Ensure we send JSON
@@ -106,7 +106,6 @@ export function CryptoWalletForm({
   }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
     const newCryptoWallet = {
       user: Number(user.id),
       wallet_address: values.walletAddress,
@@ -124,8 +123,6 @@ export function CryptoWalletForm({
 
       // Check if the response is ok (status 200-299)
       if (response.ok) {
-        const data = await response.json() // Parse the response data if needed
-
         // Update local state with the new account if necessary
         setAccounts((prevAccounts) => [...prevAccounts, newCryptoWallet])
 
@@ -169,35 +166,40 @@ export function CryptoWalletForm({
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <FormField
-                control={form.control}
-                name="walletAddress"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Wallet Address</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter wallet address" {...field} />
-                    </FormControl>
-                    <FormDescription>Your crypto wallet address.</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="network"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Network</FormLabel>
-                    <FormControl>
-                      <CryptoWalletCombobox value={field.value} onChange={field.onChange} />
-                    </FormControl>
-                    <FormDescription>The blockchain network of your wallet.</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="bg-[#F5B014] text-black hover:bg-[#F5B014]/90">
+              {/* Wallet Address and Network Inline */}
+              <div className="flex space-x-4">
+                <FormField
+                  control={form.control}
+                  name="walletAddress"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Wallet Address</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter wallet address" {...field} />
+                      </FormControl>
+                      <FormDescription>Your crypto wallet address.</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="network"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Network</FormLabel>
+                      <FormControl>
+                        <CryptoWalletCombobox value={field.value} onChange={field.onChange} />
+                      </FormControl>
+                      <FormDescription>The blockchain network of your wallet.</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Submit Button */}
+              <Button type="submit" className="bg-primary hover:bg-primary/90 text-black">
                 Add Crypto Wallet
               </Button>
             </form>
