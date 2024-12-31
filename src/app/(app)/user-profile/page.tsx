@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { BankCombobox } from '@/components/bank-combobox'
 import {
   Card,
   CardContent,
@@ -34,9 +33,9 @@ import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import UserBankAccount from '@/components/UserBankAccount'
 import { useRouter } from 'next/navigation'
-import { formatSlug } from '@/utilities/formatSlug'
 import UserStatus from '@/lib/userStatus'
 import TelegramButton from '@/components/TelegramButton'
+
 
 export default function UserProfile() {
   const { isLoggedIn, loading, user } = UserStatus()
@@ -100,8 +99,6 @@ export default function UserProfile() {
           accountNumber: accountNumber, // You can replace this with actual data if available
           balance: Number(totalAmount), // Replace with actual balance if provided by the API
         })
-
-        console.log('data', data)
 
         if (data.telegram) {
           setTelegramNotifications((prevUser) => ({
@@ -286,7 +283,7 @@ export default function UserProfile() {
   // Placeholder for disconnect logic (unchanged)
   const handleDisconnectTelegram = async () => {
     try {
-      const response = await fetch(`/api/telegram?where[id][equals]=${telegramNotifications.id}`, {
+      await fetch(`/api/telegram?where[id][equals]=${telegramNotifications.id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
