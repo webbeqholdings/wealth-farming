@@ -97,6 +97,7 @@ export default function DepositPage() {
   const [exchangeRate, setExchangeRate] = useState(1) // Default exchange rate
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [depositScreenshot, setDepositScreenshot] = useState<FormData>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const quickAmounts = [
     { label: '500K', value: 500000 },
@@ -234,59 +235,62 @@ export default function DepositPage() {
   }
 
   const handleDepositScreenshotChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+    const file = event.target.files?.[0]
     if (file) {
-      const formData = new FormData();
-      formData.append('file', file);
-      setDepositScreenshot(formData);
+      const formData = new FormData()
+      formData.append('file', file)
+      setDepositScreenshot(formData)
     } else {
-      console.error('No file selected.');
+      console.error('No file selected.')
     }
-  };
+  }
 
   const uploadScreenshot = async (formData: FormData) => {
     try {
       const response = await fetch('/api/media', {
         method: 'POST',
         body: formData,
-      });
+      })
 
       if (!response.ok) {
-        throw new Error('Screenshot upload failed');
+        throw new Error('Screenshot upload failed')
       }
 
-      const data = await response.json();
-      console.log('Uploaded screenshot data:', data);
+      const data = await response.json()
+      console.log('Uploaded screenshot data:', data)
 
       // Ensure the `id` is returned properly
       if (!data?.doc?.id) {
-        throw new Error('Media upload response does not contain an id');
+        throw new Error('Media upload response does not contain an id')
       }
 
-      return data.doc.id; // Return the extracted `id`
+      return data.doc.id // Return the extracted `id`
     } catch (error) {
-      console.error('Error uploading screenshot:', error);
-      throw error;
+      console.error('Error uploading screenshot:', error)
+      throw error
     }
-  };
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
+
+    if (isSubmitting) return
+    setIsSubmitting(true)
 
     if (!validateStep()) {
       toast({
         title: 'Form validation failed',
         description: 'Please review the form and fix errors before submitting.',
-      });
-      return;
+      })
+      return
     }
 
     try {
-      let depositScreenshotId = null; // Initialize to null
+      let depositScreenshotId = null // Initialize to null
 
       // Upload screenshot if present
       if (depositScreenshot) {
-        depositScreenshotId = await uploadScreenshot(depositScreenshot);
+        depositScreenshotId = await uploadScreenshot(depositScreenshot)
       }
 
       // Construct the request payload
@@ -299,7 +303,7 @@ export default function DepositPage() {
         type: 'deposit',
         currency: currency,
         deposit_screenshot: depositScreenshotId, // Include the screenshot ID
-      };
+      }
 
       // Make the API request
       const response = await fetch('/api/transaction/create', {
@@ -308,31 +312,32 @@ export default function DepositPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
-      });
+      })
 
-      const data = await response.json();
-      notifyDeposit(data.data); // Call notifyDeposit and get its response
+      const data = await response.json()
+      notifyDeposit(data.data) // Call notifyDeposit and get its response
 
       if (!response.ok) {
-        const errorMessage = data.response?.error || 'An unknown error occurred';
-        throw new Error(errorMessage);
+        const errorMessage = data.response?.error || 'An unknown error occurred'
+        throw new Error(errorMessage)
       }
 
       toast({
         title: 'Transaction created successfully',
         description: 'Your deposit is being processed.',
-      });
+      })
 
-      router.push('/account/history'); // Redirect to history page
+      router.push('/account/history') // Redirect to history page
     } catch (error) {
-      console.error('Error creating transaction:', error);
+      console.error('Error creating transaction:', error)
       toast({
         title: 'Transaction failed',
         description: String(error),
-      });
+      })
+    } finally {
+      setIsSubmitting(false)
     }
-  };
-
+  }
 
   return (
     <>
@@ -352,7 +357,7 @@ export default function DepositPage() {
               <Step title="Method" />
               <Step title="Confirm" />
             </Steps>
-            <form onSubmit={handleSubmit}>
+            <form>
               {step === 1 && (
                 <div className="space-y-4">
                   <div className="space-y-2">
@@ -523,7 +528,14 @@ export default function DepositPage() {
             {step < 3 ? (
               <Button onClick={handleNextStep}>Next</Button>
             ) : (
-              <Button onClick={handleSubmit}>Confirm Deposit</Button>
+              <Button
+                type="submit"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className={cn(isSubmitting && 'cursor-not-allowed opacity-50')}
+              >
+                {isSubmitting ? 'Processing...' : 'Submit'}
+              </Button>
             )}
           </CardFooter>
         </Card>
