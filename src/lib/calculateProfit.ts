@@ -8,15 +8,19 @@ import { format, getYear } from 'date-fns';
 
 const calculateProfit = (term: string, availableBalance: any, startDate: Date, type: string) => {
     const parsedStartDate = new Date(startDate);
-    const daysSinceStart = Math.abs(
-        Math.floor((new Date().getTime() - parsedStartDate.getTime()) / (1000 * 60 * 60 * 24))
-    );
+    const daysSinceStart = Math.floor((new Date().getTime() - parsedStartDate.getTime()) / (1000 * 60 * 60 * 24))
     let profitToday = 0;
     let balanceToday = availableBalance;
 
     if (daysSinceStart <= 30 && daysSinceStart >= 0) {
         profitToday = (daysSinceStart * availableBalance * 20) / (255 * 100);
         balanceToday = availableBalance + profitToday;
+        return type === 'profit' ? profitToday : balanceToday;
+    }
+
+    if(daysSinceStart < 0){
+        profitToday = 0;
+        balanceToday = availableBalance;
         return type === 'profit' ? profitToday : balanceToday;
     }
 
