@@ -3,12 +3,13 @@ import type { CollectionConfig } from 'payload'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { isAdmin } from '../access/isAdmin'
+import { isIndividualOrAdmin } from '@/access/isIndividualOrAdmin'
 
 const Transactions: CollectionConfig = {
   slug: 'transactions',
   access: {
     read: () => true,
-    create: isAdmin,
+    create: isIndividualOrAdmin,
     update: isAdmin,
     delete: isAdmin,
   },
