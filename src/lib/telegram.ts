@@ -15,7 +15,7 @@ export async function notifyDeposit(data: any) {
                     currency: 'USD',
                 }),
                 paymentMethod: "Bank Transfer",
-                requestTime: formatDateTime(`${new Date()}`),
+                requestTime: new Date().toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }),
                 depositId: data.id,
             }), // Convert the request body to JSON
         });
@@ -42,7 +42,7 @@ export async function notifyWithdrawl(data: any) {
                     currency: 'USD',
                 }),
                 paymentMethod: "Bank Transfer",
-                requestTime: formatDateTime(`${new Date()}`),
+                requestTime: new Date().toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }),
                 withdrawlId: data.id,
             }), // Convert the request body to JSON
         });
@@ -68,7 +68,7 @@ export async function notifyInvestment(data: any) {
                     style: 'currency',
                     currency: 'USD',
                 }),
-                requestTime: formatDateTime(`${new Date()}`),
+                requestTime: new Date().toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }),
                 depositId: data.id,
                 productLog: data.product_log,
                 startDate: data.start_date,
@@ -101,7 +101,7 @@ export async function notifyWithdrawlContracts(data: any) {
                     style: 'currency',
                     currency: 'USD',
                 }),
-                requestTime: formatDateTime(`${new Date()}`),
+                requestTime: new Date().toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }),
                 withdrawlId: data.id,
                 productLog: data.contract.product_log,
                 startDate: data.contract.start_date,
