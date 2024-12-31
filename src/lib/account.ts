@@ -1,4 +1,4 @@
-// 'use server'
+'use server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 // import { headers as nextHeaders } from 'next/headers'
@@ -99,4 +99,29 @@ export const getBalanceByUser = async (user_id: number, status: string): Promise
   }
 
   return total
+}
+
+export const getAccountsByUserId = async (
+  user_id: number,
+  account_types = ['investment', 'main'],
+): Promise<any> => {
+  // auth()-> user
+  const payload = await getPayload({
+    config,
+  })
+
+  // Query --> collection accounts
+  const response = await payload.find({
+    collection: 'accounts',
+    where: {
+      user: { equals: user_id },
+    },
+  }) // response.docs = array[n ket qua]
+
+  if (!response.docs.length) return false // acc nap rut, referral, invesment
+
+  // filter(() => {})
+  return response.docs.filter((item: any) => {
+    return account_types.includes(item.type)
+  })
 }

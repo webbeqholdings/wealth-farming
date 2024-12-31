@@ -32,6 +32,7 @@ import { Label } from '@/components/ui/label'
 import { ArrowDownIcon, ArrowRightIcon } from 'lucide-react'
 import { ReCaptcha } from '@/components/ReCaptcha'
 import { ReCaptchaV3 } from '@/components/ReCaptchaV3'
+import { getAccountsByUserId } from '@/lib/account'
 
 const formSchema = z.object({
   fromAccount: z.string().min(1, { message: 'Please select the source account' }),
@@ -44,7 +45,7 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>
 
 export default function TransferPage() {
-  const {isLoggedIn, loading, user} = UserStatus();
+  const { isLoggedIn, loading, user } = UserStatus()
   const router = useRouter()
   const [fromBalance, setFromBalance] = useState(0)
   const [toBalance, setToBalance] = useState(0)
@@ -52,8 +53,9 @@ export default function TransferPage() {
   const [toAccount, setToAccount] = useState(null)
   const [amount, setAmount] = useState('')
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null)
-  const [listFromAccounts, setListFromAccounts] = useState([]);
-  const [listToAccounts, setListToAccounts] = useState([]);
+  const [listFromAccounts, setListFromAccounts] = useState([])
+  const [listToAccounts, setListToAccounts] = useState([])
+  const [listAccounts, setListAccounts] = useState([])
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -65,45 +67,66 @@ export default function TransferPage() {
   })
 
   const handleFromAccountChange = (accountId: string) => {
-    // setFromBalance(accountBalances[value as keyof typeof accountBalances] || 0)
-    const selectedAccount = listFromAccounts.find((account) => account.id === Number(accountId));
-    setFromAccount(accountId.toString());
-    setFromBalance(selectedAccount?.amount || 0);
+    const selectedAccount = listAccounts.find((account) => account.id === Number(accountId))
+    setFromAccount(accountId.toString())
+    setFromBalance(selectedAccount?.amount || 0)
+
+    if (toAccount === accountId) {
+      const availableToAccounts = listAccounts.filter((account) => account.id !== Number(accountId))
+      if (availableToAccounts.length > 0) {
+        setToAccount(availableToAccounts[0].id.toString())
+        setToBalance(availableToAccounts[0].amount || 0)
+      } else {
+        setToAccount(null)
+        setToBalance(0)
+      }
+    }
   }
 
   const handleToAccountChange = (accountId: string) => {
-    const selectedAccount = listToAccounts.find((account) => account.id === Number(accountId));
-    setToAccount(accountId.toString());
-    setToBalance(selectedAccount?.amount || 0);
+    const selectedAccount = listAccounts.find((account) => account.id === Number(accountId))
+    setToAccount(accountId.toString())
+    setToBalance(selectedAccount?.amount || 0)
+
+    if (fromAccount === accountId) {
+      const availableFromAccounts = listAccounts.filter(
+        (account) => account.id !== Number(accountId),
+      )
+      if (availableFromAccounts.length > 0) {
+        setFromAccount(availableFromAccounts[0].id.toString())
+        setFromBalance(availableFromAccounts[0].amount || 0)
+      } else {
+        setFromAccount(null)
+        setFromBalance(0)
+      }
+    }
   }
 
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
-        const response = await fetch(`/api/accounts?where[user][equals]=${user.id}`); // Replace with dynamic user ID if necessary
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+        let accountsData = []
+        if (user && user.id) {
+          accountsData = await getAccountsByUserId(user.id)
         }
-        const data = await response.json();
-        setListFromAccounts(data.docs); // Store the accounts in state
-        setListToAccounts(data.docs); // Store the accounts in state
+        setListAccounts(accountsData)
       } catch (error) {
-        console.error('Failed to fetch accounts:', error);
+        console.error('Failed to fetch accounts:', error)
       }
-    };
+    }
 
-    fetchAccounts();
-  }, [loading]);
+    fetchAccounts()
+  }, [loading])
 
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
-    return <div>Loading...</div>; // You can replace this with a loading spinner component if desired
+    return <div>Loading...</div> // You can replace this with a loading spinner component if desired
   }
 
   // If the user is not logged in, redirect to the join page
   if (!isLoggedIn) {
-    router.push('/join');
-    return <div>Redirecting...</div>; // Optional: Show a redirect message
+    router.push('/join')
+    return <div>Redirecting...</div> // Optional: Show a redirect message
   }
 
   const handleTransfer = async (e: React.FormEvent) => {
@@ -126,24 +149,24 @@ export default function TransferPage() {
         body: JSON.stringify({
           user_id: user.id,
           amount: amount,
-          status: "completed",
+          status: 'completed',
           from_account: fromAccount,
           to_account: toAccount,
-          type: "transfer"
+          type: 'transfer',
         }), // Convert the request body to JSON
-      });
+      })
 
       if (!response.ok) {
         // Parse the error response to retrieve the error message
-        const errorResponse = await response.json();
-        const errorMessage = errorResponse.response?.error || 'An unknown error occurred';
-        throw new Error(errorMessage);
+        const errorResponse = await response.json()
+        const errorMessage = errorResponse.response?.error || 'An unknown error occurred'
+        throw new Error(errorMessage)
       }
       toast({
         title: 'Transfer successful',
       })
     } catch (error) {
-      console.error('Error creating transaction:', error);
+      console.error('Error creating transaction:', error)
       toast({
         title: `${error}`,
       })
@@ -154,94 +177,92 @@ export default function TransferPage() {
   console.log(process.env.NEXT_PUBLIC_GOOGLE_RECAPTCHA_V2_KEY)
   return (
     <>
-        <SiteHeader />
-        <div className="container mx-auto px-4 py-8">
-          <h1 className="text-3xl font-bold mb-6">My Transfer</h1>
-          <TabMenu items={accountConfig.tabList} defaultValue="transfer" />
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle>Transfer Funds</CardTitle>
-              <CardDescription>Move money between your accounts</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleTransfer}>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="fromAccount">From Account</Label>
-                    <Select value={fromAccount} onValueChange={handleFromAccountChange}>
-                      <SelectTrigger id="fromAccount">
-                        <SelectValue placeholder="Select account" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {listToAccounts.map((account) => (
-                          <SelectItem
-                            key={account.id}
-                            value={account.id.toString()}
-                            disabled={toAccount === account.id.toString()} // Disable the selected `fromAccount`
-                          >
-                            {account.account_name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <p className="text-sm text-muted-foreground">Balance: {fromBalance.toLocaleString('en-US', {
-                              style: 'currency',
-                              currency: 'USD',
-                            })}</p>
-                  </div>
-
-                  <div className="flex justify-center">
-                    <ArrowDownIcon className="h-6 w-6" />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="toAccount">To Account</Label>
-                    <Select value={toAccount} onValueChange={handleToAccountChange}>
-                      <SelectTrigger id="toAccount">
-                        <SelectValue placeholder="Select account" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {listToAccounts.map((account) => (
-                          <SelectItem
-                            key={account.id}
-                            value={account.id.toString()}
-                            disabled={fromAccount === account.id.toString()} // Disable the selected `fromAccount`
-                          >
-                            {account.account_name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <p className="text-sm text-muted-foreground">Balance: {toBalance.toLocaleString('en-US', {
-                              style: 'currency',
-                              currency: 'USD',
-                            })}</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="amount">Amount</Label>
-                    <Input
-                      id="amount"
-                      placeholder="Enter amount"
-                      type="number"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <ReCaptchaV3 sitekey={process.env.NEXT_PUBLIC_GOOGLE_RECAPTCHA_V3_KEY} />
-                  </div>
+      <SiteHeader />
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6">My Transfer</h1>
+        <TabMenu items={accountConfig.tabList} defaultValue="transfer" />
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Transfer Funds</CardTitle>
+            <CardDescription>Move money between your accounts</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleTransfer}>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="fromAccount">From Account</Label>
+                  <Select value={fromAccount} onValueChange={handleFromAccountChange}>
+                    <SelectTrigger id="fromAccount">
+                      <SelectValue placeholder="Select account" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {listAccounts.map((account) => (
+                        <SelectItem key={account.id} value={account.id.toString()}>
+                          {account.account_name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-sm text-muted-foreground">
+                    Balance:{' '}
+                    {fromBalance.toLocaleString('en-US', {
+                      style: 'currency',
+                      currency: 'USD',
+                    })}
+                  </p>
                 </div>
-              </form>
-            </CardContent>
-            <CardFooter>
-              <Button className="w-full" onClick={handleTransfer}>
-                Transfer
-              </Button>
-            </CardFooter>
-          </Card>
-        </div>
-        <SiteFooter />
+
+                <div className="flex justify-center">
+                  <ArrowDownIcon className="h-6 w-6" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="toAccount">To Account</Label>
+                  <Select value={toAccount} onValueChange={handleToAccountChange}>
+                    <SelectTrigger id="toAccount">
+                      <SelectValue placeholder="Select account" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {listAccounts.map((account) => (
+                        <SelectItem key={account.id} value={account.id.toString()}>
+                          {account.account_name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-sm text-muted-foreground">
+                    Balance:{' '}
+                    {toBalance.toLocaleString('en-US', {
+                      style: 'currency',
+                      currency: 'USD',
+                    })}
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="amount">Amount</Label>
+                  <Input
+                    id="amount"
+                    placeholder="Enter amount"
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <ReCaptchaV3 sitekey={process.env.NEXT_PUBLIC_GOOGLE_RECAPTCHA_V3_KEY} />
+                </div>
+              </div>
+            </form>
+          </CardContent>
+          <CardFooter>
+            <Button className="w-full" onClick={handleTransfer}>
+              Transfer
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+      <SiteFooter />
     </>
   )
 }

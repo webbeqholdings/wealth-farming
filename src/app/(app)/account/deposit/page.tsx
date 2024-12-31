@@ -33,6 +33,7 @@ import { accountConfig } from '@/config/accounts'
 import { toast } from '@/hooks/use-toast'
 import { notifyDeposit } from '@/lib/telegram'
 import CurrencyConverter from '@/components/CurrencyConverter'
+import { getAccountsByUserId } from '../../../../lib/account'
 
 // Steps component definition
 interface StepProps {
@@ -95,6 +96,8 @@ export default function DepositPage() {
   const [selectedBalance, setSelectedBalance] = useState(0)
   const [exchangeRate, setExchangeRate] = useState(1) // Default exchange rate
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
+  const [depositScreenshot, setDepositScreenshot] = useState<FormData>(null)
+
   const quickAmounts = [
     { label: '500K', value: 500000 },
     { label: '1M', value: 1000000 },
@@ -188,12 +191,12 @@ export default function DepositPage() {
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
-        const response = await fetch(`/api/accounts?where[user][equals]=${user.id}`) // Replace with dynamic user ID if necessary
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`)
+        if (user && user.id) {
+          const accountsData = await getAccountsByUserId(user.id)
+          if (accountsData) {
+            setAccounts(accountsData)
+          }
         }
-        const data = await response.json()
-        setAccounts(data.docs) // Store the accounts in state
       } catch (error) {
         console.error('Failed to fetch accounts:', error)
       }
@@ -230,6 +233,37 @@ export default function DepositPage() {
     return <div>Redirecting...</div> // Optional: Show a redirect message
   }
 
+  const handleDepositScreenshotChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      const formData = new FormData()
+      formData.append('file', file)
+      setDepositScreenshot(formData)
+    } else {
+      console.error('No file selected.')
+    }
+  }
+
+  const uploadScreenshot = async (formData: FormData) => {
+    try {
+      const response = await fetch('/api/media', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        throw new Error('Screenshot upload failed')
+      }
+
+      const data = await response.json()
+      console.log('Uploaded screenshot data:', data)
+      return data.doc
+    } catch (error) {
+      console.error('Error uploading screenshot:', error)
+      throw error
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -242,6 +276,11 @@ export default function DepositPage() {
     }
 
     try {
+      let depositScreenshotId = null
+      if (depositScreenshot) {
+        depositScreenshotId = await uploadScreenshot(depositScreenshot)
+      }
+
       const response = await fetch('/api/transaction/create', {
         method: 'POST',
         headers: {
@@ -255,6 +294,7 @@ export default function DepositPage() {
           from_account: Number(fromAccount),
           type: 'deposit',
           currency: currency,
+          deposit_screenshot: 15,
         }), // Convert the request body to JSON
       })
 
@@ -415,6 +455,15 @@ export default function DepositPage() {
                         <p className="text-sm text-center text-muted-foreground">
                           Scan this QR code with your banking app to make the transfer
                         </p>
+                        <div className="flex justify-between my-10">
+                          <span>Upload Your Deposit Screenshot</span>
+                          <Input
+                            id="deposit_screenshot"
+                            name="deposit_screenshot"
+                            type="file"
+                            onChange={handleDepositScreenshotChange}
+                          />
+                        </div>
                       </div>
                     </div>
                   )}
