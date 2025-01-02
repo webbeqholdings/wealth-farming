@@ -5,6 +5,11 @@ export const getPaymentTransfer = async () => {
 
         return {
             id: data.id || null, // Assuming id is not available in the current response
+            bankQrCode: data.bank_qr_code,
+            bankAccountNumber: data.bank_account_number,
+            bankAccountDescription: data.bank_account_description,
+            cryptoWalletQrCode: data.crypto_wallet_qr_code,
+            cryptoWalletAddress: data.crypto_wallet_address,
             cryptoWalletNetwork: data.crypto_wallet_network,
             minDeposit: data.min_deposit,
             minWithdrawal: data.min_withdrawal,
