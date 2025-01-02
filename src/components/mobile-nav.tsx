@@ -26,15 +26,6 @@ export function MobileNav() {
         }
 
         const data = await response.json()
-
-        // Extract navigation links from the response
-        // const fetchedMenuItems = data.navigationLinks.map(
-        //   (link: { id: string; title: string; url: string }) => ({
-        //     id: link.id,
-        //     title: link.title,
-        //     url: link.url,
-        //   }),
-        // )
         setMenuItems(data.menuItems) // Update state with fetched menu items
       } catch (error) {
         console.error('Error fetching menu items:', error)
@@ -97,11 +88,8 @@ export function MobileNav() {
                     {item.title}
                   </div>
                 </Link>)) : <></>
-              
             }
-
           </div>
-
         </ScrollArea>
       </SheetContent>
     </Sheet>
