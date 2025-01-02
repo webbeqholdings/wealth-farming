@@ -4,6 +4,10 @@ import config from '@payload-config'
 import { headers as nextHeaders } from 'next/headers'
 import { formatDateTime } from '@/utilities/formatDateTime'
 import { getBalanceFromAccount, getAccountIdInvestmentByUser } from './account'
+import {
+  getEmployeePlusProducts,
+  inArrayEmployeePlusUsersIDs,
+} from './investment-products/dynamicFundQuery'
 
 const payload = await getPayload({
   config,
@@ -60,14 +64,16 @@ export const getTransactions = async (
 
 export async function createTransactionInvestment(formData: any) {
   try {
-    const amount = formData.amount
-    const term = formData.term
-    const startDate = formData.startDate
-    const endDate = formData.endDate
-    const periods = formData.periods
-    const expectedReturn = formData.expectedReturn
-    const productName = formData.productName
-    let response;
+    // const amount = formData.amount
+    // const term = formData.term
+    // const startDate = formData.startDate
+    // const endDate = formData.endDate
+    // const periods = formData.periods
+    // const expectedReturn = formData.expectedReturn
+    // const productName = formData.productName
+
+    const { amount, term, startDate, endDate, periods, expectedReturn, productName } = formData
+    let response
 
     const headers = await nextHeaders()
     const auth = await payload.auth({ headers })
@@ -79,12 +85,14 @@ export async function createTransactionInvestment(formData: any) {
         type: { equals: 'investment' },
       },
     })
+
     const investmentProduct = await payload.find({
       collection: 'investment-products',
       where: {
         product_name: { equals: productName },
       },
     })
+
     if (investmentAccount.docs[0].amount < amount) {
       return {
         user: investmentAccount,
@@ -92,6 +100,7 @@ export async function createTransactionInvestment(formData: any) {
         error: true,
       }
     }
+
     if (amount < investmentProduct.docs[0].min_investment) {
       return {
         message: 'Amount not allowed investment',
@@ -99,6 +108,7 @@ export async function createTransactionInvestment(formData: any) {
       }
     }
 
+    // Can nhac Account Amount = Query
     const AmountFromAccount = investmentAccount.docs[0].amount - amount
     await payload.update({
       collection: 'accounts',
@@ -120,38 +130,11 @@ export async function createTransactionInvestment(formData: any) {
       },
     })
 
-    // user referrals
-    const userReferral = await payload.find({
-      collection: 'user-referrals',
-      where: {
-        child: { equals: auth.user.id },
-      },
-    })
     const product = await payload.findByID({
       collection: 'investment-products',
       id: Number(investmentProduct.docs[0].id),
     })
-    if (typeof userReferral.docs[0]?.parent === 'object' && userReferral.docs[0]?.parent !== null) {
-      response = await payload.create({
-        collection: 'contracts',
-        data: {
-          user: userReferral.docs[0].parent.id,
-          amount: Number(amount * 0.03),
-          balance: Number(amount * 0.03),
-          status: 'active',
-          profit: 0,
-          term: term,
-          periods: periods,
-          start_date: startDate,
-          end_date: endDate,
-          product_log: {
-            name: product.product_name,
-            min_investment: product.min_investment,
-            rate_of_return: product.rate_of_return,
-          },
-        },
-      })
-    }
+
     response = await payload.create({
       collection: 'contracts',
       data: {
@@ -166,12 +149,32 @@ export async function createTransactionInvestment(formData: any) {
         start_date: startDate,
         end_date: endDate,
         product_log: {
-          name: product.product_name,
-          min_investment: product.min_investment,
-          rate_of_return: product.rate_of_return,
+          data: product,
         },
       },
     })
+
+    // Update for Employee
+    if (inArrayEmployeePlusUsersIDs(auth.user.id)) {
+      const employeeProducts = await getEmployeePlusProducts()
+      const employeeProduct = employeeProducts.filter((prod: any) => {
+        return prod == investmentProduct.docs[0].term
+      })[0]
+
+      await payload.create({
+        collection: 'transactions',
+        data: {
+          user: Number(auth.user.id),
+          amount: Number(amount),
+          investment_product: (employeeProduct as { id: number })?.id
+            ? Number((employeeProduct as { id: number }).id)
+            : null,
+          status: 'completed',
+          from_account: investmentAccount.docs[0].id,
+          type: 'investment',
+        },
+      })
+    }
 
     return {
       data: response,
@@ -250,4 +253,193 @@ export const getTransactionsBonusByProduct = async (
   if (!res.totalDocs) return []
 
   return res.docs
+}
+
+export const getTotalDeposit = async (user_id: number): Promise<number> => {
+  let total = 0
+  const data = await payload.find({
+    collection: 'transactions',
+    where: {
+      user: { equals: Number(user_id) },
+      status: { equals: 'completed' },
+      type: { equals: 'deposit' },
+    },
+  })
+
+  if (!data.totalDocs) return 0
+
+  data.docs.forEach((t: any) => {
+    total += t.amount
+  })
+
+  return total
+}
+
+// -- 01JAN2025 Update --
+
+// -- -- Pending Transaction -- --
+export const createDeposit = async (inputData: any) => {
+  // validate: is approve pending deposit ?
+  const { amount, user_id, account_to } = inputData
+
+  // Validate
+  if (!amount) {
+    return {
+      isSuccess: false,
+      msg: 'Amount Empty',
+      data: {},
+    }
+  }
+
+  const response = await payload.create({
+    collection: 'transactions',
+    data: {
+      user: Number(user_id),
+      amount: Number(amount),
+      status: 'pending',
+      account_to: account_to,
+      type: 'deposit',
+    },
+  })
+
+  if (!response) {
+    return {
+      isSuccess: false,
+      msg: 'Deposit Failed',
+      data: {},
+    }
+  }
+
+  return {
+    isSuccess: true,
+    msg: 'Deposit Success',
+    data: response,
+  }
+}
+
+// -- -- Pending Transaction -- --
+export const createWithdrawal = async (inputData: any) => {
+  // validate: is approve pending deposit ?
+  const { amount, user_id, account_from, bank_id } = inputData
+
+  // Validate
+  if (!amount) {
+    return {
+      isSuccess: false,
+      msg: 'Amount Empty',
+      data: {},
+    }
+  }
+
+  const response = await payload.create({
+    collection: 'transactions',
+    data: {
+      user: Number(user_id), // User Created
+      amount: Number(amount),
+      status: 'pending',
+      account_from: account_from,
+      bank: bank_id,
+      type: 'withdraw',
+    },
+  })
+
+  if (!response) {
+    return {
+      isSuccess: false,
+      msg: 'Withdraw Failed',
+      data: {},
+    }
+  }
+
+  return {
+    isSuccess: true,
+    msg: 'Withdraw Success',
+    data: response,
+  }
+}
+
+// -- -- Pending Transaction -- --
+export const createTransfer = async (inputData: any) => {
+  // validate: is approve pending deposit ?
+  const { amount, user_id, account_from, account_to } = inputData
+
+  // Validate
+  if (!amount) {
+    return {
+      isSuccess: false,
+      msg: 'Amount Empty',
+      data: {},
+    }
+  }
+
+  const response = await payload.create({
+    collection: 'transactions',
+    data: {
+      user: Number(user_id), // User Created
+      amount: Number(amount),
+      status: 'completed',
+      account_from: account_from,
+      account_to: account_to,
+      type: 'transfer', // Owner Transfer
+    },
+  })
+
+  if (!response) {
+    return {
+      isSuccess: false,
+      msg: 'Transfer Failed',
+      data: {},
+    }
+  }
+
+  return {
+    isSuccess: true,
+    msg: 'Transfer Success',
+    data: response,
+  }
+}
+
+export const getSumAmountAccountFrom = async (account_from: number) => {
+  const transactions = await payload.find({
+    collection: 'transactions',
+    where: {
+      status: { equals: 'completed' },
+      account_from: { equals: account_from },
+    },
+  })
+
+  if (!transactions.totalDocs) return 0
+
+  let total = 0
+  transactions.docs.forEach((t: any) => {
+    total += t.amount
+  })
+
+  return total
+}
+
+export const getSumAmountAccountTo = async (account_to: number) => {
+  const transactions = await payload.find({
+    collection: 'transactions',
+    where: {
+      status: { equals: 'completed' },
+      account_to: { equals: account_to },
+    },
+  })
+
+  if (!transactions.totalDocs) return 0
+
+  let total = 0
+  transactions.docs.forEach((t: any) => {
+    total += t.amount
+  })
+
+  return total
+}
+
+// Amount Balance = Sum(account_to) - Sum(account_from)
+export const getSumAmountBalanceByAccount = async (account_id: number) => {
+  const sumIn = await getSumAmountAccountTo(account_id)
+  const sumOut = await getSumAmountAccountTo(account_id)
+  return sumIn - sumOut
 }

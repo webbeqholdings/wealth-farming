@@ -15,7 +15,15 @@ import {
 import { Users, Link, DollarSign, Award } from 'lucide-react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
-import { getReferralsByParentId } from '@/lib/referrals'
+import {
+  getLinkReferral,
+  getReferralsByParentId,
+  getCountChildren,
+  getCountDepositedChildren,
+  getTotalEarning,
+  getCurrentLevelRate,
+  getCurrentLevelName,
+} from '@/lib/referrals'
 import userStatus from '@/lib/userStatus'
 import { useRouter } from 'next/navigation'
 import {
@@ -49,25 +57,31 @@ export default function ReferralPage() {
   const [totalPages, setTotalPages] = useState(1)
   const [currentPage, setCurrentPage] = useState(1)
 
+  const [countChildren, setCountChildren] = useState(0)
+  const [countDepositedChildren, setCountDepositedChildren] = useState(0)
+  const [totalEarning, setTotalEarning] = useState(0)
+  const [currentLevelName, setCurrentLevelName] = useState('Loading...')
+  const [currentLevelRate, setCurrentLevelRate] = useState(0)
+
   useEffect(() => {
     // Simulating API call to fetch referral data
     const fetchReferralData = async () => {
-      const { docs, totalPages, referral_code } = await getReferralsByParentId(
-        user.id,
-        currentPage,
-        10,
-      )
+      const { docs, totalPages } = await getReferralsByParentId(user.id, currentPage, 10)
+
+      const refLink = await getLinkReferral(user.id)
+
+      // Stats
+      setCountChildren(await getCountChildren(user.id))
+      setCountDepositedChildren(await getCountDepositedChildren(user.id))
+      setTotalEarning(await getTotalEarning(user.id))
+
+      // Set Level
+      setCurrentLevelRate(await getCurrentLevelRate(user.id))
+      setCurrentLevelName(await getCurrentLevelName(user.id))
 
       setReferrals(docs) // Store the accounts in state
       setTotalPages(totalPages)
-      setReferralLink(`https://wealthfarming.org/ref/${referral_code}`)
-
-      setStats({
-        totalReferrals: 3,
-        pendingReferrals: 1,
-        completedReferrals: 2,
-        totalEarnings: 100,
-      })
+      setReferralLink(refLink)
     }
 
     fetchReferralData()
@@ -116,38 +130,38 @@ export default function ReferralPage() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Referrals</CardTitle>
+              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalReferrals}</div>
+              <div className="text-2xl font-bold">{countChildren}</div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pending Referrals</CardTitle>
+              <CardTitle className="text-sm font-medium">Deposited Users</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.pendingReferrals}</div>
+              <div className="text-2xl font-bold">{countDepositedChildren}</div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Completed Referrals</CardTitle>
+              <CardTitle className="text-sm font-medium">Total Earning</CardTitle>
               <Award className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.completedReferrals}</div>
+              <div className="text-2xl font-bold">{totalEarning}</div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Earnings</CardTitle>
+              <CardTitle className="text-sm font-medium">{currentLevelName}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${stats.totalEarnings}</div>
+              <div className="text-2xl font-bold">${(currentLevelRate * 100).toFixed(2)}</div>
             </CardContent>
           </Card>
         </div>
