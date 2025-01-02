@@ -14,7 +14,6 @@ import { siteConfig } from '@/config/site'
 
 export function MobileNav() {
   const [open, setOpen] = React.useState(false)
-  const profile_item = [{ id: '1', title: 'Profile', href: '/user-profile' }, { id: '2', title: 'Referral Reward', href: '/account/referral' }, { id: '3', title: '', href: '' }, { id: '4', title: '', href: '' }]
   const [menuItems, setMenuItems] = React.useState([])
   React.useEffect(() => {
     const getMenuItems = async () => {
@@ -33,6 +32,7 @@ export function MobileNav() {
     }
 
     getMenuItems() // Call the async function inside useEffect
+    console.log(menuItems)
   }, [])
 
   return (
@@ -82,10 +82,21 @@ export function MobileNav() {
         <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
           <div className="flex flex-col space-y-3">
             {
+
               menuItems ? menuItems.map((item) => (
-                <Link href={item.url ?? '#'}  target="_blank" rel="noreferrer">
-                  <div >
+                <Link href={item.url ?? '#'} target="_blank" rel="noreferrer">
+                  <div className='ml-4 mt-2 ' >
                     {item.title}
+                  </div>
+                  <div>
+                    {item.children ?
+                      item.children.map((itemchild) => (
+                        <Link href={itemchild.url ?? '#'} target="_blank" rel="noreferrer">
+                          <div className='pl-8'>
+                            {itemchild.title}
+                          </div>
+                        </Link>))
+                    : <></>}
                   </div>
                 </Link>)) : <></>
             }
