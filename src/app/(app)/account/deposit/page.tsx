@@ -33,6 +33,8 @@ import { accountConfig } from '@/config/accounts'
 import { toast } from '@/hooks/use-toast'
 import { notifyDeposit } from '@/lib/telegram'
 import CurrencyConverter from '@/components/CurrencyConverter'
+import { getAccountsByUserId } from '../../../../lib/account'
+import { getPaymentTransfer } from '@/lib/paymentTransfer'
 
 // Steps component definition
 interface StepProps {
@@ -95,6 +97,16 @@ export default function DepositPage() {
   const [selectedBalance, setSelectedBalance] = useState(0)
   const [exchangeRate, setExchangeRate] = useState(1) // Default exchange rate
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
+  const [depositScreenshot, setDepositScreenshot] = useState<FormData>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [bankQRCode, setBankQRCode] = useState();
+  const [bankAccountNumber, setBankAccountNumber] = useState();
+  const [bankAccountName, setBankAccountName] = useState();
+  const [cryptoWalletQrCodeUrl, setCryptoWalletQrCodeUrl] = useState();
+  const [cryptoWalletAddress, setCryptoWalletAddress] = useState();
+  const [cryptoWalletNetwork, setCryptoWalletNetwork] = useState();
+  const [minDeposit, setMinDeposit] = useState(0);
+
   const quickAmounts = [
     { label: '500K', value: 500000 },
     { label: '1M', value: 1000000 },
@@ -105,14 +117,20 @@ export default function DepositPage() {
 
   const [convertedQuickAmounts, setConvertedQuickAmounts] = useState(quickAmounts)
   const [USDCurrency, setUSDCurrency] = useState<number>(0)
-  const handleNextStep = () => {
-    if (validateStep()) {
-      if (step < 3) setStep(step + 1)
-    } else {
+  const handleNextStep = async () => {
+    if (!validateStep()) {
       toast({
         title: 'Please correct the highlighted errors.',
         description: 'Some fields are missing or invalid.',
       })
+    }
+    if (USDCurrency < minDeposit && Number(USDCurrency) > 0) {
+      toast({
+        title: 'Please correct the highlighted errors.',
+        description: `The amount must be greater than or equal to the minimum withdrawal amount of ${minDeposit} USD.`,
+      })
+    } else if (validateStep()) {
+      if (step < 3) setStep(step + 1)
     }
   }
 
@@ -141,6 +159,12 @@ export default function DepositPage() {
       if (!selectBank) newErrors.selectBank = 'Please select a bank.'
     }
 
+    if (step === 2) {
+      if (!depositScreenshot) {
+        newErrors.depositScreenshot = 'Please upload a valid deposit screenshot.';
+      }
+    }
+
     if (step === 3) {
       if (!USDCurrency || Number(USDCurrency) <= 0)
         newErrors.USDCurrency = 'Amount is required for confirmation.'
@@ -151,6 +175,21 @@ export default function DepositPage() {
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
+
+  useEffect(() => {
+    const fetchPaymentTransfer = async () => {
+      const paymentTransfer = await getPaymentTransfer();
+      setMinDeposit(paymentTransfer.minDeposit)
+      setBankQRCode(paymentTransfer.bankQrCode.url)
+      setCryptoWalletQrCodeUrl(paymentTransfer.cryptoWalletQrCode.url)
+      setCryptoWalletNetwork(paymentTransfer.cryptoWalletNetwork)
+      setCryptoWalletAddress(paymentTransfer.cryptoWalletAddress)
+      setBankAccountName(paymentTransfer.bankAccountDescription)
+      setBankAccountNumber(paymentTransfer.bankAccountNumber)
+    }
+
+    fetchPaymentTransfer()
+  }, [loading])
 
   // Fetch exchange rate when the currency changes
   useEffect(() => {
@@ -181,19 +220,15 @@ export default function DepositPage() {
     setConvertedQuickAmounts(updatedQuickAmounts)
   }, [currency, exchangeRate])
 
-  const handleQuickAmount = (value: any) => {
-    setAmount(value.toString())
-  }
-
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
-        const response = await fetch(`/api/accounts?where[user][equals]=${user.id}`) // Replace with dynamic user ID if necessary
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`)
+        if (user && user.id) {
+          const accountsData = await getAccountsByUserId(user.id)
+          if (accountsData) {
+            setAccounts(accountsData)
+          }
         }
-        const data = await response.json()
-        setAccounts(data.docs) // Store the accounts in state
       } catch (error) {
         console.error('Failed to fetch accounts:', error)
       }
@@ -230,8 +265,52 @@ export default function DepositPage() {
     return <div>Redirecting...</div> // Optional: Show a redirect message
   }
 
+  const handleDepositScreenshotChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      const formData = new FormData()
+      formData.append('file', file)
+      setDepositScreenshot(formData)
+    } else {
+      toast({
+        title: 'No File Selected',
+        description: 'Please select a file to upload.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+
+  const uploadScreenshot = async (formData: FormData) => {
+    try {
+      const response = await fetch('/api/media', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        throw new Error('Screenshot upload failed')
+      }
+
+      const data = await response.json()
+
+      // Ensure the `id` is returned properly
+      if (!data?.doc?.id) {
+        throw new Error('Media upload response does not contain an id')
+      }
+
+      return data.doc.id // Return the extracted `id`
+    } catch (error) {
+      console.error('Error uploading screenshot:', error)
+      throw error
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (isSubmitting) return
+    setIsSubmitting(true)
 
     if (!validateStep()) {
       toast({
@@ -242,42 +321,57 @@ export default function DepositPage() {
     }
 
     try {
+      let depositScreenshotId = null // Initialize to null
+
+      // Upload screenshot if present
+      if (depositScreenshot) {
+        depositScreenshotId = await uploadScreenshot(depositScreenshot)
+      }
+
+      // Construct the request payload
+      const payload = {
+        user_id: Number(user.id),
+        bank_id: Number(selectBank),
+        amount: Number(USDCurrency),
+        status: 'pending',
+        from_account: Number(fromAccount),
+        type: 'deposit',
+        currency: currency,
+        deposit_screenshot: depositScreenshotId, // Include the screenshot ID
+      }
+
+      // Make the API request
       const response = await fetch('/api/transaction/create', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json', // Specify JSON content type
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          user_id: Number(user.id),
-          bank_id: Number(selectBank),
-          amount: Number(USDCurrency),
-          status: 'pending',
-          from_account: Number(fromAccount),
-          type: 'deposit',
-          currency: currency,
-        }), // Convert the request body to JSON
+        body: JSON.stringify(payload),
       })
 
       const data = await response.json()
       notifyDeposit(data.data) // Call notifyDeposit and get its response
+
       if (!response.ok) {
-        // Parse the error response to retrieve the error message
-        const errorResponse = await response.json()
-        const errorMessage = errorResponse.response?.error || 'An unknown error occurred'
+        const errorMessage = data.response?.error || 'An unknown error occurred'
         throw new Error(errorMessage)
       }
+
       toast({
         title: 'Transaction created successfully',
         description: 'Your deposit is being processed.',
       })
+
+      router.push('/account/history') // Redirect to history page
     } catch (error) {
       console.error('Error creating transaction:', error)
       toast({
         title: 'Transaction failed',
         description: String(error),
       })
+    } finally {
+      setIsSubmitting(false)
     }
-    router.push('/account/history') // Assuming there's a dashboard page to redirect to
   }
 
   return (
@@ -298,7 +392,7 @@ export default function DepositPage() {
               <Step title="Method" />
               <Step title="Confirm" />
             </Steps>
-            <form onSubmit={handleSubmit}>
+            <form>
               {step === 1 && (
                 <div className="space-y-4">
                   <div className="space-y-2">
@@ -377,44 +471,114 @@ export default function DepositPage() {
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2 opacity-50">
-                      <RadioGroupItem value="vnpay" id="vnpay" disabled />
+                      <RadioGroupItem value="crypto" id="crypto" />
+                      <Label htmlFor="crypto" className="flex items-center space-x-2">
+                        <CreditCard className="h-4 w-4" />
+                        <span>Crypto Wallet</span>
+                      </Label>
+                    </div>
+                    {/* <div className="flex items-center space-x-2 opacity-50">
+                      <RadioGroupItem value="vnpay" id="vnpay" />
                       <Label htmlFor="vnpay" className="flex items-center space-x-2">
                         <CreditCard className="h-4 w-4" />
                         <span>VNPay (not available)</span>
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2 opacity-50">
-                      <RadioGroupItem value="momo" id="momo" disabled />
+                      <RadioGroupItem value="momo" id="momo" />
                       <Label htmlFor="momo" className="flex items-center space-x-2">
                         <CreditCard className="h-4 w-4" />
                         <span>Momo (not available)</span>
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2 opacity-50">
-                      <RadioGroupItem value="paypal" id="paypal" disabled />
+                      <RadioGroupItem value="paypal" id="paypal" />
                       <Label htmlFor="paypal" className="flex items-center space-x-2">
                         <CreditCard className="h-4 w-4" />
                         <span>PayPal (not available)</span>
                       </Label>
-                    </div>
+                    </div> */}
                   </RadioGroup>
-
                   {method === 'bank' && (
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label>Bank Transfer QR Code</Label>
+                    <div className="space-y-6">
+                      <div className="space-y-4">
+                        <Label className="flex justify-center">
+                          SCAN THIS QR CODE
+                        </Label>
                         <div className="flex justify-center">
                           <Image
-                            src="https://i.postimg.cc/y8XwnHrX/image.png"
+                            src={bankQRCode || "https://via.placeholder.com/300"}
                             alt="Bank Transfer QR Code"
-                            width={200}
-                            height={200}
-                            className="border rounded-lg"
+                            width={300}
+                            height={300}
+                            className="border rounded-lg shadow-md"
                           />
                         </div>
-                        <p className="text-sm text-center text-muted-foreground">
-                          Scan this QR code with your banking app to make the transfer
+                        <div className="space-y-1 text-center">
+                          <p className="text-sm font-medium text-gray-700">{bankAccountName}</p>
+                          <p className="text-sm font-medium text-gray-700">{bankAccountNumber}</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <Label htmlFor="deposit_screenshot" className="text-sm font-medium text-gray-700">
+                          Upload Your Deposit
+                        </Label>
+                        <Input
+                          id="deposit_screenshot"
+                          name="deposit_screenshot"
+                          type="file"
+                          onChange={handleDepositScreenshotChange}
+                          className="border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        />
+                        <p className="text-xs text-gray-500">
+                          Please upload a screenshot showing your deposit transaction. Accepted formats: JPG, PNG, with a maximum size of 5MB.
                         </p>
+                        {errors.depositScreenshot && (
+                          <p className="text-red-500 text-sm">{errors.depositScreenshot}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {method === 'crypto' && (
+                    <div className="space-y-6">
+                      <div className="space-y-4">
+                        <Label className="flex justify-center">
+                          SCAN THIS QR CODE
+                        </Label>
+                        <div className="flex justify-center">
+                          <Image
+                            src={cryptoWalletQrCodeUrl || "https://via.placeholder.com/300"}
+                            alt="Crypto Wallet QR Code"
+                            width={300}
+                            height={300}
+                            className="border rounded-lg shadow-md"
+                          />
+                        </div>
+                        <div className="space-y-1 text-center">
+                          <p className="text-sm font-medium text-gray-700">{cryptoWalletNetwork}</p>
+                          <p className="text-sm font-medium text-gray-700">{cryptoWalletAddress}</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <Label htmlFor="deposit_screenshot" className="text-sm font-medium text-gray-700">
+                          Upload Your Deposit
+                        </Label>
+                        <Input
+                          id="deposit_screenshot"
+                          name="deposit_screenshot"
+                          type="file"
+                          onChange={handleDepositScreenshotChange}
+                          className="border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        />
+                        <p className="text-xs text-gray-500">
+                          Please upload a screenshot showing your deposit transaction. Accepted formats: JPG, PNG, with a maximum size of 5MB.
+                        </p>
+                        {errors.depositScreenshot && (
+                          <p className="text-red-500 text-sm">{errors.depositScreenshot}</p>
+                        )}
                       </div>
                     </div>
                   )}
@@ -438,7 +602,7 @@ export default function DepositPage() {
                     </div>
                     <div className="flex justify-between">
                       <span>Method:</span>
-                      <span className="font-semibold">Bank Transfer</span>
+                      <span className="font-semibold">{method == 'bank' ? 'Bank Transfer' : 'Crypto Wallet'}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Account Number:</span>
@@ -460,7 +624,14 @@ export default function DepositPage() {
             {step < 3 ? (
               <Button onClick={handleNextStep}>Next</Button>
             ) : (
-              <Button onClick={handleSubmit}>Confirm Deposit</Button>
+              <Button
+                type="submit"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className={cn(isSubmitting && 'cursor-not-allowed opacity-50')}
+              >
+                {isSubmitting ? 'Processing...' : 'Submit'}
+              </Button>
             )}
           </CardFooter>
         </Card>

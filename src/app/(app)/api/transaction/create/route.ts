@@ -9,7 +9,7 @@ export async function POST(req: Request) {
       config,
     })
 
-    let { to_account, from_account, bank_id, product_id, type, amount, user_id, currency } = request
+    let { to_account, from_account, bank_id, product_id, type, amount, user_id, currency, deposit_screenshot } = request
     let response = null
     // Handle deposit type
     if (type === 'deposit') {
@@ -30,6 +30,7 @@ export async function POST(req: Request) {
           from_account: from_account ? Number(from_account) : undefined,
           to_account: to_account ? Number(to_account) : undefined,
           type,
+          deposit_screenshot: Number(deposit_screenshot)
         },
       })
     }

@@ -36,7 +36,6 @@ import { useRouter } from 'next/navigation'
 import UserStatus from '@/lib/userStatus'
 import TelegramButton from '@/components/TelegramButton'
 
-
 export default function UserProfile() {
   const { isLoggedIn, loading, user } = UserStatus()
   const router = useRouter()
