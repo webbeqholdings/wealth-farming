@@ -34,6 +34,7 @@ import { toast } from '@/hooks/use-toast'
 import { notifyDeposit } from '@/lib/telegram'
 import CurrencyConverter from '@/components/CurrencyConverter'
 import { getAccountsByUserId } from '../../../../lib/account'
+import { getPaymentTransfer } from '@/lib/paymentTransfer'
 
 // Steps component definition
 interface StepProps {
@@ -98,6 +99,13 @@ export default function DepositPage() {
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [depositScreenshot, setDepositScreenshot] = useState<FormData>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [bankQRCode, setBankQRCode] = useState();
+  const [bankAccountNumber, setBankAccountNumber] = useState();
+  const [bankAccountName, setBankAccountName] = useState();
+  const [cryptoWalletQrCodeUrl, setCryptoWalletQrCodeUrl] = useState();
+  const [cryptoWalletAddress, setCryptoWalletAddress] = useState();
+  const [cryptoWalletNetwork, setCryptoWalletNetwork] = useState();
+  const [minDeposit, setMinDeposit] = useState(0);
 
   const quickAmounts = [
     { label: '500K', value: 500000 },
@@ -109,14 +117,20 @@ export default function DepositPage() {
 
   const [convertedQuickAmounts, setConvertedQuickAmounts] = useState(quickAmounts)
   const [USDCurrency, setUSDCurrency] = useState<number>(0)
-  const handleNextStep = () => {
-    if (validateStep()) {
-      if (step < 3) setStep(step + 1)
-    } else {
+  const handleNextStep = async () => {
+    if (!validateStep()) {
       toast({
         title: 'Please correct the highlighted errors.',
         description: 'Some fields are missing or invalid.',
       })
+    }
+    if (USDCurrency < minDeposit && Number(USDCurrency) > 0) {
+      toast({
+        title: 'Please correct the highlighted errors.',
+        description: `The amount must be greater than or equal to the minimum withdrawal amount of ${minDeposit} USD.`,
+      })
+    } else if (validateStep()) {
+      if (step < 3) setStep(step + 1)
     }
   }
 
@@ -145,6 +159,12 @@ export default function DepositPage() {
       if (!selectBank) newErrors.selectBank = 'Please select a bank.'
     }
 
+    if (step === 2) {
+      if (!depositScreenshot) {
+        newErrors.depositScreenshot = 'Please upload a valid deposit screenshot.';
+      }
+    }
+
     if (step === 3) {
       if (!USDCurrency || Number(USDCurrency) <= 0)
         newErrors.USDCurrency = 'Amount is required for confirmation.'
@@ -155,6 +175,21 @@ export default function DepositPage() {
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
+
+  useEffect(() => {
+    const fetchPaymentTransfer = async () => {
+      const paymentTransfer = await getPaymentTransfer();
+      setMinDeposit(paymentTransfer.minDeposit)
+      setBankQRCode(paymentTransfer.bankQrCode.url)
+      setCryptoWalletQrCodeUrl(paymentTransfer.cryptoWalletQrCode.url)
+      setCryptoWalletNetwork(paymentTransfer.cryptoWalletNetwork)
+      setCryptoWalletAddress(paymentTransfer.cryptoWalletAddress)
+      setBankAccountName(paymentTransfer.bankAccountDescription)
+      setBankAccountNumber(paymentTransfer.bankAccountNumber)
+    }
+
+    fetchPaymentTransfer()
+  }, [loading])
 
   // Fetch exchange rate when the currency changes
   useEffect(() => {
@@ -184,10 +219,6 @@ export default function DepositPage() {
     }))
     setConvertedQuickAmounts(updatedQuickAmounts)
   }, [currency, exchangeRate])
-
-  const handleQuickAmount = (value: any) => {
-    setAmount(value.toString())
-  }
 
   useEffect(() => {
     const fetchAccounts = async () => {
@@ -241,9 +272,14 @@ export default function DepositPage() {
       formData.append('file', file)
       setDepositScreenshot(formData)
     } else {
-      console.error('No file selected.')
+      toast({
+        title: 'No File Selected',
+        description: 'Please select a file to upload.',
+        variant: 'destructive',
+      });
     }
-  }
+  };
+
 
   const uploadScreenshot = async (formData: FormData) => {
     try {
@@ -257,7 +293,6 @@ export default function DepositPage() {
       }
 
       const data = await response.json()
-      console.log('Uploaded screenshot data:', data)
 
       // Ensure the `id` is returned properly
       if (!data?.doc?.id) {
@@ -436,53 +471,114 @@ export default function DepositPage() {
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2 opacity-50">
-                      <RadioGroupItem value="vnpay" id="vnpay" disabled />
+                      <RadioGroupItem value="crypto" id="crypto" />
+                      <Label htmlFor="crypto" className="flex items-center space-x-2">
+                        <CreditCard className="h-4 w-4" />
+                        <span>Crypto Wallet</span>
+                      </Label>
+                    </div>
+                    {/* <div className="flex items-center space-x-2 opacity-50">
+                      <RadioGroupItem value="vnpay" id="vnpay" />
                       <Label htmlFor="vnpay" className="flex items-center space-x-2">
                         <CreditCard className="h-4 w-4" />
                         <span>VNPay (not available)</span>
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2 opacity-50">
-                      <RadioGroupItem value="momo" id="momo" disabled />
+                      <RadioGroupItem value="momo" id="momo" />
                       <Label htmlFor="momo" className="flex items-center space-x-2">
                         <CreditCard className="h-4 w-4" />
                         <span>Momo (not available)</span>
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2 opacity-50">
-                      <RadioGroupItem value="paypal" id="paypal" disabled />
+                      <RadioGroupItem value="paypal" id="paypal" />
                       <Label htmlFor="paypal" className="flex items-center space-x-2">
                         <CreditCard className="h-4 w-4" />
                         <span>PayPal (not available)</span>
                       </Label>
-                    </div>
+                    </div> */}
                   </RadioGroup>
-
                   {method === 'bank' && (
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label>Bank Transfer QR Code</Label>
+                    <div className="space-y-6">
+                      <div className="space-y-4">
+                        <Label className="flex justify-center">
+                          SCAN THIS QR CODE
+                        </Label>
                         <div className="flex justify-center">
                           <Image
-                            src="https://i.postimg.cc/y8XwnHrX/image.png"
+                            src={bankQRCode || "https://via.placeholder.com/300"}
                             alt="Bank Transfer QR Code"
-                            width={200}
-                            height={200}
-                            className="border rounded-lg"
+                            width={300}
+                            height={300}
+                            className="border rounded-lg shadow-md"
                           />
                         </div>
-                        <p className="text-sm text-center text-muted-foreground">
-                          Scan this QR code with your banking app to make the transfer
+                        <div className="space-y-1 text-center">
+                          <p className="text-sm font-medium text-gray-700">{bankAccountName}</p>
+                          <p className="text-sm font-medium text-gray-700">{bankAccountNumber}</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <Label htmlFor="deposit_screenshot" className="text-sm font-medium text-gray-700">
+                          Upload Your Deposit
+                        </Label>
+                        <Input
+                          id="deposit_screenshot"
+                          name="deposit_screenshot"
+                          type="file"
+                          onChange={handleDepositScreenshotChange}
+                          className="border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        />
+                        <p className="text-xs text-gray-500">
+                          Please upload a screenshot showing your deposit transaction. Accepted formats: JPG, PNG, with a maximum size of 5MB.
                         </p>
-                        <div className="flex justify-between my-10">
-                          <span>Upload Your Deposit Screenshot</span>
-                          <Input
-                            id="deposit_screenshot"
-                            name="deposit_screenshot"
-                            type="file"
-                            onChange={handleDepositScreenshotChange}
+                        {errors.depositScreenshot && (
+                          <p className="text-red-500 text-sm">{errors.depositScreenshot}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {method === 'crypto' && (
+                    <div className="space-y-6">
+                      <div className="space-y-4">
+                        <Label className="flex justify-center">
+                          SCAN THIS QR CODE
+                        </Label>
+                        <div className="flex justify-center">
+                          <Image
+                            src={cryptoWalletQrCodeUrl || "https://via.placeholder.com/300"}
+                            alt="Crypto Wallet QR Code"
+                            width={300}
+                            height={300}
+                            className="border rounded-lg shadow-md"
                           />
                         </div>
+                        <div className="space-y-1 text-center">
+                          <p className="text-sm font-medium text-gray-700">{cryptoWalletNetwork}</p>
+                          <p className="text-sm font-medium text-gray-700">{cryptoWalletAddress}</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <Label htmlFor="deposit_screenshot" className="text-sm font-medium text-gray-700">
+                          Upload Your Deposit
+                        </Label>
+                        <Input
+                          id="deposit_screenshot"
+                          name="deposit_screenshot"
+                          type="file"
+                          onChange={handleDepositScreenshotChange}
+                          className="border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        />
+                        <p className="text-xs text-gray-500">
+                          Please upload a screenshot showing your deposit transaction. Accepted formats: JPG, PNG, with a maximum size of 5MB.
+                        </p>
+                        {errors.depositScreenshot && (
+                          <p className="text-red-500 text-sm">{errors.depositScreenshot}</p>
+                        )}
                       </div>
                     </div>
                   )}
@@ -506,7 +602,7 @@ export default function DepositPage() {
                     </div>
                     <div className="flex justify-between">
                       <span>Method:</span>
-                      <span className="font-semibold">Bank Transfer</span>
+                      <span className="font-semibold">{method == 'bank' ? 'Bank Transfer' : 'Crypto Wallet'}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Account Number:</span>

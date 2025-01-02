@@ -1,49 +1,7 @@
 import type { TaskHandler } from 'payload';
 import { getPayload } from 'payload';
 import config from '@payload-config';
-import {
-    buildProfitRecordsAnnualy,
-    buildProfitRecordsQuarterly,
-    buildProfitRecordsSemester,
-    buildProfitRecordsMonthly,
-} from '@/lib/investment-products/dynamicFund'
-import { format, getYear } from 'date-fns';
-
-const calculateProfit = (term: string, availableBalance: number, startDate: Date, type: string) => {
-    const today = new Date();
-    let build;
-    if (term == 'Annually') {
-        build = buildProfitRecordsAnnualy(availableBalance, startDate, today)
-    }
-
-    if (term == 'Semester') {
-        build = buildProfitRecordsSemester(availableBalance, startDate, today)
-    }
-
-    if (term == 'Quarterly') {
-        build = buildProfitRecordsQuarterly(availableBalance, startDate, today)
-    }
-
-    if (term == 'Monthly') {
-        build = buildProfitRecordsMonthly(availableBalance, startDate, today)
-    }
-    const year = getYear(today);
-    const month = format(today, 'MM');
-
-    const dateProfitFilter = build[year].filter((item: any) => {
-        return format(item.date, 'MM') === month;
-    });
-    if (!dateProfitFilter.length) {
-        return 0;
-    }
-
-    if (type == 'profit') {
-        return dateProfitFilter[0]?.profit;
-    }
-    if (type == 'balance') {
-        return dateProfitFilter[0]?.balance;
-    }
-};
+import calculateProfit from '@/lib/calculateProfit';
 
 export const updateProfitHandler: TaskHandler<{
     input: {};
@@ -80,16 +38,8 @@ export const updateProfitHandler: TaskHandler<{
         if (isNaN(parsedStartDate.getTime())) {
             throw new Error('Invalid start_date provided');
         }
-
-        const daysSinceStart = Math.floor((new Date().getTime() - parsedStartDate.getTime()) / (1000 * 60 * 60 * 24));
-        if (daysSinceStart <= 30 && daysSinceStart >= 0) {
-            profitToday = (daysSinceStart * amount * 20) / (255 * 100); // Adjust calculation as necessary
-            balanceToday = amount
-        }
-        if (daysSinceStart > 30) {
-            profitToday = calculateProfit(term, amount, new Date(start_date), 'profit');
-            balanceToday = calculateProfit(term, amount, new Date(start_date), 'balance');
-        }
+        profitToday = calculateProfit(term, amount, new Date(start_date), 'profit');
+        balanceToday = calculateProfit(term, amount, new Date(start_date), 'balance');
 
         await payload.update({
             collection: 'contracts',
