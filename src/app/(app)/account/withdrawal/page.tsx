@@ -104,7 +104,7 @@ export default function WithdrawPage() {
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
-        const response = await fetch(`/api/accounts?where[user][equals]=${user.id}&where[account_name][equals]=Main Account`); // Replace with dynamic user ID if necessary
+        const response = await fetch(`/api/accounts?where[user][equals]=${user.id}&where[type][equals]=main`); // Replace with dynamic user ID if necessary
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -154,20 +154,23 @@ export default function WithdrawPage() {
           currency: currency
         }), // Convert the request body to JSON
       });
-      const data = await response.json()
-      notifyWithdrawl(data.data)
+      let data = await response.json()
       if (!response.ok) {
         // Parse the error response to retrieve the error message
-        const errorResponse = await response.json();
-        const errorMessage = errorResponse.response?.error || 'An unknown error occurred';
+        const errorMessage = data.response?.error || 'An unknown error occurred';
+        console.log('errorMessage: ', errorMessage);
+        toast({
+          title: `${errorMessage}`,
+        })
         throw new Error(errorMessage);
       }
+      notifyWithdrawl(data.data)
       toast({
         title: 'Transaction created successfully',
       })
       router.push('/account/history') // Assuming there's a dashboard page to redirect to
     } catch (error) {
-      console.error('Error creating transaction:', error);
+      console.log('Error creating transaction:', error);
       toast({
         title: `${error}`,
       })
