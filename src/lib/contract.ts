@@ -34,15 +34,15 @@ export const getContracts = async (page: number, limit: number): Promise<{ docs:
       docs: contracts.map((contract: any) => ({
         id: contract.id,
         userId: contract.user.id,
-        minInvestment: contract.product_log?.min_investment,
-        productName: contract.product_log?.name,
+        minInvestment: contract?.product_log?.min_investment,
+        productName: contract?.product_log?.name,
         investedAmount: contract.amount,
         expectedReturn: contract.expected_return,
         availableBalance: Number(contract.balance),
         term: contract.term,
         periods: contract.periods,
         profit: contract.profit,
-        rateOfReturn: contract.product_log.rate_of_return,
+        rateOfReturn: contract?.product_log.rate_of_return,
         startDate: contract.start_date,
         endDate: contract.end_date,
         status: contract.status,
@@ -81,7 +81,7 @@ export const getWithdrawals = async (page: number, limit: number): Promise<{ doc
     return {
       docs: withdrawals.map((withdrawal: any) => ({
         id: withdrawal.id,
-        productName: withdrawal.contract.product_log?.name,
+        productName: withdrawal.contract?.product_log?.name,
         amount: withdrawal.amount,
         date: withdrawal.createdAt,
         status: withdrawal.status,
