@@ -99,7 +99,7 @@ export default function Page() {
 
         return toast({
           title: 'Error',
-          description: 'An error occurred. Please try again!',
+          description: 'The email or password is incorrect. Please try again.',
         })
       }
 
@@ -129,15 +129,22 @@ export default function Page() {
           return router.replace('/verify-otp')
         }
 
+        // Ensure data.error is a string
+        const errorMessage =
+          typeof data.error === 'string'
+            ? data.error
+            : (data.error as any).data.errors[0].message || 'An unknown error occurred.'
+
         return toast({
           title: 'Error',
-          description: 'An error occurred. Please try again!',
+          description: errorMessage,
         })
       }
     } catch (error) {
-      toast({
+      return toast({
         title: 'Error',
-        description: 'An error occurred. Please try again!',
+        description:
+          (error as any).data.errors[0].message || 'An error occurred during registration.',
       })
     }
   }
