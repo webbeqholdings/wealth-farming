@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { withdrawInvestment } from '@/lib/contract';
 import { notifyWithdrawlContracts } from '@/lib/telegram';
 import { isAfter } from 'date-fns';
+import { getPaymentTransfer } from '@/lib/paymentTransfer'
 
 interface WithdrawDialogProps {
   isOpen: boolean;
@@ -66,6 +67,18 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
     setIsLoading(true);
 
     try {
+      const paymentTransfer = await getPaymentTransfer();
+      const minWithdrawal = paymentTransfer.minWithdrawal;
+
+      if (parseFloat(amount) < minWithdrawal) {
+        toast({
+          title: 'Error',
+          description: `The amount must be greater than or equal to the minimum withdrawal amount of ${minWithdrawal} USD.`,
+          variant: 'destructive',
+        });
+        return;
+      }
+
       const formData = new FormData();
       formData.append('amount', amount);
       formData.append('contractId', contract.id);
@@ -129,6 +142,7 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
           <DialogFooter>
             <Button
               variant="outline"
+              type="button"
               onClick={handleDialogClose}
               className="border-gray-300 text-gray-700"
             >
