@@ -44,3 +44,6 @@ next-env.d.ts
 /.vscode
 pnpm-lock.yaml
 package-lock.json
+src/app/(app)/account/deposit/bk-page.tsx
+src/app/(app)/bk-page.tsx
+/src/app/(app)/tuan

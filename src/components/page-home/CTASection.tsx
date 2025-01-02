@@ -11,7 +11,7 @@ export function CTASection() {
           innovative agricultural projects.
         </p>
         <Button size="lg" className="font-semibold text-lg px-8" asChild>
-          <Link href="/join">Join Now</Link>
+          <Link href="/investment-products/incoming/investment-process">How it works</Link>
         </Button>
       </div>
     </section>
