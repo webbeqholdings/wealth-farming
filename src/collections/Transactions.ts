@@ -12,6 +12,9 @@ import {
 
 const Transactions: CollectionConfig = {
   slug: 'transactions',
+  admin: {
+    defaultColumns: ['type', 'id', 'user', 'amount', 'investment_product', 'status'],
+  },
   access: {
     read: () => true,
     create: isIndividualOrAdmin,
@@ -72,14 +75,26 @@ const Transactions: CollectionConfig = {
     {
       name: 'from_account',
       type: 'relationship',
-      relationTo: 'accounts', // Tài khoản nguồn
+      relationTo: 'accounts',
       label: 'From Account',
     },
     {
       name: 'to_account',
       type: 'relationship',
-      relationTo: 'accounts', // Tài khoản đích
+      relationTo: 'accounts',
       label: 'To Account',
+    },
+    {
+      name: 'account_from', // New Field: Sử dụng field này khi dòng tiền đi ra khỏi accountID
+      type: 'relationship',
+      relationTo: 'accounts',
+      label: 'Acc From (New)',
+    },
+    {
+      name: 'account_to', // New Field: Sử dụng field này khi dòng tiền đi ra vào accountID
+      type: 'relationship',
+      relationTo: 'accounts',
+      label: 'Acc To (New)',
     },
     {
       name: 'deposit_screenshot',
@@ -132,7 +147,7 @@ const Transactions: CollectionConfig = {
             })
             // ... Update Referral Process
             const parentUser = await getParentIdByUser(payload, doc.user)
-            const referralRate = await getCurrentLevelRate(payload, amount)
+            const referralRate: any = await getCurrentLevelRate(payload, amount)
             const parentId = (parentUser as { id: number }).id
 
             const referralAmount = amount * referralRate
@@ -143,6 +158,17 @@ const Transactions: CollectionConfig = {
             if (!referralProduct) return
 
             if (parentId) {
+              await payload.create({
+                collection: 'transactions',
+                data: {
+                  amount: Number(referralAmount),
+                  user: Number(parentId),
+                  status: 'completed',
+                  from_account: from_account,
+                  type: 'referral_reward',
+                },
+              })
+
               await payload.create({
                 collection: 'transactions',
                 data: {
