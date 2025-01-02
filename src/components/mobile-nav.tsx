@@ -5,16 +5,34 @@ import Link, { LinkProps } from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ViewVerticalIcon } from '@radix-ui/react-icons'
 
-import { docsConfig } from '@/config/docs'
-import { siteConfig } from '@/config/site'
 import { cn } from '@/lib/utils'
 import { Icons } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { siteConfig } from '@/config/site'
 
 export function MobileNav() {
   const [open, setOpen] = React.useState(false)
+  const [menuItems, setMenuItems] = React.useState([])
+  React.useEffect(() => {
+    const getMenuItems = async () => {
+      try {
+        // Fetch the data from the API
+        const response = await fetch('/api/globals/main-menu')
+        if (!response.ok) {
+          throw new Error(`Failed to fetch menu items: ${response.statusText}`)
+        }
+
+        const data = await response.json()
+        setMenuItems(data.menuItems) // Update state with fetched menu items
+      } catch (error) {
+        console.error('Error fetching menu items:', error)
+      }
+    }
+
+    getMenuItems() // Call the async function inside useEffect
+  }, [])
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -62,43 +80,14 @@ export function MobileNav() {
         </MobileLink>
         <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
           <div className="flex flex-col space-y-3">
-            {docsConfig.mainNav?.map(
-              (item) =>
-                item.href && (
-                  <MobileLink key={item.href} href={item.href} onOpenChange={setOpen}>
+            {
+              menuItems ? menuItems.map((item) => (
+                <Link key={item.id} href={item.url ?? '#'}  target="_blank" rel="noreferrer">
+                  <div >
                     {item.title}
-                  </MobileLink>
-                ),
-            )}
-          </div>
-          <div className="flex flex-col space-y-2">
-            {docsConfig.sidebarNav.map((item, index) => (
-              <div key={index} className="flex flex-col space-y-3 pt-6">
-                <h4 className="font-medium">{item.title}</h4>
-                {item?.items?.length &&
-                  item.items.map((item) => (
-                    <React.Fragment key={item.href}>
-                      {!item.disabled &&
-                        (item.href ? (
-                          <MobileLink
-                            href={item.href}
-                            onOpenChange={setOpen}
-                            className="text-muted-foreground"
-                          >
-                            {item.title}
-                            {item.label && (
-                              <span className="ml-2 rounded-md bg-[#adfa1d] px-1.5 py-0.5 text-xs leading-none text-[#000000] no-underline group-hover:no-underline">
-                                {item.label}
-                              </span>
-                            )}
-                          </MobileLink>
-                        ) : (
-                          item.title
-                        ))}
-                    </React.Fragment>
-                  ))}
-              </div>
-            ))}
+                  </div>
+                </Link>)) : <></>
+            }
           </div>
         </ScrollArea>
       </SheetContent>
