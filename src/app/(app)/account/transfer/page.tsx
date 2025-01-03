@@ -163,12 +163,13 @@ export default function TransferPage() {
         throw new Error(errorMessage)
       }
       toast({
-        title: 'Transfer successful',
+        title: 'Transfer Successful',
       })
     } catch (error) {
       console.error('Error creating transaction:', error)
       toast({
-        title: `${error}`,
+        title: 'Error',
+        description: `${error}`
       })
     }
     router.push('/account/history')

@@ -120,14 +120,14 @@ export default function DepositPage() {
   const handleNextStep = async () => {
     if (!validateStep()) {
       toast({
-        title: 'Please correct the highlighted errors.',
-        description: 'Some fields are missing or invalid.',
+        title: 'Error',
+        description: 'Some fields are missing or invalid.'
       })
     }
     if (USDCurrency < minDeposit && Number(USDCurrency) > 0) {
       toast({
-        title: 'Please correct the highlighted errors.',
-        description: `The amount must be greater than or equal to the minimum withdrawal amount of ${minDeposit} USD.`,
+        title: `Error`,
+        description: `The amount must be greater than or equal to the minimum withdrawal amount of ${minDeposit} USD.`
       })
     } else if (validateStep()) {
       if (step < 3) setStep(step + 1)
@@ -273,9 +273,8 @@ export default function DepositPage() {
       setDepositScreenshot(formData)
     } else {
       toast({
-        title: 'No File Selected',
-        description: 'Please select a file to upload.',
-        variant: 'destructive',
+        title: 'Error',
+        description: 'Please select a file to upload.'
       });
     }
   };
@@ -314,8 +313,8 @@ export default function DepositPage() {
 
     if (!validateStep()) {
       toast({
-        title: 'Form validation failed',
-        description: 'Please review the form and fix errors before submitting.',
+        title: 'Error',
+        description: 'Please review the form and fix errors before submitting.'
       })
       return
     }
@@ -359,14 +358,13 @@ export default function DepositPage() {
 
       toast({
         title: 'Transaction created successfully',
-        description: 'Your deposit is being processed.',
       })
 
       router.push('/account/history') // Redirect to history page
     } catch (error) {
       console.error('Error creating transaction:', error)
       toast({
-        title: 'Transaction failed',
+        title: 'Error',
         description: String(error),
       })
     } finally {

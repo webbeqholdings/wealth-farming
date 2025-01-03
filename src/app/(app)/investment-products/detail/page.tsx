@@ -120,7 +120,8 @@ export default function ProductDetailPage() {
     catch (error) {
       console.log('Error creating transaction:', error);
       toast({
-        title: `${error}`
+        title: 'Error',
+        description: `${error}`
       });
     }
   }

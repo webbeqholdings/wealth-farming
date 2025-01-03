@@ -173,7 +173,8 @@ export default function UserProfile() {
     } catch (error) {
       console.error('Error updating profile:', error)
       toast({
-        title: `${error}`,
+        title: 'Error',
+        description: `${error}`
       })
     }
   }
