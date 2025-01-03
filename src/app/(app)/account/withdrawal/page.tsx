@@ -32,6 +32,7 @@ import { accountConfig } from '@/config/accounts'
 import { toast } from '@/hooks/use-toast'
 import { notifyWithdrawl } from '@/lib/telegram'
 import { getPaymentTransfer } from '@/lib/paymentTransfer'
+import Spinner from '@/components/Spinner'
 // Steps component definition
 interface StepProps {
   title: string
@@ -201,13 +202,13 @@ export default function WithdrawPage() {
 
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
-    return <div>Loading...</div>; // You can replace this with a loading spinner component if desired
+    return <Spinner/>; // You can replace this with a loading spinner component if desired
   }
 
   // If the user is not logged in, redirect to the join page
   if (!isLoggedIn) {
     router.push('/join');
-    return <div>Redirecting...</div>; // Optional: Show a redirect message
+    return <Spinner/>; // Optional: Show a redirect message
   }
 
   return (

@@ -35,6 +35,7 @@ import UserBankAccount from '@/components/UserBankAccount'
 import { useRouter } from 'next/navigation'
 import UserStatus from '@/lib/userStatus'
 import TelegramButton from '@/components/TelegramButton'
+import Spinner from '@/components/Spinner'
 
 export default function UserProfile() {
   const { isLoggedIn, loading, user } = UserStatus()
@@ -271,13 +272,13 @@ export default function UserProfile() {
 
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
-    return <div>Loading...</div> // You can replace this with a loading spinner component if desired
+    return <Spinner/> // You can replace this with a loading spinner component if desired
   }
 
   // If the user is not logged in, redirect to the join page
   if (!isLoggedIn) {
     router.push('/join')
-    return <div>Redirecting...</div> // Optional: Show a redirect message
+    return <Spinner/> // Optional: Show a redirect message
   }
 
   // Placeholder for disconnect logic (unchanged)

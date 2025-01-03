@@ -33,6 +33,7 @@ import { ArrowDownIcon, ArrowRightIcon } from 'lucide-react'
 import { ReCaptcha } from '@/components/ReCaptcha'
 import { ReCaptchaV3 } from '@/components/ReCaptchaV3'
 import { getAccountsByUserId } from '@/lib/account'
+import Spinner from '@/components/Spinner'
 
 const formSchema = z.object({
   fromAccount: z.string().min(1, { message: 'Please select the source account' }),
@@ -120,13 +121,13 @@ export default function TransferPage() {
 
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
-    return <div>Loading...</div> // You can replace this with a loading spinner component if desired
+    return <Spinner/> // You can replace this with a loading spinner component if desired
   }
 
   // If the user is not logged in, redirect to the join page
   if (!isLoggedIn) {
     router.push('/join')
-    return <div>Redirecting...</div> // Optional: Show a redirect message
+    return <Spinner/> // Optional: Show a redirect message
   }
 
   const handleTransfer = async (e: React.FormEvent) => {

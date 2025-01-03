@@ -35,6 +35,7 @@ import { notifyDeposit } from '@/lib/telegram'
 import CurrencyConverter from '@/components/CurrencyConverter'
 import { getAccountsByUserId } from '../../../../lib/account'
 import { getPaymentTransfer } from '@/lib/paymentTransfer'
+import Spinner from '@/components/Spinner'
 
 // Steps component definition
 interface StepProps {
@@ -256,13 +257,13 @@ export default function DepositPage() {
 
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
-    return <div>Loading...</div> // You can replace this with a loading spinner component if desired
+    return <Spinner/>
   }
 
   // If the user is not logged in, redirect to the join page
   if (!isLoggedIn) {
     router.push('/join')
-    return <div>Redirecting...</div> // Optional: Show a redirect message
+    return <Spinner/> // Optional: Show a redirect message
   }
 
   const handleDepositScreenshotChange = (event: React.ChangeEvent<HTMLInputElement>) => {
