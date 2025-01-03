@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { CreditCard, DollarSign, Landmark, AlertCircle, ArrowDownCircle } from 'lucide-react'
+import { AlertCircle, ArrowDownCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
@@ -31,6 +31,7 @@ import { TabMenu } from '@/components/w88/TabMenu'
 import { accountConfig } from '@/config/accounts'
 import { toast } from '@/hooks/use-toast'
 import { notifyWithdrawl } from '@/lib/telegram'
+import { getPaymentTransfer } from '@/lib/paymentTransfer'
 // Steps component definition
 interface StepProps {
   title: string
@@ -82,7 +83,7 @@ export default function WithdrawPage() {
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [amount, setAmount] = useState('')
-  const [currency, setCurrency] = useState('VND')
+  const [currency, setCurrency] = useState('USD')
   const [method, setMethod] = useState('bank')
   const [cardNumber, setCardNumber] = useState('')
   const [banks, setBanks] = useState([])
@@ -137,6 +138,14 @@ export default function WithdrawPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    const paymentTransfer = await getPaymentTransfer();
+
+    if(amount < paymentTransfer.minWithdrawal){
+      toast({
+        title: `Error: The amount must be greater than or equal to the minimum withdrawal amount of ${paymentTransfer.minWithdrawal} USD.`,
+      })
+      return;
+    }
     // In a real application, this would process the withdrawal
     try {
       const response = await fetch('/api/transaction/create', {
@@ -158,7 +167,6 @@ export default function WithdrawPage() {
       if (!response.ok) {
         // Parse the error response to retrieve the error message
         const errorMessage = data.response?.error || 'An unknown error occurred';
-        console.log('errorMessage: ', errorMessage);
         toast({
           title: `${errorMessage}`,
         })
@@ -206,7 +214,7 @@ export default function WithdrawPage() {
                 <Step title="Confirm" />
               </Steps>
 
-              <form onSubmit={handleSubmit}>
+              <form>
                 {step === 1 && (
                   <div className="space-y-4">
                     <div className="space-y-2">
@@ -217,7 +225,6 @@ export default function WithdrawPage() {
                             <SelectValue placeholder="Currency" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="VND">VND</SelectItem>
                             <SelectItem value="USD">USD</SelectItem>
                             {/* <SelectItem value="EUR">EUR</SelectItem>
                             <SelectItem value="GBP">GBP</SelectItem> */}
