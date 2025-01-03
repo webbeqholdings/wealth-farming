@@ -103,13 +103,9 @@ export function MobileNav() {
                         <AccordionContent>
                           <Link href={item.url ?? '#'} target="_blank" rel="noreferrer">
                             <div>
-
-                              {item.children.map((itemchild: { url: any; title: string }) => (
-                                <Link href={itemchild.url ?? '#'} target="_blank" rel="noreferrer">
-
-
+                              {item.children.map((itemchild: { url: any; title: string, id: number }) => (
+                                <Link key={itemchild.id} href={itemchild.url ?? '#'} target="_blank" rel="noreferrer">
                                   <div className='flex flex-row justify-start items-center mb-2 pl-4 gap-1 hover:underline'>
-                                    
                                     <div className='text-sm'>
                                       {itemchild.title}
                                     </div>
@@ -120,8 +116,6 @@ export function MobileNav() {
                           </Link>
                         </AccordionContent>
                       </AccordionItem>
-
-
                     </Accordion>
                     :
                     <div className={'border-b mr-2'}>
@@ -131,8 +125,6 @@ export function MobileNav() {
                             {item.title}
                           </div>
                         </Link>
-
-
                       </div>
                     </div>
                   }

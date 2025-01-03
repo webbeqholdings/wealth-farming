@@ -99,7 +99,7 @@ export default function Page() {
 
         return toast({
           title: 'Error',
-          description: 'An error occurred. Please try again!',
+          description: 'The email or password is incorrect. Please try again.',
         })
       }
 

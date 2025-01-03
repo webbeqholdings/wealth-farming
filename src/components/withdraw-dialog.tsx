@@ -142,6 +142,7 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
           <DialogFooter>
             <Button
               variant="outline"
+              type="button"
               onClick={handleDialogClose}
               className="border-gray-300 text-gray-700"
             >

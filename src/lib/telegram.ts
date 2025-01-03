@@ -1,4 +1,3 @@
-import { formatDateTime } from "@/utilities/formatDateTime";
 // Create a function to make the API request
 export async function notifyDeposit(data: any) {
     try {
