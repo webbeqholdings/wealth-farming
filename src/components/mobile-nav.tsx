@@ -5,16 +5,40 @@ import Link, { LinkProps } from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ViewVerticalIcon } from '@radix-ui/react-icons'
 
-import { docsConfig } from '@/config/docs'
-import { siteConfig } from '@/config/site'
 import { cn } from '@/lib/utils'
 import { Icons } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-
+import { siteConfig } from '@/config/site'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
+import { Minus } from 'lucide-react'
 export function MobileNav() {
   const [open, setOpen] = React.useState(false)
+  const [menuItems, setMenuItems] = React.useState([])
+  React.useEffect(() => {
+    const getMenuItems = async () => {
+      try {
+        // Fetch the data from the API
+        const response = await fetch('/api/globals/main-menu')
+        if (!response.ok) {
+          throw new Error(`Failed to fetch menu items: ${response.statusText}`)
+        }
+
+        const data = await response.json()
+        setMenuItems(data.menuItems) // Update state with fetched menu items
+      } catch (error) {
+        console.error('Error fetching menu items:', error)
+      }
+    }
+
+    getMenuItems() // Call the async function inside useEffect
+  }, [])
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -60,45 +84,52 @@ export function MobileNav() {
           <Icons.logo className="mr-2 h-4 w-4" />
           <span className="font-bold">{siteConfig.name}</span>
         </MobileLink>
-        <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
+        <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10">
           <div className="flex flex-col space-y-3">
-            {docsConfig.mainNav?.map(
-              (item) =>
-                item.href && (
-                  <MobileLink key={item.href} href={item.href} onOpenChange={setOpen}>
-                    {item.title}
-                  </MobileLink>
-                ),
-            )}
-          </div>
-          <div className="flex flex-col space-y-2">
-            {docsConfig.sidebarNav.map((item, index) => (
-              <div key={index} className="flex flex-col space-y-3 pt-6">
-                <h4 className="font-medium">{item.title}</h4>
-                {item?.items?.length &&
-                  item.items.map((item) => (
-                    <React.Fragment key={item.href}>
-                      {!item.disabled &&
-                        (item.href ? (
-                          <MobileLink
-                            href={item.href}
-                            onOpenChange={setOpen}
-                            className="text-muted-foreground"
-                          >
+
+            {
+
+              menuItems ? menuItems.map((item) => (
+                <>
+                  {(item.children.length >= 1) ?
+                    <Accordion type='single' collapsible className='mr-2'>
+                      <AccordionItem key={item.id} value={item.id} >
+                        <AccordionTrigger >
+                          <div className='ml-2 '>
                             {item.title}
-                            {item.label && (
-                              <span className="ml-2 rounded-md bg-[#adfa1d] px-1.5 py-0.5 text-xs leading-none text-[#000000] no-underline group-hover:no-underline">
-                                {item.label}
-                              </span>
-                            )}
-                          </MobileLink>
-                        ) : (
-                          item.title
-                        ))}
-                    </React.Fragment>
-                  ))}
-              </div>
-            ))}
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <Link href={item.url ?? '#'} target="_self" rel="noreferrer">
+                            <div>
+                              {item.children.map((itemchild: { url: any; title: string, id: number }) => (
+                                <Link key={itemchild.id} href={itemchild.url ?? '#'} target="_self" rel="noreferrer">
+                                  <div className='flex flex-row justify-start items-center mb-2 pl-4 gap-1 hover:underline'>
+                                    <div className='text-sm'>
+                                      {itemchild.title}
+                                    </div>
+                                  </div>
+                                </Link>))
+                              }
+                            </div>
+                          </Link>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                    :
+                    <div className={'border-b mr-2'}>
+                      <div className='"flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline '>
+                        <Link href={item.url ?? '#'} target="_self" rel="noreferrer">
+                          <div className='pl-2'>
+                            {item.title}
+                          </div>
+                        </Link>
+                      </div>
+                    </div>
+                  }
+                </>))
+                : <></>
+            }
           </div>
         </ScrollArea>
       </SheetContent>
