@@ -11,7 +11,13 @@ import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { siteConfig } from '@/config/site'
-
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
+import { Minus } from 'lucide-react'
 export function MobileNav() {
   const [open, setOpen] = React.useState(false)
   const [menuItems, setMenuItems] = React.useState([])
@@ -79,26 +85,59 @@ export function MobileNav() {
           <Icons.logo className="mr-2 h-4 w-4" />
           <span className="font-bold">{siteConfig.name}</span>
         </MobileLink>
-        <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
+        <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10">
           <div className="flex flex-col space-y-3">
+
             {
 
               menuItems ? menuItems.map((item) => (
-                <Link href={item.url ?? '#'} target="_blank" rel="noreferrer">
-                  <div className='ml-4 mt-2 ' >
-                    {item.title}
-                  </div>
-                  <div>
-                    {item.children ?
-                      item.children.map((itemchild) => (
-                        <Link href={itemchild.url ?? '#'} target="_blank" rel="noreferrer">
-                          <div className='pl-8'>
-                            {itemchild.title}
+                <>
+                  {(item.children.length >= 1) ?
+                    <Accordion type='single' collapsible className='mr-2'>
+                      <AccordionItem key={item.id} value={item.id} >
+                        <AccordionTrigger >
+                          <div className='ml-2 '>
+                            {item.title}
                           </div>
-                        </Link>))
-                    : <></>}
-                  </div>
-                </Link>)) : <></>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <Link href={item.url ?? '#'} target="_blank" rel="noreferrer">
+                            <div>
+
+                              {item.children.map((itemchild: { url: any; title: string }) => (
+                                <Link href={itemchild.url ?? '#'} target="_blank" rel="noreferrer">
+
+
+                                  <div className='flex flex-row justify-start items-center mb-2 pl-4 gap-1 hover:underline'>
+                                    
+                                    <div className='text-sm'>
+                                      {itemchild.title}
+                                    </div>
+                                  </div>
+                                </Link>))
+                              }
+                            </div>
+                          </Link>
+                        </AccordionContent>
+                      </AccordionItem>
+
+
+                    </Accordion>
+                    :
+                    <div className={'border-b mr-2'}>
+                      <div className='"flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline '>
+                        <Link href={item.url ?? '#'} target="_blank" rel="noreferrer">
+                          <div className='pl-2'>
+                            {item.title}
+                          </div>
+                        </Link>
+
+
+                      </div>
+                    </div>
+                  }
+                </>))
+                : <></>
             }
           </div>
         </ScrollArea>
