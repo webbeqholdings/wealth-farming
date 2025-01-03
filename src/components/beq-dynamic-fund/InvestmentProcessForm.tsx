@@ -217,7 +217,6 @@ export function InvestmentProcessForm({
         toast({
           title: 'Error',
           description: response.message,
-          variant: 'destructive',
         })
         return
       }
@@ -226,14 +225,12 @@ export function InvestmentProcessForm({
       toast({
         title: 'Success',
         description: 'Investment request has been submitted.',
-        variant: 'default',
       })
       router.push('../../investment-contracts')
     } else {
       toast({
         title: 'Error',
         description: 'Please ensure all fields are filled out correctly.',
-        variant: 'destructive',
       })
     }
   }

@@ -42,6 +42,7 @@ import { format } from 'date-fns';
 import { Document } from '@/components/report_finance'
 import { printPdf } from '@/components/printPdf';
 import { notifyInvestment } from '@/lib/telegram'
+import Spinner from '@/components/Spinner'
 
 // Mock data for a single financial product
 const product = {
@@ -82,13 +83,13 @@ export default function ProductDetailPage() {
     try {
       // If still loading, show a loading indicator (or spinner)
       if (loading) {
-        return <div>Loading...</div>; // You can replace this with a loading spinner component if desired
+        return <Spinner/>; // You can replace this with a loading spinner component if desired
       }
 
       // If the user is not logged in, redirect to the join page
       if (!isLoggedIn) {
         router.push('/join');
-        return <div>Redirecting...</div>; // Optional: Show a redirect message
+        return <Spinner/>; // Optional: Show a redirect message
       }
       const productId = localStorage.getItem('product_id');
       const response = await fetch('/api/transaction/create', {
@@ -120,7 +121,8 @@ export default function ProductDetailPage() {
     catch (error) {
       console.log('Error creating transaction:', error);
       toast({
-        title: `${error}`
+        title: 'Error',
+        description: `${error}`
       });
     }
   }
