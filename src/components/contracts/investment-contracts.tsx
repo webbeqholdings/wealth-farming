@@ -24,6 +24,7 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination"
+import Spinner from '../Spinner'
 
 interface Investment {
     id: string
@@ -124,12 +125,12 @@ export function InvestmentContracts() {
     }
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <Spinner/>;
     }
 
     if (!isLoggedIn) {
         router.push('/join');
-        return <div>Redirecting...</div>;
+        return <Spinner/>;
     }
 
     return (

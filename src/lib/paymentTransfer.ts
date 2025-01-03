@@ -1,22 +1,30 @@
+'use server'
+import { getPayload } from 'payload'
+import config from '@payload-config'
+
+const payload = await getPayload({
+    config,
+})
 export const getPaymentTransfer = async () => {
     try {
-        const response = await fetch('/api/globals/gc-payment-transfer?depth=1&draft=false&locale=undefined');
-        const data = await response.json();
-
+        const response: any = await payload.findGlobal({
+            slug: 'gc-payment-transfer',
+            depth: 1,
+        })
         return {
-            id: data.id || null, // Assuming id is not available in the current response
-            bankQrCode: data.bank_qr_code,
-            bankAccountNumber: data.bank_account_number,
-            bankAccountDescription: data.bank_account_description,
-            cryptoWalletQrCode: data.crypto_wallet_qr_code,
-            cryptoWalletAddress: data.crypto_wallet_address,
-            cryptoWalletNetwork: data.crypto_wallet_network,
-            minDeposit: data.min_deposit,
-            minWithdrawal: data.min_withdrawal,
-            minTransfer: data.min_Transfer,
-            usdToVnd: Number(data.usd_to_vnd),
-            usdtToVnd: data.usdt_to_vnd,
-            usdToUsdt: data.usd_to_usdt,
+            id: response.id || null, // Assuming id is not available in the current response
+            bankQrCode: response.bank_qr_code,
+            minWithdrawal: response.min_withdrawal,
+            bankAccountNumber: response.bank_account_number,
+            bankAccountDescription: response.bank_account_description,
+            cryptoWalletQrCode: response.crypto_wallet_qr_code,
+            cryptoWalletAddress: response.crypto_wallet_address,
+            cryptoWalletNetwork: response.crypto_wallet_network,
+            minDeposit: response.min_deposit,
+            minTransfer: response.min_transfer,
+            usdToVnd: Number(response.usd_to_vnd),
+            usdtToVnd: response.usdt_to_vnd,
+            usdToUsdt: response.usd_to_usdt,
         };
     } catch (error) {
         console.error('Transaction error:', error);

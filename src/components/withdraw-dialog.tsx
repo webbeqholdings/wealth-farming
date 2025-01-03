@@ -50,16 +50,14 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
       toast({
         title: 'Error',
         description: 'Withdrawl can only occur after the contract deadline.',
-        variant: 'destructive',
       });
       return;
     }
 
     if (contract.status === 'inactive') {
       toast({
-        title: 'Invalid Contract',
+        title: 'Error',
         description: 'The selected contract is inactive and cannot be processed.',
-        variant: 'destructive',
       });
       return;
     }
@@ -74,7 +72,6 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
         toast({
           title: 'Error',
           description: `The amount must be greater than or equal to the minimum withdrawal amount of ${minWithdrawal} USD.`,
-          variant: 'destructive',
         });
         return;
       }
@@ -98,7 +95,6 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
       toast({
         title: 'Error',
         description: 'Failed to process withdrawal. Please try again.',
-        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
