@@ -81,7 +81,7 @@ export function SiteHeader() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Avatar className="h-8 w-8 cursor-pointer">
-                      <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
+                      <AvatarImage src={user.avatar?.url} alt="User" />
                       <AvatarFallback>U</AvatarFallback>
                     </Avatar>
                   </DropdownMenuTrigger>

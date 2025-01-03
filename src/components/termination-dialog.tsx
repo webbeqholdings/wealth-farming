@@ -46,9 +46,8 @@ export function TerminationDialog({ isOpen, onClose, contract, setActiveTab }: T
     event.preventDefault();
     if (contract.status === 'inactive') {
       toast({
-        title: 'Invalid Contract',
+        title: 'Error',
         description: 'The selected contract is inactive and cannot be processed.',
-        variant: 'destructive',
       });
       return;
     }
@@ -71,7 +70,7 @@ export function TerminationDialog({ isOpen, onClose, contract, setActiveTab }: T
         handleDialogClose();
       } else {
         toast({
-          title: 'Withdrawal Fail',
+          title: 'Error',
           description: `${result.message}`,
         });
       }
@@ -80,7 +79,6 @@ export function TerminationDialog({ isOpen, onClose, contract, setActiveTab }: T
       toast({
         title: 'Error',
         description: 'Failed to process withdrawal. Please try again.',
-        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
