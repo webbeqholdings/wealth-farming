@@ -280,7 +280,8 @@ export const getTotalDeposit = async (user_id: number): Promise<number> => {
 // -- -- Pending Transaction -- --
 export const createDeposit = async (inputData: any) => {
   // validate: is approve pending deposit ?
-  const { amount, user_id, account_to } = inputData
+  console.log('.. createDeposit', inputData)
+  const { amount, user_id, account_to, deposit_screenshot } = inputData
 
   // Validate
   if (!amount) {
@@ -299,6 +300,7 @@ export const createDeposit = async (inputData: any) => {
       status: 'pending',
       account_to: account_to,
       type: 'deposit',
+      deposit_screenshot: deposit_screenshot,
     },
   })
 
@@ -440,6 +442,6 @@ export const getSumAmountAccountTo = async (account_to: number) => {
 // Amount Balance = Sum(account_to) - Sum(account_from)
 export const getSumAmountBalanceByAccount = async (account_id: number) => {
   const sumIn = await getSumAmountAccountTo(account_id)
-  const sumOut = await getSumAmountAccountTo(account_id)
+  const sumOut = await getSumAmountAccountFrom(account_id)
   return sumIn - sumOut
 }

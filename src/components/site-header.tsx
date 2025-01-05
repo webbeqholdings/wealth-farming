@@ -19,14 +19,15 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Facebook, Gift, DollarSign, UserCircle, LogOut, Wallet } from 'lucide-react'
 import { getBalanceAmountByUser } from '@/lib/account'
-
+import { me } from '@/lib/me'
 export function SiteHeader() {
   const { isLoggedIn, loading, user } = userStatus()
   const [balance, setBalance] = useState(0)
   const router = useRouter()
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData: any = async () => {
+      const user = await me()
       const totalAmount: number = await getBalanceAmountByUser(user.id)
       setBalance(totalAmount)
       // @ts-nocheck
@@ -35,7 +36,7 @@ export function SiteHeader() {
     }
 
     fetchData() // Call the fetch function
-  }, [loading])
+  }, [loading, balance])
   // Handle logout
   const handleLogout = async () => {
     try {
