@@ -36,6 +36,7 @@ import CurrencyConverter from '@/components/CurrencyConverter'
 import { getAccountsByUserId } from '../../../../lib/account'
 import { getPaymentTransfer } from '@/lib/paymentTransfer'
 import Spinner from '@/components/Spinner'
+import { createDeposit, getSumAmountBalanceByAccount } from '@/lib/transaction'
 
 // Steps component definition
 interface StepProps {
@@ -95,18 +96,19 @@ export default function DepositPage() {
   const [banks, setBanks] = useState([])
   const [selectBank, setSelectBank] = useState(null)
   const [fromAccount, setFromAccount] = useState(null)
+  const [toAccount, setToAccount] = useState(null)
   const [selectedBalance, setSelectedBalance] = useState(0)
   const [exchangeRate, setExchangeRate] = useState(1) // Default exchange rate
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [depositScreenshot, setDepositScreenshot] = useState<FormData>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [bankQRCode, setBankQRCode] = useState();
-  const [bankAccountNumber, setBankAccountNumber] = useState();
-  const [bankAccountName, setBankAccountName] = useState();
-  const [cryptoWalletQrCodeUrl, setCryptoWalletQrCodeUrl] = useState();
-  const [cryptoWalletAddress, setCryptoWalletAddress] = useState();
-  const [cryptoWalletNetwork, setCryptoWalletNetwork] = useState();
-  const [minDeposit, setMinDeposit] = useState(0);
+  const [bankQRCode, setBankQRCode] = useState()
+  const [bankAccountNumber, setBankAccountNumber] = useState()
+  const [bankAccountName, setBankAccountName] = useState()
+  const [cryptoWalletQrCodeUrl, setCryptoWalletQrCodeUrl] = useState()
+  const [cryptoWalletAddress, setCryptoWalletAddress] = useState()
+  const [cryptoWalletNetwork, setCryptoWalletNetwork] = useState()
+  const [minDeposit, setMinDeposit] = useState(0)
 
   const quickAmounts = [
     { label: '500K', value: 500000 },
@@ -122,13 +124,13 @@ export default function DepositPage() {
     if (!validateStep()) {
       toast({
         title: 'Error',
-        description: 'Some fields are missing or invalid.'
+        description: 'Some fields are missing or invalid.',
       })
     }
     if (USDCurrency < minDeposit && Number(USDCurrency) > 0) {
       toast({
         title: `Error`,
-        description: `The amount must be greater than or equal to the minimum withdrawal amount of ${minDeposit} USD.`
+        description: `The amount must be greater than or equal to the minimum withdrawal amount of ${minDeposit} USD.`,
       })
     } else if (validateStep()) {
       if (step < 3) setStep(step + 1)
@@ -139,11 +141,12 @@ export default function DepositPage() {
     if (step > 1) setStep(step - 1)
   }
 
-  const handleFromAccountChange = (accountId: string) => {
+  const handleToAccountOnChange = (accountId: string) => {
     const numericAccountId = Number(accountId) // Convert the string to a number
     const selectedAccount = accounts.find((account) => account.id === numericAccountId)
-    setFromAccount(numericAccountId.toString()) // Store the numeric ID in state
-    setSelectedBalance(selectedAccount?.amount || 0)
+    setToAccount(numericAccountId.toString()) // Store the numeric ID in state
+
+    setSelectedBalance(selectedAccount?.balance || 0)
   }
 
   const handleBankChange = (bankId: string) => {
@@ -154,7 +157,7 @@ export default function DepositPage() {
     const newErrors: { [key: string]: string } = {}
 
     if (step === 1) {
-      if (!fromAccount) newErrors.fromAccount = 'Please select an account.'
+      if (!toAccount) newErrors.toAccount = 'Please select an account.'
       if (!USDCurrency || Number(USDCurrency) <= 0)
         newErrors.USDCurrency = 'Please enter a valid deposit amount.'
       if (!selectBank) newErrors.selectBank = 'Please select a bank.'
@@ -162,14 +165,14 @@ export default function DepositPage() {
 
     if (step === 2) {
       if (!depositScreenshot) {
-        newErrors.depositScreenshot = 'Please upload a valid deposit screenshot.';
+        newErrors.depositScreenshot = 'Please upload a valid deposit screenshot.'
       }
     }
 
     if (step === 3) {
       if (!USDCurrency || Number(USDCurrency) <= 0)
         newErrors.USDCurrency = 'Amount is required for confirmation.'
-      if (!fromAccount) newErrors.fromAccount = 'Account selection is missing for confirmation.'
+      if (!toAccount) newErrors.toAccount = 'Account selection is missing for confirmation.'
       if (!selectBank) newErrors.selectBank = 'Bank selection is missing for confirmation.'
     }
 
@@ -179,7 +182,7 @@ export default function DepositPage() {
 
   useEffect(() => {
     const fetchPaymentTransfer = async () => {
-      const paymentTransfer = await getPaymentTransfer();
+      const paymentTransfer = await getPaymentTransfer()
       setMinDeposit(paymentTransfer.minDeposit)
       setBankQRCode(paymentTransfer.bankQrCode.url)
       setCryptoWalletQrCodeUrl(paymentTransfer.cryptoWalletQrCode.url)
@@ -225,7 +228,11 @@ export default function DepositPage() {
     const fetchAccounts = async () => {
       try {
         if (user && user.id) {
-          const accountsData = await getAccountsByUserId(user.id)
+          let accountsData = await getAccountsByUserId(user.id)
+          accountsData.map(async (_acc: any) => {
+            _acc.balance = await getSumAmountBalanceByAccount(_acc.id)
+            return _acc
+          })
           if (accountsData) {
             setAccounts(accountsData)
           }
@@ -257,13 +264,13 @@ export default function DepositPage() {
 
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
-    return <Spinner/>
+    return <Spinner />
   }
 
   // If the user is not logged in, redirect to the join page
   if (!isLoggedIn) {
     router.push('/join')
-    return <Spinner/> // Optional: Show a redirect message
+    return <Spinner /> // Optional: Show a redirect message
   }
 
   const handleDepositScreenshotChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -275,11 +282,10 @@ export default function DepositPage() {
     } else {
       toast({
         title: 'Error',
-        description: 'Please select a file to upload.'
-      });
+        description: 'Please select a file to upload.',
+      })
     }
-  };
-
+  }
 
   const uploadScreenshot = async (formData: FormData) => {
     try {
@@ -315,7 +321,7 @@ export default function DepositPage() {
     if (!validateStep()) {
       toast({
         title: 'Error',
-        description: 'Please review the form and fix errors before submitting.'
+        description: 'Please review the form and fix errors before submitting.',
       })
       return
     }
@@ -328,33 +334,19 @@ export default function DepositPage() {
         depositScreenshotId = await uploadScreenshot(depositScreenshot)
       }
 
-      // Construct the request payload
-      const payload = {
+      const responseDeposit = await createDeposit({
         user_id: Number(user.id),
-        bank_id: Number(selectBank),
+        bank: Number(selectBank),
         amount: Number(USDCurrency),
-        status: 'pending',
-        from_account: Number(fromAccount),
-        type: 'deposit',
-        currency: currency,
+        account_to: Number(toAccount),
+        currency: 'USD',
         deposit_screenshot: depositScreenshotId, // Include the screenshot ID
-      }
-
-      // Make the API request
-      const response = await fetch('/api/transaction/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
       })
 
-      const data = await response.json()
-      notifyDeposit(data.data) // Call notifyDeposit and get its response
+      notifyDeposit(responseDeposit.data) // Call notifyDeposit and get its response
 
-      if (!response.ok) {
-        const errorMessage = data.response?.error || 'An unknown error occurred'
-        throw new Error(errorMessage)
+      if (!responseDeposit.isSuccess) {
+        throw new Error('error Deposit')
       }
 
       toast({
@@ -395,15 +387,15 @@ export default function DepositPage() {
               {step === 1 && (
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="fromAccount">Account</Label>
-                    <Select value={fromAccount} onValueChange={handleFromAccountChange}>
-                      <SelectTrigger id="fromAccount">
+                    <Label htmlFor="accountTo">Deposit To Account</Label>
+                    <Select value={toAccount} onValueChange={handleToAccountOnChange}>
+                      <SelectTrigger id="accountTo">
                         <SelectValue placeholder="Select account" />
                       </SelectTrigger>
                       <SelectContent>
-                        {accounts.map((account) => (
-                          <SelectItem key={account.id} value={account.id.toString()}>
-                            {account.account_name}
+                        {accounts.map((acc) => (
+                          <SelectItem key={acc.id} value={acc.id.toString()}>
+                            {acc.account_name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -415,9 +407,7 @@ export default function DepositPage() {
                         currency: 'USD',
                       })}
                     </p>
-                    {errors.fromAccount && (
-                      <p className="text-red-500 text-sm">{errors.fromAccount}</p>
-                    )}
+                    {errors.toAccount && <p className="text-red-500 text-sm">{errors.toAccount}</p>}
                   </div>
 
                   <CurrencyConverter setUSDCurrency={setUSDCurrency} />
@@ -425,7 +415,7 @@ export default function DepositPage() {
                     <p className="text-red-500 text-sm">{errors.USDCurrency}</p>
                   )}
                   <div className="space-y-2">
-                    <Label htmlFor="fromAccount">Your Bank Account</Label>
+                    <Label htmlFor="bank">Your Bank Account</Label>
                     <Select value={selectBank} onValueChange={handleBankChange}>
                       <SelectTrigger id="bank">
                         <SelectValue placeholder="Select bank" />
@@ -501,12 +491,10 @@ export default function DepositPage() {
                   {method === 'bank' && (
                     <div className="space-y-6">
                       <div className="space-y-4">
-                        <Label className="flex justify-center">
-                          SCAN THIS QR CODE
-                        </Label>
+                        <Label className="flex justify-center">SCAN THIS QR CODE</Label>
                         <div className="flex justify-center">
                           <Image
-                            src={bankQRCode || "https://via.placeholder.com/300"}
+                            src={bankQRCode || 'https://via.placeholder.com/300'}
                             alt="Bank Transfer QR Code"
                             width={300}
                             height={300}
@@ -520,7 +508,10 @@ export default function DepositPage() {
                       </div>
 
                       <div className="space-y-4">
-                        <Label htmlFor="deposit_screenshot" className="text-sm font-medium text-gray-700">
+                        <Label
+                          htmlFor="deposit_screenshot"
+                          className="text-sm font-medium text-gray-700"
+                        >
                           Upload Your Deposit
                         </Label>
                         <Input
@@ -531,7 +522,8 @@ export default function DepositPage() {
                           className="border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         />
                         <p className="text-xs text-gray-500">
-                          Please upload a screenshot showing your deposit transaction. Accepted formats: JPG, PNG, with a maximum size of 5MB.
+                          Please upload a screenshot showing your deposit transaction. Accepted
+                          formats: JPG, PNG, with a maximum size of 5MB.
                         </p>
                         {errors.depositScreenshot && (
                           <p className="text-red-500 text-sm">{errors.depositScreenshot}</p>
@@ -543,12 +535,10 @@ export default function DepositPage() {
                   {method === 'crypto' && (
                     <div className="space-y-6">
                       <div className="space-y-4">
-                        <Label className="flex justify-center">
-                          SCAN THIS QR CODE
-                        </Label>
+                        <Label className="flex justify-center">SCAN THIS QR CODE</Label>
                         <div className="flex justify-center">
                           <Image
-                            src={cryptoWalletQrCodeUrl || "https://via.placeholder.com/300"}
+                            src={cryptoWalletQrCodeUrl || 'https://via.placeholder.com/300'}
                             alt="Crypto Wallet QR Code"
                             width={300}
                             height={300}
@@ -562,7 +552,10 @@ export default function DepositPage() {
                       </div>
 
                       <div className="space-y-4">
-                        <Label htmlFor="deposit_screenshot" className="text-sm font-medium text-gray-700">
+                        <Label
+                          htmlFor="deposit_screenshot"
+                          className="text-sm font-medium text-gray-700"
+                        >
                           Upload Your Deposit
                         </Label>
                         <Input
@@ -573,7 +566,8 @@ export default function DepositPage() {
                           className="border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         />
                         <p className="text-xs text-gray-500">
-                          Please upload a screenshot showing your deposit transaction. Accepted formats: JPG, PNG, with a maximum size of 5MB.
+                          Please upload a screenshot showing your deposit transaction. Accepted
+                          formats: JPG, PNG, with a maximum size of 5MB.
                         </p>
                         {errors.depositScreenshot && (
                           <p className="text-red-500 text-sm">{errors.depositScreenshot}</p>
@@ -589,7 +583,7 @@ export default function DepositPage() {
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>Confirm your deposit</AlertTitle>
                     <AlertDescription>
-                      Please review the details below before confirming your deposit.
+                      - Please review the details below before confirming your deposit.
                     </AlertDescription>
                   </Alert>
                   <div className="space-y-2">
@@ -601,7 +595,9 @@ export default function DepositPage() {
                     </div>
                     <div className="flex justify-between">
                       <span>Method:</span>
-                      <span className="font-semibold">{method == 'bank' ? 'Bank Transfer' : 'Crypto Wallet'}</span>
+                      <span className="font-semibold">
+                        {method == 'bank' ? 'Bank Transfer' : 'Crypto Wallet'}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span>Account Number:</span>
