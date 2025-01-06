@@ -625,7 +625,7 @@ export const contractEndAt = (startDate: Date, term: Term): Date => {
 
     if (!isStartOfMonth(startDate)) {
       // not Start Quarterly
-      if (!defineStartQuarterly.includes(month)) {
+      if (defineStartQuarterly.includes(month)) {
         let nextQuarterLastMonth
         let year = getYear(startDate)
 
