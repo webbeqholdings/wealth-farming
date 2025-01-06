@@ -50,7 +50,6 @@ const Spinner = () => {
           }
         `}</style>
         </svg>
-        <p className="text-lg font-medium text-gray-600">Loading, please wait...</p>
       </div>
     </div>
 
