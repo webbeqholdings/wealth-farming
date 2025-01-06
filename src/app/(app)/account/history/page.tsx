@@ -53,7 +53,7 @@ export default function HistoryPage() {
   const [accounts, setAccounts] = useState([])
   const [totalPages, setTotalPages] = useState(1)
   const [currentPage, setCurrentPage] = useState(1)
-  const { setTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
 
   useEffect(() => {
     const fetchAccounts = async () => {
@@ -109,11 +109,13 @@ export default function HistoryPage() {
   }
 
   const handleExportPdf = async (element: string) => {
-    setTheme('light')
-
-    await printPdf(element, false)
-
-    setTheme('dark')
+    if (theme === 'dark') {
+      setTheme('light')
+      await printPdf(element, false)
+      setTheme('dark')
+    } else {
+      await printPdf(element, false)
+    }
   }
 
   return (
