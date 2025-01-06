@@ -147,61 +147,60 @@ export default function HistoryPage() {
 
         {/* Transactions Table and Chart */}
         <Tabs defaultValue="table" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="table">Table View</TabsTrigger>
-            <TabsTrigger value="chart">Chart View</TabsTrigger>
-          </TabsList>
           <TabsContent value="table" className="space-y-4">
-            <div className="flex justify-end space-x-2 mb-4">
-              <Button
-                variant={activeTab === 'all' ? 'default' : 'outline'}
-                onClick={() => {
-                  setActiveTab('all')
-                  setCurrentPage(1)
-                }}
-              >
-                All
-              </Button>
-              <Button
-                variant={activeTab === 'deposit' ? 'default' : 'outline'}
-                onClick={() => {
-                  setActiveTab('deposit')
-                  setCurrentPage(1)
-                }}
-              >
-                Deposits
-              </Button>
-              <Button
-                variant={activeTab === 'withdraw' ? 'default' : 'outline'}
-                onClick={() => {
-                  setActiveTab('withdraw')
-                  setCurrentPage(1)
-                }}
-              >
-                Withdrawals
-              </Button>
-              <Button
-                variant={activeTab === 'transfer' ? 'default' : 'outline'}
-                onClick={() => {
-                  setActiveTab('transfer')
-                  setCurrentPage(1)
-                }}
-              >
-                Transfers
-              </Button>
-              <Button
-                variant={activeTab === 'investment' ? 'default' : 'outline'}
-                onClick={() => {
-                  setActiveTab('investment')
-                  setCurrentPage(1)
-                }}
-              >
-                Investments
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex space-x-2">
+                <Button
+                  variant={activeTab === 'all' ? 'default' : 'outline'}
+                  onClick={() => {
+                    setActiveTab('all');
+                    setCurrentPage(1);
+                  }}
+                >
+                  All
+                </Button>
+                <Button
+                  variant={activeTab === 'deposit' ? 'default' : 'outline'}
+                  onClick={() => {
+                    setActiveTab('deposit');
+                    setCurrentPage(1);
+                  }}
+                >
+                  Deposits
+                </Button>
+                <Button
+                  variant={activeTab === 'withdraw' ? 'default' : 'outline'}
+                  onClick={() => {
+                    setActiveTab('withdraw');
+                    setCurrentPage(1);
+                  }}
+                >
+                  Withdrawals
+                </Button>
+                <Button
+                  variant={activeTab === 'transfer' ? 'default' : 'outline'}
+                  onClick={() => {
+                    setActiveTab('transfer');
+                    setCurrentPage(1);
+                  }}
+                >
+                  Transfers
+                </Button>
+                <Button
+                  variant={activeTab === 'investment' ? 'default' : 'outline'}
+                  onClick={() => {
+                    setActiveTab('investment');
+                    setCurrentPage(1);
+                  }}
+                >
+                  Investments
+                </Button>
+              </div>
+              <Button asChild onClick={() => handleExportPdf('tableContent')}>
+                <button>Download PDF</button>
               </Button>
             </div>
-            <Button asChild onClick={() => handleExportPdf('tableContent')}>
-              <button>Download PDF</button>
-            </Button>
+
             <Table id="tableContent">
               <TableHeader>
                 <TableRow>
@@ -340,25 +339,6 @@ export default function HistoryPage() {
             ) : (
               <></>
             )}
-          </TabsContent>
-          <TabsContent value="chart">
-            <Card>
-              <CardHeader>
-                <CardTitle>Transaction History</CardTitle>
-                <CardDescription>Deposits and withdrawals over time</CardDescription>
-              </CardHeader>
-              <CardContent className="pt-2">
-                <ResponsiveContainer width="100%" height={350}>
-                  <BarChart data={chartData}>
-                    <XAxis dataKey="name" stroke="#888888" />
-                    <YAxis stroke="#888888" />
-                    <Tooltip />
-                    <Bar dataKey="deposits" fill="#4ade80" name="Deposits" />
-                    <Bar dataKey="withdrawals" fill="#f87171" name="Withdrawals" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
           </TabsContent>
         </Tabs>
 
