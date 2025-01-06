@@ -1,29 +1,47 @@
 'use client'
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-
-const EXCHANGE_RATES = {
-  USD: 1,
-  USDT: 1,
-  VND: 25300,
-}
+import { getPaymentTransfer } from '@/lib/paymentTransfer'
 
 interface CurrencyConverterProps {
   setUSDCurrency: React.Dispatch<React.SetStateAction<number>>
 }
 
-type Currency = keyof typeof EXCHANGE_RATES
+type Currency = 'USD' | 'USDT' | 'VND'
 
 export default function CurrencyConverter({ setUSDCurrency }: CurrencyConverterProps) {
+  const [exchangeRates, setExchangeRates] = useState<{ [key in Currency]: number }>({
+    USD: 1,
+    USDT: 1,
+    VND: 25300,
+  })
   const [values, setValues] = useState<Record<Currency, string>>({
     USD: '',
     USDT: '',
     VND: '',
   })
+
+  useEffect(() => {
+    const fetchExchangeRates = async () => {
+      try {
+        const result = await getPaymentTransfer()
+        if (result) {
+          setExchangeRates({
+            USD: 1,
+            USDT: result.usdToUsdt,
+            VND: result.usdToVnd,
+          })
+        }
+      } catch (error) {
+        console.error('Error fetching exchange rates:', error)
+      }
+    }
+    fetchExchangeRates()
+  }, [])
 
   const formatCurrency = (value: string, currency: string): string => {
     const numValue = parseFloat(value)
@@ -45,19 +63,22 @@ export default function CurrencyConverter({ setUSDCurrency }: CurrencyConverterP
     return formatter.format(numValue)
   }
 
-  const convert = useCallback((amount: string, from: Currency) => {
-    const numAmount = parseFloat(amount)
-    if (isNaN(numAmount)) {
-      return { USD: '', USDT: '', VND: '' }
-    }
+  const convert = useCallback(
+    (amount: string, from: Currency) => {
+      const numAmount = parseFloat(amount)
+      if (isNaN(numAmount)) {
+        return { USD: '', USDT: '', VND: '' }
+      }
 
-    const inUSD = numAmount / EXCHANGE_RATES[from]
-    return {
-      USD: inUSD.toFixed(2),
-      USDT: inUSD.toFixed(2),
-      VND: (inUSD * EXCHANGE_RATES.VND).toFixed(2),
-    }
-  }, [])
+      const inUSD = numAmount / exchangeRates[from]
+      return {
+        USD: inUSD.toFixed(2),
+        USDT: inUSD.toFixed(2),
+        VND: (inUSD * exchangeRates.VND).toFixed(2),
+      }
+    },
+    [exchangeRates],
+  )
 
   const handleChange = (currency: Currency) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
@@ -78,7 +99,7 @@ export default function CurrencyConverter({ setUSDCurrency }: CurrencyConverterP
           <AlertTitle className="text-red-500">Heads up!</AlertTitle>
           <AlertDescription>System only use USD currency. </AlertDescription>
         </Alert>
-        {(Object.keys(EXCHANGE_RATES) as Currency[]).map((currency) => (
+        {(Object.keys(exchangeRates) as Currency[]).map((currency) => (
           <div key={currency} className="space-y-2">
             <Label htmlFor={currency} className="flex justify-between items-center">
               <span>{currency}</span>
