@@ -7,10 +7,27 @@ import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import ReportBack from '@/components/beq-dynamic-fund/ReportBack'
 import { Term } from '@/lib/investment-products/dynamicFund'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts'
+import { request } from 'http'
+import { ProfitChart } from '@/components/ProfitChart'
+
+interface ProfitItem {
+  date: Date
+  balance: number
+}
 
 export default function InvestmentProcessPage() {
   const [profitData, setProfitData] = useState([])
   const [requestFormData, setRequestFormData] = useState({})
+
+  const formattedProfitData = Object.entries(profitData).flatMap(([year, items]) =>
+    items.map((item: ProfitItem) => ({
+      time: item.date,
+      balance: item.balance,
+    })),
+  )
   return (
     <>
       <SiteHeader />
@@ -31,17 +48,37 @@ export default function InvestmentProcessPage() {
                 dataExtra={(requestFormData as { dataExtra: object }).dataExtra}
               />
             )}
-
-            {Object.entries(profitData).map(([year, item]) => {
-              return (
-                <div key={year} className="mb-10">
-                  <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
-                    {`Year ${year}`}
-                  </h2>
-                  <ProfitTable data={item} />
-                </div>
-              )
-            })}
+            {Object.keys(profitData).length > 0 && (
+              <Tabs defaultValue="table" className="space-y-4">
+                <TabsList>
+                  <TabsTrigger value="table">Bảng Lãi</TabsTrigger>
+                  <TabsTrigger value="chart">Biểu Đồ</TabsTrigger>
+                </TabsList>
+                <TabsContent value="table" className="space-y-4">
+                  {Object.entries(profitData).map(([year, item]) => {
+                    return (
+                      <div key={year} className="mb-10">
+                        <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
+                          {`Year ${year}`}
+                        </h2>
+                        <ProfitTable data={item} />
+                      </div>
+                    )
+                  })}
+                </TabsContent>
+                <TabsContent value="chart">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Biểu Đồ Lợi Nhuận</CardTitle>
+                      <CardDescription>Biểu diễn số dư theo thời gian</CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-2">
+                      <ProfitChart profitData={formattedProfitData} />
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
+            )}
           </div>
         </div>
       </div>
