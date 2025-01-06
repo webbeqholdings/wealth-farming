@@ -6,8 +6,8 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { withdrawInvestment } from '@/lib/contract';
 import { notifyWithdrawlContracts } from '@/lib/telegram';
-import { isAfter } from 'date-fns';
 import { getPaymentTransfer } from '@/lib/paymentTransfer'
+import { endOfMonth, endOfQuarter, endOfYear, isAfter, differenceInDays } from 'date-fns';
 
 interface WithdrawDialogProps {
   isOpen: boolean;
@@ -39,6 +39,34 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
     return isAfter(today, endDate); // Check if today is after the contract end date
   };
 
+  // Calculate expected end dates for each term
+  const getExpectedEndDate = (term: any, start: any) => {
+    switch (term) {
+      case 'monthly':
+        return endOfMonth(start);
+      case 'quarterly':
+        return endOfQuarter(start);
+      case 'semester':
+        const semesterEndMonth = start.getMonth() < 6 ? 5 : 11; // June or December
+        return new Date(start.getFullYear(), semesterEndMonth + 1, 0); // Last day of the semester
+      case 'yearly':
+        return endOfYear(start);
+      default:
+        throw new Error('Unsupported term. Valid terms: monthly, quarterly, semester, yearly.');
+    }
+  };
+
+  const checkTermFullness = (startDate: any, term: any) => {
+    const start = new Date(startDate);
+
+    // Calculate total days in the expected term
+    const expectedEndDate = getExpectedEndDate(term, start);
+    const totalTermDays = differenceInDays(expectedEndDate, start) + 1;
+    // Calculate actual duration of the contract
+    const actualDurationDays = differenceInDays(new Date(), start) + 1;
+    return actualDurationDays >= totalTermDays
+  };
+
   const handleDialogClose = () => {
     setAmount('');
     onClose();
@@ -46,14 +74,13 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
 
   async function handleWithdraw(event: React.FormEvent) {
     event.preventDefault();
-    if (!isWithdrawalAllowed()) {
+    if (!checkTermFullness(contract.startDate, contract.term)) {
       toast({
         title: 'Error',
-        description: 'Withdrawl can only occur after the contract deadline.',
+        description: `Withdrawl can only occur after ${contract.term}.`,
       });
       return;
     }
-
     if (contract.status === 'inactive') {
       toast({
         title: 'Error',
