@@ -80,6 +80,7 @@
     "react-hook-form": "^7.53.2",
     "react-spring": "^9.7.4",
     "recharts": "^2.13.3",
+    "resend": "^4.0.1",
     "sharp": "0.32.6",
     "slugify": "^1.6.6",
     "tailwind-merge": "^2.5.4",
