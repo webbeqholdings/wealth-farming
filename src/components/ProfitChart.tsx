@@ -37,10 +37,25 @@ export function ProfitChart({ profitData }: ProfitChartProps) {
     <ResponsiveContainer width="100%" height={350}>
       <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="time" label={{ value: 'Time', position: 'insideBottom', offset: -5 }} />
-        <YAxis label={{ value: 'Balance ($)', angle: -90, position: 'insideLeft' }} />
+        <XAxis
+          dataKey="time"
+          label={{ value: 'Time', position: 'insideBottom', offset: -5 }}
+        />
+        <YAxis
+          label={{
+            value: 'Balance ($)',
+            angle: -90,
+            position: 'insideLeft',
+            dx: -8 // Shift the label to the left by 5px
+          }}
+        />
         <Tooltip content={<CustomTooltip />} />
-        <Line type="monotone" dataKey="balance" stroke="blue" activeDot={{ r: 8 }} />
+        <Line
+          type="monotone"
+          dataKey="balance"
+          stroke="blue"
+          activeDot={{ r: 8 }}
+        />
       </LineChart>
     </ResponsiveContainer>
   )
