@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import clsx from 'clsx';
+import clsx from 'clsx'
 import {
   Table,
   TableBody,
@@ -30,8 +30,10 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination"
+} from '@/components/ui/pagination'
 import Spinner from '@/components/Spinner'
+import { printPdf } from '@/components/printPdf'
+import { useTheme } from 'next-themes'
 
 // Mock data for chart
 const chartData = [
@@ -47,32 +49,35 @@ export default function HistoryPage() {
   const router = useRouter()
   const { isLoggedIn, loading, user } = UserStatus()
   const [activeTab, setActiveTab] = useState('all')
-  const [transactions, setTransactions] = useState([]);
-  const [accounts, setAccounts] = useState([]);
-  const [totalPages, setTotalPages] = useState(1);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [transactions, setTransactions] = useState([])
+  const [accounts, setAccounts] = useState([])
+  const [totalPages, setTotalPages] = useState(1)
+  const [currentPage, setCurrentPage] = useState(1)
+  const { theme, setTheme } = useTheme()
 
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
-        const response = await fetch(`/api/accounts?where[user][equals]=${user.id}`); // Replace with dynamic user ID if necessary
+        const response = await fetch(`/api/accounts?where[user][equals]=${user.id}`) // Replace with dynamic user ID if necessary
         if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+          throw new Error(`HTTP error! Status: ${response.status}`)
         }
-        const data = await response.json();
+        const data = await response.json()
 
         // Transform API response into desired format
-        const transformedAccounts = data.docs.map((account: { account_name: string, amount: number }) => ({
-          name: account.account_name,
-          balance: account.amount, // Assuming you want to divide the amount to convert to another unit
-          currency: 'USD', // Hardcoded as 'USD', replace with dynamic value if available in the API
-        }));
+        const transformedAccounts = data.docs.map(
+          (account: { account_name: string; amount: number }) => ({
+            name: account.account_name,
+            balance: account.amount, // Assuming you want to divide the amount to convert to another unit
+            currency: 'USD', // Hardcoded as 'USD', replace with dynamic value if available in the API
+          }),
+        )
 
-        setAccounts(transformedAccounts); // Store the transformed accounts in state
+        setAccounts(transformedAccounts) // Store the transformed accounts in state
       } catch (error) {
-        console.error('Failed to fetch accounts:', error);
+        console.error('Failed to fetch accounts:', error)
       }
-    };
+    }
 
     fetchAccounts()
   }, [loading])
@@ -80,27 +85,37 @@ export default function HistoryPage() {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const { docs, totalPages } = await getTransactions(currentPage, 10, activeTab);
+        const { docs, totalPages } = await getTransactions(currentPage, 10, activeTab)
 
-        setTransactions(docs); // Store the accounts in state
-        setTotalPages(totalPages);
+        setTransactions(docs) // Store the accounts in state
+        setTotalPages(totalPages)
       } catch (error) {
-        console.error('Failed to fetch accounts:', error);
+        console.error('Failed to fetch accounts:', error)
       }
-    };
+    }
 
-    fetchTransactions();
-  }, [loading, activeTab, currentPage]);
+    fetchTransactions()
+  }, [loading, activeTab, currentPage])
 
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
-    return <Spinner/>; // You can replace this with a loading spinner component if desired
+    return <Spinner /> // You can replace this with a loading spinner component if desired
   }
 
   // If the user is not logged in, redirect to the join page
   if (!isLoggedIn) {
-    router.push('/join');
-    return <Spinner/>; // Optional: Show a redirect message
+    router.push('/join')
+    return <Spinner /> // Optional: Show a redirect message
+  }
+
+  const handleExportPdf = async (element: string) => {
+    if (theme === 'dark') {
+      setTheme('light')
+      await printPdf(element, false)
+      setTheme('dark')
+    } else {
+      await printPdf(element, false)
+    }
   }
 
   return (
@@ -140,47 +155,77 @@ export default function HistoryPage() {
             <div className="flex justify-end space-x-2 mb-4">
               <Button
                 variant={activeTab === 'all' ? 'default' : 'outline'}
-                onClick={() => { setActiveTab('all'); setCurrentPage(1) }}
+                onClick={() => {
+                  setActiveTab('all')
+                  setCurrentPage(1)
+                }}
               >
                 All
               </Button>
               <Button
                 variant={activeTab === 'deposit' ? 'default' : 'outline'}
-                onClick={() => { setActiveTab('deposit'); setCurrentPage(1) }}
+                onClick={() => {
+                  setActiveTab('deposit')
+                  setCurrentPage(1)
+                }}
               >
                 Deposits
               </Button>
               <Button
                 variant={activeTab === 'withdraw' ? 'default' : 'outline'}
-                onClick={() => { setActiveTab('withdraw'); setCurrentPage(1) }}
+                onClick={() => {
+                  setActiveTab('withdraw')
+                  setCurrentPage(1)
+                }}
               >
                 Withdrawals
               </Button>
               <Button
                 variant={activeTab === 'transfer' ? 'default' : 'outline'}
-                onClick={() => { setActiveTab('transfer'); setCurrentPage(1) }}
+                onClick={() => {
+                  setActiveTab('transfer')
+                  setCurrentPage(1)
+                }}
               >
                 Transfers
               </Button>
               <Button
                 variant={activeTab === 'investment' ? 'default' : 'outline'}
-                onClick={() => { setActiveTab('investment'); setCurrentPage(1) }}
+                onClick={() => {
+                  setActiveTab('investment')
+                  setCurrentPage(1)
+                }}
               >
                 Investments
               </Button>
             </div>
-            <Table>
+            <Button asChild onClick={() => handleExportPdf('tableContent')}>
+              <button>Download PDF</button>
+            </Button>
+            <Table id="tableContent">
               <TableHeader>
                 <TableRow>
                   <TableHead>Date</TableHead>
                   <TableHead>Type</TableHead>
-                  {activeTab === 'all' || activeTab === 'investment' ? <TableHead>Product</TableHead> : ''}
+                  {activeTab === 'all' || activeTab === 'investment' ? (
+                    <TableHead>Product</TableHead>
+                  ) : (
+                    ''
+                  )}
                   <TableHead>Amount</TableHead>
-                  {activeTab === 'all' || activeTab === 'investment' ? <TableHead>Profit</TableHead> : ''}
+                  {activeTab === 'all' || activeTab === 'investment' ? (
+                    <TableHead>Profit</TableHead>
+                  ) : (
+                    ''
+                  )}
                   {activeTab !== 'transfer' ? <TableHead>Account</TableHead> : ''}
                   {activeTab === 'transfer' ? <TableHead>From Account</TableHead> : ''}
                   {activeTab === 'transfer' ? <TableHead>To Account</TableHead> : ''}
-                  {activeTab === 'all' || activeTab === 'deposit' || activeTab === 'withdraw' ? <TableHead>Status</TableHead> : ''}
+                  {activeTab === 'all' || activeTab === 'deposit' || activeTab === 'withdraw' ? (
+                    <TableHead>Status</TableHead>
+                  ) : (
+                    ''
+                  )}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -191,16 +236,27 @@ export default function HistoryPage() {
                       (activeTab === 'deposit' && t.type == 'deposit') ||
                       (activeTab === 'withdraw' && t.type == 'withdraw') ||
                       (activeTab === 'transfer' && t.type == 'transfer') ||
-                      (activeTab === 'investment' && t.type == 'investment')
+                      (activeTab === 'investment' && t.type == 'investment'),
                   )
                   .map((transaction) => (
                     <TableRow key={transaction.id}>
                       <TableCell>{transaction.date}</TableCell>
-                      <TableCell>{transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1).toLowerCase()}</TableCell>
-                      {activeTab === 'all' || activeTab === 'investment' ? <TableHead>{transaction.product_name}</TableHead> : ''}
+                      <TableCell>
+                        {transaction.type.charAt(0).toUpperCase() +
+                          transaction.type.slice(1).toLowerCase()}
+                      </TableCell>
+                      {activeTab === 'all' || activeTab === 'investment' ? (
+                        <TableHead>{transaction.product_name}</TableHead>
+                      ) : (
+                        ''
+                      )}
                       <TableCell>
                         <span
-                          className={transaction.amount >= 0 && transaction.profit_or_loss >= 0 ? 'text-green-600' : 'text-red-600'}
+                          className={
+                            transaction.amount >= 0 && transaction.profit_or_loss >= 0
+                              ? 'text-green-600'
+                              : 'text-red-600'
+                          }
                         >
                           {transaction.amount.toLocaleString('en-US', {
                             style: 'currency',
@@ -208,17 +264,36 @@ export default function HistoryPage() {
                           })}
                         </span>
                       </TableCell>
-                      {activeTab === 'all' || activeTab === 'investment' ? <TableCell><span
-                        className={transaction.amount >= 0 && transaction.profit_or_loss >= 0 ? 'text-green-600' : 'text-red-600'}
-                      >{transaction.profit_or_loss}{transaction.unit_code}</span></TableCell> : ''}
+                      {activeTab === 'all' || activeTab === 'investment' ? (
+                        <TableCell>
+                          <span
+                            className={
+                              transaction.amount >= 0 && transaction.profit_or_loss >= 0
+                                ? 'text-green-600'
+                                : 'text-red-600'
+                            }
+                          >
+                            {transaction.profit_or_loss}
+                            {transaction.unit_code}
+                          </span>
+                        </TableCell>
+                      ) : (
+                        ''
+                      )}
                       <TableCell>{transaction.account}</TableCell>
-                      {activeTab === 'transfers' ? <TableCell>{transaction.to_account}</TableCell> : ''}
-                      {activeTab === 'all' || activeTab === 'deposit' || activeTab === 'withdraw' ? (
+                      {activeTab === 'transfers' ? (
+                        <TableCell>{transaction.to_account}</TableCell>
+                      ) : (
+                        ''
+                      )}
+                      {activeTab === 'all' ||
+                      activeTab === 'deposit' ||
+                      activeTab === 'withdraw' ? (
                         <TableCell
                           className={clsx({
-                            'text-yellow-500': transaction.status === 'pending',  // Yellow font
+                            'text-yellow-500': transaction.status === 'pending', // Yellow font
                             'text-green-500': transaction.status === 'completed', // Green font
-                            'text-red-500': transaction.status === 'failed',      // Red font
+                            'text-red-500': transaction.status === 'failed', // Red font
                           })}
                         >
                           {transaction.status}
@@ -230,38 +305,41 @@ export default function HistoryPage() {
                   ))}
               </TableBody>
             </Table>
-            {transactions && transactions.length > 0 ? <div className="flex justify-end mt-4 mb-4">
-              <Pagination className="cursor-pointer">
-                <PaginationPrevious
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                  className="text-sm font-medium rounded-lg hover:bg-gray-100"
-                >
-                  Previous
-                </PaginationPrevious>
-                <PaginationContent>
-                  {[...Array(totalPages)].map((_, index) => (
-                    <PaginationItem key={index}>
-                      <PaginationLink
-                        onClick={() => setCurrentPage(index + 1)}
-                        isActive={currentPage === index + 1}
-                        className={`text-sm font-medium rounded-lg ${currentPage === index + 1
-                          ? 'border-gray-400'
-                          : ''
+            {transactions && transactions.length > 0 ? (
+              <div className="flex justify-end mt-4 mb-4">
+                <Pagination className="cursor-pointer">
+                  <PaginationPrevious
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    className="text-sm font-medium rounded-lg hover:bg-gray-100"
+                  >
+                    Previous
+                  </PaginationPrevious>
+                  <PaginationContent>
+                    {[...Array(totalPages)].map((_, index) => (
+                      <PaginationItem key={index}>
+                        <PaginationLink
+                          onClick={() => setCurrentPage(index + 1)}
+                          isActive={currentPage === index + 1}
+                          className={`text-sm font-medium rounded-lg ${
+                            currentPage === index + 1 ? 'border-gray-400' : ''
                           }`}
-                      >
-                        {index + 1}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ))}
-                </PaginationContent>
-                <PaginationNext
-                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                  className="px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-100"
-                >
-                  Next
-                </PaginationNext>
-              </Pagination>
-            </div> : <></>}
+                        >
+                          {index + 1}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                  </PaginationContent>
+                  <PaginationNext
+                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                    className="px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-100"
+                  >
+                    Next
+                  </PaginationNext>
+                </Pagination>
+              </div>
+            ) : (
+              <></>
+            )}
           </TabsContent>
           <TabsContent value="chart">
             <Card>

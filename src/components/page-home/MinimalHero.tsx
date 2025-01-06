@@ -28,9 +28,9 @@ export function MinimalHero() {
               </PageHeaderDescription>
               <PageActions>
                 <Button asChild size="sm">
-                  <a href="#charts">Browse Charts</a>
+                  <a href="/investment-products/incoming/investment-process">How it works</a>
                 </Button>
-                <Link href="/docs/components/chart">Documentation</Link>
+                {/* <Link href="/docs/components/chart">Documentation</Link> */}
               </PageActions>
             </PageHeader>
           </div>

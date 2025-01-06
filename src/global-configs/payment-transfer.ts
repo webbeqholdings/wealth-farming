@@ -74,7 +74,7 @@ const GcPaymentTransfer: GlobalConfig = {
     {
       name: 'usd_to_usdt',
       type: 'number',
-      label: 'USDT to USDT',
+      label: 'USD to USDT',
       defaultValue: 1,
     },
   ],
