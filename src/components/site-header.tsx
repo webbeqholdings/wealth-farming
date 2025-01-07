@@ -28,6 +28,7 @@ export function SiteHeader() {
   useEffect(() => {
     const fetchData: any = async () => {
       const user = await me()
+      if (!user) return
       const totalAmount: number = await getBalanceAmountByUser(user.id)
       setBalance(totalAmount)
       // @ts-nocheck
