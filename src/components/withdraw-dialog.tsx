@@ -6,8 +6,8 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { withdrawInvestment } from '@/lib/contract';
 import { notifyWithdrawlContracts } from '@/lib/telegram';
-import { isAfter } from 'date-fns';
 import { getPaymentTransfer } from '@/lib/paymentTransfer'
+import { endOfMonth, addMonths, differenceInDays } from 'date-fns';
 
 interface WithdrawDialogProps {
   isOpen: boolean;
@@ -34,9 +34,81 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
 
   const today = new Date();
 
-  const isWithdrawalAllowed = () => {
-    const endDate = new Date(contract.endDate);
-    return isAfter(today, endDate); // Check if today is after the contract end date
+  // Calculate expected end dates for each term
+  const getExpectedEndDate = (term: string, start: Date) => {
+    switch (term) {
+      case 'monthly':
+        return endOfMonth(start);
+      case 'quarterly': {
+        // Add 4 months and get the last date of that month
+        const fourMonthsLater = addMonths(start, 3);
+        return endOfMonth(fourMonthsLater);
+      }
+      case 'semester': {
+        // Add 6 months and get the last date of that month
+        const sixMonthsLater = addMonths(start, 5);
+        return endOfMonth(sixMonthsLater);
+      }
+      case 'annually': {
+        // Add 12 months and get the last date of that month
+        const twelveMonthsLater = addMonths(start, 11);
+        return endOfMonth(twelveMonthsLater);
+      }
+      default:
+        throw new Error('Unsupported term. Valid terms: monthly, quarterly, semester, yearly.');
+    }
+  };
+
+  const getBeginningOfNextMonth = (startDate: any) => {
+    const start = new Date(startDate);
+  
+    // Check if the start date is the beginning of the month
+    if (start.getDate() === 1) {
+      // If it's already the first day, return it
+      return start;
+    }
+  
+    // Move to the first day of the next month
+    const nextMonth = new Date(start.getFullYear(), start.getMonth() + 1, 1);
+  
+    return nextMonth;
+  }
+
+  const checkTermFullness = (startDate: any, term: any) => {
+    const start = getBeginningOfNextMonth(startDate);
+
+    // Calculate total days in the expected term
+    const expectedEndDate = getExpectedEndDate(term, start);
+    const totalTermDays = differenceInDays(expectedEndDate, start) + 1;
+    // Calculate actual duration of the contract
+    const actualDurationDays = differenceInDays(new Date(), start) + 1;
+    return actualDurationDays >= totalTermDays
+  };
+
+  const toastMessage = (term: any) => {
+    let termDescription;
+  
+    switch (term) {
+      case 'monthly':
+        termDescription = 'first month';
+        break;
+      case 'quarterly':
+        termDescription = 'first quarter';
+        break;
+      case 'semester':
+        termDescription = 'first semester';
+        break;
+      case 'annually':
+        termDescription = 'first year';
+        break;
+      default:
+        throw new Error('Unsupported term.');
+    }
+  
+    toast({
+      title: 'Error',
+      description: `Withdrawal can only occur after ${termDescription}.`,
+    });
   };
 
   const handleDialogClose = () => {
@@ -46,14 +118,10 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
 
   async function handleWithdraw(event: React.FormEvent) {
     event.preventDefault();
-    if (!isWithdrawalAllowed()) {
-      toast({
-        title: 'Error',
-        description: 'Withdrawl can only occur after the contract deadline.',
-      });
+    if (!checkTermFullness(contract.startDate, contract.term)) {
+      toastMessage(contract.term)
       return;
     }
-
     if (contract.status === 'inactive') {
       toast({
         title: 'Error',
