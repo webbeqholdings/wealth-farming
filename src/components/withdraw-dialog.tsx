@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { withdrawInvestment } from '@/lib/contract';
 import { notifyWithdrawlContracts } from '@/lib/telegram';
 import { getPaymentTransfer } from '@/lib/paymentTransfer'
-import { endOfMonth, endOfQuarter, endOfYear, isAfter, differenceInDays } from 'date-fns';
+import { endOfMonth, addMonths, differenceInDays } from 'date-fns';
 
 interface WithdrawDialogProps {
   isOpen: boolean;
@@ -34,30 +34,48 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
 
   const today = new Date();
 
-  const isWithdrawalAllowed = () => {
-    const endDate = new Date(contract.endDate);
-    return isAfter(today, endDate); // Check if today is after the contract end date
-  };
-
   // Calculate expected end dates for each term
-  const getExpectedEndDate = (term: any, start: any) => {
+  const getExpectedEndDate = (term: string, start: Date) => {
     switch (term) {
       case 'monthly':
         return endOfMonth(start);
-      case 'quarterly':
-        return endOfQuarter(start);
-      case 'semester':
-        const semesterEndMonth = start.getMonth() < 6 ? 5 : 11; // June or December
-        return new Date(start.getFullYear(), semesterEndMonth + 1, 0); // Last day of the semester
-      case 'yearly':
-        return endOfYear(start);
+      case 'quarterly': {
+        // Add 4 months and get the last date of that month
+        const fourMonthsLater = addMonths(start, 3);
+        return endOfMonth(fourMonthsLater);
+      }
+      case 'semester': {
+        // Add 6 months and get the last date of that month
+        const sixMonthsLater = addMonths(start, 5);
+        return endOfMonth(sixMonthsLater);
+      }
+      case 'annually': {
+        // Add 12 months and get the last date of that month
+        const twelveMonthsLater = addMonths(start, 11);
+        return endOfMonth(twelveMonthsLater);
+      }
       default:
         throw new Error('Unsupported term. Valid terms: monthly, quarterly, semester, yearly.');
     }
   };
 
-  const checkTermFullness = (startDate: any, term: any) => {
+  const getBeginningOfNextMonth = (startDate: any) => {
     const start = new Date(startDate);
+  
+    // Check if the start date is the beginning of the month
+    if (start.getDate() === 1) {
+      // If it's already the first day, return it
+      return start;
+    }
+  
+    // Move to the first day of the next month
+    const nextMonth = new Date(start.getFullYear(), start.getMonth() + 1, 1);
+  
+    return nextMonth;
+  }
+
+  const checkTermFullness = (startDate: any, term: any) => {
+    const start = getBeginningOfNextMonth(startDate);
 
     // Calculate total days in the expected term
     const expectedEndDate = getExpectedEndDate(term, start);
@@ -65,6 +83,32 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
     // Calculate actual duration of the contract
     const actualDurationDays = differenceInDays(new Date(), start) + 1;
     return actualDurationDays >= totalTermDays
+  };
+
+  const toastMessage = (term: any) => {
+    let termDescription;
+  
+    switch (term) {
+      case 'monthly':
+        termDescription = 'first month';
+        break;
+      case 'quarterly':
+        termDescription = 'first quarter';
+        break;
+      case 'semester':
+        termDescription = 'first semester';
+        break;
+      case 'annually':
+        termDescription = 'first year';
+        break;
+      default:
+        throw new Error('Unsupported term.');
+    }
+  
+    toast({
+      title: 'Error',
+      description: `Withdrawal can only occur after ${termDescription}.`,
+    });
   };
 
   const handleDialogClose = () => {
@@ -75,10 +119,7 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
   async function handleWithdraw(event: React.FormEvent) {
     event.preventDefault();
     if (!checkTermFullness(contract.startDate, contract.term)) {
-      toast({
-        title: 'Error',
-        description: `Withdrawl can only occur after ${contract.term}.`,
-      });
+      toastMessage(contract.term)
       return;
     }
     if (contract.status === 'inactive') {
