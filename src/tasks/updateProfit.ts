@@ -100,7 +100,7 @@ export const updateProfitHandler: TaskHandler<{
         const totalTermDays = differenceInDays(expectedEndDate, start) + 1;
         // Calculate actual duration of the contract
         const actualDurationDays = differenceInDays(today, start) + 1;
-        return actualDurationDays >= totalTermDays
+        return (actualDurationDays >= totalTermDays) && (today.getDate() == 1)
     };
 
     // Fetch all active contracts

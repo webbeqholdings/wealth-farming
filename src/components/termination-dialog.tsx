@@ -9,7 +9,6 @@ import { notifyWithdrawlContracts } from '@/lib/telegram';
 import { standardApplyProgramDays } from '@/lib/investment-products/dynamicFund';
 
 interface TerminationDialogProps {
-
   isOpen: boolean;
   onClose: () => void;
   contract: {
@@ -44,9 +43,7 @@ export function TerminationDialog({ isOpen, onClose, contract, setActiveTab }: T
     onClose();
   };
 
-
-
-  function calculateTimeDifference_withUnit(dateStart: string | Date, dateEnd: string | Date, unit: 'year' | 'month' | 'day') {
+  function calculateTimeDifferenceWithUnit(dateStart: string | Date, dateEnd: string | Date, unit: string) {
     // Hàm chuyển đổi chuỗi định dạng DD/MM/YYYY thành đối tượng Date "/"
     const parseDate = (dateStr: string): Date => {
       const [day, month, year] = dateStr.split("-").map(Number);
@@ -73,38 +70,19 @@ export function TerminationDialog({ isOpen, onClose, contract, setActiveTab }: T
       throw new Error("Invalid endDate format. Please provide a valid Date or a date string in DD/MM/YYYY format.");
     }
 
-    console.log(dateStart, end)
-
-    // Tính khoảng cách theo đơn vị
-    switch (unit) {
-      case 'year':
-        return end.getFullYear() - start.getFullYear();
-      case 'month':
-        return (
-          (end.getFullYear() - start.getFullYear()) * 12 +
-          (end.getMonth() - start.getMonth())
-        );
-      case 'day':
-        const remainday = Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
-        return (remainday < 0 ? 0 : remainday);
-      default:
-        throw new Error("Invalid unit. Please use 'year', 'month', or 'day'.");
-    }
+    const remainday = Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
+    return (remainday < 0 ? 0 : remainday);
+    
   }
 
-  const isUseUnder90DayRate = (calculateTimeDifference_withUnit(new Date(contract.startDate), today.getUTCDate() + "-" + today.getUTCMonth() + 1 + "-" + today.getUTCFullYear(), "day") <= standardApplyProgramDays)
+  const isUseUnder90DayRate = (calculateTimeDifferenceWithUnit(new Date(contract.startDate), today.getUTCDate() + "-" + today.getUTCMonth() + 1 + "-" + today.getUTCFullYear(), "day") <= standardApplyProgramDays)
 
   function caculatedTerminationRate(): number {
-
-
     const utcToday = today.getUTCDate() + "-" + today.getUTCMonth() + 1 + "-" + today.getUTCFullYear()
-    const dayNum = calculateTimeDifference_withUnit(new Date(contract.startDate), utcToday, "day")
+    const dayNum = calculateTimeDifferenceWithUnit(new Date(contract.startDate), utcToday, "day")
     if (dayNum <= standardApplyProgramDays) {
-
-      return parseFloat(((under90DayRate * dayNum)).toFixed(4))
+      return parseFloat(((under90DayRate * dayNum)).toFixed(2))
     }
-
-
   }
   function caculatedTerminationTotal(): number {
     return contract.investedAmount + (contract.investedAmount * caculatedTerminationRate())
@@ -186,9 +164,9 @@ export function TerminationDialog({ isOpen, onClose, contract, setActiveTab }: T
                 required
                 disabled
               />
-              
-
-
+              <p className="text-sm text-gray-600 mt-1">
+                Balance Available: <strong>${daysSinceStart < standardApplyProgramDays ? caculatedTerminationTotal(): contract.availableBalance.toFixed(2)}</strong>
+              </p>
             </div>
           </div>
           <DialogFooter className="mt-6">

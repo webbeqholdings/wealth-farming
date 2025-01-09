@@ -17,7 +17,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
-import { Minus } from 'lucide-react'
 export function MobileNav() {
   const [open, setOpen] = React.useState(false)
   const [menuItems, setMenuItems] = React.useState([])
