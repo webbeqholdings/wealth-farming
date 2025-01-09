@@ -71,10 +71,10 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
       case 'semester': {
         // Determine the semester and return its last date
         if (currentMonth == 1 && currentDate == 1) {
-          return new Date(start.getFullYear(), 5, 30);
+          return new Date(start.getFullYear(), 6, 30);
         }
         if ((currentMonth == 7 || currentDate == 1) || (currentMonth == 1 && currentDate > 1) || (currentMonth >= 2 && currentMonth <= 6)) {
-          return new Date(start.getFullYear(), 11, 31);
+          return new Date(start.getFullYear(), 12, 31);
         }
         if ((currentMonth == 7 && currentDate > 1) || (currentMonth > 7)) {
           const nextYear = start.getFullYear() + 1;
@@ -159,6 +159,7 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
       });
 
       return;
+
     }
     if (contract.status === 'inactive') {
       toast({
@@ -167,7 +168,6 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
       });
       return;
     }
-    
     setIsLoading(true);
 
     try {
@@ -182,16 +182,18 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
         return;
       }
 
-      const formData = new FormData();
-      formData.append('amount', amount);
-      formData.append('contractId', contract.id);
-      formData.append('userId', contract.userId);
+      const formData = {
+        amount: amount,
+        contractId: contract.id,
+        userId: contract.userId
+      }
 
       const result = await withdrawInvestment(formData);
-      notifyWithdrawlContracts(result.data);
+      // notifyWithdrawlContracts(result.data);
+      console.log("Result: ",result)
       if (result.success) {
         toast({
-          title: 'Withdrawal Successfully',
+          title: 'Withdrawal Successfully', 
           description: `Total Profit: ${amount} USD`,
         });
         setActiveTab('withdraw');
@@ -255,7 +257,7 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
               disabled={
                 isLoading ||
                 !amount ||
-                parseFloat(amount) >= contract.profit
+                parseFloat(amount) > contract.profit
               }
               className="bg-blue-500 text-white hover:bg-blue-600"
             >

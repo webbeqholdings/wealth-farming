@@ -86,13 +86,12 @@ export function MobileNav() {
         </MobileLink>
         <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10">
           <div className="flex flex-col space-y-3">
-
             {
 
               menuItems ? menuItems.map((item) => (
-                <>
+                <div key={item.id + '-menu_view'}>
                   {(item.children.length >= 1) ?
-                    <Accordion type='single' collapsible className='mr-2'>
+                    <Accordion key={item.id + '-menu_dropdownToggle'} type='single' collapsible className='mr-2'>
                       <AccordionItem key={item.id} value={item.id} >
                         <AccordionTrigger >
                           <div className='ml-2 '>
@@ -117,7 +116,7 @@ export function MobileNav() {
                       </AccordionItem>
                     </Accordion>
                     :
-                    <div className={'border-b mr-2'}>
+                    <div key={item.id + '-menu'} className={'border-b mr-2'}>
                       <div className='"flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline '>
                         <Link href={item.url ?? '#'} target="_self" rel="noreferrer">
                           <div className='pl-2'>
@@ -127,7 +126,7 @@ export function MobileNav() {
                       </div>
                     </div>
                   }
-                </>))
+                </div>))
                 : <></>
             }
           </div>

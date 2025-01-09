@@ -107,13 +107,12 @@ export async function withdrawInvestment(formData: any) {
     const amount = formData.amount
     const contractId = formData.contractId
     const userId = formData.userId
-
     const response = await payload.create({
       collection: 'withdrawals',
       data: {
-        contract: contractId,
-        user: userId,
-        amount: amount,
+        contract: Number(contractId),
+        user: Number(userId),
+        amount: Number(amount),
         status: 'pending',
       },
     })

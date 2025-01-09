@@ -348,6 +348,7 @@ export function InvestmentContracts() {
                                                         Withdraw
                                                     </Button>
                                                     <Button
+                                                        disabled = {investment.status == 'inactive'}
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={() => handleTerminate(investment)}
