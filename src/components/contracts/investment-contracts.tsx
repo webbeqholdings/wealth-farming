@@ -25,6 +25,13 @@ import {
     PaginationPrevious,
 } from "@/components/ui/pagination"
 import Spinner from '../Spinner'
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+  } from "@/components/ui/popover"
+import { Label } from "@/components/ui/label"
+import { Settings } from 'lucide-react' 
 
 interface Investment {
     id: string
@@ -199,6 +206,35 @@ export function InvestmentContracts() {
                 </div>
 
                 <div className="flex justify-end space-x-2 mb-4">
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button variant="outline">
+                        <Settings />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80 ">
+                        <form>
+                            <div className="grid gap-2 ">
+                                <div className="grid grid-cols-4 items-center gap-4 font-medium">
+                                    <Label className="col-span-2">Profit Withdraw</Label>
+                                    <div className="col-span-2 flex items-center  rounded-md ">
+                                        <span className="px-3 text-gray-500">$</span>
+                                        <input
+                                            id="monthlyProfit"
+                                            defaultValue="0"
+                                            className="h-8 w-24 rounded-md"
+                                            type="number"
+                                        />
+                                    </div>
+                                    <div className='col-span-4 flex justify-center'>
+                                        <button className='col-span-2 mt-2 py-2 px-4 bg-primary rounded-md font-semibold ' type="submit">Update</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </PopoverContent>
+                </Popover>
+
                     <Button
                         variant={activeTab === 'investment' ? 'default' : 'outline'}
                         onClick={() => { setActiveTab('investment'); setCurrentPage(1) }}
