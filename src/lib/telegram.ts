@@ -1,7 +1,7 @@
 // Create a function to make the API request
 export async function notifyDeposit(data: any) {
     try {
-        const response = await fetch('https://dev.bot.alert.wealthfarming.org/api/notify-deposit', {
+        const response = await fetch('https://alert.wealthfarming.org/api/notify-deposit', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json', // Specify JSON content type
@@ -28,7 +28,7 @@ export async function notifyDeposit(data: any) {
 
 export async function notifyWithdrawl(data: any) {
     try {
-        const response = await fetch('https://dev.bot.alert.wealthfarming.org/api/notify-withdrawl', {
+        const response = await fetch('https://alert.wealthfarming.org/api/notify-withdrawl', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json', // Specify JSON content type
@@ -55,7 +55,7 @@ export async function notifyWithdrawl(data: any) {
 
 export async function notifyInvestment(data: any) {
     try {
-        const response = await fetch('https://dev.bot.alert.wealthfarming.org/api/notify-investment', {
+        const response = await fetch('https://alert.wealthfarming.org/api/notify-investment', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json', // Specify JSON content type
@@ -88,7 +88,7 @@ export async function notifyInvestment(data: any) {
 
 export async function notifyWithdrawlContracts(data: any) {
     try {
-        const response = await fetch('https://dev.bot.alert.wealthfarming.org/api/notify-withdrawl-contracts', {
+        const response = await fetch('https://alert.wealthfarming.org/api/notify-withdrawl-contracts', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json', // Specify JSON content type

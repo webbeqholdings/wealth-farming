@@ -23,24 +23,16 @@ import {
   PercentIcon,
   AlertTriangleIcon,
   BarChartIcon,
-  CalendarIcon
+  CalendarIcon,
 } from 'lucide-react'
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Legend,
-  ResponsiveContainer,
-} from 'recharts'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { toast } from '@/hooks/use-toast'
-import { format } from 'date-fns';
+import { format } from 'date-fns'
 import { Document } from '@/components/report_finance'
-import { printPdf } from '@/components/printPdf';
+import { printPdf } from '@/components/printPdf'
 import { notifyInvestment } from '@/lib/telegram'
 import Spinner from '@/components/Spinner'
 
@@ -72,7 +64,7 @@ const product = {
 }
 
 export default function ProductDetailPage() {
-  const { isLoggedIn, loading, user } = UserStatus();
+  const { isLoggedIn, loading, user } = UserStatus()
   const [financialProducts, setFinancialProducts] = useState(null)
   const [investmentAmount, setInvestmentAmount] = useState(product.minInvestment)
   const [simulatedReturns, setSimulatedReturns] = useState<{ year: number; balance: number }[]>([])
@@ -83,15 +75,15 @@ export default function ProductDetailPage() {
     try {
       // If still loading, show a loading indicator (or spinner)
       if (loading) {
-        return <Spinner/>; // You can replace this with a loading spinner component if desired
+        return <Spinner /> // You can replace this with a loading spinner component if desired
       }
 
       // If the user is not logged in, redirect to the join page
       if (!isLoggedIn) {
-        router.push('/join');
-        return <Spinner/>; // Optional: Show a redirect message
+        router.push('/join')
+        return <Spinner /> // Optional: Show a redirect message
       }
-      const productId = localStorage.getItem('product_id');
+      const productId = localStorage.getItem('product_id')
       const response = await fetch('/api/transaction/create', {
         method: 'POST',
         headers: {
@@ -101,29 +93,28 @@ export default function ProductDetailPage() {
           user_id: user.id,
           product_id: productId,
           amount: investmentAmount,
-          status: "pending",
-          type: "investment"
+          status: 'pending',
+          type: 'investment',
         }), // Convert the request body to JSON
-      });
-      const data = await response.json();
-      await notifyInvestment(data.data);
+      })
+      const data = await response.json()
+      await notifyInvestment(data.data)
       if (!response.ok) {
         // Parse the error response to retrieve the error message
-        const errorResponse = await response.json();
-        const errorMessage = errorResponse.response?.error || 'An unknown error occurred';
-        throw new Error(errorMessage);
+        const errorResponse = await response.json()
+        const errorMessage = errorResponse.response?.error || 'An unknown error occurred'
+        throw new Error(errorMessage)
       }
       router.push('/account/history')
       toast({
         title: 'Investment Successfully',
       })
-    }
-    catch (error) {
-      console.log('Error creating transaction:', error);
+    } catch (error) {
+      console.log('Error creating transaction:', error)
       toast({
         title: 'Error',
-        description: `${error}`
-      });
+        description: `${error}`,
+      })
     }
   }
 
@@ -131,7 +122,7 @@ export default function ProductDetailPage() {
   useEffect(() => {
     async function fetchInvestmentProducts() {
       try {
-        const productId = localStorage.getItem('product_id');
+        const productId = localStorage.getItem('product_id')
         const response = await fetch(`/api/investment-products/${productId}`)
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`)
@@ -141,14 +132,14 @@ export default function ProductDetailPage() {
           id: data.id,
           name: data.product_name,
           description: data.description || 'No description available.',
-          product_overview: data.product_overview.root.children.map((child: any) => renderContent(child)).join(' '),
+          product_overview: data.product_overview.root.children
+            .map((child: any) => renderContent(child))
+            .join(' '),
           type: data?.fund.name, // Default type for all products
           interestRate: `${data.interest_rate_from}% - ${data.interest_rate_to}%`,
           minInvestment: data.min_investment,
           maxInvestment: data.max_investment,
-          term: data.profit_period
-            ? data.profit_period.replace('_', ' ').toUpperCase()
-            : 'N/A',
+          term: data.profit_period ? data.profit_period.replace('_', ' ').toUpperCase() : 'N/A',
           startDate: data.start_date,
           endDate: data.end_date,
           status: data.status,
@@ -223,14 +214,18 @@ export default function ProductDetailPage() {
               {financialProducts?.startDate && (
                 <div className="flex items-center">
                   <CalendarIcon className="mr-2 h-5 w-5" />
-                  <span>Start Date: {format(new Date(financialProducts?.startDate), 'MMM dd, yyyy')}</span>
+                  <span>
+                    Start Date: {format(new Date(financialProducts?.startDate), 'MMM dd, yyyy')}
+                  </span>
                 </div>
               )}
 
               {financialProducts?.endDate && (
                 <div className="flex items-center">
                   <CalendarIcon className="mr-2 h-5 w-5" />
-                  <span>End Date: {format(new Date(financialProducts?.endDate), 'MMM dd, yyyy')}</span>
+                  <span>
+                    End Date: {format(new Date(financialProducts?.endDate), 'MMM dd, yyyy')}
+                  </span>
                 </div>
               )}
             </div>
@@ -378,7 +373,7 @@ export default function ProductDetailPage() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span>Annual Report 2023</span>
-                    <Button asChild onClick={printPdf}>
+                    <Button asChild onClick={() => printPdf('documentContent', true)}>
                       <button>Download PDF</button>
                     </Button>
                   </div>

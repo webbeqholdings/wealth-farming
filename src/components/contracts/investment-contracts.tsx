@@ -15,7 +15,7 @@ import { WithdrawDialog } from '@/components/withdraw-dialog'
 import { TerminationDialog } from '../termination-dialog'
 import userStatus from '@/lib/userStatus'
 import { useRouter } from 'next/navigation'
-import { getContracts, getWithdrawals } from '@/lib/contract'
+import { getContracts, getWithdrawals, updateExtendContract } from '@/lib/contract'
 import {
     Pagination,
     PaginationContent,
@@ -29,9 +29,16 @@ import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-  } from "@/components/ui/popover"
+} from "@/components/ui/popover"
 import { Label } from "@/components/ui/label"
-import { Settings } from 'lucide-react' 
+import { Settings } from 'lucide-react'
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { CircleHelp } from 'lucide-react'
 
 interface Investment {
     id: string
@@ -39,6 +46,7 @@ interface Investment {
     productName: string
     investedAmount: number
     minInvestment: number
+    extendContract: number
     expectedReturn: number
     availableBalance: number,
     rateOfReturn: number,
@@ -73,6 +81,7 @@ export function InvestmentContracts() {
     const [totalPageInvestments, setTotalPagesInvestment] = useState(1);
     const [totalPageWithdrawl, setTotalPagesWithdrawl] = useState(1);
     const [activeTab, setActiveTab] = useState('investment')
+    const [checkedStates, setCheckedStates] = useState<any>({});
     // Handle tab switch and data fetching
     useEffect(() => {
         const fetchData = async () => {
@@ -80,6 +89,12 @@ export function InvestmentContracts() {
                 const { docs, totalPages } = await getContracts(currentPage, 10);
                 setInvestments(docs);
                 setTotalPagesInvestment(totalPages);
+                // Initialize checkedStates based on fetched investments
+                const initialCheckedStates = docs.reduce((acc: any, investment: any) => {
+                    acc[investment.id] = investment.extendContract === 1;
+                    return acc;
+                }, {});
+                setCheckedStates(initialCheckedStates);
             } else if (activeTab === 'withdraw') {
                 const { docs, totalPages } = await getWithdrawals(currentPage, 10);
                 setWithdrawals(docs);
@@ -131,13 +146,47 @@ export function InvestmentContracts() {
         }
     }
 
+    // Handle toggle switch and API update
+    const handleSwitchExtend = async (investment: any) => {
+        const investmentId = investment.id;
+        const newCheckedState = !checkedStates[investmentId]; // Toggle state
+
+        // Optimistically update UI
+        setCheckedStates((prevState: any) => ({
+            ...prevState,
+            [investmentId]: newCheckedState,
+        }));
+
+        try {
+            const formData = {
+                id: investment.id,
+                extendContract: newCheckedState
+            }
+
+            const response = await updateExtendContract(formData)
+            if (!response.success) {
+                throw new Error('Failed to update extendContract');
+            }
+
+            console.log(`Successfully updated extendContract for ${investmentId}`);
+        } catch (error) {
+            console.error('Failed to update extendContract:', error);
+
+            // Revert state if API call fails
+            setCheckedStates((prevState: any) => ({
+                ...prevState,
+                [investmentId]: !newCheckedState,
+            }));
+        }
+    };
+
     if (loading) {
-        return <Spinner/>;
+        return <Spinner />;
     }
 
     if (!isLoggedIn) {
         router.push('/join');
-        return <Spinner/>;
+        return <Spinner />;
     }
 
     return (
@@ -206,34 +255,34 @@ export function InvestmentContracts() {
                 </div>
 
                 <div className="flex justify-end space-x-2 mb-4">
-                <Popover>
-                    <PopoverTrigger asChild>
-                        <Button variant="outline">
-                        <Settings />
-                        </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-80 ">
-                        <form>
-                            <div className="grid gap-2 ">
-                                <div className="grid grid-cols-4 items-center gap-4 font-medium">
-                                    <Label className="col-span-2">Profit Withdraw</Label>
-                                    <div className="col-span-2 flex items-center  rounded-md ">
-                                        <span className="px-3 text-gray-500">$</span>
-                                        <input
-                                            id="monthlyProfit"
-                                            defaultValue="0"
-                                            className="h-8 w-24 rounded-md"
-                                            type="number"
-                                        />
-                                    </div>
-                                    <div className='col-span-4 flex justify-center'>
-                                        <button className='col-span-2 mt-2 py-2 px-4 bg-primary rounded-md font-semibold ' type="submit">Update</button>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button variant="outline">
+                                <Settings />
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80 ">
+                            <form>
+                                <div className="grid gap-2 ">
+                                    <div className="grid grid-cols-4 items-center gap-4 font-medium">
+                                        <Label className="col-span-2">Profit Withdraw</Label>
+                                        <div className="col-span-2 flex items-center  rounded-md ">
+                                            <span className="px-3 text-gray-500">$</span>
+                                            <input
+                                                id="monthlyProfit"
+                                                defaultValue="0"
+                                                className="h-8 w-24 rounded-md"
+                                                type="number"
+                                            />
+                                        </div>
+                                        <div className='col-span-4 flex justify-center'>
+                                            <button className='col-span-2 mt-2 py-2 px-4 bg-primary rounded-md font-semibold ' type="submit">Update</button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </form>
-                    </PopoverContent>
-                </Popover>
+                            </form>
+                        </PopoverContent>
+                    </Popover>
 
                     <Button
                         variant={activeTab === 'investment' ? 'default' : 'outline'}
@@ -266,6 +315,19 @@ export function InvestmentContracts() {
                                             <TableHead>Start Date</TableHead>
                                             <TableHead>End Date</TableHead>
                                             <TableHead>Status</TableHead>
+                                            <TableHead className="relative flex items-center space-x-2 cursor-pointer">
+                                                <span>Extend</span>
+                                                <TooltipProvider>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <CircleHelp size={16} strokeWidth={1.25} />
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <p>Enable automatic profit withdrawal for each term by extending your contract.</p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
+                                            </TableHead>
                                             <TableHead className="text-right">Actions</TableHead>
                                         </TableRow>
                                     </TableHeader>
@@ -292,7 +354,27 @@ export function InvestmentContracts() {
                                                         {investment.status.charAt(0).toUpperCase() + investment.status.slice(1)}
                                                     </span>
                                                 </TableCell>
-                                                <TableCell className="text-right">
+                                                <TableCell> {/* New cell for Switch Extend */}
+                                                    <label className="flex items-center space-x-2 cursor-pointer">
+                                                        <div className="relative">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="sr-only"
+                                                                onChange={() => handleSwitchExtend(investment)}
+                                                                checked={checkedStates[investment.id] || false}
+                                                            />
+                                                            <div
+                                                                className={`w-10 h-6 bg-gray-200 rounded-full shadow-inner ${checkedStates[investment.id] ? 'bg-green-500' : 'bg-gray-300'
+                                                                    }`}
+                                                            ></div>
+                                                            <div
+                                                                className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transform transition-transform ${checkedStates[investment.id] ? 'translate-x-4' : ''
+                                                                    }`}
+                                                            ></div>
+                                                        </div>
+                                                    </label>
+                                                </TableCell>
+                                                <TableCell className="text-right relative flex items-center space-x-2">
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
@@ -302,6 +384,7 @@ export function InvestmentContracts() {
                                                         Withdraw
                                                     </Button>
                                                     <Button
+                                                        disabled={investment.status == 'inactive'}
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={() => handleTerminate(investment)}
