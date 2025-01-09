@@ -46,6 +46,7 @@ export const getContracts = async (page: number, limit: number): Promise<{ docs:
         startDate: contract.start_date,
         endDate: contract.end_date,
         status: contract.status,
+        extendContract: contract.extend_contract,
         lastWithdrawal: contract.updatedAt || null,
       })),
       totalPages: response.totalPages,
@@ -106,13 +107,12 @@ export async function withdrawInvestment(formData: any) {
     const amount = formData.amount
     const contractId = formData.contractId
     const userId = formData.userId
-
     const response = await payload.create({
       collection: 'withdrawals',
       data: {
-        contract: contractId,
-        user: userId,
-        amount: amount,
+        contract: Number(contractId),
+        user: Number(userId),
+        amount: Number(amount),
         status: 'pending',
       },
     })
@@ -150,6 +150,32 @@ export async function withdrawInvestment(formData: any) {
       success: true,
       data: response,
       message: `Successfully initiated withdrawal of ${amount} from contract ${contractId}`
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message: `${error}`
+    }
+  }
+}
+
+export async function updateExtendContract(formData: any) {
+  try {
+    const payload = await getPayload({
+      config,
+    });
+    const response = await payload.update({
+      collection: 'contracts',
+      id: formData.id,
+      data: {
+        extend_contract: formData.extendContract ? 1 : 0
+      },
+    });
+    // Simulate API call delay
+    return {
+      success: true,
+      data: response,
+      message: `extend Contract Successfully`
     }
   } catch (error) {
     return {
