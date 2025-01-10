@@ -160,8 +160,6 @@ export function InvestmentContracts() {
             if (!response.success) {
                 throw new Error('Failed to update extendContract');
             }
-
-            console.log(`Successfully updated extendContract for ${investmentId}`);
         } catch (error) {
             console.error('Failed to update extendContract:', error);
 
