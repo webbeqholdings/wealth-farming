@@ -55,7 +55,7 @@ export default function ReferralPage() {
 
       setReferrals(docs) // Store the accounts in state
       setTotalPages(totalPages)
-      setReferralLink(`https://localhost:3000/join/${user.referral_code}`)
+      setReferralLink(`https://wealthfarming.org/join/${user.referral_code}`)
     }
 
     fetchReferralData()
