@@ -251,7 +251,7 @@ export default function UserProfile() {
   }
 
   const copyReferralCode = () => {
-    navigator.clipboard.writeText(referralInfo.referralCode)
+    navigator.clipboard.writeText(user.referral_code)
     alert('Referral code copied to clipboard!')
   }
 
@@ -480,7 +480,7 @@ export default function UserProfile() {
             <div className="space-y-2">
               <Label htmlFor="referral-code">Your Referral Code</Label>
               <div className="flex space-x-2">
-                <Input id="referral-code" value={referralInfo.referralCode} readOnly />
+                <Input id="referral-code" value={user.referral_code} readOnly />
                 <Button variant="outline" size="icon" onClick={copyReferralCode}>
                   <Copy className="h-4 w-4" />
                   <span className="sr-only">Copy referral code</span>
