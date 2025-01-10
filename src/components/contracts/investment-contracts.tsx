@@ -353,14 +353,14 @@ export function InvestmentContracts() {
                                                     </span>
                                                 </TableCell>
 
-                                                <TableCell className="">
+                                                <TableCell className="text-right relative flex items-center space-x-2">
                                                     <Popover>
                                                         <PopoverTrigger asChild>
                                                             <Button variant="ghost">
                                                                 <Settings />
                                                             </Button>
                                                         </PopoverTrigger>
-                                                        <PopoverContent className="">
+                                                        <PopoverContent className="w-80 ">
                                                             <form method='POST' onSubmit={handleChangeSetting}>
                                                                 <div className="grid gap-2 ">
                                                                     <input name={"id"} defaultValue={investment.id} hidden />
@@ -428,19 +428,18 @@ export function InvestmentContracts() {
                                                     <Button
                                                         variant="ghost"
                                                         onClick={() => handleWithdraw(investment)}
-                                                        className="hover:text-black p-4" // Add padding for a larger button
+                                                        className="hover:text-black "
                                                     >
-                                                        <LucideBanknote size={64} /> {/* Increase icon size */}
+                                                        <LucideBanknote />
                                                     </Button>
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={() => handleTerminate(investment)}
-                                                        className="hover:text-red-500 ml-4 p-3" // Adjust padding and margin for larger button
+                                                        className="hover:text-red-500 ml-2"
                                                     >
-                                                        <LucideBan color="#f00505" size={48} /> {/* Increase icon size */}
+                                                        <LucideBan color={'#f00505'} />
                                                     </Button>
-
                                                 </TableCell>
                                             </TableRow>
                                         ))}
