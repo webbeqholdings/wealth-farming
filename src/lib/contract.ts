@@ -47,6 +47,7 @@ export const getContracts = async (page: number, limit: number): Promise<{ docs:
         endDate: contract.end_date,
         status: contract.status,
         extendContract: contract.extend_contract,
+        setting: contract.config_log,
         lastWithdrawal: contract.updatedAt || null,
       })),
       totalPages: response.totalPages,
@@ -159,7 +160,7 @@ export async function withdrawInvestment(formData: any) {
   }
 }
 
-export async function updateExtendContract(formData: any) {
+export async function updateSetting(formData: any) {
   try {
     const payload = await getPayload({
       config,
@@ -168,14 +169,14 @@ export async function updateExtendContract(formData: any) {
       collection: 'contracts',
       id: formData.id,
       data: {
-        extend_contract: formData.extendContract ? 1 : 0
+        config_log: formData.setting ?? {} 
       },
     });
     // Simulate API call delay
     return {
       success: true,
       data: response,
-      message: `extend Contract Successfully`
+      message: `update Setting Successfully`
     }
   } catch (error) {
     return {
