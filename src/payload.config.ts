@@ -80,12 +80,12 @@ export default buildConfig({
     defaultFromAddress: 'no-reply@mail-resend.wealthfarming.org',
     defaultFromName: 'Wealth Farming',
     transportOptions: {
-      host: 'smtp.resend.com',
+      host: process.env.SMTP_HOST,
       secure: true,
-      port: 465,
+      port: process.env.SMTP_PORT,
       auth: {
-        user: 'resend',
-        pass: 're_ip4jyiwq_9g2TPDZ51HsKkVMPAnp5uMD9',
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
       },
     },
   }),
