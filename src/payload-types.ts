@@ -265,7 +265,6 @@ export interface Contract {
   periods?: number | null;
   start_date?: string | null;
   end_date?: string | null;
-  extend_contract?: number | null;
   status: 'active' | 'inactive' | 'pending' | 'closed';
   note_log?:
     | {
@@ -845,7 +844,6 @@ export interface ContractsSelect<T extends boolean = true> {
   periods?: T;
   start_date?: T;
   end_date?: T;
-  extend_contract?: T;
   status?: T;
   note_log?: T;
   product_log?: T;
