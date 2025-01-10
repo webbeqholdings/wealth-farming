@@ -41,12 +41,6 @@ export default function ReferralPage() {
   const { isLoggedIn, loading, user } = userStatus()
   const [referralLink, setReferralLink] = useState('')
   const [referrals, setReferrals] = useState<Referral[]>([])
-  const [stats, setStats] = useState({
-    totalReferrals: 0,
-    pendingReferrals: 0,
-    completedReferrals: 0,
-    totalEarnings: 0,
-  })
   const [totalPages, setTotalPages] = useState(1)
   const [currentPage, setCurrentPage] = useState(1)
 
@@ -61,14 +55,7 @@ export default function ReferralPage() {
 
       setReferrals(docs) // Store the accounts in state
       setTotalPages(totalPages)
-      setReferralLink(`https://wealthfarming.org/ref/${referral_code}`)
-
-      setStats({
-        totalReferrals: 3,
-        pendingReferrals: 1,
-        completedReferrals: 2,
-        totalEarnings: 100,
-      })
+      setReferralLink(`https://wealthfarming.org/join/${user.referral_code}`)
     }
 
     fetchReferralData()
@@ -121,7 +108,7 @@ export default function ReferralPage() {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalReferrals}</div>
+              <div className="text-2xl font-bold">{referrals.length}</div>
             </CardContent>
           </Card>
           <Card>
@@ -130,7 +117,7 @@ export default function ReferralPage() {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.pendingReferrals}</div>
+              <div className="text-2xl font-bold">{referrals.filter((ref: any) => ref.status === 'Pending').length}</div>
             </CardContent>
           </Card>
           <Card>
@@ -139,7 +126,7 @@ export default function ReferralPage() {
               <Award className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.completedReferrals}</div>
+              <div className="text-2xl font-bold">{referrals.filter((ref: any) => ref.status === 'Completed').length}</div>
             </CardContent>
           </Card>
           <Card>
@@ -148,7 +135,7 @@ export default function ReferralPage() {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${stats.totalEarnings}</div>
+              <div className="text-2xl font-bold">$100000</div>
             </CardContent>
           </Card>
         </div>

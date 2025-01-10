@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
@@ -15,7 +15,7 @@ import { WithdrawDialog } from '@/components/withdraw-dialog'
 import { TerminationDialog } from '../termination-dialog'
 import userStatus from '@/lib/userStatus'
 import { useRouter } from 'next/navigation'
-import { getContracts, getWithdrawals, updateExtendContract } from '@/lib/contract'
+import { getContracts, getWithdrawals, updateSetting } from '@/lib/contract'
 import {
     Pagination,
     PaginationContent,
@@ -26,12 +26,21 @@ import {
 } from "@/components/ui/pagination"
 import Spinner from '../Spinner'
 import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
+import { Label } from "@/components/ui/label"
+import { LucideBan, LucideBanknote, Settings } from 'lucide-react'
+import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { CircleHelp } from 'lucide-react'
+import { getPaymentTransfer } from '@/lib/paymentTransfer'
+import { useToast } from '@/hooks/use-toast'
 
 interface Investment {
     id: string
@@ -48,6 +57,10 @@ interface Investment {
     profit: number,
     startDate: Date,
     endDate: Date,
+    setting: {
+        auto_profit: number | null,
+        extend_contract: boolean | null,
+    },
     status: 'active' | 'completed' | 'pending' | 'inactive'
     lastWithdrawal?: string
 }
@@ -65,6 +78,7 @@ interface Withdrawal {
 export function InvestmentContracts() {
     const router = useRouter()
     const { isLoggedIn, loading, user } = userStatus();
+    const { toast } = useToast();
     const [selectedContract, setSelectedContract] = useState<Investment | null>(null)
     const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false)
     const [terminationDialogOpen, setTerminationDialogOpen] = useState(false)
@@ -76,26 +90,28 @@ export function InvestmentContracts() {
     const [activeTab, setActiveTab] = useState('investment')
     const [checkedStates, setCheckedStates] = useState<any>({});
     // Handle tab switch and data fetching
-    useEffect(() => {
-        const fetchData = async () => {
-            if (activeTab === 'investment') {
-                const { docs, totalPages } = await getContracts(currentPage, 10);
-                setInvestments(docs);
-                setTotalPagesInvestment(totalPages);
-                // Initialize checkedStates based on fetched investments
-                const initialCheckedStates = docs.reduce((acc: any, investment: any) => {
-                    acc[investment.id] = investment.extendContract === 1;
-                    return acc;
-                }, {});
-                setCheckedStates(initialCheckedStates);
-            } else if (activeTab === 'withdraw') {
-                const { docs, totalPages } = await getWithdrawals(currentPage, 10);
-                setWithdrawals(docs);
-                setTotalPagesWithdrawl(totalPages)
-            }
-        };
-        fetchData();
+    // Unified fetchData function
+    const fetchData = useCallback(async () => {
+        if (activeTab === 'investment') {
+            const { docs, totalPages } = await getContracts(currentPage, 10);
+            setInvestments(docs);
+            setTotalPagesInvestment(totalPages);
+            const initialCheckedStates = docs.reduce((acc: any, investment: any) => {
+                acc[investment.id] = investment.setting?.extend_contract === true || false;
+                return acc;
+            }, {});
+            setCheckedStates(initialCheckedStates);
+        } else if (activeTab === 'withdraw') {
+            const { docs, totalPages } = await getWithdrawals(currentPage, 10);
+            setWithdrawals(docs);
+            setTotalPagesWithdrawl(totalPages);
+        }
     }, [activeTab, currentPage]);
+
+    // Call fetchData in useEffect
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
 
     // Calculate ROI
     const calculateROI = () => {
@@ -108,6 +124,7 @@ export function InvestmentContracts() {
 
         return ((totalExpected - totalInvested) / totalInvested) * 100;
     };
+
 
     const handleWithdraw = (investment: Investment) => {
         setSelectedContract(investment)
@@ -139,6 +156,58 @@ export function InvestmentContracts() {
         }
     }
 
+    // Handle Press Update in Setting
+    async function handleChangeSetting(e: any) {
+
+        // Prevent the browser from reloading the page
+        e.preventDefault();
+
+        // Read the form data
+        const formData = new FormData(e.target);
+        const formJson = Object.fromEntries(formData.entries());
+
+        try {
+            const paymentTransfer = await getPaymentTransfer();
+            const minWithdrawal = paymentTransfer.minWithdrawal;
+
+            if (parseFloat(formJson.monthlyProfit.toString()) >= 10) {
+
+                const formData = {
+                    id: formJson.id,
+                    setting: {
+                        auto_profit: formJson.monthlyProfit,
+                        extend_contract: formJson.extend_contract == 'on' ? true : false
+                    }
+                }
+
+                const response = await updateSetting(formData)
+                if (!response.success) {
+
+                    throw new Error('Failed to update setting');
+                }
+                fetchData()
+                toast({
+                    title: 'Update setting successful',
+
+                });
+                console.log(`Successfully updated setting for ${formJson.id}`);
+            }
+            else {
+                toast({
+                    title: 'Error',
+                    description: `The amount must be greater than or equal to the minimum withdrawal amount of ${minWithdrawal} USD.`,
+                });
+                fetchData();
+                return;
+            }
+        } catch (error) {
+            console.error('Failed to update setting:', error);
+            fetchData();
+            // Revert state if API call fails
+        }
+    }
+
+
     // Handle toggle switch and API update
     const handleSwitchExtend = async (investment: any) => {
         const investmentId = investment.id;
@@ -149,28 +218,6 @@ export function InvestmentContracts() {
             ...prevState,
             [investmentId]: newCheckedState,
         }));
-
-        try {
-            const formData = {
-                id: investment.id,
-                extendContract: newCheckedState
-            }
-
-            const response = await updateExtendContract(formData)
-            if (!response.success) {
-                throw new Error('Failed to update extendContract');
-            }
-
-            console.log(`Successfully updated extendContract for ${investmentId}`);
-        } catch (error) {
-            console.error('Failed to update extendContract:', error);
-
-            // Revert state if API call fails
-            setCheckedStates((prevState: any) => ({
-                ...prevState,
-                [investmentId]: !newCheckedState,
-            }));
-        }
     };
 
     if (loading) {
@@ -279,20 +326,7 @@ export function InvestmentContracts() {
                                             <TableHead>Start Date</TableHead>
                                             <TableHead>End Date</TableHead>
                                             <TableHead>Status</TableHead>
-                                            <TableHead className="relative flex items-center space-x-2 cursor-pointer">
-                                                <span>Extend</span>
-                                                <TooltipProvider>
-                                                    <Tooltip>
-                                                        <TooltipTrigger asChild>
-                                                            <CircleHelp size={16} strokeWidth={1.25} />
-                                                        </TooltipTrigger>
-                                                        <TooltipContent>
-                                                            <p>Enable automatic profit withdrawal for each term by extending your contract.</p>
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </TooltipProvider>
-                                            </TableHead>
-                                            <TableHead className="text-right">Actions</TableHead>
+                                            <TableHead className="text-center">Actions</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -318,43 +352,93 @@ export function InvestmentContracts() {
                                                         {investment.status.charAt(0).toUpperCase() + investment.status.slice(1)}
                                                     </span>
                                                 </TableCell>
-                                                <TableCell> {/* New cell for Switch Extend */}
-                                                    <label className="flex items-center space-x-2 cursor-pointer">
-                                                        <div className="relative">
-                                                            <input
-                                                                type="checkbox"
-                                                                className="sr-only"
-                                                                onChange={() => handleSwitchExtend(investment)}
-                                                                checked={checkedStates[investment.id] || false}
-                                                            />
-                                                            <div
-                                                                className={`w-10 h-6 bg-gray-200 rounded-full shadow-inner ${checkedStates[investment.id] ? 'bg-green-500' : 'bg-gray-300'
-                                                                    }`}
-                                                            ></div>
-                                                            <div
-                                                                className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transform transition-transform ${checkedStates[investment.id] ? 'translate-x-4' : ''
-                                                                    }`}
-                                                            ></div>
-                                                        </div>
-                                                    </label>
-                                                </TableCell>
+
                                                 <TableCell className="text-right relative flex items-center space-x-2">
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                            <Button variant="ghost">
+                                                                <Settings />
+                                                            </Button>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className="w-80 ">
+                                                            <form method='POST' onSubmit={handleChangeSetting}>
+                                                                <div className="grid gap-2 ">
+                                                                    <input name={"id"} defaultValue={investment.id} hidden />
+                                                                    <div className="grid grid-cols-4 items-center gap-4 font-medium">
+                                                                        <Label className="col-span-2">Profit Withdraw</Label>
+                                                                        <div className="col-span-2 flex items-center  rounded-md ">
+                                                                            <span className="px-3 text-gray-500">$</span>
+                                                                            <input
+                                                                                name="monthlyProfit"
+                                                                                defaultValue={investment.setting?.auto_profit ?? 0}
+                                                                                className="h-8 w-24 rounded-md"
+                                                                                type="number"
+                                                                            />
+                                                                        </div>
+                                                                        <Label className="col-span-2">
+                                                                            <div className="relative flex items-center space-x-2 cursor-pointer">
+                                                                                <span>Extend Contract</span>
+                                                                                <TooltipProvider>
+                                                                                    <Tooltip>
+                                                                                        <TooltipTrigger asChild>
+                                                                                            <CircleHelp size={16} strokeWidth={1.25} />
+                                                                                        </TooltipTrigger>
+                                                                                        <TooltipContent>
+                                                                                            <p>Enable automatic profit withdrawal for each term by extending your contract.</p>
+                                                                                        </TooltipContent>
+                                                                                    </Tooltip>
+                                                                                </TooltipProvider>
+                                                                            </div>
+                                                                        </Label>
+
+                                                                        <div>
+                                                                            <label className="flex items-center justify-center space-x-2 cursor-pointer">
+                                                                                <div className="relative">
+                                                                                    <input
+                                                                                        type="checkbox"
+                                                                                        name="extend_contract"
+                                                                                        className="sr-only"
+                                                                                        onChange={() => handleSwitchExtend(investment)}
+                                                                                        checked={checkedStates[investment.id] || false}
+                                                                                    />
+                                                                                    <div
+                                                                                        className={`w-10 h-6 bg-gray-200 rounded-full shadow-inner ${checkedStates[investment.id] ? 'bg-green-500' : 'bg-gray-300'
+                                                                                            }`}
+                                                                                    ></div>
+                                                                                    <div
+                                                                                        className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transform transition-transform ${checkedStates[investment.id] ? 'translate-x-4' : ''
+                                                                                            }`}
+                                                                                    ></div>
+                                                                                </div>
+                                                                            </label>
+                                                                        </div>
+                                                                        <div className='col-span-4 flex justify-center'>
+                                                                            <button
+                                                                                className='col-span-2 mt-2 py-2 px-4 bg-primary rounded-md font-semibold '
+                                                                                type="submit"
+                                                                            >
+                                                                                Update
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </form>
+                                                        </PopoverContent>
+                                                    </Popover>
                                                     <Button
                                                         variant="ghost"
-                                                        size="sm"
                                                         onClick={() => handleWithdraw(investment)}
-                                                        className="hover:text-black"
+                                                        className="hover:text-black "
                                                     >
-                                                        Withdraw
+                                                        <LucideBanknote />
                                                     </Button>
                                                     <Button
-                                                        disabled = {investment.status == 'inactive'}
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={() => handleTerminate(investment)}
                                                         className="hover:text-red-500 ml-2"
                                                     >
-                                                        Termination
+                                                        <LucideBan color={'#f00505'} />
                                                     </Button>
                                                 </TableCell>
                                             </TableRow>
