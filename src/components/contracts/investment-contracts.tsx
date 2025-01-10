@@ -158,23 +158,6 @@ export function InvestmentContracts() {
 
     // Handle Press Update in Setting
     async function handleChangeSetting(e: any) {
-        const fetchData = async () => {
-            if (activeTab === 'investment') {
-                const { docs, totalPages } = await getContracts(currentPage, 10);
-                setInvestments(docs);
-                setTotalPagesInvestment(totalPages);
-                // Initialize checkedStates based on fetched investments
-                const initialCheckedStates = docs.reduce((acc: any, investment: any) => {
-                    acc[investment.id] = investment.setting?.extend_contract === true || false;
-                    return acc;
-                }, {});
-                setCheckedStates(initialCheckedStates);
-            } else if (activeTab === 'withdraw') {
-                const { docs, totalPages } = await getWithdrawals(currentPage, 10);
-                setWithdrawals(docs);
-                setTotalPagesWithdrawl(totalPages)
-            }
-        };
 
         // Prevent the browser from reloading the page
         e.preventDefault();
