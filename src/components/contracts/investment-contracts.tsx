@@ -31,7 +31,7 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 import { Label } from "@/components/ui/label"
-import { Settings } from 'lucide-react'
+import { LucideBan, LucideBanknote, Settings } from 'lucide-react'
 import {
     Tooltip,
     TooltipContent,
@@ -89,7 +89,7 @@ export function InvestmentContracts() {
     const [totalPageWithdrawl, setTotalPagesWithdrawl] = useState(1);
     const [activeTab, setActiveTab] = useState('investment')
     const [checkedStates, setCheckedStates] = useState<any>({});
-        // Handle tab switch and data fetching
+    // Handle tab switch and data fetching
     // Unified fetchData function
     const fetchData = useCallback(async () => {
         if (activeTab === 'investment') {
@@ -182,13 +182,13 @@ export function InvestmentContracts() {
 
                 const response = await updateSetting(formData)
                 if (!response.success) {
-                    
+
                     throw new Error('Failed to update setting');
                 }
                 fetchData()
                 toast({
                     title: 'Update setting successful',
-                    
+
                 });
                 console.log(`Successfully updated setting for ${formJson.id}`);
             }
@@ -353,14 +353,14 @@ export function InvestmentContracts() {
                                                     </span>
                                                 </TableCell>
 
-                                                <TableCell className="text-right relative flex items-center space-x-2">
+                                                <TableCell className="">
                                                     <Popover>
                                                         <PopoverTrigger asChild>
-                                                            <Button variant="outline">
+                                                            <Button variant="ghost">
                                                                 <Settings />
                                                             </Button>
                                                         </PopoverTrigger>
-                                                        <PopoverContent className="w-80 ">
+                                                        <PopoverContent className="">
                                                             <form method='POST' onSubmit={handleChangeSetting}>
                                                                 <div className="grid gap-2 ">
                                                                     <input name={"id"} defaultValue={investment.id} hidden />
@@ -427,20 +427,20 @@ export function InvestmentContracts() {
                                                     </Popover>
                                                     <Button
                                                         variant="ghost"
-                                                        size="sm"
                                                         onClick={() => handleWithdraw(investment)}
-                                                        className="hover:text-black"
+                                                        className="hover:text-black p-4" // Add padding for a larger button
                                                     >
-                                                        Withdraw
+                                                        <LucideBanknote size={64} /> {/* Increase icon size */}
                                                     </Button>
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={() => handleTerminate(investment)}
-                                                        className="hover:text-red-500 ml-2"
+                                                        className="hover:text-red-500 ml-4 p-3" // Adjust padding and margin for larger button
                                                     >
-                                                        Termination
+                                                        <LucideBan color="#f00505" size={48} /> {/* Increase icon size */}
                                                     </Button>
+
                                                 </TableCell>
                                             </TableRow>
                                         ))}
