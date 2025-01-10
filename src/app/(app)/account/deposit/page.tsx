@@ -383,7 +383,7 @@ export default function DepositPage() {
               <Step title="Method" />
               <Step title="Confirm" />
             </Steps>
-            <form>
+            <div>
               {step === 1 && (
                 <div className="space-y-4">
                   <div className="space-y-2">
@@ -608,7 +608,7 @@ export default function DepositPage() {
                   </div>
                 </div>
               )}
-            </form>
+            </div>
           </CardContent>
           <CardFooter className="flex justify-between">
             {step > 1 && (
@@ -620,7 +620,7 @@ export default function DepositPage() {
               <Button onClick={handleNextStep}>Next</Button>
             ) : (
               <Button
-                type="submit"
+                type="button"
                 onClick={handleSubmit}
                 disabled={isSubmitting}
                 className={cn(isSubmitting && 'cursor-not-allowed opacity-50')}
