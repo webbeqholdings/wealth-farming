@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
@@ -90,26 +90,28 @@ export function InvestmentContracts() {
     const [activeTab, setActiveTab] = useState('investment')
     const [checkedStates, setCheckedStates] = useState<any>({});
         // Handle tab switch and data fetching
-    useEffect(() => {
-        const fetchData = async () => {
-            if (activeTab === 'investment') {
-                const { docs, totalPages } = await getContracts(currentPage, 10);
-                setInvestments(docs);
-                setTotalPagesInvestment(totalPages);
-                // Initialize checkedStates based on fetched investments
-                const initialCheckedStates = docs.reduce((acc: any, investment: any) => {
-                    acc[investment.id] = investment.setting?.extend_contract === true || false;
-                    return acc;
-                }, {});
-                setCheckedStates(initialCheckedStates);
-            } else if (activeTab === 'withdraw') {
-                const { docs, totalPages } = await getWithdrawals(currentPage, 10);
-                setWithdrawals(docs);
-                setTotalPagesWithdrawl(totalPages)
-            }
-        };
-        fetchData();
+    // Unified fetchData function
+    const fetchData = useCallback(async () => {
+        if (activeTab === 'investment') {
+            const { docs, totalPages } = await getContracts(currentPage, 10);
+            setInvestments(docs);
+            setTotalPagesInvestment(totalPages);
+            const initialCheckedStates = docs.reduce((acc: any, investment: any) => {
+                acc[investment.id] = investment.setting?.extend_contract === true || false;
+                return acc;
+            }, {});
+            setCheckedStates(initialCheckedStates);
+        } else if (activeTab === 'withdraw') {
+            const { docs, totalPages } = await getWithdrawals(currentPage, 10);
+            setWithdrawals(docs);
+            setTotalPagesWithdrawl(totalPages);
+        }
     }, [activeTab, currentPage]);
+
+    // Call fetchData in useEffect
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
 
     // Calculate ROI
     const calculateROI = () => {
@@ -233,8 +235,6 @@ export function InvestmentContracts() {
             ...prevState,
             [investmentId]: newCheckedState,
         }));
-
-
     };
 
     if (loading) {
@@ -312,8 +312,6 @@ export function InvestmentContracts() {
                 </div>
 
                 <div className="flex justify-end space-x-2 mb-4">
-
-
                     <Button
                         variant={activeTab === 'investment' ? 'default' : 'outline'}
                         onClick={() => { setActiveTab('investment'); setCurrentPage(1) }}
@@ -387,7 +385,6 @@ export function InvestmentContracts() {
                                                                         <Label className="col-span-2">Profit Withdraw</Label>
                                                                         <div className="col-span-2 flex items-center  rounded-md ">
                                                                             <span className="px-3 text-gray-500">$</span>
-
                                                                             <input
                                                                                 name="monthlyProfit"
                                                                                 defaultValue={investment.setting?.auto_profit ?? 0}
@@ -395,7 +392,6 @@ export function InvestmentContracts() {
                                                                                 type="number"
                                                                             />
                                                                         </div>
-
                                                                         <Label className="col-span-2">
                                                                             <div className="relative flex items-center space-x-2 cursor-pointer">
                                                                                 <span>Extend Contract</span>
@@ -455,7 +451,6 @@ export function InvestmentContracts() {
                                                         Withdraw
                                                     </Button>
                                                     <Button
-                                                        disabled={investment.status == 'inactive'}
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={() => handleTerminate(investment)}

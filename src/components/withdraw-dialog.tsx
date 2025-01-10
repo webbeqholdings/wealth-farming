@@ -256,7 +256,7 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
               disabled={
                 isLoading ||
                 !amount ||
-                parseFloat(amount) > contract.profit
+                parseFloat(amount) >= contract.profit
               }
               className="bg-blue-500 text-white hover:bg-blue-600"
             >
