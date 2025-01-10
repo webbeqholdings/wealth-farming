@@ -77,11 +77,12 @@ export default buildConfig({
     },
   },
   email: nodemailerAdapter({
-    defaultFromAddress: 'beq@beqholdings.com',
+    defaultFromAddress: 'no-reply@mail-resend.wealthfarming.org',
     defaultFromName: 'Wealth Farming',
     transportOptions: {
       host: process.env.SMTP_HOST,
-      port: 587,
+      secure: true,
+      port: process.env.SMTP_PORT,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
