@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { withdrawInvestment } from '@/lib/contract';
 import { notifyWithdrawlContracts } from '@/lib/telegram';
 import { getPaymentTransfer } from '@/lib/paymentTransfer'
-import { endOfMonth, addMonths, differenceInDays } from 'date-fns';
+import { endOfMonth, addMonths, endOfYear, differenceInDays } from 'date-fns';
 
 interface WithdrawDialogProps {
   isOpen: boolean;
@@ -32,27 +32,64 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const today = new Date();
-
   // Calculate expected end dates for each term
   const getExpectedEndDate = (term: string, start: Date) => {
+    const currentMonth = start.getMonth();
+    const currentDate = start.getDate();
     switch (term) {
       case 'monthly':
-        return endOfMonth(start);
+        if (currentMonth == 1 && currentDate == 1) {
+          return endOfMonth(start); // End of the current month
+        }
+        if ((currentMonth == 1 && currentDate > 1) || (currentMonth > 1 && currentMonth < 12)) {
+          const nextMonthStart: any = new Date(start.getFullYear(), currentMonth + 1, 1); // First day of the month after next
+          return new Date(nextMonthStart - 1); // Subtract 1 millisecond to get the last day of the next month
+        }
+        if (currentMonth == 12 && currentDate > 1) {
+          const nextYear = start.getFullYear() + 1;
+          return new Date(nextYear, 1, 31);
+        }
       case 'quarterly': {
-        // Add 4 months and get the last date of that month
-        const fourMonthsLater = addMonths(start, 3);
-        return endOfMonth(fourMonthsLater);
+        // End of the current quarter
+        if (currentMonth == 1 && currentDate == 1) {
+          return new Date(start.getFullYear(), 3, 31);
+        }
+        if ((currentMonth == 4 && currentDate == 1) || (currentMonth == 1 && currentDate > 1) || (currentMonth >= 2 && currentMonth <= 3)) {
+          return new Date(start.getFullYear(), 6, 30);
+        }
+        if ((currentMonth == 7 && currentDate == 1) || (currentMonth == 4 && currentDate > 1) || (currentMonth >= 5 && currentMonth <= 6)) {
+          return new Date(start.getFullYear(), 9, 30);
+        }
+        if ((currentMonth == 10 && currentDate == 1) || (currentMonth == 7 && currentDate > 1) || (currentMonth >= 8 && currentMonth <= 9)) {
+          return new Date(start.getFullYear(), 12, 31);
+        }
+        if ((currentMonth == 10 && currentDate > 1) || (currentMonth > 10)) {
+          const nextYear = start.getFullYear() + 1;
+          return new Date(nextYear, 3, 31);
+        }
       }
       case 'semester': {
-        // Add 6 months and get the last date of that month
-        const sixMonthsLater = addMonths(start, 5);
-        return endOfMonth(sixMonthsLater);
+        // Determine the semester and return its last date
+        if (currentMonth == 1 && currentDate == 1) {
+          return new Date(start.getFullYear(), 6, 30);
+        }
+        if ((currentMonth == 7 || currentDate == 1) || (currentMonth == 1 && currentDate > 1) || (currentMonth >= 2 && currentMonth <= 6)) {
+          return new Date(start.getFullYear(), 12, 31);
+        }
+        if ((currentMonth == 7 && currentDate > 1) || (currentMonth > 7)) {
+          const nextYear = start.getFullYear() + 1;
+          return new Date(nextYear, 6, 30);
+        }
       }
       case 'annually': {
-        // Add 12 months and get the last date of that month
-        const twelveMonthsLater = addMonths(start, 11);
-        return endOfMonth(twelveMonthsLater);
+        // End of the year
+        if (currentMonth == 1 && currentDate == 1) {
+          return endOfYear(start);
+        }
+        if ((currentMonth == 1 && currentDate > 1) || currentMonth > 1) {
+          const nextYear = start.getFullYear() + 1;
+          return new Date(nextYear, 12, 31);
+        }
       }
       default:
         throw new Error('Unsupported term. Valid terms: monthly, quarterly, semester, yearly.');
@@ -61,16 +98,16 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
 
   const getBeginningOfNextMonth = (startDate: any) => {
     const start = new Date(startDate);
-  
+
     // Check if the start date is the beginning of the month
     if (start.getDate() === 1) {
       // If it's already the first day, return it
       return start;
     }
-  
+
     // Move to the first day of the next month
     const nextMonth = new Date(start.getFullYear(), start.getMonth() + 1, 1);
-  
+
     return nextMonth;
   }
 
@@ -87,7 +124,7 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
 
   const toastMessage = (term: any) => {
     let termDescription;
-  
+
     switch (term) {
       case 'monthly':
         termDescription = 'first month';
@@ -104,11 +141,8 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
       default:
         throw new Error('Unsupported term.');
     }
-  
-    toast({
-      title: 'Error',
-      description: `Withdrawal can only occur after ${termDescription}.`,
-    });
+
+    return termDescription;
   };
 
   const handleDialogClose = () => {
@@ -119,8 +153,13 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
   async function handleWithdraw(event: React.FormEvent) {
     event.preventDefault();
     if (!checkTermFullness(contract.startDate, contract.term)) {
-      toastMessage(contract.term)
+      toast({
+        title: 'Error',
+        description: `Withdrawal can only occur after ${toastMessage(contract.term)}.`,
+      });
+
       return;
+
     }
     if (contract.status === 'inactive') {
       toast({
@@ -129,7 +168,6 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
       });
       return;
     }
-    
     setIsLoading(true);
 
     try {
@@ -144,16 +182,17 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
         return;
       }
 
-      const formData = new FormData();
-      formData.append('amount', amount);
-      formData.append('contractId', contract.id);
-      formData.append('userId', contract.userId);
+      const formData = {
+        amount: amount,
+        contractId: contract.id,
+        userId: contract.userId
+      }
 
       const result = await withdrawInvestment(formData);
-      notifyWithdrawlContracts(result.data);
+      // notifyWithdrawlContracts(result.data);
       if (result.success) {
         toast({
-          title: 'Withdrawal Successfully',
+          title: 'Withdrawal Successfully', 
           description: `Total Profit: ${amount} USD`,
         });
         setActiveTab('withdraw');
@@ -181,7 +220,7 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
         <form onSubmit={handleWithdraw}>
           <div className="grid gap-4">
             <div className="bg-yellow-100 text-yellow-800 text-sm rounded-md p-3">
-              <strong>Note:</strong> Withdrawals profit can only be made after the contract&apos;s end date.
+              <strong>Note:</strong> Withdrawals profit can only be made after the {toastMessage(contract.term)}.
             </div>
             <div className="grid gap-2">
               <Label htmlFor="amount" className="text-gray-700">
