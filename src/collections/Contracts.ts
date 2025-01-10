@@ -52,6 +52,11 @@ const Contracts: CollectionConfig = {
       label: 'End Date',
     },
     {
+      name: 'extend_contract',
+      type: 'number',
+      label: 'Extend Contract',
+    },
+    {
       name: 'status',
       type: 'select',
       options: [
