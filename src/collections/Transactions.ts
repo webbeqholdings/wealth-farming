@@ -9,6 +9,9 @@ import {
   getParentIdByUser,
   getReferralProducts,
 } from '@/lib/admin-side/referrals'
+import { sendEmailDeposit } from '@/utilities/emailDeposit'
+import { sendEmailWithdraw } from '@/utilities/emailWithdraw'
+
 
 const Transactions: CollectionConfig = {
   slug: 'transactions',
@@ -108,11 +111,15 @@ const Transactions: CollectionConfig = {
         const payload = await getPayload({
           config,
         })
-
         const { amount, from_account, type, status } = doc
 
         if (operation === 'update' && type === 'deposit' && status === 'completed') {
           // Fetch the existing account details
+          const userDetail = await payload.findByID({
+            collection: 'users',
+            id: doc.user,
+          })
+
           const fromAccount = await payload.findByID({
             collection: 'accounts',
             id: from_account,
@@ -176,7 +183,47 @@ const Transactions: CollectionConfig = {
               }
             }
           }
+          //Send email Deposit Confirmation
+          try {
+            await sendEmailDeposit(userDetail.email, 'Deposit Confirmation', userDetail.first_name, userDetail.last_name, amount)
+          } catch (error) {
+            console.error('Error sending Deposit Confirmation email:', error)
+          }
         }
+
+        if (operation === 'update' && doc.type === 'withdraw' && doc.status === 'completed') {
+          // Fetch the existing account details
+          const userDetail = await payload.findByID({
+            collection: 'users',
+            id: doc.user,
+          })
+
+          const fromAccount = await payload.findByID({
+            collection: 'accounts',
+            id: from_account,
+          })
+
+          if (fromAccount) {
+            // Update the account amount
+            const updatedAmount = fromAccount.amount - amount
+
+            // Save the updated account data
+            await payload.update({
+              collection: 'accounts',
+              id: from_account,
+              data: {
+                amount: updatedAmount,
+              },
+            })
+          }
+          //Send email Withdrawal Confirmation
+          try {
+            await sendEmailWithdraw(userDetail.email, 'Withdrawal Confirmation', userDetail.first_name, userDetail.last_name, amount)
+          } catch (error) {
+            console.error('Error sending Withdrawal Confirmation email:', error)
+          }
+        }
+
         if (operation === 'update' && doc.type === 'withdraw' && doc.status === 'failed') {
           const fromAccountId = doc.from_account
           const transactionAmount = doc.amount
