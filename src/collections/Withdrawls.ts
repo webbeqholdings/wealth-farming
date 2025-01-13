@@ -136,8 +136,11 @@ const Withdrawals: CollectionConfig = {
                     });
 
                     // Set custom message for failed status
-                    data.message = `Withdrawal failed. The contract has been reactivated with a balance of ${data.amount}.`;
-                    
+                    data.message = `Withdrawal failed. The contract has been reactivated with a balance of ${data.amount.toLocaleString('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                    })}.`;
+
                     handleSendEmail(account, data)
                 }
             },

@@ -75,8 +75,8 @@ export const sendEmailDeposit = async (to: string, subject: string, first_name: 
                   border-radius: 0 0 8px 8px;
                 "
               >
-                <p style="margin: 0 0 10px 0">This is an automated message, please do not reply.</p>
-                <p style="margin: 0">© 2024 Your Company Name. All rights reserved.</p>
+                <p style="margin: 0 0 10px 0; color: #666666">This is an automated message, please do not reply.</p>
+                <p style="margin: 0; color: #666666">© 2025 BEQ Holdings. All rights reserved.</p>
               </td>
             </tr>
           </table>

@@ -218,7 +218,7 @@ const Transactions: CollectionConfig = {
           }
           //Send email Withdrawal Confirmation
           try {
-            await sendEmailWithdraw(userDetail.email, 'Withdrawal Confirmation', userDetail.first_name, userDetail.last_name, amount)
+            await sendEmailWithdraw(userDetail.email, 'Withdrawal Confirmation', userDetail.first_name, userDetail.last_name, -amount)
           } catch (error) {
             console.error('Error sending Withdrawal Confirmation email:', error)
           }

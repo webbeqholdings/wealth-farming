@@ -54,7 +54,7 @@ export const sendEmailWithdraw = async (to: string, subject: string, first_name:
               <td style="padding: 40px 30px">
                 <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.5">Hello ${first_name} ${last_name},</p>
                 <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.5">
-                  We are pleased to inform you that your withdrawal of <strong>$${amount.toFixed(2)}</strong> USD has been successfully processed.
+                  We are pleased to inform you that your withdrawal of <strong>-$${amount.toFixed(2)}</strong> USD has been successfully processed.
                 </p>
                 <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.5">
                   If you have any questions or need further assistance, please don't hesitate to contact our support team.
@@ -75,8 +75,8 @@ export const sendEmailWithdraw = async (to: string, subject: string, first_name:
                   border-radius: 0 0 8px 8px;
                 "
               >
-                <p style="margin: 0 0 10px 0">This is an automated message, please do not reply.</p>
-                <p style="margin: 0">© 2024 Your Company Name. All rights reserved.</p>
+                <p style="margin: 0 0 10px 0; color: #666666">This is an automated message, please do not reply.</p>
+                <p style="margin: 0; color: #666666">© 2025 BEQ Holdings. All rights reserved.</p>
               </td>
             </tr>
           </table>
