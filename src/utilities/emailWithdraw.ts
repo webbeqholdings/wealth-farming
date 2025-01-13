@@ -1,10 +1,30 @@
 import { getPayload } from 'payload'
 import config from '@payload-config';
 
-export const sendEmailWithdraw = async (to: string, subject: string, first_name: string, last_name: string, amount: Number) => {
+export const sendEmailWithdraw = async (to: string, subject: string, first_name: string, last_name: string, amount: Number, status: String) => {
   const payload = await getPayload({
       config
   });
+
+  // Dynamic email content based on status
+  const contentByStatus =
+    status === "completed"
+      ? `
+        <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.5">
+          We are pleased to inform you that your withdrawal of <strong>$${amount.toFixed(2)}</strong> USD has been successfully processed.
+        </p>
+        <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.5">
+          Thank you for choosing our services! If you have any questions or need further assistance, please don't hesitate to contact our support team.
+        </p>
+      `
+      : `
+        <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.5">
+          We regret to inform you that your withdrawal of <strong>$${amount.toFixed(2)}</strong> USD has failed.
+        </p>
+        <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.5">
+          Please check your account details and try again. If the issue persists, feel free to contact our support team for assistance.
+        </p>
+      `;
 
   const htmlContent = `
 <!doctype html>
@@ -12,7 +32,7 @@ export const sendEmailWithdraw = async (to: string, subject: string, first_name:
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Withdrawal Confirmation</title>
+    <title>Withdrawal Status</title>
   </head>
   <body
     style="
@@ -42,26 +62,22 @@ export const sendEmailWithdraw = async (to: string, subject: string, first_name:
                 style="
                   padding: 40px 30px;
                   text-align: center;
-                  background-color: #4f46e5;
+                  background-color: ${status === "completed" ? "#4CAF50" : "#FF5722"};
                   border-radius: 8px 8px 0 0;
                 "
               >
-                <h1 style="color: #ffffff; font-size: 28px; margin: 0">Withdrawal Confirmation</h1>
+                <h1 style="color: #ffffff; font-size: 28px; margin: 0">
+                  Withdrawal ${status.charAt(0).toUpperCase() + status.slice(1)}
+                </h1>
               </td>
             </tr>
             <!-- Content -->
             <tr>
               <td style="padding: 40px 30px">
-                <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.5">Hello ${first_name} ${last_name},</p>
                 <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.5">
-                  We are pleased to inform you that your withdrawal of <strong>-$${amount.toFixed(2)}</strong> USD has been successfully processed.
+                  Hello ${first_name} ${last_name},
                 </p>
-                <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.5">
-                  If you have any questions or need further assistance, please don't hesitate to contact our support team.
-                </p>
-                <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.5">
-                  Thank you for choosing our services!
-                </p>
+                ${contentByStatus}
               </td>
             </tr>
             <!-- Footer -->

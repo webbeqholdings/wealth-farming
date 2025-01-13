@@ -113,13 +113,24 @@ const Transactions: CollectionConfig = {
         })
         const { amount, from_account, type, status } = doc
 
+        const handleSendEmail = async (user: any, amount: any, status: any, type: any) => {
+
+          try {
+
+            if (type === 'deposit') {
+              await sendEmailDeposit(user.email, `Deposit ${status}`, user.first_name, user.last_name, amount, status)
+            }
+            else if (type === 'withdraw') {
+              await sendEmailWithdraw(user.email, `Withdrawal ${status}`, user.first_name, user.last_name, amount, status)
+            }
+
+          } catch (error) {
+            console.error(`Error sending ${type} ${status} email:`, error)
+          }
+        }
+
         if (operation === 'update' && type === 'deposit' && status === 'completed') {
           // Fetch the existing account details
-          const userDetail = await payload.findByID({
-            collection: 'users',
-            id: doc.user,
-          })
-
           const fromAccount = await payload.findByID({
             collection: 'accounts',
             id: from_account,
@@ -182,22 +193,24 @@ const Transactions: CollectionConfig = {
                 })
               }
             }
-          }
-          //Send email Deposit Confirmation
-          try {
-            await sendEmailDeposit(userDetail.email, 'Deposit Confirmation', userDetail.first_name, userDetail.last_name, amount)
-          } catch (error) {
-            console.error('Error sending Deposit Confirmation email:', error)
-          }
+            handleSendEmail(fromAccount.user, amount, status, type)
+          } 
+        }
+
+        if (operation === 'update' && type === 'deposit' && status === 'failed') {
+          // Fetch the existing account details
+          const fromAccount = await payload.findByID({
+            collection: 'accounts',
+            id: from_account,
+          })
+          
+          if (fromAccount) {
+            handleSendEmail(fromAccount.user, amount, status, type)
+          }    
         }
 
         if (operation === 'update' && doc.type === 'withdraw' && doc.status === 'completed') {
           // Fetch the existing account details
-          const userDetail = await payload.findByID({
-            collection: 'users',
-            id: doc.user,
-          })
-
           const fromAccount = await payload.findByID({
             collection: 'accounts',
             id: from_account,
@@ -215,13 +228,10 @@ const Transactions: CollectionConfig = {
                 amount: updatedAmount,
               },
             })
+            
+            handleSendEmail(fromAccount.user, amount, doc.status, doc.type)
           }
-          //Send email Withdrawal Confirmation
-          try {
-            await sendEmailWithdraw(userDetail.email, 'Withdrawal Confirmation', userDetail.first_name, userDetail.last_name, -amount)
-          } catch (error) {
-            console.error('Error sending Withdrawal Confirmation email:', error)
-          }
+
         }
 
         if (operation === 'update' && doc.type === 'withdraw' && doc.status === 'failed') {
@@ -232,18 +242,9 @@ const Transactions: CollectionConfig = {
             collection: 'accounts',
             id: fromAccountId,
           })
-          if (fromAccount) {
-            // Update the account amount
-            const updatedAmount = fromAccount.amount - transactionAmount
 
-            // Save the updated account data
-            await payload.update({
-              collection: 'accounts',
-              id: fromAccountId,
-              data: {
-                amount: updatedAmount,
-              },
-            })
+          if (fromAccount) {
+            handleSendEmail(fromAccount.user, transactionAmount, doc.status, type)
           }
         }
       },
