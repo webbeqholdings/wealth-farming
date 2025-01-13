@@ -1,9 +1,26 @@
 import { Payload } from 'payload'
 import config from '@payload-config'
 
-// Admin ko cho xai bien payload ben ngoai nhu vay!
+export const getTotalDeposit = async (payload: Payload, user_id: number): Promise<number> => {
+  let total = 0
+  const data = await payload.find({
+    collection: 'transactions',
+    where: {
+      user: { equals: Number(user_id) },
+      status: { equals: 'completed' },
+      type: { equals: 'deposit' },
+    },
+  })
 
-// the same luon nha : payload: Payload
+  if (!data.totalDocs) return 0
+
+  data.docs.forEach((t: any) => {
+    total += t.amount
+  })
+
+  return total
+}
+
 export const getSumAmountAccountFrom = async (payload: Payload, account_from: number) => {
   const transactions = await payload.find({
     collection: 'transactions',
@@ -23,7 +40,6 @@ export const getSumAmountAccountFrom = async (payload: Payload, account_from: nu
   return total
 }
 
-// them tham so payload: Payload vo day nha
 export const getSumAmountAccountTo = async (payload: Payload, account_to: number) => {
   const transactions = await payload.find({
     collection: 'transactions',

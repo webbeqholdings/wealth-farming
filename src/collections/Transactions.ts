@@ -1,5 +1,5 @@
 // transactions.collection.js
-import type { CollectionConfig } from 'payload'
+import type { BasePayload, CollectionConfig } from 'payload'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { isAdmin } from '../access/isAdmin'
@@ -9,7 +9,8 @@ import {
   getParentIdByUser,
   getReferralProducts,
 } from '@/lib/admin-side/referrals'
-import { getSumAmountBalanceByAccount } from '@/lib/admin-side/transaction'
+import { getTotalDeposit } from '@/lib/admin-side/transaction'
+import { getAccountsByUserId } from '@/lib/admin-side/account'
 
 const Transactions: CollectionConfig = {
   slug: 'transactions',
@@ -134,11 +135,14 @@ const Transactions: CollectionConfig = {
           const parentUser = await getParentIdByUser(payload, doc.user)
           // const referralRate: any = await getCurrentLevelRate(payload, amount)
           const parentId = (parentUser as { id: number }).id
-          console.log('parentId', parentId)
 
           if (parentId) {
+            const accountReferral = await getAccountsByUserId(payload, doc.user, [
+              'referral_reward',
+            ])
+            console.log('accountReferral', accountReferral)
             // Get total deposit
-            const totalAmount = await getSumAmountBalanceByAccount(payload, parentId)
+            const totalAmount = await getTotalDeposit(payload, doc.user)
 
             const referralRate = await getCurrentLevelRate(payload, totalAmount)
             const referralAmount = amount * referralRate
@@ -156,7 +160,7 @@ const Transactions: CollectionConfig = {
                 amount: Number(referralAmount),
                 user: Number(parentId),
                 status: 'completed',
-                account_to: account_to,
+                account_to: Number(accountReferral.id),
                 type: 'referral_reward',
               },
             })
@@ -168,7 +172,7 @@ const Transactions: CollectionConfig = {
                 user: Number(parentId),
                 investment_product: referralProduct.id,
                 status: 'completed',
-                from_account: account_to,
+                from_account: Number(accountReferral.id),
                 type: 'investment',
               },
             })
