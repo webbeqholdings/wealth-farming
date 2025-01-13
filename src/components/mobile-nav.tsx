@@ -86,50 +86,51 @@ export function MobileNav() {
         </MobileLink>
         <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10">
           <div className="flex flex-col space-y-3">
-
-            {
-
-              menuItems ? menuItems.map((item) => (
-                <>
-                  {(item.children.length >= 1) ?
-                    <Accordion type='single' collapsible className='mr-2'>
-                      <AccordionItem key={item.id} value={item.id} >
-                        <AccordionTrigger >
-                          <div className='ml-2 '>
-                            {item.title}
-                          </div>
+            {menuItems ? (
+              menuItems.map((item) => (
+                <div key={item.id}>
+                  {item.children.length >= 1 ? (
+                    <Accordion type="single" collapsible className="mr-2">
+                      <AccordionItem key={item.id} value={item.id}>
+                        <AccordionTrigger>
+                          <div className="ml-2 ">{item.title}</div>
                         </AccordionTrigger>
                         <AccordionContent>
                           <Link href={item.url ?? '#'} target="_self" rel="noreferrer">
                             <div>
-                              {item.children.map((itemchild: { url: any; title: string, id: number }) => (
-                                <Link key={itemchild.id} href={itemchild.url ?? '#'} target="_self" rel="noreferrer">
-                                  <div className='flex flex-row justify-start items-center mb-2 pl-4 gap-1 hover:underline'>
-                                    <div className='text-sm'>
-                                      {itemchild.title}
+                              {item.children.map(
+                                (itemchild: { url: any; title: string; id: number }) => (
+                                  <Link
+                                    key={itemchild.id}
+                                    href={itemchild.url ?? '#'}
+                                    target="_self"
+                                    rel="noreferrer"
+                                  >
+                                    <div className="flex flex-row justify-start items-center mb-2 pl-4 gap-1 hover:underline">
+                                      <div className="text-sm">{itemchild.title}</div>
                                     </div>
-                                  </div>
-                                </Link>))
-                              }
+                                  </Link>
+                                ),
+                              )}
                             </div>
                           </Link>
                         </AccordionContent>
                       </AccordionItem>
                     </Accordion>
-                    :
+                  ) : (
                     <div className={'border-b mr-2'}>
                       <div className='"flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline '>
                         <Link href={item.url ?? '#'} target="_self" rel="noreferrer">
-                          <div className='pl-2'>
-                            {item.title}
-                          </div>
+                          <div className="pl-2">{item.title}</div>
                         </Link>
                       </div>
                     </div>
-                  }
-                </>))
-                : <></>
-            }
+                  )}
+                </div>
+              ))
+            ) : (
+              <></>
+            )}
           </div>
         </ScrollArea>
       </SheetContent>
