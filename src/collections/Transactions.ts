@@ -9,6 +9,7 @@ import {
   getParentIdByUser,
   getReferralProducts,
 } from '@/lib/admin-side/referrals'
+import { getSumAmountBalanceByAccount } from '@/lib/admin-side/transaction'
 
 const Transactions: CollectionConfig = {
   slug: 'transactions',
@@ -131,15 +132,22 @@ const Transactions: CollectionConfig = {
         if (operation === 'update' && type === 'deposit' && status === 'completed') {
           // ... Update Referral Process
           const parentUser = await getParentIdByUser(payload, doc.user)
-          const referralRate: any = await getCurrentLevelRate(payload, amount)
+          // const referralRate: any = await getCurrentLevelRate(payload, amount)
           const parentId = (parentUser as { id: number }).id
+          console.log('parentId', parentId)
 
           if (parentId) {
+            // Get total deposit
+            const totalAmount = await getSumAmountBalanceByAccount(payload, parentId)
+
+            const referralRate = await getCurrentLevelRate(payload, totalAmount)
             const referralAmount = amount * referralRate
+
             const referralProducts = await getReferralProducts(payload)
-            const referralProduct = referralProducts.filter((prod) => {
-              return prod.term == 'annually'
-            })[0]
+            const referralProduct = referralProducts.find((prod) => {
+              return prod.term == 'monthly'
+            })
+
             if (!referralProduct) return
 
             await payload.create({
@@ -148,7 +156,7 @@ const Transactions: CollectionConfig = {
                 amount: Number(referralAmount),
                 user: Number(parentId),
                 status: 'completed',
-                account_from: account_to,
+                account_to: account_to,
                 type: 'referral_reward',
               },
             })
@@ -164,6 +172,7 @@ const Transactions: CollectionConfig = {
                 type: 'investment',
               },
             })
+
             await payload.create({
               collection: 'contracts',
               data: {
