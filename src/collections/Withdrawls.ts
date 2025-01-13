@@ -87,6 +87,19 @@ const Withdrawals: CollectionConfig = {
 
                     // Set message for completed status
                     data.message = 'Withdrawal completed successfully.';
+
+                    await payload.create({
+                        collection: 'transactions',
+                        data: {
+                          amount: data.amount,
+                          user: Number(data.user),
+                          status: 'completed',
+                          from_account: account.id,
+                          type: 'bonus',
+                          message: data.message
+                        },
+                    })
+
                 } else if (data.status === 'failed') {
                     // Validate contract data
                     const contract = await payload.findByID({
@@ -114,6 +127,18 @@ const Withdrawals: CollectionConfig = {
 
                     // Set custom message for failed status
                     data.message = `Withdrawal failed. The contract has been reactivated with a balance of ${data.amount}.`;
+
+                    await payload.create({
+                        collection: 'transactions',
+                        data: {
+                          amount: data.amount,
+                          user: Number(data.user),
+                          status: 'failed',
+                        //   from_account: account.id,
+                          type: 'bonus',
+                          message: data.message
+                        },
+                    })
                 }
             },
         ],

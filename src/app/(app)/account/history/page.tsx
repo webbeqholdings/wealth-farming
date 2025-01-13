@@ -195,6 +195,15 @@ export default function HistoryPage() {
                 >
                   Investments
                 </Button>
+                <Button
+                  variant={activeTab === 'bonus' ? 'default' : 'outline'}
+                  onClick={() => {
+                    setActiveTab('bonus');
+                    setCurrentPage(1);
+                  }}
+                >
+                  Bonus
+                </Button>
               </div>
               <Button asChild onClick={() => handleExportPdf('tableContent')}>
                 <button>Download PDF</button>
@@ -206,7 +215,7 @@ export default function HistoryPage() {
                 <TableRow>
                   <TableHead>Date</TableHead>
                   <TableHead>Type</TableHead>
-                  {activeTab === 'all' || activeTab === 'investment' ? (
+                  {activeTab === 'all' || activeTab === 'investment' || activeTab === 'bonus' ? (
                     <TableHead>Product</TableHead>
                   ) : (
                     ''
@@ -225,6 +234,11 @@ export default function HistoryPage() {
                   ) : (
                     ''
                   )}
+                  {activeTab === 'bonus' ? (
+                    <TableHead>Message</TableHead>
+                  ) : (
+                    ''
+                  )}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -235,7 +249,8 @@ export default function HistoryPage() {
                       (activeTab === 'deposit' && t.type == 'deposit') ||
                       (activeTab === 'withdraw' && t.type == 'withdraw') ||
                       (activeTab === 'transfer' && t.type == 'transfer') ||
-                      (activeTab === 'investment' && t.type == 'investment'),
+                      (activeTab === 'investment' && t.type == 'investment') ||
+                      (activeTab === 'bonus' && t.type == 'bonus'),
                   )
                   .map((transaction) => (
                     <TableRow key={transaction.id}>
@@ -244,7 +259,7 @@ export default function HistoryPage() {
                         {transaction.type.charAt(0).toUpperCase() +
                           transaction.type.slice(1).toLowerCase()}
                       </TableCell>
-                      {activeTab === 'all' || activeTab === 'investment' ? (
+                      {activeTab === 'all' || activeTab === 'investment' || activeTab === 'bonus' ? (
                         <TableHead>{transaction.product_name}</TableHead>
                       ) : (
                         ''
@@ -297,6 +312,11 @@ export default function HistoryPage() {
                         >
                           {transaction.status}
                         </TableCell>
+                      ) : (
+                        ''
+                      )}
+                      {activeTab === 'bonus' ? (
+                        <TableHead>{transaction.message}</TableHead>
                       ) : (
                         ''
                       )}

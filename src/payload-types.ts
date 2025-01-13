@@ -372,6 +372,7 @@ export interface Transaction {
   to_account?: (number | null) | Account;
   deposit_screenshot?: (number | null) | Media;
   type: 'deposit' | 'withdraw' | 'bonus' | 'transfer' | 'investment' | 'referral_reward';
+  message?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -923,6 +924,7 @@ export interface TransactionsSelect<T extends boolean = true> {
   to_account?: T;
   deposit_screenshot?: T;
   type?: T;
+  message?: T;
   updatedAt?: T;
   createdAt?: T;
 }
