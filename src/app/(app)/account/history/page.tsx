@@ -22,7 +22,7 @@ import { TabMenu } from '@/components/w88/TabMenu'
 import { accountConfig } from '@/config/accounts'
 import { formatDateTime } from '@/utilities/formatDateTime'
 import UserStatus from '@/lib/userStatus'
-import { getTransactions } from '@/lib/transaction'
+import { getTransactions, getTransactionsWithDate } from '@/lib/transaction'
 import {
   Pagination,
   PaginationContent,
@@ -34,6 +34,15 @@ import {
 import Spinner from '@/components/Spinner'
 import { printPdf } from '@/components/printPdf'
 import { useTheme } from 'next-themes'
+import { format } from "date-fns"
+import { CalendarIcon, ArrowDownToLine } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { Calendar } from "@/components/ui/calendar"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
 // Mock data for chart
 const chartData = [
@@ -54,6 +63,8 @@ export default function HistoryPage() {
   const [totalPages, setTotalPages] = useState(1)
   const [currentPage, setCurrentPage] = useState(1)
   const { theme, setTheme } = useTheme()
+  const [startDate, setStartDate] = useState<Date>()
+  const [endDate, setEndDate] = useState<Date>()
 
   useEffect(() => {
     const fetchAccounts = async () => {
@@ -97,6 +108,40 @@ export default function HistoryPage() {
     fetchTransactions()
   }, [loading, activeTab, currentPage])
 
+  // Update Start Date & End Date
+  const handleEndDateSelect = (date: Date) => {
+    const updatedEndDate = new Date(date);
+    updatedEndDate.setHours(23, 59, 59, 999);
+    setEndDate(updatedEndDate);
+  };
+
+  useEffect(() => {
+    if (startDate || endDate) {
+      if (!(startDate instanceof Date) || !(endDate instanceof Date)) {
+        console.error("Start date or end date is not a valid Date object.");
+        return;
+      }
+      if (startDate > endDate) {
+        console.error("Start date must be earlier than or equal to end date");
+        return;
+      }
+
+      filterDate();
+    }
+  }, [startDate, endDate, activeTab]);
+
+  function filterDate() {
+    const fetchTransactions = async () => {
+      try {
+        const { docs, totalPages } = await getTransactionsWithDate(currentPage, 10, activeTab, startDate.toISOString(), endDate.toISOString());
+        setTransactions(docs); // Store the transactions in state
+        setTotalPages(totalPages);
+      } catch (error) {
+        console.error('Failed to fetch transactions:', error);
+      }
+    };
+    fetchTransactions(); // Invoke the asynchronous function
+  }
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
     return <Spinner /> // You can replace this with a loading spinner component if desired
@@ -150,6 +195,53 @@ export default function HistoryPage() {
           <TabsContent value="table" className="space-y-4">
             <div className="flex justify-between items-center mb-4">
               <div className="flex space-x-2">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-[240px] justify-start text-left font-normal",
+                        !Date && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon />
+                      {startDate ? format(startDate, "PPP") : <span>Start Date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={startDate}
+                      onSelect={setStartDate}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-[240px] justify-start text-left font-normal",
+                        !Date && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon />
+                      {endDate ? format(endDate, "PPP") : <span>End Date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={endDate}
+                      onSelect={handleEndDateSelect}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div className="flex space-x-2 items-center">
                 <Button
                   variant={activeTab === 'all' ? 'default' : 'outline'}
                   onClick={() => {
@@ -204,10 +296,14 @@ export default function HistoryPage() {
                 >
                   Bonus
                 </Button>
+                <div
+                  className="p-2 cursor-pointer hover:bg-gray-200 rounded-md"
+                  onClick={() => handleExportPdf('tableContent')}
+                  title="Export to PDF"
+                >
+                  <ArrowDownToLine className="w-5 h-5 text-gray-600" />
+                </div>
               </div>
-              <Button asChild onClick={() => handleExportPdf('tableContent')}>
-                <button>Download PDF</button>
-              </Button>
             </div>
 
             <Table id="tableContent">
@@ -301,8 +397,8 @@ export default function HistoryPage() {
                         ''
                       )}
                       {activeTab === 'all' ||
-                      activeTab === 'deposit' ||
-                      activeTab === 'withdraw' ? (
+                        activeTab === 'deposit' ||
+                        activeTab === 'withdraw' ? (
                         <TableCell
                           className={clsx({
                             'text-yellow-500': transaction.status === 'pending', // Yellow font
@@ -339,9 +435,8 @@ export default function HistoryPage() {
                         <PaginationLink
                           onClick={() => setCurrentPage(index + 1)}
                           isActive={currentPage === index + 1}
-                          className={`text-sm font-medium rounded-lg ${
-                            currentPage === index + 1 ? 'border-gray-400' : ''
-                          }`}
+                          className={`text-sm font-medium rounded-lg ${currentPage === index + 1 ? 'border-gray-400' : ''
+                            }`}
                         >
                           {index + 1}
                         </PaginationLink>

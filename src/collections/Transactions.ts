@@ -9,6 +9,9 @@ import {
   getParentIdByUser,
   getReferralProducts,
 } from '@/lib/admin-side/referrals'
+import { sendEmailDeposit } from '@/utilities/emailDeposit'
+import { sendEmailWithdraw } from '@/utilities/emailWithdraw'
+
 
 const Transactions: CollectionConfig = {
   slug: 'transactions',
@@ -113,8 +116,20 @@ const Transactions: CollectionConfig = {
         const payload = await getPayload({
           config,
         })
-
         const { amount, from_account, type, status } = doc
+
+        const handleSendEmail = async (user: any, amount: any, status: any, type: any) => {
+          try {
+            if (type === 'deposit') {
+              await sendEmailDeposit(user.email, `Deposit ${status}`, user.first_name, user.last_name, amount, status)
+            }
+            else if (type === 'withdraw') {
+              await sendEmailWithdraw(user.email, `Withdrawal ${status}`, user.first_name, user.last_name, amount, status)
+            }
+          } catch (error) {
+            console.error(`Error sending ${type} ${status} email:`, error)
+          }
+        }
 
         if (operation === 'update' && type === 'deposit' && status === 'completed') {
           // Fetch the existing account details
@@ -180,8 +195,47 @@ const Transactions: CollectionConfig = {
                 })
               }
             }
-          }
+            handleSendEmail(fromAccount.user, amount, status, type)
+          } 
         }
+
+        if (operation === 'update' && type === 'deposit' && status === 'failed') {
+          // Fetch the existing account details
+          const fromAccount = await payload.findByID({
+            collection: 'accounts',
+            id: from_account,
+          })
+          
+          if (fromAccount) {
+            handleSendEmail(fromAccount.user, amount, status, type)
+          }    
+        }
+
+        if (operation === 'update' && doc.type === 'withdraw' && doc.status === 'completed') {
+          // Fetch the existing account details
+          const fromAccount = await payload.findByID({
+            collection: 'accounts',
+            id: from_account,
+          })
+
+          if (fromAccount) {
+            // Update the account amount
+            const updatedAmount = fromAccount.amount - amount
+
+            // Save the updated account data
+            await payload.update({
+              collection: 'accounts',
+              id: from_account,
+              data: {
+                amount: updatedAmount,
+              },
+            })
+            
+            handleSendEmail(fromAccount.user, amount, doc.status, doc.type)
+          }
+
+        }
+
         if (operation === 'update' && doc.type === 'withdraw' && doc.status === 'failed') {
           const fromAccountId = doc.from_account
           const transactionAmount = doc.amount
@@ -190,18 +244,9 @@ const Transactions: CollectionConfig = {
             collection: 'accounts',
             id: fromAccountId,
           })
-          if (fromAccount) {
-            // Update the account amount
-            const updatedAmount = fromAccount.amount - transactionAmount
 
-            // Save the updated account data
-            await payload.update({
-              collection: 'accounts',
-              id: fromAccountId,
-              data: {
-                amount: updatedAmount,
-              },
-            })
+          if (fromAccount) {
+            handleSendEmail(fromAccount.user, transactionAmount, doc.status, type)
           }
         }
       },
