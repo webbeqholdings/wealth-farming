@@ -190,7 +190,7 @@ export default function WithdrawPage() {
       toast({
         title: 'Transaction created successfully',
       })
-      router.push('/account/history') // Assuming there's a dashboard page to redirect to
+      router.push('/account/history/withdraw') // Assuming there's a dashboard page to redirect to
     } catch (error) {
       console.log('Error creating transaction:', error);
       toast({
