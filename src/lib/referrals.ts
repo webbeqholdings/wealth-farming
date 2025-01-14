@@ -49,6 +49,72 @@ export const getReferralsByParentId = async (
   }
 }
 
+export const getReferralsByParentIdWithFilter = async (
+  parentId: number,
+  page: number,
+  limit: number,
+  startDate: string,
+  endDate: string,
+  nameFilter: string,
+): Promise<{ docs: any; referral_code: string; totalPages: number; totalDocs: number }> => {
+  try {
+    var query
+    if(nameFilter != '' && startDate!='' && endDate!=''){
+      query = {
+        parent: { equals: parentId },
+        referral_at: {
+          greater_than_equal: startDate,
+          less_than_equal: endDate,
+        },
+        or:[ {'child.first_name': {like: nameFilter}}, {'child.last_name': {like: nameFilter}}, {'child.email': {like: nameFilter}}]}
+    } else if (nameFilter !=''){
+      query = {
+        parent: { equals: parentId },
+        or:[ {'child.first_name': {like: nameFilter}}, {'child.last_name': {like: nameFilter}}, {'child.email': {like: nameFilter}}]} 
+    } else if (startDate != '' && endDate != '') {
+      query = {
+        parent: { equals: parentId },
+        referral_at: {
+          greater_than_equal: startDate,
+          less_than_equal: endDate,
+        }}
+      }else{
+        query = {
+          parent: { equals: parentId },
+        }
+      }
+
+    const response = await payload.find({
+      collection: 'user-referrals',
+      where: {
+        ...query,
+      },
+      page, // Pass the page number
+      limit, // Pass the number of items per page
+    })
+
+    const referrals: any = response.docs
+    return {
+      docs: referrals.map((referral: any) => ({
+        id: referral.id.toString(), // Ensure ID is a string
+        name: `${referral.child?.first_name || ''} ${referral.child?.last_name || ''}`.trim(),
+        email: referral.child?.email || 'N/A', // Default to 'N/A' if email is missing
+        date: referral.referral_at
+          ? new Date(referral.referral_at).toISOString().split('T')[0] // Format date to YYYY-MM-DD
+          : 'N/A',
+        status: referral.child?.email_verified ? 'Completed' : 'Pending', // Use email_verified for status
+      })),
+      referral_code: referrals[0].parent.referral_code,
+      totalPages: response.totalPages,
+      totalDocs: response.totalDocs,
+    }
+  } catch (error) {
+    console.error('Error fetching referrals by parent ID:', error)
+
+    return { docs: [], referral_code: '', totalPages: 0, totalDocs: 0 }
+  }
+}
+
 export const getParentIdByUser = async (user_id: number): Promise<number | Boolean | User> => {
   const response = await payload.find({
     collection: 'user-referrals',
@@ -60,8 +126,6 @@ export const getParentIdByUser = async (user_id: number): Promise<number | Boole
   if (!response.docs.length) {
     return false
   }
-
-  console.log('response.docs[0].parent', response.docs[0].parent)
 
   return response.docs[0].parent
 }

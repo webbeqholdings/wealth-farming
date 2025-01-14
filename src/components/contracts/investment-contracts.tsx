@@ -15,7 +15,7 @@ import { WithdrawDialog } from '@/components/withdraw-dialog'
 import { TerminationDialog } from '../termination-dialog'
 import userStatus from '@/lib/userStatus'
 import { useRouter } from 'next/navigation'
-import { getContracts, getWithdrawals, updateSetting } from '@/lib/contract'
+import { getContracts, getWithdrawals, updateSetting, getContractsWithDate, getWithdrawalsWithDate } from '@/lib/contract'
 import {
     Pagination,
     PaginationContent,
@@ -41,6 +41,11 @@ import {
 import { CircleHelp } from 'lucide-react'
 import { getPaymentTransfer } from '@/lib/paymentTransfer'
 import { useToast } from '@/hooks/use-toast'
+import { format } from "date-fns"
+import { CalendarIcon } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { Calendar } from "@/components/ui/calendar"
+
 
 interface Investment {
     id: string
@@ -89,6 +94,8 @@ export function InvestmentContracts() {
     const [totalPageWithdrawl, setTotalPagesWithdrawl] = useState(1);
     const [activeTab, setActiveTab] = useState('investment')
     const [checkedStates, setCheckedStates] = useState<any>({});
+    const [startDate, setStartDate] = useState<Date>()
+    const [endDate, setEndDate] = useState<Date>()
     // Handle tab switch and data fetching
     // Unified fetchData function
     const fetchData = useCallback(async () => {
@@ -112,6 +119,59 @@ export function InvestmentContracts() {
     useEffect(() => {
         fetchData();
     }, [fetchData]);
+
+    useEffect(() => {
+      if (startDate && endDate) {
+        if (!(startDate instanceof Date) || !(endDate instanceof Date)) {
+          console.error("Start date or end date is not a valid Date object.");
+          return;
+        }
+        if (startDate > endDate) {
+          console.error("Start date must be earlier than or equal to end date");
+          return;
+        }
+          filterDate();
+      }
+      else{
+          fetchData();
+      }
+    }, [startDate, endDate, activeTab]);
+
+    // Update Start Date & End Date
+    const handleEndDateSelect = (date: Date) => {
+        if (date){
+            const updatedEndDate = new Date(date);
+            updatedEndDate.setHours(23, 59, 59, 999);
+            setEndDate(updatedEndDate);
+        }
+        else{
+            setEndDate(date);
+        }
+    };
+
+    function filterDate() {
+      const fetchContracts = async () => {
+      try {
+          if (activeTab === 'investment') {
+              const { docs, totalPages } = await getContractsWithDate(currentPage, 10, startDate.toISOString(), endDate.toISOString());
+              setInvestments(docs);
+              setTotalPagesInvestment(totalPages);
+              const initialCheckedStates = docs.reduce((acc: any, investment: any) => {
+                  acc[investment.id] = investment.setting?.extend_contract === true || false;
+                  return acc;
+              }, {});
+              setCheckedStates(initialCheckedStates);
+          } else if (activeTab === 'withdraw') {
+              const { docs, totalPages } = await getWithdrawalsWithDate(currentPage, 10, startDate.toISOString(), endDate.toISOString());
+              setWithdrawals(docs);
+              setTotalPagesWithdrawl(totalPages);
+          }
+      } catch (error) {
+          console.error('Failed to fetch contracts:', error);
+      }
+      };
+      fetchContracts();
+  }
 
     // Calculate ROI
     const calculateROI = () => {
@@ -292,7 +352,57 @@ export function InvestmentContracts() {
                     </Card>
                 </div>
 
-                <div className="flex justify-end space-x-2 mb-4">
+                <div className='grid grid-cols-2'>
+                <div className="flex space-x-2 justify-start">
+                    <Popover>
+                    <PopoverTrigger asChild>
+                        <Button
+                        variant={"outline"}
+                        className={cn(
+                            "w-[240px] justify-start text-left font-normal",
+                            !Date && "text-muted-foreground"
+                        )}
+                        >
+                        <CalendarIcon />
+                        {startDate ? format(startDate, "PPP") : <span>Start Date</span>}
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                        mode="single"
+                        selected={startDate}
+                        onSelect={setStartDate}
+                        initialFocus
+                        />
+                    </PopoverContent>
+                    </Popover>
+                    <Popover>
+                    <PopoverTrigger asChild>
+                        <Button
+                        variant={"outline"}
+                        className={cn(
+                            "w-[240px] justify-start text-left font-normal",
+                            !Date && "text-muted-foreground"
+                        )}
+                        >
+                        <CalendarIcon />
+                        {endDate ? format(endDate, "PPP") : <span>End Date</span>}
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                        mode="single"
+                        selected={endDate}
+                        onSelect={(date) => {
+                              handleEndDateSelect(date);
+                        }}
+                        initialFocus
+                        />
+                    </PopoverContent>
+                    </Popover>
+                </div>
+
+                <div className="flex justify-end space-x-2">
                     <Button
                         variant={activeTab === 'investment' ? 'default' : 'outline'}
                         onClick={() => { setActiveTab('investment'); setCurrentPage(1) }}
@@ -305,6 +415,7 @@ export function InvestmentContracts() {
                     >
                         Withdraw
                     </Button>
+                </div>
                 </div>
 
                 <Card className=" shadow-sm">

@@ -15,7 +15,7 @@ import {
 import { Users, Link, DollarSign, Award } from 'lucide-react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
-import { getReferralsByParentId } from '@/lib/referrals'
+import { getReferralsByParentId, getReferralsByParentIdWithFilter} from '@/lib/referrals'
 import userStatus from '@/lib/userStatus'
 import { useRouter } from 'next/navigation'
 import {
@@ -35,6 +35,15 @@ interface Referral {
   date: string
   status: 'Pending' | 'Completed'
 }
+import { format } from "date-fns"
+import { CalendarIcon } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { Calendar } from "@/components/ui/calendar"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
 export default function ReferralPage() {
   const router = useRouter()
@@ -43,28 +52,95 @@ export default function ReferralPage() {
   const [referrals, setReferrals] = useState<Referral[]>([])
   const [totalPages, setTotalPages] = useState(1)
   const [currentPage, setCurrentPage] = useState(1)
+  const [startDate, setStartDate] = useState<Date>()
+  const [endDate, setEndDate] = useState<Date>()
+  const [nameFilter, setNameFilter] = useState('')
 
   useEffect(() => {
-    // Simulating API call to fetch referral data
-    const fetchReferralData = async () => {
-      const { docs, totalPages, referral_code } = await getReferralsByParentId(
-        user.id,
-        currentPage,
-        10,
-      )
-
-      setReferrals(docs) // Store the accounts in state
-      setTotalPages(totalPages)
-      setReferralLink(`https://wealthfarming.org/join/${user.referral_code}`)
-    }
-
-    fetchReferralData()
+    fetchData()
   }, [loading, currentPage])
+
 
   const copyReferralLink = () => {
     navigator.clipboard.writeText(referralLink)
     alert('Referral link copied to clipboard!')
   }
+
+  // Update Start Date & End Date
+  const fetchData = async () => {
+    const { docs, totalPages, referral_code } = await getReferralsByParentId(
+      user.id,
+      currentPage,
+      10,
+    )
+    setReferrals(docs) // Store the accounts in state
+    setTotalPages(totalPages)
+    setReferralLink(`https://wealthfarming.org/join/${user.referral_code}`)
+  }
+  const handleEndDateSelect = (date: Date) => {
+    if(date){
+      const updatedEndDate = new Date(date);
+      updatedEndDate.setHours(23, 59, 59, 999);
+      setEndDate(updatedEndDate);
+    }
+    else {
+      setEndDate(date);
+    }
+  };
+  
+  useEffect(() =>{
+    if (nameFilter!='' && (startDate && endDate)){
+      const fetchReferralData = async () => {
+        const { docs, totalPages, referral_code } = await getReferralsByParentIdWithFilter(
+          user.id,
+          currentPage,
+          10,
+          startDate.toISOString(),
+          endDate.toISOString(),
+          nameFilter,
+        )
+        setReferrals(docs) // Store the accounts in state
+        setTotalPages(totalPages)
+        setReferralLink(`https://wealthfarming.org/join/${user.referral_code}`)
+      }
+      fetchReferralData()
+    }
+    else if (nameFilter != ''){
+      const fetchReferralData = async () => {
+        const { docs, totalPages, referral_code } = await getReferralsByParentIdWithFilter(
+          user.id,
+          currentPage,
+          10,
+          '',
+          '',
+          nameFilter,
+        )
+        setReferrals(docs) // Store the accounts in state
+        setTotalPages(totalPages)
+        setReferralLink(`https://wealthfarming.org/join/${user.referral_code}`)
+      }
+      fetchReferralData()
+    }
+    else if ((startDate && endDate)){
+      const fetchReferralData = async () => {
+        const { docs, totalPages, referral_code } = await getReferralsByParentIdWithFilter(
+          user.id,
+          currentPage,
+          10,
+          startDate.toISOString(),
+          endDate.toISOString(),
+          nameFilter,
+        )
+        setReferrals(docs) // Store the accounts in state
+        setTotalPages(totalPages)
+        setReferralLink(`https://wealthfarming.org/join/${user.referral_code}`)
+      }
+      fetchReferralData()
+    }
+    else{
+      fetchData()
+    }
+  }, [nameFilter, startDate, endDate]);
 
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
@@ -140,6 +216,62 @@ export default function ReferralPage() {
           </Card>
         </div>
 
+        <div className="flex justify-end space-x-2 mb-2">
+          <Popover>
+            <div className=''>
+            <Input 
+              type="text" 
+              placeholder="Name" 
+              onChange={(e) => setNameFilter(e.target.value)} 
+            />
+            </div>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={cn(
+                  "w-[240px] justify-start text-left font-normal",
+                  !Date && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon />
+                {startDate ? format(startDate, "PPP") : <span>Start Date</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={startDate}
+                onSelect={setStartDate}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={cn(
+                  "w-[240px] justify-start text-left font-normal",
+                  !Date && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon />
+                {endDate ? format(endDate, "PPP") : <span>End Date</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={endDate}
+                onSelect={(date) => {
+                  handleEndDateSelect(date);
+                }}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+
         {/* Referrals Table */}
         <Card>
           <CardHeader>
@@ -164,11 +296,10 @@ export default function ReferralPage() {
                       <TableCell>{referral.date}</TableCell>
                       <TableCell>
                         <span
-                          className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                            referral.status === 'Completed'
+                          className={`px-2 py-1 rounded-full text-xs font-semibold ${referral.status === 'Completed'
                               ? 'bg-green-100 text-green-800'
                               : 'bg-yellow-100 text-yellow-800'
-                          }`}
+                            }`}
                         >
                           {referral.status}
                         </span>
@@ -192,9 +323,8 @@ export default function ReferralPage() {
                         <PaginationLink
                           onClick={() => setCurrentPage(index + 1)}
                           isActive={currentPage === index + 1}
-                          className={`text-sm font-medium rounded-lg ${
-                            currentPage === index + 1 ? 'border-gray-400' : ''
-                          }`}
+                          className={`text-sm font-medium rounded-lg ${currentPage === index + 1 ? 'border-gray-400' : ''
+                            }`}
                         >
                           {index + 1}
                         </PaginationLink>
