@@ -428,8 +428,8 @@ export default function UserProfile() {
                           <DollarSign className="h-5 w-5 text-muted-foreground" />
                           <span>
                             {account.balance.toLocaleString('en-US', {
-                              style: 'currency',
-                              currency: 'USD',
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
                             })}
                           </span>
                         </div>
