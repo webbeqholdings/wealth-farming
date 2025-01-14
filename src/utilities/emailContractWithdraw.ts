@@ -52,7 +52,7 @@ export const sendEmailContractWithdraw = async (
                 style="
                   padding: 40px 30px;
                   text-align: center;
-                  background-color: ${isCompleted ? '#4f46e5' : '#e53e3e'};
+                  background-color: ${isCompleted ? '#4CAF50' : '#e53e3e'};
                   border-radius: 8px 8px 0 0;
                 "
               >

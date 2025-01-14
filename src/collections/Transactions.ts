@@ -114,16 +114,13 @@ const Transactions: CollectionConfig = {
         const { amount, from_account, type, status } = doc
 
         const handleSendEmail = async (user: any, amount: any, status: any, type: any) => {
-
           try {
-
             if (type === 'deposit') {
               await sendEmailDeposit(user.email, `Deposit ${status}`, user.first_name, user.last_name, amount, status)
             }
             else if (type === 'withdraw') {
               await sendEmailWithdraw(user.email, `Withdrawal ${status}`, user.first_name, user.last_name, amount, status)
             }
-
           } catch (error) {
             console.error(`Error sending ${type} ${status} email:`, error)
           }
