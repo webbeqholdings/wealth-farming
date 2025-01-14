@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { CalendarIcon } from 'lucide-react'
-import { format, differenceInDays, isBefore, isEqual, addDays, getYear } from 'date-fns'
+import { format, differenceInDays, isBefore, addDays, getYear } from 'date-fns'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
@@ -21,14 +21,11 @@ import {
   buildProfitRecordsQuarterly,
   buildProfitRecordsSemester,
   buildProfitRecordsMonthly,
-  // rateConfig,
   contractEndAt,
   contractMultiPeriodEndAt,
   standardApplyProgramDays,
   canCancelContractAt,
-  Term,
 } from '@/lib/investment-products/dynamicFund'
-import { getProducts } from '@/lib/investment-products/localApi'
 import { createTransactionInvestment } from '@/lib/transaction'
 import { getPublicProducts } from '@/lib/investment-products/dynamicFundQuery'
 
