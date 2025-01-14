@@ -16,6 +16,7 @@ import * as migration_20241229_054012_create_payment_transfer_global from './202
 import * as migration_20241230_075829_create_crypto_wallets from './20241230_075829_create_crypto_wallets';
 import * as migration_20241230_100602_add_fields_min_to_paymant_config from './20241230_100602_add_fields_min_to_paymant_config';
 import * as migration_20241231_054938_add_column_deposit_screenshot_to_transaction from './20241231_054938_add_column_deposit_screenshot_to_transaction';
+import * as migration_20250114_122714_add_field_message_to_transaction from './20250114_122714_add_field_message_to_transaction';
 
 export const migrations = [
   {
@@ -106,6 +107,11 @@ export const migrations = [
   {
     up: migration_20241231_054938_add_column_deposit_screenshot_to_transaction.up,
     down: migration_20241231_054938_add_column_deposit_screenshot_to_transaction.down,
-    name: '20241231_054938_add_column_deposit_screenshot_to_transaction'
+    name: '20241231_054938_add_column_deposit_screenshot_to_transaction',
+  },
+  {
+    up: migration_20250114_122714_add_field_message_to_transaction.up,
+    down: migration_20250114_122714_add_field_message_to_transaction.down,
+    name: '20250114_122714_add_field_message_to_transaction'
   },
 ];
