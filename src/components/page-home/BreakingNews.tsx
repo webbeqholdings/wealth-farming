@@ -108,7 +108,7 @@ export function BreakingNewsCarousel() {
               <CarouselItem key={index} className="pl-1 md:basis-1/2 lg:basis-1/3">
                 <a className="cursor-pointer" href={`/blog/${item.slug}`}>
                 <div className="p-1 h-full">
-                  <Card className="h-full flex flex-col hover:bg-slate-300">
+                  <Card className="h-full flex flex-col transition-colors duration-300 hover:bg-gray-100">
                     <CardHeader className="grid grid-cols-3">
                       <div className="col-span-2">
                         <CardTitle className="text-sm font-medium">{item.title}</CardTitle>
