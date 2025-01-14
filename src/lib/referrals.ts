@@ -49,21 +49,40 @@ export const getReferralsByParentId = async (
   }
 }
 
-export const getReferralsByParentIdWithDate = async (
+export const getReferralsByParentIdWithFilter = async (
   parentId: number,
   page: number,
   limit: number,
   startDate: string,
   endDate: string,
+  nameFilter: string,
 ): Promise<{ docs: any; referral_code: string; totalPages: number; totalDocs: number }> => {
   try {
-    const query = {
-      parent: { equals: parentId },
-      referral_at: {
-        greater_than_equal: startDate,
-        less_than_equal: endDate,
-      },
-    }
+    var query
+    if(nameFilter != '' && startDate!='' && endDate!=''){
+      query = {
+        parent: { equals: parentId },
+        referral_at: {
+          greater_than_equal: startDate,
+          less_than_equal: endDate,
+        },
+        or:[ {'child.first_name': {like: nameFilter}}, {'child.last_name': {like: nameFilter}}, {'child.email': {like: nameFilter}}]}
+    } else if (nameFilter !=''){
+      query = {
+        parent: { equals: parentId },
+        or:[ {'child.first_name': {like: nameFilter}}, {'child.last_name': {like: nameFilter}}, {'child.email': {like: nameFilter}}]} 
+    } else if (startDate != '' && endDate != '') {
+      query = {
+        parent: { equals: parentId },
+        referral_at: {
+          greater_than_equal: startDate,
+          less_than_equal: endDate,
+        }}
+      }else{
+        query = {
+          parent: { equals: parentId },
+        }
+      }
 
     const response = await payload.find({
       collection: 'user-referrals',
