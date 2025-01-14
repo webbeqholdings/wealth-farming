@@ -120,6 +120,23 @@ export function InvestmentContracts() {
         fetchData();
     }, [fetchData]);
 
+    useEffect(() => {
+      if (startDate && endDate) {
+        if (!(startDate instanceof Date) || !(endDate instanceof Date)) {
+          console.error("Start date or end date is not a valid Date object.");
+          return;
+        }
+        if (startDate > endDate) {
+          console.error("Start date must be earlier than or equal to end date");
+          return;
+        }
+          filterDate();
+      }
+      else{
+          fetchData();
+      }
+    }, [startDate, endDate, activeTab]);
+
     // Update Start Date & End Date
     const handleEndDateSelect = (date: Date) => {
         if (date){
@@ -131,47 +148,30 @@ export function InvestmentContracts() {
             setEndDate(date);
         }
     };
-    useEffect(() => {
-        if (startDate && endDate) {
-          if (!(startDate instanceof Date) || !(endDate instanceof Date)) {
-            console.error("Start date or end date is not a valid Date object.");
-            return;
-          }
-          if (startDate > endDate) {
-            console.error("Start date must be earlier than or equal to end date");
-            return;
-          }
-      
-            filterDate();
-        }
-        else{
-            fetchData();
-        }
-      }, [startDate, endDate, activeTab]);
 
     function filterDate() {
-        const fetchContracts = async () => {
-        try {
-            if (activeTab === 'investment') {
-                const { docs, totalPages } = await getContractsWithDate(currentPage, 10, startDate.toISOString(), endDate.toISOString());
-                setInvestments(docs);
-                setTotalPagesInvestment(totalPages);
-                const initialCheckedStates = docs.reduce((acc: any, investment: any) => {
-                    acc[investment.id] = investment.setting?.extend_contract === true || false;
-                    return acc;
-                }, {});
-                setCheckedStates(initialCheckedStates);
-            } else if (activeTab === 'withdraw') {
-                const { docs, totalPages } = await getWithdrawalsWithDate(currentPage, 10, startDate.toISOString(), endDate.toISOString());
-                setWithdrawals(docs);
-                setTotalPagesWithdrawl(totalPages);
-            }
-        } catch (error) {
-            console.error('Failed to fetch contracts:', error);
-        }
-        };
-        fetchContracts();
-    }
+      const fetchContracts = async () => {
+      try {
+          if (activeTab === 'investment') {
+              const { docs, totalPages } = await getContractsWithDate(currentPage, 10, startDate.toISOString(), endDate.toISOString());
+              setInvestments(docs);
+              setTotalPagesInvestment(totalPages);
+              const initialCheckedStates = docs.reduce((acc: any, investment: any) => {
+                  acc[investment.id] = investment.setting?.extend_contract === true || false;
+                  return acc;
+              }, {});
+              setCheckedStates(initialCheckedStates);
+          } else if (activeTab === 'withdraw') {
+              const { docs, totalPages } = await getWithdrawalsWithDate(currentPage, 10, startDate.toISOString(), endDate.toISOString());
+              setWithdrawals(docs);
+              setTotalPagesWithdrawl(totalPages);
+          }
+      } catch (error) {
+          console.error('Failed to fetch contracts:', error);
+      }
+      };
+      fetchContracts();
+  }
 
     // Calculate ROI
     const calculateROI = () => {
@@ -402,7 +402,7 @@ export function InvestmentContracts() {
                     </Popover>
                 </div>
 
-                <div className="flex justify-end space-x-2 mb-4">
+                <div className="flex justify-end space-x-2">
                     <Button
                         variant={activeTab === 'investment' ? 'default' : 'outline'}
                         onClick={() => { setActiveTab('investment'); setCurrentPage(1) }}

@@ -83,7 +83,6 @@ export const getContractsWithDate = async (
       limit, // Pass the number of items per page
     });
     const contracts = response.docs;
-    console.log(contracts)
 
     return {
       docs: contracts.map((contract: any) => ({

@@ -56,21 +56,25 @@ export default function ReferralPage() {
   const [endDate, setEndDate] = useState<Date>()
 
   useEffect(() => {
-    // Simulating API call to fetch referral data
-    const fetchReferralData = async () => {
-      const { docs, totalPages, referral_code } = await getReferralsByParentId(
-        user.id,
-        currentPage,
-        10,
-      )
-
-      setReferrals(docs) // Store the accounts in state
-      setTotalPages(totalPages)
-      setReferralLink(`https://wealthfarming.org/join/${user.referral_code}`)
-    }
-
-    fetchReferralData()
+    fetchData()
   }, [loading, currentPage])
+
+  useEffect(() => {
+    if (startDate && endDate) {
+      if (!(startDate instanceof Date) || !(endDate instanceof Date)) {
+        console.error("Start date or end date is not a valid Date object.");
+        return;
+      }
+      if (startDate > endDate) {
+        console.error("Start date must be earlier than or equal to end date");
+        return;
+      }
+      filterDate();
+    }
+    else {
+      fetchData();
+    }
+  }, [startDate, endDate]);
 
   const copyReferralLink = () => {
     navigator.clipboard.writeText(referralLink)
@@ -84,7 +88,6 @@ export default function ReferralPage() {
       currentPage,
       10,
     )
-
     setReferrals(docs) // Store the accounts in state
     setTotalPages(totalPages)
     setReferralLink(`https://wealthfarming.org/join/${user.referral_code}`)
@@ -99,24 +102,6 @@ export default function ReferralPage() {
       setEndDate(date);
     }
   };
-
-  useEffect(() => {
-  if (startDate && endDate) {
-    if (!(startDate instanceof Date) || !(endDate instanceof Date)) {
-      console.error("Start date or end date is not a valid Date object.");
-      return;
-    }
-    if (startDate > endDate) {
-      console.error("Start date must be earlier than or equal to end date");
-      return;
-    }
-
-    filterDate();
-  }
-  else {
-    fetchData();
-  }
-}, [startDate, endDate]);
   
   function filterDate() {
     const fetchReferralData = async () => {
@@ -127,12 +112,10 @@ export default function ReferralPage() {
         startDate.toISOString(),
         endDate.toISOString(),
       )
-
       setReferrals(docs) // Store the accounts in state
       setTotalPages(totalPages)
       setReferralLink(`https://wealthfarming.org/join/${user.referral_code}`)
     }
-
     fetchReferralData()
   }
 
@@ -210,53 +193,53 @@ export default function ReferralPage() {
           </Card>
         </div>
 
-        <div className="flex space-x-2 mb-2">
+        <div className="flex justify-end space-x-2 mb-2">
           <Popover>
             <PopoverTrigger asChild>
-                <Button
+              <Button
                 variant={"outline"}
                 className={cn(
-                    "w-[240px] justify-start text-left font-normal",
-                    !Date && "text-muted-foreground"
+                  "w-[240px] justify-start text-left font-normal",
+                  !Date && "text-muted-foreground"
                 )}
-                >
+              >
                 <CalendarIcon />
                 {startDate ? format(startDate, "PPP") : <span>Start Date</span>}
-                </Button>
+              </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
+              <Calendar
                 mode="single"
                 selected={startDate}
                 onSelect={setStartDate}
                 initialFocus
-                />
+              />
             </PopoverContent>
-            </Popover>
-            <Popover>
+          </Popover>
+          <Popover>
             <PopoverTrigger asChild>
-                <Button
+              <Button
                 variant={"outline"}
                 className={cn(
-                    "w-[240px] justify-start text-left font-normal",
-                    !Date && "text-muted-foreground"
+                  "w-[240px] justify-start text-left font-normal",
+                  !Date && "text-muted-foreground"
                 )}
-                >
+              >
                 <CalendarIcon />
                 {endDate ? format(endDate, "PPP") : <span>End Date</span>}
-                </Button>
+              </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
+              <Calendar
                 mode="single"
                 selected={endDate}
                 onSelect={(date) => {
-                handleEndDateSelect(date);
+                  handleEndDateSelect(date);
                 }}
                 initialFocus
-                />
+              />
             </PopoverContent>
-            </Popover>
+          </Popover>
         </div>
 
         {/* Referrals Table */}
@@ -283,11 +266,10 @@ export default function ReferralPage() {
                       <TableCell>{referral.date}</TableCell>
                       <TableCell>
                         <span
-                          className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                            referral.status === 'Completed'
+                          className={`px-2 py-1 rounded-full text-xs font-semibold ${referral.status === 'Completed'
                               ? 'bg-green-100 text-green-800'
                               : 'bg-yellow-100 text-yellow-800'
-                          }`}
+                            }`}
                         >
                           {referral.status}
                         </span>
@@ -311,9 +293,8 @@ export default function ReferralPage() {
                         <PaginationLink
                           onClick={() => setCurrentPage(index + 1)}
                           isActive={currentPage === index + 1}
-                          className={`text-sm font-medium rounded-lg ${
-                            currentPage === index + 1 ? 'border-gray-400' : ''
-                          }`}
+                          className={`text-sm font-medium rounded-lg ${currentPage === index + 1 ? 'border-gray-400' : ''
+                            }`}
                         >
                           {index + 1}
                         </PaginationLink>
