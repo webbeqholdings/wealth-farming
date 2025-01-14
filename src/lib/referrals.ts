@@ -127,8 +127,6 @@ export const getParentIdByUser = async (user_id: number): Promise<number | Boole
     return false
   }
 
-  console.log('response.docs[0].parent', response.docs[0].parent)
-
   return response.docs[0].parent
 }
 
