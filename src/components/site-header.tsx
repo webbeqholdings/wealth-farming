@@ -80,7 +80,9 @@ export function SiteHeader() {
                 <div className="hidden md:flex items-center space-x-2 bg-muted p-2 rounded-md">
                   <DollarSign className="h-4 w-4 text-green-500" />
                   <span className="font-medium">
-                    {balance.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+                    {balance.toLocaleString('en-US', {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,})}
                   </span>
                 </div>
                 <Button
