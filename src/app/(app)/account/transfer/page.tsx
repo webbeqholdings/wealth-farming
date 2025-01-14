@@ -173,7 +173,7 @@ export default function TransferPage() {
         description: `${error}`
       })
     }
-    router.push('/account/history?tab=transfer')
+    router.push('/account/history/transfer')
     form.reset()
   }
   console.log(process.env.NEXT_PUBLIC_GOOGLE_RECAPTCHA_V2_KEY)
