@@ -272,12 +272,16 @@ export function InvestmentContracts() {
         }
         fetchData()
         toast({
-          title: 'Update setting successful',
+          title: t('update_setting_success'),
         })
       } else {
+        const mess =  getMessage(JSON.stringify({
+            key: 'withdraw_must_greater',
+            params: { amount: minWithdrawal },
+          }))
         toast({
           title: 'Error',
-          description: `The amount must be greater than or equal to the minimum withdrawal amount of ${minWithdrawal} USD.`,
+          description: t(mess),
         })
         fetchData()
         return
@@ -706,7 +710,6 @@ export function InvestmentContracts() {
                     isOpen={withdrawDialogOpen}
                     onClose={() => setWithdrawDialogOpen(false)}
                     contract={selectedContract}
-                    terminated_avail={terminatedAvaibility}
                     setActiveTab={setActiveTab}
                 />
             )}

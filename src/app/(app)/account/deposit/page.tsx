@@ -124,17 +124,32 @@ export default function DepositPage() {
 
   const [convertedQuickAmounts, setConvertedQuickAmounts] = useState(quickAmounts)
   const [USDCurrency, setUSDCurrency] = useState<number>(0)
+  const getMessage = (messageField: string | object): string => {
+    if (typeof messageField === 'string') {
+      try {
+        const messageData = JSON.parse(messageField);
+        return t(messageData.key, messageData.params || {}) as string;
+      } catch (e) {
+        return t(messageField);
+      }
+    }
+    return '';
+  };
   const handleNextStep = async () => {
     if (!validateStep()) {
       toast({
         title: 'Error',
-        description: 'Some fields are missing or invalid.',
+        description: t('missing_field'),
       })
     }
     if (USDCurrency < minDeposit && Number(USDCurrency) > 0) {
+      const mess =  getMessage(JSON.stringify({
+        key: 'amount_must_greater',
+        params: { amount: minDeposit },
+      }))
       toast({
         title: `Error`,
-        description: `The amount must be greater than or equal to the minimum withdrawal amount of ${minDeposit} USD.`,
+        description: mess,
       })
     } else if (validateStep()) {
       if (step < 3) setStep(step + 1)
@@ -161,15 +176,15 @@ export default function DepositPage() {
     const newErrors: { [key: string]: string } = {}
 
     if (step === 1) {
-      if (!toAccount) newErrors.toAccount = 'Please select an account.'
+      if (!toAccount) newErrors.toAccount = t('select_account')
       if (!USDCurrency || Number(USDCurrency) <= 0)
-        newErrors.USDCurrency = 'Please enter a valid deposit amount.'
-      if (!selectBank) newErrors.selectBank = 'Please select a bank.'
+        newErrors.USDCurrency = t('enter_deposit_amount')
+      if (!selectBank) newErrors.selectBank = t('withdraw_nobank_warning')
     }
 
     if (step === 2) {
       if (!depositScreenshot) {
-        newErrors.depositScreenshot = 'Please upload a valid deposit screenshot.'
+        newErrors.depositScreenshot = t('upload_screenshot')
       }
     }
 
@@ -288,7 +303,7 @@ export default function DepositPage() {
     } else {
       toast({
         title: 'Error',
-        description: 'Please select a file to upload.',
+        description: t('upload_file'),
       })
     }
   }
@@ -301,7 +316,7 @@ export default function DepositPage() {
       })
 
       if (!response.ok) {
-        throw new Error('Screenshot upload failed')
+        throw new Error(t('screenshot_fail'))
       }
 
       const data = await response.json()
@@ -327,7 +342,7 @@ export default function DepositPage() {
     if (!validateStep()) {
       toast({
         title: 'Error',
-        description: 'Please review the form and fix errors before submitting.',
+        description: t('review_form'),
       })
       return
     }
@@ -357,12 +372,12 @@ export default function DepositPage() {
       }
 
       toast({
-        title: 'Transaction created successfully',
+        title: t('transaction_sucess'),
       })
 
       router.push('/account/history/deposit') // Redirect to history page with tab = 'deposit'
     } catch (error) {
-      console.error('Error creating transaction:', error)
+      console.error('transaction_error', error)
       toast({
         title: 'Error',
         description: String(error),
@@ -395,9 +410,9 @@ export default function DepositPage() {
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="accountTo">{t('account')}</Label>
-                    <Select value={toAccount} onValueChange={handleToAccountOnChange}>
+                    <Select onValueChange={handleToAccountOnChange}>
                       <SelectTrigger id="accountTo">
-                        <SelectValue placeholder="Select account" />
+                        <SelectValue placeholder={t("select_account")} />
                       </SelectTrigger>
                       <SelectContent>
                         {accounts.map((acc) => (
@@ -423,9 +438,9 @@ export default function DepositPage() {
                   )}
                   <div className="space-y-2">
                     <Label htmlFor="bank">{t('bank_account')}</Label>
-                    <Select value={selectBank} onValueChange={handleBankChange}>
+                    <Select onValueChange={handleBankChange}>
                       <SelectTrigger id="bank">
-                        <SelectValue placeholder="Select bank" />
+                        <SelectValue placeholder={t("select_bank")} />
                       </SelectTrigger>
                       <SelectContent>
                         {banks.map((bank) => (
@@ -626,7 +641,7 @@ export default function DepositPage() {
                 disabled={isSubmitting}
                 className={cn(isSubmitting && 'cursor-not-allowed opacity-50')}
               >
-                {isSubmitting ? 'Processing...' : 'Submit'}
+                {isSubmitting ? t('processing') : t('submit')}
               </Button>
             )}
           </CardFooter>

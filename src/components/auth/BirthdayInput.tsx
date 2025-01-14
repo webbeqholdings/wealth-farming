@@ -4,18 +4,20 @@ import React, { useState } from 'react'
 import Cleave from 'cleave.js/react'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
+import { useTranslation } from 'react-i18next'
 
 interface BirthdayInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string
 }
 
 export function BirthdayInput({
-  label = 'Date of Birth',
+  label = 'birth_date',
   className,
   ...props
 }: BirthdayInputProps) {
   const [value, setValue] = useState('')
   const [isValid, setIsValid] = useState(true)
+  const { t } = useTranslation()
 
   const validateDate = (dateString: string) => {
     const regex = /^(\d{2})-(\d{2})-(\d{4})$/
@@ -52,7 +54,7 @@ export function BirthdayInput({
 
   return (
     <div className="space-y-2">
-      <Label htmlFor="birthday">{label}</Label>
+      <Label htmlFor="birthday">{t(label)}</Label>
       <Cleave
         id="birthday"
         name={props.name}

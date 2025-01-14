@@ -95,13 +95,29 @@ export default function WithdrawPage() {
   const [accounts, setAccounts] = useState([])
   const [selectBank, setSelectBank] = useState(null)
 
+  const getMessage = (messageField: string | object): string => {
+    if (typeof messageField === 'string') {
+      try {
+        const messageData = JSON.parse(messageField);
+        return t(messageData.key, messageData.params || {}) as string;
+      } catch (e) {
+        return t(messageField);
+      }
+    }
+    return '';
+  };
+
   const handleNextStep = async () => {
     if (step === 1) {
       const paymentTransfer = await getPaymentTransfer()
       if (Number(amount) < paymentTransfer.minWithdrawal) {
+        const mess =  getMessage(JSON.stringify({
+          key: 'withdraw_must_greater',
+          params: { amount: paymentTransfer.minWithdrawal },
+        }))
         toast({
-          title: `Error`,
-          description: `The amount must be greater than or equal to the minimum withdrawal amount of ${paymentTransfer.minWithdrawal} USD.`,
+          title: t(`error`),
+          description: mess,
         })
         return
       }
@@ -110,7 +126,7 @@ export default function WithdrawPage() {
     if (step === 2 && method === 'bank' && !selectBank) {
       toast({
         title: 'Error',
-        description: 'Please select a bank account to proceed.',
+        description: t('withdraw_bank'),
       })
       return
     }
@@ -206,20 +222,20 @@ export default function WithdrawPage() {
       if (!response?.isSuccess) {
         // Nếu không thành công, hiển thị thông báo lỗi
         toast({
-          title: 'Error',
-          description: response.msg,
+          title: t('error'),
+          description: t(response.msg),
         })
-        throw new Error(response.msg)
+        throw new Error(t(response.msg))
       }
       notifyWithdrawl(response.data)
       toast({
-        title: 'Transaction created successfully',
+        title: t('transaction_sucess'),
       })
       router.push('/account/history/withdraw') // Assuming there's a dashboard page to redirect to
     } catch (error) {
       console.log('Error creating transaction:', error)
       toast({
-        title: 'Error',
+        title: t('error'),
         description: `${error}`,
       })
     }
