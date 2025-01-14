@@ -1,6 +1,6 @@
 'use server'
-import { getPayload } from 'payload';
-import config from '@payload-config';
+import { getPayload } from 'payload'
+import config from '@payload-config'
 import { headers as nextHeaders } from 'next/headers'
 
 interface Withdrawal {
@@ -12,14 +12,27 @@ interface Withdrawal {
   message: string
 }
 
+interface ProductLog {
+  data: {
+    product_name?: string
+  }
+}
 
-export const getContracts = async (page: number, limit: number): Promise<{ docs: any; totalPages: number; totalDocs: number }> => {
+interface EligibleContract {
+  productName: string
+  eligible: boolean
+}
+
+export const getContracts = async (
+  page: number,
+  limit: number,
+): Promise<{ docs: any; totalPages: number; totalDocs: number }> => {
   try {
     const payload = await getPayload({
       config,
-    });
-    const headers = await nextHeaders();
-    const auth = await payload.auth({ headers });
+    })
+    const headers = await nextHeaders()
+    const auth = await payload.auth({ headers })
     const response = await payload.find({
       collection: 'contracts',
       where: {
@@ -27,15 +40,14 @@ export const getContracts = async (page: number, limit: number): Promise<{ docs:
       },
       page, // Pass the page number
       limit, // Pass the number of items per page
-    });
-    const contracts = response.docs;
-
+    })
+    const contracts = response.docs
     return {
       docs: contracts.map((contract: any) => ({
         id: contract.id,
         userId: contract.user.id,
         minInvestment: contract?.product_log?.min_investment,
-        productName: contract?.product_log?.name,
+        productName: contract?.product_log?.data?.product_name,
         investedAmount: contract.amount,
         expectedReturn: contract.expected_return,
         availableBalance: Number(contract.balance),
@@ -52,22 +64,24 @@ export const getContracts = async (page: number, limit: number): Promise<{ docs:
       })),
       totalPages: response.totalPages,
       totalDocs: response.totalDocs,
-    };
+    }
   } catch (error) {
-    console.error('Transaction error:', error);
+    console.error('Transaction error:', error)
 
-    return { docs: [], totalPages: 0, totalDocs: 0 };
+    return { docs: [], totalPages: 0, totalDocs: 0 }
   }
-};
+}
 
-
-export const getWithdrawals = async (page: number, limit: number): Promise<{ docs: Withdrawal[]; totalPages: number; totalDocs: number }> => {
+export const getWithdrawals = async (
+  page: number,
+  limit: number,
+): Promise<{ docs: Withdrawal[]; totalPages: number; totalDocs: number }> => {
   try {
     const payload = await getPayload({
       config,
-    });
-    const headers = await nextHeaders();
-    const auth = await payload.auth({ headers });
+    })
+    const headers = await nextHeaders()
+    const auth = await payload.auth({ headers })
 
     const response = await payload.find({
       collection: 'withdrawals',
@@ -76,9 +90,9 @@ export const getWithdrawals = async (page: number, limit: number): Promise<{ doc
       },
       page, // Pass the page number
       limit, // Pass the number of items per page
-    });
+    })
 
-    const withdrawals = response.docs;
+    const withdrawals = response.docs
 
     return {
       docs: withdrawals.map((withdrawal: any) => ({
@@ -87,24 +101,23 @@ export const getWithdrawals = async (page: number, limit: number): Promise<{ doc
         amount: withdrawal.amount,
         date: withdrawal.createdAt,
         status: withdrawal.status,
-        message: withdrawal.message
+        message: withdrawal.message,
       })),
       totalPages: response.totalPages,
       totalDocs: response.totalDocs,
-    };
+    }
   } catch (error) {
-    console.error('Withdraw error:', error);
+    console.error('Withdraw error:', error)
 
-    return { docs: [], totalPages: 0, totalDocs: 0 };
+    return { docs: [], totalPages: 0, totalDocs: 0 }
   }
-};
-
+}
 
 export async function withdrawInvestment(formData: any) {
   try {
     const payload = await getPayload({
       config,
-    });
+    })
     const amount = formData.amount
     const contractId = formData.contractId
     const userId = formData.userId
@@ -120,7 +133,7 @@ export async function withdrawInvestment(formData: any) {
 
     const contract = await payload.findByID({
       collection: 'contracts',
-      id: contractId
+      id: contractId,
     })
 
     // Update contract based on withdrawal amount
@@ -130,9 +143,9 @@ export async function withdrawInvestment(formData: any) {
         id: contractId,
         data: {
           profit: contract.profit - amount,
-          balance: Number(contract.balance) - amount
+          balance: Number(contract.balance) - amount,
         },
-      });
+      })
     } else if (amount <= Number(contract.balance)) {
       await payload.update({
         collection: 'contracts',
@@ -142,20 +155,20 @@ export async function withdrawInvestment(formData: any) {
           balance: 0,
           profit: 0,
         },
-      });
+      })
     } else {
-      throw new Error('Invalid withdrawal amount. Amount exceeds available balance or profit.');
+      throw new Error('Invalid withdrawal amount. Amount exceeds available balance or profit.')
     }
     // Simulate API call delay
     return {
       success: true,
       data: response,
-      message: `Successfully initiated withdrawal of ${amount} from contract ${contractId}`
+      message: `Successfully initiated withdrawal of ${amount} from contract ${contractId}`,
     }
   } catch (error) {
     return {
       success: false,
-      message: `${error}`
+      message: `${error}`,
     }
   }
 }
@@ -164,24 +177,82 @@ export async function updateSetting(formData: any) {
   try {
     const payload = await getPayload({
       config,
-    });
+    })
     const response = await payload.update({
       collection: 'contracts',
       id: formData.id,
       data: {
-        config_log: formData.setting ?? {} 
+        config_log: formData.setting ?? {},
       },
-    });
+    })
     // Simulate API call delay
     return {
       success: true,
       data: response,
-      message: `update Setting Successfully`
+      message: `update Setting Successfully`,
     }
   } catch (error) {
     return {
       success: false,
-      message: `${error}`
+      message: `${error}`,
     }
+  }
+}
+
+export const getEligibleContracts = async (): Promise<{ docs: EligibleContract[] }> => {
+  try {
+    const payload = await getPayload({
+      config,
+    })
+    const headers = await nextHeaders()
+    const auth = await payload.auth({ headers })
+
+    const response = await payload.find({
+      collection: 'contracts',
+      where: {
+        user: { equals: auth.user.id },
+      },
+    })
+
+    const contracts = response.docs
+    const today = new Date()
+
+    const eligibleContracts = contracts
+      .filter((contract) => {
+        const startDate = new Date(contract.start_date)
+        let daysDifference
+
+        if (contract.status === 'active') {
+          daysDifference = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 3600 * 24))
+        } else if (contract.status === 'closed') {
+          const endDate = new Date(contract.end_date)
+          daysDifference = Math.floor(
+            (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24),
+          )
+        }
+
+        return daysDifference >= 90
+      })
+      .map((contract) => {
+        const productLog = contract.product_log
+        console.log(productLog)
+        if (
+          productLog &&
+          typeof productLog === 'object' &&
+          'data' in productLog &&
+          typeof productLog.data === 'object'
+        ) {
+          const productName = (productLog.data as { product_name?: string })?.product_name
+          return {
+            productName,
+            eligible: true,
+          }
+        }
+      })
+
+    return { docs: eligibleContracts }
+  } catch (error) {
+    console.error('Error fetching eligible contracts:', error)
+    return { docs: [] }
   }
 }

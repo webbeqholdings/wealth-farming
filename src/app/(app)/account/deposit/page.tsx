@@ -181,7 +181,7 @@ export default function DepositPage() {
     const fetchPaymentTransfer = async () => {
       const paymentTransfer = await getPaymentTransfer();
       setMinDeposit(paymentTransfer.minDeposit)
-      setBankQRCode(paymentTransfer.bankQrCode.url)
+      setBankQRCode(paymentTransfer.bankQrCode?.url)
       setCryptoWalletQrCodeUrl(paymentTransfer.cryptoWalletQrCode.url)
       setCryptoWalletNetwork(paymentTransfer.cryptoWalletNetwork)
       setCryptoWalletAddress(paymentTransfer.cryptoWalletAddress)
@@ -241,7 +241,7 @@ export default function DepositPage() {
   useEffect(() => {
     const fetchBanks = async () => {
       try {
-        const response = await fetch(`/api/banks?where[user][equals]=${user.id}`) // Replace with dynamic user ID if necessary
+        const response = await fetch(`/api/banks?where[user][equals]=${user?.id}`) // Replace with dynamic user ID if necessary
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`)
         }
