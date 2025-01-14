@@ -109,27 +109,44 @@ export default function HistoryPage() {
   }, [loading, activeTab, currentPage])
 
   // Update Start Date & End Date
+  const fetchData = async () => {
+    try {
+      const { docs, totalPages } = await getTransactions(currentPage, 10, activeTab)
+
+      setTransactions(docs) // Store the accounts in state
+      setTotalPages(totalPages)
+    } catch (error) {
+      console.error('Failed to fetch accounts:', error)
+    }
+  }
+
   const handleEndDateSelect = (date: Date) => {
-    const updatedEndDate = new Date(date);
-    updatedEndDate.setHours(23, 59, 59, 999);
-    setEndDate(updatedEndDate);
+    if(date){
+      const updatedEndDate = new Date(date);
+      updatedEndDate.setHours(23, 59, 59, 999);
+      setEndDate(updatedEndDate);
+    } else {
+      setEndDate(date);
+    }
   };
 
   useEffect(() => {
-    if (startDate || endDate) {
-      if (!(startDate instanceof Date) || !(endDate instanceof Date)) {
-        console.error("Start date or end date is not a valid Date object.");
-        return;
-      }
-      if (startDate > endDate) {
-        console.error("Start date must be earlier than or equal to end date");
-        return;
-      }
-
-      filterDate();
+  if (startDate && endDate) {
+    if (!(startDate instanceof Date) || !(endDate instanceof Date)) {
+      console.error("Start date or end date is not a valid Date object.");
+      return;
     }
-  }, [startDate, endDate, activeTab]);
+    if (startDate > endDate) {
+      console.error("Start date must be earlier than or equal to end date");
+      return;
+    }
 
+    filterDate();
+  } else {
+    fetchData();
+  }
+}, [startDate, endDate, activeTab]);
+  
   function filterDate() {
     const fetchTransactions = async () => {
       try {
@@ -234,7 +251,7 @@ export default function HistoryPage() {
                     <Calendar
                       mode="single"
                       selected={endDate}
-                      onSelect={handleEndDateSelect}
+                      onSelect={(date) => {handleEndDateSelect(date)}}
                       initialFocus
                     />
                   </PopoverContent>
