@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useRouter } from 'next/navigation'
@@ -54,10 +55,19 @@ const chartData = [
   { name: 'Jun', deposits: 3490, withdrawals: 1500 },
 ]
 
-export default function HistoryPage() {
+export default function HistoryPage({
+  params,
+}: {
+  params: Promise<{ tab: string }>
+}) {
   const router = useRouter()
+
+  //Get Tab param from query
+  const searchParams = useSearchParams()
+  const tab = searchParams.get('tab')
+
   const { isLoggedIn, loading, user } = UserStatus()
-  const [activeTab, setActiveTab] = useState('all')
+  const [activeTab, setActiveTab] = useState(tab ? tab : 'deposit') // Deposit tab as default
   const [transactions, setTransactions] = useState([])
   const [accounts, setAccounts] = useState([])
   const [totalPages, setTotalPages] = useState(1)
@@ -243,15 +253,6 @@ export default function HistoryPage() {
 
               <div className="flex space-x-2 items-center">
                 <Button
-                  variant={activeTab === 'all' ? 'default' : 'outline'}
-                  onClick={() => {
-                    setActiveTab('all');
-                    setCurrentPage(1);
-                  }}
-                >
-                  All
-                </Button>
-                <Button
                   variant={activeTab === 'deposit' ? 'default' : 'outline'}
                   onClick={() => {
                     setActiveTab('deposit');
@@ -311,13 +312,13 @@ export default function HistoryPage() {
                 <TableRow>
                   <TableHead>Date</TableHead>
                   <TableHead>Type</TableHead>
-                  {activeTab === 'all' || activeTab === 'investment' || activeTab === 'bonus' ? (
+                  {activeTab === 'investment' ? (
                     <TableHead>Product</TableHead>
                   ) : (
                     ''
                   )}
                   <TableHead>Amount</TableHead>
-                  {activeTab === 'all' || activeTab === 'investment' ? (
+                  {activeTab === 'investment' ? (
                     <TableHead>Profit</TableHead>
                   ) : (
                     ''
@@ -325,7 +326,7 @@ export default function HistoryPage() {
                   {activeTab !== 'transfer' ? <TableHead>Account</TableHead> : ''}
                   {activeTab === 'transfer' ? <TableHead>From Account</TableHead> : ''}
                   {activeTab === 'transfer' ? <TableHead>To Account</TableHead> : ''}
-                  {activeTab === 'all' || activeTab === 'deposit' || activeTab === 'withdraw' ? (
+                  {activeTab === 'deposit' || activeTab === 'withdraw' ? (
                     <TableHead>Status</TableHead>
                   ) : (
                     ''
@@ -341,7 +342,6 @@ export default function HistoryPage() {
                 {transactions
                   .filter(
                     (t) =>
-                      activeTab === 'all' ||
                       (activeTab === 'deposit' && t.type == 'deposit') ||
                       (activeTab === 'withdraw' && t.type == 'withdraw') ||
                       (activeTab === 'transfer' && t.type == 'transfer') ||
@@ -355,7 +355,7 @@ export default function HistoryPage() {
                         {transaction.type.charAt(0).toUpperCase() +
                           transaction.type.slice(1).toLowerCase()}
                       </TableCell>
-                      {activeTab === 'all' || activeTab === 'investment' || activeTab === 'bonus' ? (
+                      {activeTab === 'investment' ? (
                         <TableHead>{transaction.product_name}</TableHead>
                       ) : (
                         ''
@@ -391,13 +391,12 @@ export default function HistoryPage() {
                         ''
                       )}
                       <TableCell>{transaction.account}</TableCell>
-                      {activeTab === 'transfers' ? (
+                      {activeTab === 'transfer' ? (
                         <TableCell>{transaction.to_account}</TableCell>
                       ) : (
                         ''
                       )}
-                      {activeTab === 'all' ||
-                        activeTab === 'deposit' ||
+                      {activeTab === 'deposit' ||
                         activeTab === 'withdraw' ? (
                         <TableCell
                           className={clsx({

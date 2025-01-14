@@ -147,6 +147,11 @@ const Withdrawals: CollectionConfig = {
                         },
                     });
 
+                    data.message = `Withdrawal failed. The contract has been reactivated with a balance of ${data.amount.toLocaleString('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                    })}.`;
+
                     // Set custom message for failed status
                     await payload.create({
                         collection: 'transactions',
@@ -154,15 +159,11 @@ const Withdrawals: CollectionConfig = {
                           amount: data.amount,
                           user: Number(data.user),
                           status: 'failed',
-                        //   from_account: account.id,
+                          from_account: account.id,
                           type: 'bonus',
                           message: data.message
                         },
                     })
-                    data.message = `Withdrawal failed. The contract has been reactivated with a balance of ${data.amount.toLocaleString('en-US', {
-                        style: 'currency',
-                        currency: 'USD',
-                    })}.`;
 
                     handleSendEmail(account, data)
                 }
