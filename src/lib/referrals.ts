@@ -184,6 +184,28 @@ export const getInvestmentAmountByParent = async (parent_id: number): Promise<nu
   return total
 }
 
+export const getDepositAmountByParent = async (parent_id: number): Promise<number> => {
+  const referrals = await payload.find({
+    collection: 'user-referrals',
+    where: {
+      parent: { equals: parent_id },
+    },
+  })
+
+  let total = 0
+
+  referrals.docs.forEach((child: any) => {
+    const account_id = getAccountIdInvestmentByUser(child.id)
+    const loadBalance = async () => {
+      const total_deposit = await getBalanceFromAccount('deposit', account_id, 'completed')
+      total += total_deposit
+    }
+    loadBalance()
+  })
+
+  return total
+}
+
 export const getConfigRates = async (): Promise<any[]> => {
   const data = await getReferralConfigRates()
   return data

@@ -17,7 +17,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
-import { Minus } from 'lucide-react'
 export function MobileNav() {
   const [open, setOpen] = React.useState(false)
   const [menuItems, setMenuItems] = React.useState([])
@@ -86,14 +85,17 @@ export function MobileNav() {
         </MobileLink>
         <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10">
           <div className="flex flex-col space-y-3">
-            {menuItems ? (
-              menuItems.map((item) => (
-                <div key={item.id}>
-                  {item.children.length >= 1 ? (
-                    <Accordion type="single" collapsible className="mr-2">
-                      <AccordionItem key={item.id} value={item.id}>
-                        <AccordionTrigger>
-                          <div className="ml-2 ">{item.title}</div>
+            {
+
+              menuItems ? menuItems.map((item) => (
+                <div key={item.id + '-menu_view'}>
+                  {(item.children.length >= 1) ?
+                    <Accordion key={item.id + '-menu_dropdownToggle'} type='single' collapsible className='mr-2'>
+                      <AccordionItem key={item.id} value={item.id} >
+                        <AccordionTrigger >
+                          <div className='ml-2 '>
+                            {item.title}
+                          </div>
                         </AccordionTrigger>
                         <AccordionContent>
                           <Link href={item.url ?? '#'} target="_self" rel="noreferrer">
@@ -117,20 +119,18 @@ export function MobileNav() {
                         </AccordionContent>
                       </AccordionItem>
                     </Accordion>
-                  ) : (
-                    <div className={'border-b mr-2'}>
+                    :
+                    <div key={item.id + '-menu'} className={'border-b mr-2'}>
                       <div className='"flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline '>
                         <Link href={item.url ?? '#'} target="_self" rel="noreferrer">
                           <div className="pl-2">{item.title}</div>
                         </Link>
                       </div>
                     </div>
-                  )}
-                </div>
-              ))
-            ) : (
-              <></>
-            )}
+                  }
+                </div>))
+                : <></>
+            }
           </div>
         </ScrollArea>
       </SheetContent>

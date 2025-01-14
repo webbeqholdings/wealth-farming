@@ -11,6 +11,9 @@ import {
 } from '@/lib/admin-side/referrals'
 import { getTotalDeposit } from '@/lib/admin-side/transaction'
 import { getAccountsByUserId } from '@/lib/admin-side/account'
+import { sendEmailDeposit } from '@/utilities/emailDeposit'
+import { sendEmailWithdraw } from '@/utilities/emailWithdraw'
+
 
 const Transactions: CollectionConfig = {
   slug: 'transactions',
@@ -130,6 +133,19 @@ const Transactions: CollectionConfig = {
 
         const { amount, account_to, type, status } = doc
 
+        const handleSendEmail = async (user: any, amount: any, status: any, type: any) => {
+          try {
+            if (type === 'deposit') {
+              await sendEmailDeposit(user.email, `Deposit ${status}`, user.first_name, user.last_name, amount, status)
+            }
+            else if (type === 'withdraw') {
+              await sendEmailWithdraw(user.email, `Withdrawal ${status}`, user.first_name, user.last_name, amount, status)
+            }
+          } catch (error) {
+            console.error(`Error sending ${type} ${status} email:`, error)
+          }
+        }
+
         if (operation === 'update' && type === 'deposit' && status === 'completed') {
           // ... Update Referral Process
           const parentUser = await getParentIdByUser(payload, doc.user)
@@ -207,18 +223,9 @@ const Transactions: CollectionConfig = {
             collection: 'accounts',
             id: fromAccountId,
           })
-          if (fromAccount) {
-            // Update the account amount
-            const updatedAmount = fromAccount.amount - transactionAmount
 
-            // Save the updated account data
-            await payload.update({
-              collection: 'accounts',
-              id: fromAccountId,
-              data: {
-                amount: updatedAmount,
-              },
-            })
+          if (fromAccount) {
+            handleSendEmail(fromAccount.user, transactionAmount, doc.status, type)
           }
         }
       },

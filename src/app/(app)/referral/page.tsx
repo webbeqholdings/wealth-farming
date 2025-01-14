@@ -1,3 +1,4 @@
+'use client'
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -9,9 +10,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { CheckCircle, Users, DollarSign, ArrowRight, Trophy } from 'lucide-react'
+import { CheckCircle, Users, DollarSign, ArrowRight, Trophy, Network } from 'lucide-react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
+import { getReferralConfigRates } from '@/lib/investment-products/dynamicFundQuery'
+import { useEffect, useState } from 'react'
 
 // Mock data for the ranking table
 const topReferrers = [
@@ -23,6 +26,18 @@ const topReferrers = [
 ]
 
 export default function ReferralsIntroductionPage() {
+
+  const [configs, setConfigs] = useState([])
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      const config = await getReferralConfigRates()
+      setConfigs(config)
+    }
+    fetchConfig()
+  }, [])
+
+  
   return (
     <div>
       <SiteHeader/>
@@ -119,6 +134,38 @@ export default function ReferralsIntroductionPage() {
                     <TableCell>{referrer.username}</TableCell>
                     <TableCell>{referrer.referrals}</TableCell>
                     <TableCell>{referrer.rewards}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+
+        <Card className="mb-12">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Network className="mr-2 h-6 w-6" />
+              Referral Levels
+            </CardTitle>
+            {/* <CardDescription></CardDescription> */}
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[100px]">Name</TableHead>
+                  <TableHead>Min</TableHead>
+                  <TableHead>Max</TableHead>
+                  <TableHead>Rate</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {configs.map((config) => (
+                  <TableRow key={config.name}>
+                    <TableCell className="font-medium">{config.name}</TableCell>
+                    <TableCell>{config.min}</TableCell>
+                    <TableCell>{config.max}</TableCell>
+                    <TableCell>{config.rate}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

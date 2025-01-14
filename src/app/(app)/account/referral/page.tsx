@@ -49,12 +49,6 @@ export default function ReferralPage() {
   const { isLoggedIn, loading, user } = userStatus()
   const [referralLink, setReferralLink] = useState('')
   const [referrals, setReferrals] = useState<Referral[]>([])
-  const [stats, setStats] = useState({
-    totalReferrals: 0,
-    pendingReferrals: 0,
-    completedReferrals: 0,
-    totalEarnings: 0,
-  })
   const [totalPages, setTotalPages] = useState(1)
   const [currentPage, setCurrentPage] = useState(1)
 
@@ -82,7 +76,7 @@ export default function ReferralPage() {
 
       setReferrals(docs) // Store the accounts in state
       setTotalPages(totalPages)
-      setReferralLink(refLink)
+      setReferralLink(`https://wealthfarming.org/join/${user.referral_code}`)
     }
 
     fetchReferralData()

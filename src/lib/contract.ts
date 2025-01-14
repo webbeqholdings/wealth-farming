@@ -48,6 +48,8 @@ export const getContracts = async (
         startDate: contract.start_date,
         endDate: contract.end_date,
         status: contract.status,
+        extendContract: contract.extend_contract,
+        setting: contract.config_log,
         lastWithdrawal: contract.updatedAt || null,
       })),
       totalPages: response.totalPages,
@@ -109,13 +111,12 @@ export async function withdrawInvestment(formData: any) {
     const amount = formData.amount
     const contractId = formData.contractId
     const userId = formData.userId
-
     const response = await payload.create({
       collection: 'withdrawals',
       data: {
-        contract: contractId,
-        user: userId,
-        amount: amount,
+        contract: Number(contractId),
+        user: Number(userId),
+        amount: Number(amount),
         status: 'pending',
       },
     })
@@ -158,6 +159,32 @@ export async function withdrawInvestment(formData: any) {
     return {
       success: false,
       message: `${error}`,
+    }
+  }
+}
+
+export async function updateSetting(formData: any) {
+  try {
+    const payload = await getPayload({
+      config,
+    });
+    const response = await payload.update({
+      collection: 'contracts',
+      id: formData.id,
+      data: {
+        config_log: formData.setting ?? {} 
+      },
+    });
+    // Simulate API call delay
+    return {
+      success: true,
+      data: response,
+      message: `update Setting Successfully`
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message: `${error}`
     }
   }
 }

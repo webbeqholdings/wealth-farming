@@ -36,11 +36,13 @@ import { useRouter } from 'next/navigation'
 import UserStatus from '@/lib/userStatus'
 import TelegramButton from '@/components/TelegramButton'
 import Spinner from '@/components/Spinner'
+import { getAccountsByUser } from '@/lib/account'
 
 export default function UserProfile() {
   const { isLoggedIn, loading, user } = UserStatus()
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [accounts, setAccounts] = useState([]);
   const [userInfo, setUserInfo] = useState({
     firstName: '',
     lastName: '',
@@ -251,7 +253,7 @@ export default function UserProfile() {
   }
 
   const copyReferralCode = () => {
-    navigator.clipboard.writeText(referralInfo.referralCode)
+    navigator.clipboard.writeText(user.referral_code)
     alert('Referral code copied to clipboard!')
   }
 
@@ -269,6 +271,26 @@ export default function UserProfile() {
       },
     }))
   }
+
+  // Wallet Accounts
+  useEffect(() => {
+    const fetchAccounts = async () => {
+      try {
+        const response = await getAccountsByUser(user.id)
+        // Transform API response into desired format
+        const transformedAccounts = response.map((account: { account_name: string, amount: number }) => ({
+          name: account.account_name,
+          balance: account.amount, // Assuming you want to divide the amount to convert to another unit
+          currency: 'USD', // Hardcoded as 'USD', replace with dynamic value if available in the API
+        }));
+
+        setAccounts(transformedAccounts); // Store the transformed accounts in state
+      } catch (error) {
+        console.error('Failed to fetch accounts:', error);
+      }
+    };
+    fetchAccounts()
+  }, [loading])
 
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
@@ -393,21 +415,26 @@ export default function UserProfile() {
                   <TabsTrigger value="details">Account Details</TabsTrigger>
                   <TabsTrigger value="transactions">Recent Transactions</TabsTrigger>
                 </TabsList>
-                <TabsContent value="details" className="space-y-4">
-                  <div className="flex items-center space-x-4">
-                    <CreditCard className="h-5 w-5 text-muted-foreground" />
-                    <span>Account Number: {userInfo.accountNumber}</span>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <DollarSign className="h-5 w-5 text-muted-foreground" />
-                    <span>
-                      Current Balance:{' '}
-                      {userInfo.balance.toLocaleString('en-US', {
-                        style: 'currency',
-                        currency: 'USD',
-                      })}
-                    </span>
-                  </div>
+
+                <TabsContent value="details">
+                  {/* Wallet Accounts */}
+                      {accounts.map((account) => (
+                        <>
+                        <div className="flex items-center space-x-4 mt-4">
+                          <CreditCard className="h-5 w-5 text-muted-foreground" />
+                          <span>{account.name}</span>
+                        </div>
+                        <div className="flex items-center space-x-4 mt-2">
+                          <DollarSign className="h-5 w-5 text-muted-foreground" />
+                          <span>
+                            {account.balance.toLocaleString('en-US', {
+                              style: 'currency',
+                              currency: 'USD',
+                            })}
+                          </span>
+                        </div>
+                        </>
+                      ))}
                 </TabsContent>
                 <TabsContent value="transactions">
                   <ul className="space-y-2">
@@ -480,7 +507,7 @@ export default function UserProfile() {
             <div className="space-y-2">
               <Label htmlFor="referral-code">Your Referral Code</Label>
               <div className="flex space-x-2">
-                <Input id="referral-code" value={referralInfo.referralCode} readOnly />
+                <Input id="referral-code" value={user.referral_code} readOnly />
                 <Button variant="outline" size="icon" onClick={copyReferralCode}>
                   <Copy className="h-4 w-4" />
                   <span className="sr-only">Copy referral code</span>
@@ -540,12 +567,12 @@ export default function UserProfile() {
                 <div className="mt-4 flex justify-between items-center">
                   <span className="text-sm text-gray-500">Chat with us on Telegram:</span>
                   <a
-                    href="https://t.me/wealth_farming_bot"
+                    href="https://t.me/dev_wealth_farming_bot"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:text-blue-700 text-sm font-semibold"
                   >
-                    @wealth_farming_bot
+                    @dev_wealth_farming_bot
                   </a>
                 </div>
 

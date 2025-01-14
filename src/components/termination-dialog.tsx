@@ -29,7 +29,8 @@ interface TerminationDialogProps {
 export function TerminationDialog({ isOpen, onClose, contract, setActiveTab }: TerminationDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-
+  const today = new Date()
+  const under90DayRate = 0.2 / 365;
   const parsedStartDate = new Date(contract.startDate);
 
   if (isNaN(parsedStartDate.getTime())) {
@@ -41,6 +42,51 @@ export function TerminationDialog({ isOpen, onClose, contract, setActiveTab }: T
   const handleDialogClose = () => {
     onClose();
   };
+
+  function calculateTimeDifferenceWithUnit(dateStart: string | Date, dateEnd: string | Date, unit: string) {
+    // Hàm chuyển đổi chuỗi định dạng DD/MM/YYYY thành đối tượng Date "/"
+    const parseDate = (dateStr: string): Date => {
+      const [day, month, year] = dateStr.split("-").map(Number);
+      return new Date(year, month - 1, day);
+    };
+
+    // Kiểm tra và chuyển đổi startDate và endDate thành đối tượng Date
+    let start: Date;
+    let end: Date;
+
+    if (typeof dateStart === "string") {
+      start = parseDate(dateStart);  // Nếu là chuỗi, chuyển đổi
+    } else if (dateStart instanceof Date) {
+      start = dateStart;  // Nếu là đối tượng Date, sử dụng luôn
+    } else {
+      throw new Error("Invalid startDate format. Please provide a valid Date or a date string in DD/MM/YYYY format.");
+    }
+
+    if (typeof dateEnd === "string") {
+      end = parseDate(dateEnd);  // Nếu là chuỗi, chuyển đổi
+    } else if (dateEnd instanceof Date) {
+      end = dateEnd;  // Nếu là đối tượng Date, sử dụng luôn
+    } else {
+      throw new Error("Invalid endDate format. Please provide a valid Date or a date string in DD/MM/YYYY format.");
+    }
+
+    const remainday = Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
+    return (remainday < 0 ? 0 : remainday);
+    
+  }
+
+  const isUseUnder90DayRate = (calculateTimeDifferenceWithUnit(new Date(contract.startDate), today.getUTCDate() + "-" + today.getUTCMonth() + 1 + "-" + today.getUTCFullYear(), "day") <= standardApplyProgramDays)
+
+  function caculatedTerminationRate(): number {
+    const utcToday = today.getUTCDate() + "-" + today.getUTCMonth() + 1 + "-" + today.getUTCFullYear()
+    const dayNum = calculateTimeDifferenceWithUnit(new Date(contract.startDate), utcToday, "day")
+    if (dayNum <= standardApplyProgramDays) {
+      return parseFloat(((under90DayRate * dayNum)).toFixed(2))
+    }
+  }
+  function caculatedTerminationTotal(): number {
+    return contract.investedAmount + (contract.investedAmount * caculatedTerminationRate())
+  }
 
   async function handleWithdraw(event: React.FormEvent) {
     event.preventDefault();
@@ -54,7 +100,7 @@ export function TerminationDialog({ isOpen, onClose, contract, setActiveTab }: T
 
     try {
       const formData = {
-        amount: contract.availableBalance,
+        amount: isUseUnder90DayRate ? caculatedTerminationTotal() : contract.availableBalance,
         contractId: contract.id,
         userId: contract.userId
       }
@@ -112,14 +158,14 @@ export function TerminationDialog({ isOpen, onClose, contract, setActiveTab }: T
               </Label>
               <Input
                 id="amount"
-                value={contract.availableBalance.toFixed(2)}
+                value={daysSinceStart < standardApplyProgramDays ? caculatedTerminationTotal(): contract.availableBalance.toFixed(2) }
                 placeholder="Enter amount to withdraw"
                 className="bg-gray-100 border border-gray-300 rounded-lg p-2.5"
                 required
                 disabled
               />
               <p className="text-sm text-gray-600 mt-1">
-                Balance Available: <strong>${contract.availableBalance.toFixed(2)}</strong>
+                Balance Available: <strong>${daysSinceStart < standardApplyProgramDays ? caculatedTerminationTotal(): contract.availableBalance.toFixed(2)}</strong>
               </p>
             </div>
           </div>

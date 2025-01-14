@@ -79,19 +79,19 @@ export const sendEmail = async (to: string, subject: string, otp: string) => {
               </tr>
               <!-- Footer -->
               <tr>
-                <td
-                  style="
-                    padding: 30px;
-                    text-align: center;
-                    font-size: 14px;
-                    background-color: #f8f8f8;
-                    border-radius: 0 0 8px 8px;
-                  "
-                >
-                  <p style="margin: 0 0 10px 0">This is an automated message, please do not reply.</p>
-                  <p style="margin: 0">© 2024 Your Company Name. All rights reserved.</p>
-                </td>
-              </tr>
+              <td
+                style="
+                  padding: 30px;
+                  text-align: center;
+                  font-size: 14px;
+                  background-color: #f8f8f8;
+                  border-radius: 0 0 8px 8px;
+                "
+              >
+                <p style="margin: 0 0 10px 0; color: #666666">This is an automated message, please do not reply.</p>
+                <p style="margin: 0; color: #666666">© 2025 BEQ Holdings. All rights reserved.</p>
+              </td>
+            </tr>
             </table>
           </td>
         </tr>
