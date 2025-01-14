@@ -427,7 +427,7 @@ export default function UserProfile() {
                         <div className="flex items-center space-x-4 mt-2">
                           <DollarSign className="h-5 w-5 text-muted-foreground" />
                           <span>
-                            Balance: {account.balance.toLocaleString('en-US', {
+                            {account.balance.toLocaleString('en-US', {
                               style: 'currency',
                               currency: 'USD',
                             })}

@@ -35,7 +35,7 @@ import Spinner from '@/components/Spinner'
 import { printPdf } from '@/components/printPdf'
 import { useTheme } from 'next-themes'
 import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
+import { CalendarIcon, ArrowDownToLine } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -151,17 +151,14 @@ export default function HistoryPage() {
     const fetchTransactions = async () => {
       try {
         const { docs, totalPages } = await getTransactionsWithDate(currentPage, 10, activeTab, startDate.toISOString(), endDate.toISOString());
-  
         setTransactions(docs); // Store the transactions in state
         setTotalPages(totalPages);
       } catch (error) {
         console.error('Failed to fetch transactions:', error);
       }
     };
-  
     fetchTransactions(); // Invoke the asynchronous function
   }
-  
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
     return <Spinner /> // You can replace this with a loading spinner component if desired
@@ -214,7 +211,7 @@ export default function HistoryPage() {
         <Tabs defaultValue="table" className="space-y-4">
           <TabsContent value="table" className="space-y-4">
             <div className="flex justify-between items-center mb-4">
-            <div className="flex space-x-2">
+              <div className="flex space-x-2">
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -261,7 +258,7 @@ export default function HistoryPage() {
                 </Popover>
               </div>
 
-              <div className="flex space-x-2">
+              <div className="flex space-x-2 items-center">
                 <Button
                   variant={activeTab === 'all' ? 'default' : 'outline'}
                   onClick={() => {
@@ -307,9 +304,13 @@ export default function HistoryPage() {
                 >
                   Investments
                 </Button>
-                <Button asChild onClick={() => handleExportPdf('tableContent')}>
-                  <button>Download PDF</button>
-                </Button>
+                <div
+                  className="p-2 cursor-pointer hover:bg-gray-200 rounded-md"
+                  onClick={() => handleExportPdf('tableContent')}
+                  title="Export to PDF"
+                >
+                  <ArrowDownToLine className="w-5 h-5 text-gray-600" />
+                </div>
               </div>
             </div>
 
@@ -398,8 +399,8 @@ export default function HistoryPage() {
                         ''
                       )}
                       {activeTab === 'all' ||
-                      activeTab === 'deposit' ||
-                      activeTab === 'withdraw' ? (
+                        activeTab === 'deposit' ||
+                        activeTab === 'withdraw' ? (
                         <TableCell
                           className={clsx({
                             'text-yellow-500': transaction.status === 'pending', // Yellow font
@@ -431,9 +432,8 @@ export default function HistoryPage() {
                         <PaginationLink
                           onClick={() => setCurrentPage(index + 1)}
                           isActive={currentPage === index + 1}
-                          className={`text-sm font-medium rounded-lg ${
-                            currentPage === index + 1 ? 'border-gray-400' : ''
-                          }`}
+                          className={`text-sm font-medium rounded-lg ${currentPage === index + 1 ? 'border-gray-400' : ''
+                            }`}
                         >
                           {index + 1}
                         </PaginationLink>
