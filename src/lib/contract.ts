@@ -12,8 +12,24 @@ interface Withdrawal {
   message: string
 }
 
+const findFirstEligibleContract = (contracts: any[], today: Date) => {
+  // Sort contracts by start_date in ascending order
+  const sortedContracts = contracts.sort(
+    (a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
+  );
 
-export const getContracts = async (page: number, limit: number): Promise<{ docs: any; totalPages: number; totalDocs: number }> => {
+  for (let i = 0; i < sortedContracts.length; i++) {
+    const contract = sortedContracts[i];
+    const timeElapsed = today.getTime() - new Date(contract.start_date).getTime();
+    if (timeElapsed > 90 * 24 * 60 * 60 * 1000 && contract.status == 'active') {
+      return contract; 
+    }
+  }
+
+  return null; // No eligible contract found
+};
+
+export const getContracts = async (page: number, limit: number): Promise<{ docs: any; totalPages: number; totalDocs: number; contractWithMinDate: any}> => {
   try {
     const payload = await getPayload({
       config,
@@ -29,6 +45,7 @@ export const getContracts = async (page: number, limit: number): Promise<{ docs:
       limit, // Pass the number of items per page
     });
     const contracts = response.docs;
+    const contractWithMinStartDate = findFirstEligibleContract(contracts, new Date())
 
     return {
       docs: contracts.map((contract: any) => ({
@@ -52,11 +69,12 @@ export const getContracts = async (page: number, limit: number): Promise<{ docs:
       })),
       totalPages: response.totalPages,
       totalDocs: response.totalDocs,
+      contractWithMinDate: contractWithMinStartDate,
     };
   } catch (error) {
     console.error('Transaction error:', error);
 
-    return { docs: [], totalPages: 0, totalDocs: 0 };
+    return { docs: [], totalPages: 0, totalDocs: 0, contractWithMinDate: null };
   }
 };
 
@@ -115,7 +133,25 @@ export const getContractsWithDate = async (
 };
 
 
-export const getWithdrawals = async (page: number, limit: number): Promise<{ docs: Withdrawal[]; totalPages: number; totalDocs: number }> => {
+const findFirstEligibleWithdraw = (withdrawals: any[], today: Date) => {
+  const sortedWithdrawals = withdrawals.sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  );
+  for (let i = 0; i < sortedWithdrawals.length; i++) {
+    const withdrawal = sortedWithdrawals[i];
+    const timeElapsedComplete = new Date(withdrawal.createdAt).getTime() - new Date(withdrawal.contract.start_date).getTime();
+    const timeElapsedPending = today.getTime() - new Date(withdrawal.contract.start_date).getTime();
+    if (timeElapsedComplete > 90 * 24 * 60 * 60 * 1000 && withdrawal.status == 'completed') {
+      return withdrawal; 
+    }
+    else if (timeElapsedPending > 90 * 24 * 60 * 60 * 1000 && withdrawal.status == 'pending') {
+      return withdrawal; 
+    }
+  }
+  return null; // No eligible contract found
+};
+
+export const getWithdrawals = async (page: number, limit: number): Promise<{ docs: Withdrawal[]; totalPages: number; totalDocs: number; withdrawWithMinDate: any }> => {
   try {
     const payload = await getPayload({
       config,
@@ -134,6 +170,9 @@ export const getWithdrawals = async (page: number, limit: number): Promise<{ doc
 
     const withdrawals = response.docs;
 
+    // Find the contract with the minimum start_date
+    const withdrawWithMinStartDate = findFirstEligibleWithdraw(withdrawals, new Date())
+
     return {
       docs: withdrawals.map((withdrawal: any) => ({
         id: withdrawal.id,
@@ -145,11 +184,12 @@ export const getWithdrawals = async (page: number, limit: number): Promise<{ doc
       })),
       totalPages: response.totalPages,
       totalDocs: response.totalDocs,
+      withdrawWithMinDate: withdrawWithMinStartDate,
     };
   } catch (error) {
     console.error('Withdraw error:', error);
 
-    return { docs: [], totalPages: 0, totalDocs: 0 };
+    return { docs: [], totalPages: 0, totalDocs: 0, withdrawWithMinDate: null};
   }
 };
 
@@ -208,6 +248,9 @@ export async function withdrawInvestment(formData: any) {
     const amount = formData.amount
     const contractId = formData.contractId
     const userId = formData.userId
+    const note = formData.note
+    const image = formData.image
+
     const response = await payload.create({
       collection: 'withdrawals',
       data: {
@@ -215,6 +258,8 @@ export async function withdrawInvestment(formData: any) {
         user: Number(userId),
         amount: Number(amount),
         status: 'pending',
+        ...(note && { note }),
+        ...(image && { image })
       },
     })
 

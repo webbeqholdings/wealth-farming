@@ -51,6 +51,17 @@ const Withdrawals: CollectionConfig = {
             label: 'Message',
             type: 'text',
         },
+        {
+            name: 'note',
+            label: 'Note',
+            type: 'text',
+        },
+        {
+            name: 'image',
+            label: 'Image',
+            type: 'relationship',
+            relationTo: 'media',
+        },
     ],
     timestamps: true, // Automatically adds createdAt and updatedAt fields
     hooks: {

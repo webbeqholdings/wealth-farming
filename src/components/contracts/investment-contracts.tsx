@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/table'
 import { WithdrawDialog } from '@/components/withdraw-dialog'
 import { TerminationDialog } from '../termination-dialog'
+import { TerminationDialogException } from '../termination-dialog-exception'
 import userStatus from '@/lib/userStatus'
 import { useRouter } from 'next/navigation'
 import { getContracts, getWithdrawals, updateSetting, getContractsWithDate, getWithdrawalsWithDate } from '@/lib/contract'
@@ -45,6 +46,7 @@ import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Calendar } from "@/components/ui/calendar"
+import { Contract } from '@/payload-types'
 
 
 interface Investment {
@@ -87,6 +89,7 @@ export function InvestmentContracts() {
     const [selectedContract, setSelectedContract] = useState<Investment | null>(null)
     const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false)
     const [terminationDialogOpen, setTerminationDialogOpen] = useState(false)
+    const [terminationDialogOpenException, setTerminationDialogOpenException] = useState(false)
     const [investments, setInvestments] = useState<Investment[]>()
     const [withdrawals, setWithdrawals] = useState<Withdrawal[]>()
     const [currentPage, setCurrentPage] = useState(1);
@@ -96,8 +99,21 @@ export function InvestmentContracts() {
     const [checkedStates, setCheckedStates] = useState<any>({});
     const [startDate, setStartDate] = useState<Date>()
     const [endDate, setEndDate] = useState<Date>()
+    const [terminatedAvaibility, setTerminatedAvaibility] = useState(false)
     // Handle tab switch and data fetching
     // Unified fetchData function
+
+    useEffect(() => {
+        async function fetchMyData() {
+            const { contractWithMinDate } = await getContracts(currentPage, 10);
+            const { withdrawWithMinDate } = await getWithdrawals(currentPage, 10);
+            if (contractWithMinDate || withdrawWithMinDate){
+                setTerminatedAvaibility(true);
+            }
+        }
+        fetchMyData()
+    })
+
     const fetchData = useCallback(async () => {
         if (activeTab === 'investment') {
             const { docs, totalPages } = await getContracts(currentPage, 10);
@@ -190,8 +206,14 @@ export function InvestmentContracts() {
         setWithdrawDialogOpen(true)
     }
     const handleTerminate = (investment: Investment) => {
-        setSelectedContract(investment)
-        setTerminationDialogOpen(true)
+        if (terminatedAvaibility) {
+            setSelectedContract(investment)
+            setTerminationDialogOpen(true)
+        }
+        else {
+            setSelectedContract(investment)
+            setTerminationDialogOpenException(true)
+        }
     }
 
     const formatCurrency = (amount: number) => {
@@ -686,6 +708,14 @@ export function InvestmentContracts() {
                 <TerminationDialog
                     isOpen={terminationDialogOpen}
                     onClose={() => setTerminationDialogOpen(false)}
+                    contract={selectedContract}
+                    setActiveTab={setActiveTab}
+                />
+            )}
+            {selectedContract && (
+                <TerminationDialogException
+                    isOpen={terminationDialogOpenException}
+                    onClose={() => setTerminationDialogOpenException(false)}
                     contract={selectedContract}
                     setActiveTab={setActiveTab}
                 />
