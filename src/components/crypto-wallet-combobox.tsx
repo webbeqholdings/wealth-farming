@@ -41,7 +41,7 @@ export function CryptoWalletCombobox({
             <ChevronsUpDown className="opacity-100" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[100%] p-0">
+        <PopoverContent className="w-full sm:w-[300px] md:w-[400px] lg:w-[500px] xl:w-[650px] 2xl:w-[700px] p-0">
           <Command>
             <CommandInput placeholder="Search network..." className="h-9" />
             <CommandList>
