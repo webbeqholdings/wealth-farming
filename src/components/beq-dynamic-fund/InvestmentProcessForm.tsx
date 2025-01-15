@@ -33,7 +33,7 @@ import { useToast } from '@/hooks/use-toast'
 import { notifyInvestment } from '@/lib/telegram'
 import { useRouter } from 'next/navigation'
 import userStatus from '@/lib/userStatus'
-import { checkUserHasValidContractTerm } from '@/lib/contract'
+import { checkContractLarger90Days } from '@/lib/contract'
 
 const minRangeDays = 5
 const now = new Date()
@@ -71,7 +71,7 @@ export function InvestmentProcessForm({
       const fetchRates = async () => {
         try {
           setIsSiteLoading(true)
-          const MonthlyAvalable = await checkUserHasValidContractTerm()
+          const MonthlyAvalable = await checkContractLarger90Days()
           const response: any = await getPublicProducts()
           if (MonthlyAvalable) {
             setRateConfig(response)

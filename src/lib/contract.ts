@@ -288,7 +288,7 @@ export async function updateSetting(formData: any) {
 }
 
 
-export async function checkUserHasValidContractTerm() {
+export async function checkContractLarger90Days() {
   try {
     const payload = await getPayload({
       config,
@@ -321,7 +321,6 @@ export async function checkUserHasValidContractTerm() {
     if (test_data) {
       return true
     }
-
 
     // Check inactive contract
     const query_inactiveContract = {
