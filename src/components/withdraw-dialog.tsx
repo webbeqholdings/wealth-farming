@@ -25,9 +25,10 @@ interface WithdrawDialogProps {
     profit: number
   };
   setActiveTab: (tab: string) => void;
+  terminated_avail: boolean;
 }
 
-export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: WithdrawDialogProps) {
+export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab, terminated_avail }: WithdrawDialogProps) {
   const [amount, setAmount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -211,6 +212,17 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
   return (
     <Dialog open={isOpen} onOpenChange={handleDialogClose}>
       <DialogContent className="sm:max-w-[425px] bg-white border-gray-300 shadow-md">
+
+      <>{!terminated_avail && <> 
+        <DialogHeader>
+          <DialogTitle className="text-gray-900">Withdraw Funds</DialogTitle>
+          <DialogDescription className="text-gray-600">
+            Your account does not meet the requirements for withdrawal.
+          </DialogDescription>
+          </DialogHeader>
+      </>}</>
+
+      <>{terminated_avail && <>
         <DialogHeader>
           <DialogTitle className="text-gray-900">Withdraw Funds</DialogTitle>
           <DialogDescription className="text-gray-600">
@@ -264,6 +276,7 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
             </Button>
           </DialogFooter>
         </form>
+        </>}</>
       </DialogContent>
     </Dialog>
   );
