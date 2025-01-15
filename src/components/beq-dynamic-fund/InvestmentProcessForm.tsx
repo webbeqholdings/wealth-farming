@@ -75,15 +75,11 @@ export function InvestmentProcessForm({
           const response: any = await getPublicProducts()
           if (MonthlyAvalable) {
             setRateConfig(response)
-
           }
           else {
             const no90Term = response.slice(1, 4)
             setRateConfig(no90Term)
           }
-
-
-
         } finally {
           setIsSiteLoading(false)
         }
