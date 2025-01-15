@@ -104,6 +104,11 @@ const Transactions: CollectionConfig = {
       label: 'Transaction Type',
       required: true,
     },
+    {
+      name: 'message',
+      label: 'Message',
+      type: 'text',
+    },
   ],
   hooks: {
     afterChange: [
