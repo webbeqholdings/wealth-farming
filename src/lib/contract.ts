@@ -54,7 +54,7 @@ export const getContracts = async (
         term: contract.term,
         periods: contract.periods,
         profit: contract.profit,
-        rateOfReturn: contract?.product_log.rate_of_return,
+        rateOfReturn: contract?.product_log?.data?.rate_of_return,
         startDate: contract.start_date,
         endDate: contract.end_date,
         status: contract.status,
@@ -111,7 +111,7 @@ export const getContractsWithDate = async (
         term: contract.term,
         periods: contract.periods,
         profit: contract.profit,
-        rateOfReturn: contract?.product_log.rate_of_return,
+        rateOfReturn: contract?.product_log?.rate_of_return,
         startDate: contract.start_date,
         endDate: contract.end_date,
         status: contract.status,
@@ -341,7 +341,6 @@ export const getEligibleContracts = async (): Promise<{ docs: EligibleContract[]
       })
       .map((contract) => {
         const productLog = contract.product_log
-        console.log(productLog)
         if (
           productLog &&
           typeof productLog === 'object' &&
