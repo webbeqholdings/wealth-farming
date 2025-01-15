@@ -15,7 +15,7 @@ import {
 import { Users, Link, DollarSign, Award } from 'lucide-react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
-import { getReferralsByParentId, getReferralsByParentIdWithDate } from '@/lib/referrals'
+import { getReferralsByParentId, getReferralsByParentIdWithFilter} from '@/lib/referrals'
 import userStatus from '@/lib/userStatus'
 import { useRouter } from 'next/navigation'
 import {
@@ -54,27 +54,12 @@ export default function ReferralPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [startDate, setStartDate] = useState<Date>()
   const [endDate, setEndDate] = useState<Date>()
+  const [nameFilter, setNameFilter] = useState('')
 
   useEffect(() => {
     fetchData()
   }, [loading, currentPage])
 
-  useEffect(() => {
-    if (startDate && endDate) {
-      if (!(startDate instanceof Date) || !(endDate instanceof Date)) {
-        console.error("Start date or end date is not a valid Date object.");
-        return;
-      }
-      if (startDate > endDate) {
-        console.error("Start date must be earlier than or equal to end date");
-        return;
-      }
-      filterDate();
-    }
-    else {
-      fetchData();
-    }
-  }, [startDate, endDate]);
 
   const copyReferralLink = () => {
     navigator.clipboard.writeText(referralLink)
@@ -103,21 +88,59 @@ export default function ReferralPage() {
     }
   };
   
-  function filterDate() {
-    const fetchReferralData = async () => {
-      const { docs, totalPages, referral_code } = await getReferralsByParentIdWithDate(
-        user.id,
-        currentPage,
-        10,
-        startDate.toISOString(),
-        endDate.toISOString(),
-      )
-      setReferrals(docs) // Store the accounts in state
-      setTotalPages(totalPages)
-      setReferralLink(`https://wealthfarming.org/join/${user.referral_code}`)
+  useEffect(() =>{
+    if (nameFilter!='' && (startDate && endDate)){
+      const fetchReferralData = async () => {
+        const { docs, totalPages, referral_code } = await getReferralsByParentIdWithFilter(
+          user.id,
+          currentPage,
+          10,
+          startDate.toISOString(),
+          endDate.toISOString(),
+          nameFilter,
+        )
+        setReferrals(docs) // Store the accounts in state
+        setTotalPages(totalPages)
+        setReferralLink(`https://wealthfarming.org/join/${user.referral_code}`)
+      }
+      fetchReferralData()
     }
-    fetchReferralData()
-  }
+    else if (nameFilter != ''){
+      const fetchReferralData = async () => {
+        const { docs, totalPages, referral_code } = await getReferralsByParentIdWithFilter(
+          user.id,
+          currentPage,
+          10,
+          '',
+          '',
+          nameFilter,
+        )
+        setReferrals(docs) // Store the accounts in state
+        setTotalPages(totalPages)
+        setReferralLink(`https://wealthfarming.org/join/${user.referral_code}`)
+      }
+      fetchReferralData()
+    }
+    else if ((startDate && endDate)){
+      const fetchReferralData = async () => {
+        const { docs, totalPages, referral_code } = await getReferralsByParentIdWithFilter(
+          user.id,
+          currentPage,
+          10,
+          startDate.toISOString(),
+          endDate.toISOString(),
+          nameFilter,
+        )
+        setReferrals(docs) // Store the accounts in state
+        setTotalPages(totalPages)
+        setReferralLink(`https://wealthfarming.org/join/${user.referral_code}`)
+      }
+      fetchReferralData()
+    }
+    else{
+      fetchData()
+    }
+  }, [nameFilter, startDate, endDate]);
 
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
@@ -195,6 +218,13 @@ export default function ReferralPage() {
 
         <div className="flex justify-end space-x-2 mb-2">
           <Popover>
+            <div className=''>
+            <Input 
+              type="text" 
+              placeholder="Name" 
+              onChange={(e) => setNameFilter(e.target.value)} 
+            />
+            </div>
             <PopoverTrigger asChild>
               <Button
                 variant={"outline"}

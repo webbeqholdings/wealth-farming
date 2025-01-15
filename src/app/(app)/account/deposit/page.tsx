@@ -361,7 +361,7 @@ export default function DepositPage() {
         title: 'Transaction created successfully',
       })
 
-      router.push('/account/history?tab=deposit') // Redirect to history page with tab = 'deposit'
+      router.push('/account/history/deposit') // Redirect to history page with tab = 'deposit'
     } catch (error) {
       console.error('Error creating transaction:', error)
       toast({

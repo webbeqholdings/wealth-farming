@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useState, useEffect, use } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useRouter } from 'next/navigation'
@@ -58,16 +57,17 @@ const chartData = [
 export default function HistoryPage({
   params,
 }: {
-  params: Promise<{ tab: string }>
+  params: Promise<{ slug: string }>
 }) {
   const router = useRouter()
-
-  //Get Tab param from query
-  const searchParams = useSearchParams()
-  const tab = searchParams.get('tab')
+  
+  const slug = use(params).slug
+  const tab = slug === "withdraw" || slug === "transfer" || slug ==="bonus" || slug === "investment" 
+    ? slug 
+    : 'deposit' // Deposit tab as default
 
   const { isLoggedIn, loading, user } = UserStatus()
-  const [activeTab, setActiveTab] = useState(tab ? tab : 'deposit') // Deposit tab as default
+  const [activeTab, setActiveTab] = useState(tab) 
   const [transactions, setTransactions] = useState([])
   const [accounts, setAccounts] = useState([])
   const [totalPages, setTotalPages] = useState(1)
@@ -343,7 +343,7 @@ export default function HistoryPage({
                   {activeTab !== 'transfer' ? <TableHead>Account</TableHead> : ''}
                   {activeTab === 'transfer' ? <TableHead>From Account</TableHead> : ''}
                   {activeTab === 'transfer' ? <TableHead>To Account</TableHead> : ''}
-                  {activeTab === 'deposit' || activeTab === 'withdraw' ? (
+                  {activeTab === 'deposit' || activeTab === 'withdraw' || activeTab === 'bonus' ? (
                     <TableHead>Status</TableHead>
                   ) : (
                     ''
@@ -379,11 +379,15 @@ export default function HistoryPage({
                       )}
                       <TableCell>
                         <span
-                          className={
-                            transaction.amount >= 0 && transaction.profit_or_loss >= 0
-                              ? 'text-green-600'
-                              : 'text-red-600'
-                          }
+                          // className={
+                          //   transaction.amount >= 0 && transaction.profit_or_loss >= 0
+                          //     ? 'text-green-600'
+                          //     : 'text-red-600'
+                          // }
+                          className={clsx({
+                            'text-green-600': transaction.amount >= 0 && transaction.profit_or_loss >= 0,
+                            'text-red-600': transaction.status === 'failed' || transaction.amount < 0, 
+                          })}
                         >
                           {transaction.amount.toLocaleString('en-US', {
                             style: 'currency',
@@ -391,7 +395,7 @@ export default function HistoryPage({
                           })}
                         </span>
                       </TableCell>
-                      {activeTab === 'all' || activeTab === 'investment' ? (
+                      {activeTab === 'investment' ? (
                         <TableCell>
                           <span
                             className={
@@ -414,7 +418,8 @@ export default function HistoryPage({
                         ''
                       )}
                       {activeTab === 'deposit' ||
-                        activeTab === 'withdraw' ? (
+                        activeTab === 'withdraw' ||
+                        activeTab === 'bonus' ? (
                         <TableCell
                           className={clsx({
                             'text-yellow-500': transaction.status === 'pending', // Yellow font
