@@ -104,7 +104,7 @@ export const getContractsWithDate = async (
         id: contract.id,
         userId: contract.user.id,
         minInvestment: contract?.product_log?.min_investment,
-        productName: contract?.product_log?.name,
+        productName: contract?.product_log?.data?.product_name,
         investedAmount: contract.amount,
         expectedReturn: contract.expected_return,
         availableBalance: Number(contract.balance),

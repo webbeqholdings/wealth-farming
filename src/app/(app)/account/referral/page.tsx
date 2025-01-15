@@ -15,7 +15,16 @@ import {
 import { Users, Link, DollarSign, Award } from 'lucide-react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
-import { getReferralsByParentId, getReferralsByParentIdWithFilter} from '@/lib/referrals'
+import {
+  getLinkReferral,
+  getReferralsByParentId,
+  getCountChildren,
+  getCountDepositedChildren,
+  getTotalEarning,
+  getCurrentLevelRate,
+  getCurrentLevelName,
+  getReferralsByParentIdWithFilter,
+} from '@/lib/referrals'
 import userStatus from '@/lib/userStatus'
 import { useRouter } from 'next/navigation'
 import {
@@ -35,15 +44,11 @@ interface Referral {
   date: string
   status: 'Pending' | 'Completed'
 }
-import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Calendar } from "@/components/ui/calendar"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
+import { format } from 'date-fns'
+import { CalendarIcon } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Calendar } from '@/components/ui/calendar'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
 export default function ReferralPage() {
   const router = useRouter()
@@ -56,10 +61,35 @@ export default function ReferralPage() {
   const [endDate, setEndDate] = useState<Date>()
   const [nameFilter, setNameFilter] = useState('')
 
-  useEffect(() => {
-    fetchData()
-  }, [loading, currentPage])
+  const [countChildren, setCountChildren] = useState(0)
+  const [countDepositedChildren, setCountDepositedChildren] = useState(0)
+  const [totalEarning, setTotalEarning] = useState(0)
+  const [currentLevelName, setCurrentLevelName] = useState('Loading...')
+  const [currentLevelRate, setCurrentLevelRate] = useState(0)
 
+  useEffect(() => {
+    // Simulating API call to fetch referral data
+    const fetchReferralData = async () => {
+      const { docs, totalPages } = await getReferralsByParentId(user.id, currentPage, 10)
+
+      const refLink = await getLinkReferral(user.id)
+
+      // Stats
+      setCountChildren(await getCountChildren(user.id))
+      setCountDepositedChildren(await getCountDepositedChildren(user.id))
+      setTotalEarning(await getTotalEarning(user.id))
+
+      // Set Level
+      setCurrentLevelRate(await getCurrentLevelRate(user.id))
+      setCurrentLevelName(await getCurrentLevelName(user.id))
+
+      setReferrals(docs) // Store the accounts in state
+      setTotalPages(totalPages)
+      setReferralLink(`https://wealthfarming.org/join/${user.referral_code}`)
+    }
+
+    fetchReferralData()
+  }, [loading, currentPage])
 
   const copyReferralLink = () => {
     navigator.clipboard.writeText(referralLink)
@@ -78,18 +108,17 @@ export default function ReferralPage() {
     setReferralLink(`https://wealthfarming.org/join/${user.referral_code}`)
   }
   const handleEndDateSelect = (date: Date) => {
-    if(date){
-      const updatedEndDate = new Date(date);
-      updatedEndDate.setHours(23, 59, 59, 999);
-      setEndDate(updatedEndDate);
+    if (date) {
+      const updatedEndDate = new Date(date)
+      updatedEndDate.setHours(23, 59, 59, 999)
+      setEndDate(updatedEndDate)
+    } else {
+      setEndDate(date)
     }
-    else {
-      setEndDate(date);
-    }
-  };
-  
-  useEffect(() =>{
-    if (nameFilter!='' && (startDate && endDate)){
+  }
+
+  useEffect(() => {
+    if (nameFilter != '' && startDate && endDate) {
       const fetchReferralData = async () => {
         const { docs, totalPages, referral_code } = await getReferralsByParentIdWithFilter(
           user.id,
@@ -104,8 +133,7 @@ export default function ReferralPage() {
         setReferralLink(`https://wealthfarming.org/join/${user.referral_code}`)
       }
       fetchReferralData()
-    }
-    else if (nameFilter != ''){
+    } else if (nameFilter != '') {
       const fetchReferralData = async () => {
         const { docs, totalPages, referral_code } = await getReferralsByParentIdWithFilter(
           user.id,
@@ -120,8 +148,7 @@ export default function ReferralPage() {
         setReferralLink(`https://wealthfarming.org/join/${user.referral_code}`)
       }
       fetchReferralData()
-    }
-    else if ((startDate && endDate)){
+    } else if (startDate && endDate) {
       const fetchReferralData = async () => {
         const { docs, totalPages, referral_code } = await getReferralsByParentIdWithFilter(
           user.id,
@@ -136,21 +163,20 @@ export default function ReferralPage() {
         setReferralLink(`https://wealthfarming.org/join/${user.referral_code}`)
       }
       fetchReferralData()
-    }
-    else{
+    } else {
       fetchData()
     }
-  }, [nameFilter, startDate, endDate]);
+  }, [nameFilter, startDate, endDate])
 
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
-    return <Spinner/> // You can replace this with a loading spinner component if desired
+    return <Spinner /> // You can replace this with a loading spinner component if desired
   }
 
   // If the user is not logged in, redirect to the join page
   if (!isLoggedIn) {
     router.push('/join')
-    return <Spinner/> // Optional: Show a redirect message
+    return <Spinner /> // Optional: Show a redirect message
   }
 
   return (
@@ -180,83 +206,78 @@ export default function ReferralPage() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Referrals</CardTitle>
+              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{referrals.length}</div>
+              <div className="text-2xl font-bold">{countChildren}</div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pending Referrals</CardTitle>
+              <CardTitle className="text-sm font-medium">Deposited Users</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{referrals.filter((ref: any) => ref.status === 'Pending').length}</div>
+              <div className="text-2xl font-bold">{countDepositedChildren}</div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Completed Referrals</CardTitle>
+              <CardTitle className="text-sm font-medium">Total Earning</CardTitle>
               <Award className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{referrals.filter((ref: any) => ref.status === 'Completed').length}</div>
+              <div className="text-2xl font-bold">{totalEarning}</div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Earnings</CardTitle>
+              <CardTitle className="text-sm font-medium">{currentLevelName}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">$100000</div>
+              <div className="text-2xl font-bold">${(currentLevelRate * 100).toFixed(2)}</div>
             </CardContent>
           </Card>
         </div>
 
         <div className="flex justify-end space-x-2 mb-2">
           <Popover>
-            <div className=''>
-            <Input 
-              type="text" 
-              placeholder="Name" 
-              onChange={(e) => setNameFilter(e.target.value)} 
-            />
+            <div className="">
+              <Input
+                type="text"
+                placeholder="Name"
+                onChange={(e) => setNameFilter(e.target.value)}
+              />
             </div>
             <PopoverTrigger asChild>
               <Button
-                variant={"outline"}
+                variant={'outline'}
                 className={cn(
-                  "w-[240px] justify-start text-left font-normal",
-                  !Date && "text-muted-foreground"
+                  'w-[240px] justify-start text-left font-normal',
+                  !Date && 'text-muted-foreground',
                 )}
               >
                 <CalendarIcon />
-                {startDate ? format(startDate, "PPP") : <span>Start Date</span>}
+                {startDate ? format(startDate, 'PPP') : <span>Start Date</span>}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={startDate}
-                onSelect={setStartDate}
-                initialFocus
-              />
+              <Calendar mode="single" selected={startDate} onSelect={setStartDate} initialFocus />
             </PopoverContent>
           </Popover>
           <Popover>
             <PopoverTrigger asChild>
               <Button
-                variant={"outline"}
+                variant={'outline'}
                 className={cn(
-                  "w-[240px] justify-start text-left font-normal",
-                  !Date && "text-muted-foreground"
+                  'w-[240px] justify-start text-left font-normal',
+                  !Date && 'text-muted-foreground',
                 )}
               >
                 <CalendarIcon />
-                {endDate ? format(endDate, "PPP") : <span>End Date</span>}
+                {endDate ? format(endDate, 'PPP') : <span>End Date</span>}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -264,7 +285,7 @@ export default function ReferralPage() {
                 mode="single"
                 selected={endDate}
                 onSelect={(date) => {
-                  handleEndDateSelect(date);
+                  handleEndDateSelect(date)
                 }}
                 initialFocus
               />
@@ -296,10 +317,11 @@ export default function ReferralPage() {
                       <TableCell>{referral.date}</TableCell>
                       <TableCell>
                         <span
-                          className={`px-2 py-1 rounded-full text-xs font-semibold ${referral.status === 'Completed'
+                          className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                            referral.status === 'Completed'
                               ? 'bg-green-100 text-green-800'
                               : 'bg-yellow-100 text-yellow-800'
-                            }`}
+                          }`}
                         >
                           {referral.status}
                         </span>
@@ -323,8 +345,9 @@ export default function ReferralPage() {
                         <PaginationLink
                           onClick={() => setCurrentPage(index + 1)}
                           isActive={currentPage === index + 1}
-                          className={`text-sm font-medium rounded-lg ${currentPage === index + 1 ? 'border-gray-400' : ''
-                            }`}
+                          className={`text-sm font-medium rounded-lg ${
+                            currentPage === index + 1 ? 'border-gray-400' : ''
+                          }`}
                         >
                           {index + 1}
                         </PaginationLink>

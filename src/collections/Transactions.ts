@@ -1,5 +1,5 @@
 // transactions.collection.js
-import type { CollectionConfig } from 'payload'
+import type { BasePayload, CollectionConfig } from 'payload'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { isAdmin } from '../access/isAdmin'
@@ -9,12 +9,18 @@ import {
   getParentIdByUser,
   getReferralProducts,
 } from '@/lib/admin-side/referrals'
+import { getTotalDeposit } from '@/lib/admin-side/transaction'
+import { getAccountsByUserId } from '@/lib/admin-side/account'
 import { sendEmailDeposit } from '@/utilities/emailDeposit'
 import { sendEmailWithdraw } from '@/utilities/emailWithdraw'
 
 
 const Transactions: CollectionConfig = {
   slug: 'transactions',
+  admin: {
+    defaultColumns: ['type', 'id', 'user', 'amount', 'investment_product', 'status'],
+    group: 'BeQ Dynamic Fund',
+  },
   access: {
     read: () => true,
     create: isIndividualOrAdmin,
@@ -48,6 +54,7 @@ const Transactions: CollectionConfig = {
       type: 'relationship',
       relationTo: 'units',
       label: 'Unit',
+      defaultValue: 1, // USD
     },
     {
       name: 'bank',
@@ -75,14 +82,26 @@ const Transactions: CollectionConfig = {
     {
       name: 'from_account',
       type: 'relationship',
-      relationTo: 'accounts', // Tài khoản nguồn
+      relationTo: 'accounts',
       label: 'From Account',
     },
     {
       name: 'to_account',
       type: 'relationship',
-      relationTo: 'accounts', // Tài khoản đích
+      relationTo: 'accounts',
       label: 'To Account',
+    },
+    {
+      name: 'account_from', // New Field: Sử dụng field này khi dòng tiền đi ra khỏi accountID
+      type: 'relationship',
+      relationTo: 'accounts',
+      label: 'Acc From (New)',
+    },
+    {
+      name: 'account_to', // New Field: Sử dụng field này khi dòng tiền đi ra vào accountID
+      type: 'relationship',
+      relationTo: 'accounts',
+      label: 'Acc To (New)',
     },
     {
       name: 'deposit_screenshot',
@@ -116,7 +135,8 @@ const Transactions: CollectionConfig = {
         const payload = await getPayload({
           config,
         })
-        const { amount, from_account, type, status } = doc
+
+        const { amount, account_to, type, status } = doc
 
         const handleSendEmail = async (user: any, amount: any, status: any, type: any) => {
           try {
@@ -132,108 +152,72 @@ const Transactions: CollectionConfig = {
         }
 
         if (operation === 'update' && type === 'deposit' && status === 'completed') {
-          // Fetch the existing account details
-          const fromAccount = await payload.findByID({
-            collection: 'accounts',
-            id: from_account,
-          })
+          // ... Update Referral Process
+          const parentUser = await getParentIdByUser(payload, doc.user)
+          // const referralRate: any = await getCurrentLevelRate(payload, amount)
+          const parentId = (parentUser as { id: number }).id
 
-          if (fromAccount) {
-            // Update the account amount
-            const updatedAmount = fromAccount.amount + amount
+          if (parentId) {
+            const accountReferral = await getAccountsByUserId(payload, doc.user, [
+              'referral_reward',
+            ])
+            console.log('accountReferral', accountReferral)
+            // Get total deposit
+            const totalAmount = await getTotalDeposit(payload, doc.user)
 
-            // Save the updated account data
-            await payload.update({
-              collection: 'accounts',
-              id: from_account,
-              data: {
-                amount: updatedAmount,
-              },
-            })
-            // ... Update Referral Process
-            const parentUser = await getParentIdByUser(payload, doc.user)
-            const referralRate = await getCurrentLevelRate(payload, amount)
-            const parentId = (parentUser as { id: number }).id
+            const referralRate = await getCurrentLevelRate(payload, totalAmount)
             const referralAmount = amount * referralRate
+
             const referralProducts = await getReferralProducts(payload)
-            if(referralProducts){
-              const referralProduct = referralProducts.filter((prod) => {
-                return prod.term == 'annually'
-              })[0]
-              if (!referralProduct) return
+            const referralProduct = referralProducts.find((prod) => {
+              return prod.term == 'monthly'
+            })
 
-              if (parentId) {
-                await payload.create({
-                  collection: 'transactions',
-                  data: {
-                    amount: Number(referralAmount),
-                    user: Number(parentId),
-                    investment_product: referralProduct.id,
-                    status: 'completed',
-                    from_account: from_account,
-                    type: 'investment',
-                  },
-                })
-                await payload.create({
-                  collection: 'contracts',
-                  data: {
-                    user: Number(parentId),
-                    amount: Number(referralAmount),
-                    balance: Number(referralAmount),
-                    expected_return: referralProduct.rate_of_return,
-                    status: 'active',
-                    term: referralProduct.term,
-                    profit: 0,
-                    periods: 1,
-                    start_date: new Date().toISOString(),
-                    end_date: null,
-                    product_log: {
-                      data: referralProduct,
-                    },
-                    note_log: ['Contract by Referral'],
-                  },
-                })
-              }
-            }
-            handleSendEmail(fromAccount.user, amount, status, type)
-          } 
-        }
+            if (!referralProduct) return
 
-        if (operation === 'update' && type === 'deposit' && status === 'failed') {
-          // Fetch the existing account details
-          const fromAccount = await payload.findByID({
-            collection: 'accounts',
-            id: from_account,
-          })
-          
-          if (fromAccount) {
-            handleSendEmail(fromAccount.user, amount, status, type)
-          }    
-        }
-
-        if (operation === 'update' && doc.type === 'withdraw' && doc.status === 'completed') {
-          // Fetch the existing account details
-          const fromAccount = await payload.findByID({
-            collection: 'accounts',
-            id: from_account,
-          })
-
-          if (fromAccount) {
-            // Update the account amount
-            const updatedAmount = fromAccount.amount - amount
-
-            // Save the updated account data
-            await payload.update({
-              collection: 'accounts',
-              id: from_account,
+            await payload.create({
+              collection: 'transactions',
               data: {
-                amount: updatedAmount,
+                amount: Number(referralAmount),
+                user: Number(parentId),
+                status: 'completed',
+                account_to: Number(accountReferral.id),
+                type: 'referral_reward',
               },
             })
-            
-            handleSendEmail(fromAccount.user, amount, doc.status, doc.type)
-          }
 
+            await payload.create({
+              collection: 'transactions',
+              data: {
+                amount: Number(referralAmount),
+                user: Number(parentId),
+                investment_product: referralProduct.id,
+                status: 'completed',
+                from_account: Number(accountReferral.id),
+                type: 'investment',
+              },
+            })
+
+            await payload.create({
+              collection: 'contracts',
+              data: {
+                user: Number(parentId),
+                amount: Number(referralAmount),
+                balance: Number(referralAmount),
+                expected_return: referralProduct.rate_of_return,
+                status: 'active',
+                term: referralProduct.term,
+                profit: 0,
+                periods: 1,
+                start_date: new Date().toISOString(),
+                end_date: null,
+                product_log: {
+                  data: referralProduct,
+                },
+                note_log: ['Contract by Referral'],
+              },
+            })
+          }
         }
 
         if (operation === 'update' && doc.type === 'withdraw' && doc.status === 'failed') {

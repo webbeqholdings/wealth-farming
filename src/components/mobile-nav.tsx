@@ -100,15 +100,20 @@ export function MobileNav() {
                         <AccordionContent>
                           <Link href={item.url ?? '#'} target="_self" rel="noreferrer">
                             <div>
-                              {item.children.map((itemchild: { url: any; title: string, id: number }) => (
-                                <Link key={itemchild.id} href={itemchild.url ?? '#'} target="_self" rel="noreferrer">
-                                  <div className='flex flex-row justify-start items-center mb-2 pl-4 gap-1 hover:underline'>
-                                    <div className='text-sm'>
-                                      {itemchild.title}
+                              {item.children.map(
+                                (itemchild: { url: any; title: string; id: number }) => (
+                                  <Link
+                                    key={itemchild.id}
+                                    href={itemchild.url ?? '#'}
+                                    target="_self"
+                                    rel="noreferrer"
+                                  >
+                                    <div className="flex flex-row justify-start items-center mb-2 pl-4 gap-1 hover:underline">
+                                      <div className="text-sm">{itemchild.title}</div>
                                     </div>
-                                  </div>
-                                </Link>))
-                              }
+                                  </Link>
+                                ),
+                              )}
                             </div>
                           </Link>
                         </AccordionContent>
@@ -118,9 +123,7 @@ export function MobileNav() {
                     <div key={item.id + '-menu'} className={'border-b mr-2'}>
                       <div className='"flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline '>
                         <Link href={item.url ?? '#'} target="_self" rel="noreferrer">
-                          <div className='pl-2'>
-                            {item.title}
-                          </div>
+                          <div className="pl-2">{item.title}</div>
                         </Link>
                       </div>
                     </div>

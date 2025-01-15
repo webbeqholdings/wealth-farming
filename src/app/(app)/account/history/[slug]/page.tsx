@@ -34,15 +34,11 @@ import {
 import Spinner from '@/components/Spinner'
 import { printPdf } from '@/components/printPdf'
 import { useTheme } from 'next-themes'
-import { format } from "date-fns"
-import { CalendarIcon, ArrowDownToLine } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Calendar } from "@/components/ui/calendar"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
+import { format } from 'date-fns'
+import { CalendarIcon, ArrowDownToLine } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Calendar } from '@/components/ui/calendar'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
 // Mock data for chart
 const chartData = [
@@ -54,20 +50,17 @@ const chartData = [
   { name: 'Jun', deposits: 3490, withdrawals: 1500 },
 ]
 
-export default function HistoryPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>
-}) {
+export default function HistoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const router = useRouter()
-  
+
   const slug = use(params).slug
-  const tab = slug === "withdraw" || slug === "transfer" || slug ==="bonus" || slug === "investment" 
-    ? slug 
-    : 'deposit' // Deposit tab as default
+  const tab =
+    slug === 'withdraw' || slug === 'transfer' || slug === 'bonus' || slug === 'investment'
+      ? slug
+      : 'deposit' // Deposit tab as default
 
   const { isLoggedIn, loading, user } = UserStatus()
-  const [activeTab, setActiveTab] = useState(tab) 
+  const [activeTab, setActiveTab] = useState(tab)
   const [transactions, setTransactions] = useState([])
   const [accounts, setAccounts] = useState([])
   const [totalPages, setTotalPages] = useState(1)
@@ -131,43 +124,49 @@ export default function HistoryPage({
   }
 
   const handleEndDateSelect = (date: Date) => {
-    if(date){
-      const updatedEndDate = new Date(date);
-      updatedEndDate.setHours(23, 59, 59, 999);
-      setEndDate(updatedEndDate);
+    if (date) {
+      const updatedEndDate = new Date(date)
+      updatedEndDate.setHours(23, 59, 59, 999)
+      setEndDate(updatedEndDate)
     } else {
-      setEndDate(date);
+      setEndDate(date)
     }
-  };
+  }
 
   useEffect(() => {
-  if (startDate && endDate) {
-    if (!(startDate instanceof Date) || !(endDate instanceof Date)) {
-      console.error("Start date or end date is not a valid Date object.");
-      return;
-    }
-    if (startDate > endDate) {
-      console.error("Start date must be earlier than or equal to end date");
-      return;
-    }
+    if (startDate && endDate) {
+      if (!(startDate instanceof Date) || !(endDate instanceof Date)) {
+        console.error('Start date or end date is not a valid Date object.')
+        return
+      }
+      if (startDate > endDate) {
+        console.error('Start date must be earlier than or equal to end date')
+        return
+      }
 
-    filterDate();
-  } else {
-    fetchData();
-  }
-}, [startDate, endDate, activeTab]);
-  
+      filterDate()
+    } else {
+      fetchData()
+    }
+  }, [startDate, endDate, activeTab])
+
   function filterDate() {
     const fetchTransactions = async () => {
       try {
-        const { docs, totalPages } = await getTransactionsWithDate(currentPage, 10, activeTab, startDate.toISOString(), endDate.toISOString());
-        setTransactions(docs); // Store the transactions in state
-        setTotalPages(totalPages);
+        const { docs, totalPages } = await getTransactionsWithDate(
+          currentPage,
+          10,
+          activeTab,
+          startDate.toISOString(),
+          endDate.toISOString(),
+        )
+        setTransactions(docs) // Store the transactions in state
+        setTotalPages(totalPages)
       } catch (error) {
-        console.error('Failed to fetch transactions:', error);
+        console.error('Failed to fetch transactions:', error)
       }
-    };
-    fetchTransactions(); // Invoke the asynchronous function
+    }
+    fetchTransactions() // Invoke the asynchronous function
   }
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
@@ -225,14 +224,14 @@ export default function HistoryPage({
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
-                      variant={"outline"}
+                      variant={'outline'}
                       className={cn(
-                        "w-[240px] justify-start text-left font-normal",
-                        !Date && "text-muted-foreground"
+                        'w-[240px] justify-start text-left font-normal',
+                        !Date && 'text-muted-foreground',
                       )}
                     >
                       <CalendarIcon />
-                      {startDate ? format(startDate, "PPP") : <span>Start Date</span>}
+                      {startDate ? format(startDate, 'PPP') : <span>Start Date</span>}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -247,21 +246,23 @@ export default function HistoryPage({
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
-                      variant={"outline"}
+                      variant={'outline'}
                       className={cn(
-                        "w-[240px] justify-start text-left font-normal",
-                        !Date && "text-muted-foreground"
+                        'w-[240px] justify-start text-left font-normal',
+                        !Date && 'text-muted-foreground',
                       )}
                     >
                       <CalendarIcon />
-                      {endDate ? format(endDate, "PPP") : <span>End Date</span>}
+                      {endDate ? format(endDate, 'PPP') : <span>End Date</span>}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
                       selected={endDate}
-                      onSelect={(date) => {handleEndDateSelect(date)}}
+                      onSelect={(date) => {
+                        handleEndDateSelect(date)
+                      }}
                       initialFocus
                     />
                   </PopoverContent>
@@ -272,8 +273,8 @@ export default function HistoryPage({
                 <Button
                   variant={activeTab === 'deposit' ? 'default' : 'outline'}
                   onClick={() => {
-                    setActiveTab('deposit');
-                    setCurrentPage(1);
+                    setActiveTab('deposit')
+                    setCurrentPage(1)
                   }}
                 >
                   Deposits
@@ -281,8 +282,8 @@ export default function HistoryPage({
                 <Button
                   variant={activeTab === 'withdraw' ? 'default' : 'outline'}
                   onClick={() => {
-                    setActiveTab('withdraw');
-                    setCurrentPage(1);
+                    setActiveTab('withdraw')
+                    setCurrentPage(1)
                   }}
                 >
                   Withdrawals
@@ -290,8 +291,8 @@ export default function HistoryPage({
                 <Button
                   variant={activeTab === 'transfer' ? 'default' : 'outline'}
                   onClick={() => {
-                    setActiveTab('transfer');
-                    setCurrentPage(1);
+                    setActiveTab('transfer')
+                    setCurrentPage(1)
                   }}
                 >
                   Transfers
@@ -299,8 +300,8 @@ export default function HistoryPage({
                 <Button
                   variant={activeTab === 'investment' ? 'default' : 'outline'}
                   onClick={() => {
-                    setActiveTab('investment');
-                    setCurrentPage(1);
+                    setActiveTab('investment')
+                    setCurrentPage(1)
                   }}
                 >
                   Investments
@@ -308,8 +309,8 @@ export default function HistoryPage({
                 <Button
                   variant={activeTab === 'bonus' ? 'default' : 'outline'}
                   onClick={() => {
-                    setActiveTab('bonus');
-                    setCurrentPage(1);
+                    setActiveTab('bonus')
+                    setCurrentPage(1)
                   }}
                 >
                   Bonus
@@ -329,17 +330,13 @@ export default function HistoryPage({
                 <TableRow>
                   <TableHead>Date</TableHead>
                   <TableHead>Type</TableHead>
-                  {activeTab === 'investment' ? (
+                  {activeTab === 'all' || activeTab === 'investment' || activeTab === 'bonus' ? (
                     <TableHead>Product</TableHead>
                   ) : (
                     ''
                   )}
                   <TableHead>Amount</TableHead>
-                  {activeTab === 'investment' ? (
-                    <TableHead>Profit</TableHead>
-                  ) : (
-                    ''
-                  )}
+                  {activeTab === 'investment' ? <TableHead>Profit</TableHead> : ''}
                   {activeTab !== 'transfer' ? <TableHead>Account</TableHead> : ''}
                   {activeTab === 'transfer' ? <TableHead>From Account</TableHead> : ''}
                   {activeTab === 'transfer' ? <TableHead>To Account</TableHead> : ''}
@@ -348,11 +345,7 @@ export default function HistoryPage({
                   ) : (
                     ''
                   )}
-                  {activeTab === 'bonus' ? (
-                    <TableHead>Message</TableHead>
-                  ) : (
-                    ''
-                  )}
+                  {activeTab === 'bonus' ? <TableHead>Message</TableHead> : ''}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -372,7 +365,9 @@ export default function HistoryPage({
                         {transaction.type.charAt(0).toUpperCase() +
                           transaction.type.slice(1).toLowerCase()}
                       </TableCell>
-                      {activeTab === 'investment' ? (
+                      {activeTab === 'all' ||
+                      activeTab === 'investment' ||
+                      activeTab === 'bonus' ? (
                         <TableHead>{transaction.product_name}</TableHead>
                       ) : (
                         ''
@@ -385,8 +380,10 @@ export default function HistoryPage({
                           //     : 'text-red-600'
                           // }
                           className={clsx({
-                            'text-green-600': transaction.amount >= 0 && transaction.profit_or_loss >= 0,
-                            'text-red-600': transaction.status === 'failed' || transaction.amount < 0, 
+                            'text-green-600':
+                              transaction.amount >= 0 && transaction.profit_or_loss >= 0,
+                            'text-red-600':
+                              transaction.status === 'failed' || transaction.amount < 0,
                           })}
                         >
                           {transaction.amount.toLocaleString('en-US', {
@@ -418,8 +415,8 @@ export default function HistoryPage({
                         ''
                       )}
                       {activeTab === 'deposit' ||
-                        activeTab === 'withdraw' ||
-                        activeTab === 'bonus' ? (
+                      activeTab === 'withdraw' ||
+                      activeTab === 'bonus' ? (
                         <TableCell
                           className={clsx({
                             'text-yellow-500': transaction.status === 'pending', // Yellow font
@@ -432,11 +429,7 @@ export default function HistoryPage({
                       ) : (
                         ''
                       )}
-                      {activeTab === 'bonus' ? (
-                        <TableHead>{transaction.message}</TableHead>
-                      ) : (
-                        ''
-                      )}
+                      {activeTab === 'bonus' ? <TableHead>{transaction.message}</TableHead> : ''}
                     </TableRow>
                   ))}
               </TableBody>
@@ -456,8 +449,9 @@ export default function HistoryPage({
                         <PaginationLink
                           onClick={() => setCurrentPage(index + 1)}
                           isActive={currentPage === index + 1}
-                          className={`text-sm font-medium rounded-lg ${currentPage === index + 1 ? 'border-gray-400' : ''
-                            }`}
+                          className={`text-sm font-medium rounded-lg ${
+                            currentPage === index + 1 ? 'border-gray-400' : ''
+                          }`}
                         >
                           {index + 1}
                         </PaginationLink>
