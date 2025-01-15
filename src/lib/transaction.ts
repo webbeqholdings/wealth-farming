@@ -38,20 +38,19 @@ export const getTransactions = async (
       limit, // Pass the number of items per page
     })
     const transactions = response.docs
-
     return {
       docs: transactions.map((transaction: any) => ({
         id: transaction.id,
         type: transaction.type,
         amount: transaction.amount,
         date: formatDateTime(transaction.createdAt),
-        account: transaction.from_account?.account_name,
-        to_account: transaction.to_account?.account_name,
+        account: transaction.account_from?.account_name,
+        to_account: transaction.account_to?.account_name,
         profit_or_loss: transaction?.profit_or_loss,
         unit_code: transaction?.unit?.unit_code,
         product_name: transaction?.investment_product?.product_name,
         status: transaction?.status,
-        message: transaction?.message
+        message: transaction?.message,
       })),
       totalPages: response.totalPages,
       totalDocs: response.totalDocs,
@@ -67,7 +66,7 @@ export const getTransactionsWithDate = async (
   page: number,
   limit: number,
   activeTab: string, // Added activeTab parameter
-  startDate: string, 
+  startDate: string,
   endDate: string,
 ): Promise<{ docs: any; totalPages: number; totalDocs: number }> => {
   try {
@@ -77,7 +76,7 @@ export const getTransactionsWithDate = async (
     const whereCondition: any = {
       user: { equals: auth.user.id },
     }
-    
+
     const query = {
       createdAt: {
         greater_than_equal: startDate,
@@ -93,8 +92,8 @@ export const getTransactionsWithDate = async (
     const response = await payload.find({
       collection: 'transactions',
       where: {
-        ...whereCondition, 
-        ...query 
+        ...whereCondition,
+        ...query,
       },
       page, // Pass the page number
       limit, // Pass the number of items per page

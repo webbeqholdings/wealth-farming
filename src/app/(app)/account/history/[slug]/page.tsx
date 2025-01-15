@@ -408,7 +408,12 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
                       ) : (
                         ''
                       )}
-                      <TableCell>{transaction.account}</TableCell>
+                      {activeTab === 'deposit' ? (
+                        <TableCell>{transaction.to_account}</TableCell>
+                      ) : (
+                        <TableCell>{transaction.account}</TableCell>
+                      )}
+                      {/* <TableCell>{transaction.account}</TableCell> */}
                       {activeTab === 'transfer' ? (
                         <TableCell>{transaction.to_account}</TableCell>
                       ) : (
