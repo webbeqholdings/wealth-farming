@@ -45,8 +45,6 @@ import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Calendar } from "@/components/ui/calendar"
-import { Contract } from '@/payload-types'
-
 
 interface Investment {
     id: string
@@ -88,7 +86,6 @@ export function InvestmentContracts() {
     const [selectedContract, setSelectedContract] = useState<Investment | null>(null)
     const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false)
     const [terminationDialogOpen, setTerminationDialogOpen] = useState(false)
-    const [terminationDialogOpenException, setTerminationDialogOpenException] = useState(false)
     const [investments, setInvestments] = useState<Investment[]>()
     const [withdrawals, setWithdrawals] = useState<Withdrawal[]>()
     const [currentPage, setCurrentPage] = useState(1);
