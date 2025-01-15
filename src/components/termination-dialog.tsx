@@ -24,14 +24,17 @@ interface TerminationDialogProps {
     status: string
   };
   setActiveTab: (tab: string) => void;
+  terminated_avail: boolean;
 }
 
-export function TerminationDialog({ isOpen, onClose, contract, setActiveTab }: TerminationDialogProps) {
+export function TerminationDialog({ isOpen, onClose, contract, setActiveTab, terminated_avail }: TerminationDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const today = new Date()
   const under90DayRate = 0.2 / 365;
   const parsedStartDate = new Date(contract.startDate);
+  const [proofScreenshot, setProofScreenshot] = useState<FormData>(null)
+  const [note, setNote] = useState('');
 
   if (isNaN(parsedStartDate.getTime())) {
     throw new Error('Invalid start_date provided');
@@ -88,6 +91,46 @@ export function TerminationDialog({ isOpen, onClose, contract, setActiveTab }: T
     return contract.investedAmount + (contract.investedAmount * caculatedTerminationRate())
   }
 
+  const uploadScreenshot = async (formData: FormData) => {
+    try {
+      const response = await fetch('/api/media', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        throw new Error('Screenshot upload failed')
+      }
+
+      const data = await response.json()
+
+      // Ensure the `id` is returned properly
+      if (!data?.doc?.id) {
+        throw new Error('Media upload response does not contain an id')
+      }
+
+      return data.doc.id // Return the extracted `id`
+    } catch (error) {
+      console.error('Error uploading screenshot:', error)
+      throw error
+    }
+  }
+
+  const handleProofScreenshotChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      const formData = new FormData()
+      formData.append('file', file)
+      setProofScreenshot(formData)
+    } else {
+      toast({
+        title: 'Error',
+        description: 'Please select a file to upload.'
+      });
+    }
+  };
+
+
   async function handleWithdraw(event: React.FormEvent) {
     event.preventDefault();
     if (contract.status === 'inactive') {
@@ -99,11 +142,26 @@ export function TerminationDialog({ isOpen, onClose, contract, setActiveTab }: T
     }
 
     try {
-      const formData = {
+      let proofScreenshotId = null;
+      if (proofScreenshot) {
+        proofScreenshotId = await uploadScreenshot(proofScreenshot)
+      }
+      var formData
+      if (terminated_avail) {
+      formData = {
         amount: isUseUnder90DayRate ? caculatedTerminationTotal() : contract.availableBalance,
         contractId: contract.id,
         userId: contract.userId
       }
+    } else {
+      formData = {
+        amount: isUseUnder90DayRate ? caculatedTerminationTotal() : contract.availableBalance,
+        contractId: contract.id,
+        userId: contract.userId,
+        note,
+        image: proofScreenshotId, // Include the screenshot ID
+      }
+    }
 
       const result = await withdrawInvestment(formData);
       if (result.success) {
@@ -152,6 +210,8 @@ export function TerminationDialog({ isOpen, onClose, contract, setActiveTab }: T
             <div className="bg-yellow-50 text-yellow-800 text-sm rounded-md p-3">
               <strong>Warning:</strong> Terminating this contract will result in no further benefits. Proceed with caution.
             </div>
+            <> {terminated_avail &&
+            <>
             <div className="grid gap-2">
               <Label htmlFor="amount" className="font-medium text-gray-800">
                 Withdrawal Amount
@@ -168,7 +228,39 @@ export function TerminationDialog({ isOpen, onClose, contract, setActiveTab }: T
                 Balance Available: <strong>${daysSinceStart < standardApplyProgramDays ? caculatedTerminationTotal(): contract.availableBalance.toFixed(2)}</strong>
               </p>
             </div>
+            </>}</>
           </div>
+          <> {!terminated_avail &&
+          <>
+          <div className="space-y-4 mt-3">
+            <Label htmlFor="deposit_screenshot" className="text-sm font-medium text-gray-700">
+              Note
+            </Label>
+            <Input
+                id="note1"
+                type="text"
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                required
+            />
+          </div>
+          <div className="space-y-4 mt-3">
+            <Label htmlFor="deposit_screenshot" className="text-sm font-medium text-gray-700">
+              Upload Photo
+            </Label>
+            <Input
+              id="deposit_screenshot"
+              name="deposit_screenshot"
+              type="file"
+              onChange={handleProofScreenshotChange}
+              className="border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              required
+            />
+            <p className="text-xs text-gray-500">
+              Please upload a screenshot showing the photo. Accepted formats: JPG, PNG, with a maximum size of 5MB.
+            </p>
+          </div> </>}
+          </>
           <DialogFooter className="mt-6">
             <Button
               variant="outline"

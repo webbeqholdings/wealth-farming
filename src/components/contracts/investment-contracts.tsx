@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/table'
 import { WithdrawDialog } from '@/components/withdraw-dialog'
 import { TerminationDialog } from '../termination-dialog'
-import { TerminationDialogException } from '../termination-dialog-exception'
 import userStatus from '@/lib/userStatus'
 import { useRouter } from 'next/navigation'
 import { getContracts, getWithdrawals, updateSetting, getContractsWithDate, getWithdrawalsWithDate } from '@/lib/contract'
@@ -206,14 +205,8 @@ export function InvestmentContracts() {
         setWithdrawDialogOpen(true)
     }
     const handleTerminate = (investment: Investment) => {
-        if (terminatedAvaibility) {
-            setSelectedContract(investment)
-            setTerminationDialogOpen(true)
-        }
-        else {
-            setSelectedContract(investment)
-            setTerminationDialogOpenException(true)
-        }
+        setSelectedContract(investment)
+        setTerminationDialogOpen(true)
     }
 
     const formatCurrency = (amount: number) => {
@@ -701,6 +694,7 @@ export function InvestmentContracts() {
                     isOpen={withdrawDialogOpen}
                     onClose={() => setWithdrawDialogOpen(false)}
                     contract={selectedContract}
+                    terminated_avail={terminatedAvaibility}
                     setActiveTab={setActiveTab}
                 />
             )}
@@ -709,14 +703,7 @@ export function InvestmentContracts() {
                     isOpen={terminationDialogOpen}
                     onClose={() => setTerminationDialogOpen(false)}
                     contract={selectedContract}
-                    setActiveTab={setActiveTab}
-                />
-            )}
-            {selectedContract && (
-                <TerminationDialogException
-                    isOpen={terminationDialogOpenException}
-                    onClose={() => setTerminationDialogOpenException(false)}
-                    contract={selectedContract}
+                    terminated_avail={terminatedAvaibility}
                     setActiveTab={setActiveTab}
                 />
             )}
