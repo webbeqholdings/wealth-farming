@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useRouter } from 'next/navigation'
@@ -22,7 +23,7 @@ import { TabMenu } from '@/components/w88/TabMenu'
 import { accountConfig } from '@/config/accounts'
 import { formatDateTime } from '@/utilities/formatDateTime'
 import UserStatus from '@/lib/userStatus'
-import { getTransactions } from '@/lib/transaction'
+import { getTransactions, getTransactionsWithDate } from '@/lib/transaction'
 import {
   Pagination,
   PaginationContent,
@@ -34,6 +35,15 @@ import {
 import Spinner from '@/components/Spinner'
 import { printPdf } from '@/components/printPdf'
 import { useTheme } from 'next-themes'
+import { format } from "date-fns"
+import { CalendarIcon, ArrowDownToLine } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { Calendar } from "@/components/ui/calendar"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
 // Mock data for chart
 const chartData = [
@@ -45,15 +55,26 @@ const chartData = [
   { name: 'Jun', deposits: 3490, withdrawals: 1500 },
 ]
 
-export default function HistoryPage() {
+export default function HistoryPage({
+  params,
+}: {
+  params: Promise<{ tab: string }>
+}) {
   const router = useRouter()
+
+  //Get Tab param from query
+  const searchParams = useSearchParams()
+  const tab = searchParams.get('tab')
+
   const { isLoggedIn, loading, user } = UserStatus()
-  const [activeTab, setActiveTab] = useState('all')
+  const [activeTab, setActiveTab] = useState(tab ? tab : 'deposit') // Deposit tab as default
   const [transactions, setTransactions] = useState([])
   const [accounts, setAccounts] = useState([])
   const [totalPages, setTotalPages] = useState(1)
   const [currentPage, setCurrentPage] = useState(1)
   const { theme, setTheme } = useTheme()
+  const [startDate, setStartDate] = useState<Date>()
+  const [endDate, setEndDate] = useState<Date>()
 
   useEffect(() => {
     const fetchAccounts = async () => {
@@ -97,6 +118,57 @@ export default function HistoryPage() {
     fetchTransactions()
   }, [loading, activeTab, currentPage])
 
+  // Update Start Date & End Date
+  const fetchData = async () => {
+    try {
+      const { docs, totalPages } = await getTransactions(currentPage, 10, activeTab)
+
+      setTransactions(docs) // Store the accounts in state
+      setTotalPages(totalPages)
+    } catch (error) {
+      console.error('Failed to fetch accounts:', error)
+    }
+  }
+
+  const handleEndDateSelect = (date: Date) => {
+    if(date){
+      const updatedEndDate = new Date(date);
+      updatedEndDate.setHours(23, 59, 59, 999);
+      setEndDate(updatedEndDate);
+    } else {
+      setEndDate(date);
+    }
+  };
+
+  useEffect(() => {
+  if (startDate && endDate) {
+    if (!(startDate instanceof Date) || !(endDate instanceof Date)) {
+      console.error("Start date or end date is not a valid Date object.");
+      return;
+    }
+    if (startDate > endDate) {
+      console.error("Start date must be earlier than or equal to end date");
+      return;
+    }
+
+    filterDate();
+  } else {
+    fetchData();
+  }
+}, [startDate, endDate, activeTab]);
+  
+  function filterDate() {
+    const fetchTransactions = async () => {
+      try {
+        const { docs, totalPages } = await getTransactionsWithDate(currentPage, 10, activeTab, startDate.toISOString(), endDate.toISOString());
+        setTransactions(docs); // Store the transactions in state
+        setTotalPages(totalPages);
+      } catch (error) {
+        console.error('Failed to fetch transactions:', error);
+      }
+    };
+    fetchTransactions(); // Invoke the asynchronous function
+  }
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
     return <Spinner /> // You can replace this with a loading spinner component if desired
@@ -150,15 +222,53 @@ export default function HistoryPage() {
           <TabsContent value="table" className="space-y-4">
             <div className="flex justify-between items-center mb-4">
               <div className="flex space-x-2">
-                <Button
-                  variant={activeTab === 'all' ? 'default' : 'outline'}
-                  onClick={() => {
-                    setActiveTab('all');
-                    setCurrentPage(1);
-                  }}
-                >
-                  All
-                </Button>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-[240px] justify-start text-left font-normal",
+                        !Date && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon />
+                      {startDate ? format(startDate, "PPP") : <span>Start Date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={startDate}
+                      onSelect={setStartDate}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-[240px] justify-start text-left font-normal",
+                        !Date && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon />
+                      {endDate ? format(endDate, "PPP") : <span>End Date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={endDate}
+                      onSelect={(date) => {handleEndDateSelect(date)}}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div className="flex space-x-2 items-center">
                 <Button
                   variant={activeTab === 'deposit' ? 'default' : 'outline'}
                   onClick={() => {
@@ -195,10 +305,23 @@ export default function HistoryPage() {
                 >
                   Investments
                 </Button>
+                <Button
+                  variant={activeTab === 'bonus' ? 'default' : 'outline'}
+                  onClick={() => {
+                    setActiveTab('bonus');
+                    setCurrentPage(1);
+                  }}
+                >
+                  Bonus
+                </Button>
+                <div
+                  className="p-2 cursor-pointer hover:bg-gray-200 rounded-md"
+                  onClick={() => handleExportPdf('tableContent')}
+                  title="Export to PDF"
+                >
+                  <ArrowDownToLine className="w-5 h-5 text-gray-600" />
+                </div>
               </div>
-              <Button asChild onClick={() => handleExportPdf('tableContent')}>
-                <button>Download PDF</button>
-              </Button>
             </div>
 
             <Table id="tableContent">
@@ -206,13 +329,13 @@ export default function HistoryPage() {
                 <TableRow>
                   <TableHead>Date</TableHead>
                   <TableHead>Type</TableHead>
-                  {activeTab === 'all' || activeTab === 'investment' ? (
+                  {activeTab === 'investment' ? (
                     <TableHead>Product</TableHead>
                   ) : (
                     ''
                   )}
                   <TableHead>Amount</TableHead>
-                  {activeTab === 'all' || activeTab === 'investment' ? (
+                  {activeTab === 'investment' ? (
                     <TableHead>Profit</TableHead>
                   ) : (
                     ''
@@ -220,8 +343,13 @@ export default function HistoryPage() {
                   {activeTab !== 'transfer' ? <TableHead>Account</TableHead> : ''}
                   {activeTab === 'transfer' ? <TableHead>From Account</TableHead> : ''}
                   {activeTab === 'transfer' ? <TableHead>To Account</TableHead> : ''}
-                  {activeTab === 'all' || activeTab === 'deposit' || activeTab === 'withdraw' ? (
+                  {activeTab === 'deposit' || activeTab === 'withdraw' ? (
                     <TableHead>Status</TableHead>
+                  ) : (
+                    ''
+                  )}
+                  {activeTab === 'bonus' ? (
+                    <TableHead>Message</TableHead>
                   ) : (
                     ''
                   )}
@@ -231,11 +359,11 @@ export default function HistoryPage() {
                 {transactions
                   .filter(
                     (t) =>
-                      activeTab === 'all' ||
                       (activeTab === 'deposit' && t.type == 'deposit') ||
                       (activeTab === 'withdraw' && t.type == 'withdraw') ||
                       (activeTab === 'transfer' && t.type == 'transfer') ||
-                      (activeTab === 'investment' && t.type == 'investment'),
+                      (activeTab === 'investment' && t.type == 'investment') ||
+                      (activeTab === 'bonus' && t.type == 'bonus'),
                   )
                   .map((transaction) => (
                     <TableRow key={transaction.id}>
@@ -244,7 +372,7 @@ export default function HistoryPage() {
                         {transaction.type.charAt(0).toUpperCase() +
                           transaction.type.slice(1).toLowerCase()}
                       </TableCell>
-                      {activeTab === 'all' || activeTab === 'investment' ? (
+                      {activeTab === 'investment' ? (
                         <TableHead>{transaction.product_name}</TableHead>
                       ) : (
                         ''
@@ -280,14 +408,13 @@ export default function HistoryPage() {
                         ''
                       )}
                       <TableCell>{transaction.account}</TableCell>
-                      {activeTab === 'transfers' ? (
+                      {activeTab === 'transfer' ? (
                         <TableCell>{transaction.to_account}</TableCell>
                       ) : (
                         ''
                       )}
-                      {activeTab === 'all' ||
-                      activeTab === 'deposit' ||
-                      activeTab === 'withdraw' ? (
+                      {activeTab === 'deposit' ||
+                        activeTab === 'withdraw' ? (
                         <TableCell
                           className={clsx({
                             'text-yellow-500': transaction.status === 'pending', // Yellow font
@@ -297,6 +424,11 @@ export default function HistoryPage() {
                         >
                           {transaction.status}
                         </TableCell>
+                      ) : (
+                        ''
+                      )}
+                      {activeTab === 'bonus' ? (
+                        <TableHead>{transaction.message}</TableHead>
                       ) : (
                         ''
                       )}
@@ -319,9 +451,8 @@ export default function HistoryPage() {
                         <PaginationLink
                           onClick={() => setCurrentPage(index + 1)}
                           isActive={currentPage === index + 1}
-                          className={`text-sm font-medium rounded-lg ${
-                            currentPage === index + 1 ? 'border-gray-400' : ''
-                          }`}
+                          className={`text-sm font-medium rounded-lg ${currentPage === index + 1 ? 'border-gray-400' : ''
+                            }`}
                         >
                           {index + 1}
                         </PaginationLink>
