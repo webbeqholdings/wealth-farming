@@ -13,13 +13,9 @@ interface Withdrawal {
 }
 
 const findFirstEligibleContract = (contracts: any[], today: Date) => {
-  // Sort contracts by start_date in ascending order
-  const sortedContracts = contracts.sort(
-    (a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
-  );
 
-  for (let i = 0; i < sortedContracts.length; i++) {
-    const contract = sortedContracts[i];
+  for (let i = 0; i < contracts.length; i++) {
+    const contract = contracts[i];
     const timeElapsed = today.getTime() - new Date(contract.start_date).getTime();
     if (timeElapsed > 90 * 24 * 60 * 60 * 1000 && contract.status == 'active') {
       return contract; 
@@ -134,11 +130,8 @@ export const getContractsWithDate = async (
 
 
 const findFirstEligibleWithdraw = (withdrawals: any[], today: Date) => {
-  const sortedWithdrawals = withdrawals.sort(
-    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-  );
-  for (let i = 0; i < sortedWithdrawals.length; i++) {
-    const withdrawal = sortedWithdrawals[i];
+  for (let i = 0; i < withdrawals.length; i++) {
+    const withdrawal = withdrawals[i];
     const timeElapsedComplete = new Date(withdrawal.createdAt).getTime() - new Date(withdrawal.contract.start_date).getTime();
     const timeElapsedPending = today.getTime() - new Date(withdrawal.contract.start_date).getTime();
     if (timeElapsedComplete > 90 * 24 * 60 * 60 * 1000 && withdrawal.status == 'completed') {
