@@ -60,7 +60,7 @@ export default function IndexPage() {
       description: 'Kick off your journey with your favorite Spot pairs or Futures contracts!',
       icon: BarChart3,
       buttonText: 'Trade Now',
-      buttonHref: 'investment-products/incoming/invesment-process',
+      buttonHref: 'investment-products/incoming/investment-process',
     },
   ]
 
