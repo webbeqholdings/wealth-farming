@@ -32,10 +32,11 @@ import { TabMenu } from '@/components/w88/TabMenu'
 import { accountConfig } from '@/config/accounts'
 import { toast } from '@/hooks/use-toast'
 import { notifyDeposit } from '@/lib/telegram'
-import CurrencyConverter from '@/components/CurrencyConverter'
+import CurrencyConverter , { useCurrencyConverter }from '@/components/CurrencyConverter'
 import { getAccountsByUserId } from '../../../../lib/account'
 import { getPaymentTransfer } from '@/lib/paymentTransfer'
 import Spinner from '@/components/Spinner'
+import { generateTranferMessageCode } from '@/utilities/referralCode'
 
 // Steps component definition
 interface StepProps {
@@ -85,6 +86,7 @@ function Steps({ currentStep, className, children }: StepsProps) {
 
 export default function DepositPage() {
   const { isLoggedIn, loading, user } = userStatus()
+  const { convertUSDtoVND } = useCurrencyConverter(() => {});
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [amount, setAmount] = useState('')
@@ -107,7 +109,6 @@ export default function DepositPage() {
   const [cryptoWalletAddress, setCryptoWalletAddress] = useState();
   const [cryptoWalletNetwork, setCryptoWalletNetwork] = useState();
   const [minDeposit, setMinDeposit] = useState(0);
-
   const quickAmounts = [
     { label: '500K', value: 500000 },
     { label: '1M', value: 1000000 },
@@ -176,7 +177,6 @@ export default function DepositPage() {
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
-
   useEffect(() => {
     const fetchPaymentTransfer = async () => {
       const paymentTransfer = await getPaymentTransfer();
@@ -505,11 +505,12 @@ export default function DepositPage() {
                           SCAN THIS QR CODE
                         </Label>
                         <div className="flex justify-center">
-                          <Image
-                            src={bankQRCode || "https://via.placeholder.com/300"}
+                          <img
+                            //src={bankQRCode || "https://via.placeholder.com/300"}
+                            src={process.env.PAYMENT_QR_API_VN + "?accountName=TA%20THI%20MY%20PHUONG&amount="+ convertUSDtoVND(USDCurrency,0) +"&addInfo="+encodeURIComponent("Wealth Farming - "+generateTranferMessageCode(6))+""}
                             alt="Bank Transfer QR Code"
-                            width={300}
-                            height={300}
+                            width={400}
+                            height={400}
                             className="border rounded-lg shadow-md"
                           />
                         </div>
