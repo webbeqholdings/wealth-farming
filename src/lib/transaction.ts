@@ -393,7 +393,6 @@ export const createWithdrawal = async (inputData: any) => {
       data: {},
     }
   }
-
   const response = await payload.create({
     collection: 'transactions',
     data: {
@@ -401,7 +400,7 @@ export const createWithdrawal = async (inputData: any) => {
       amount: Number(amount),
       status: 'pending',
       account_from: account_from,
-      bank: bank_id,
+      bank: Number(bank_id),
       type: 'withdraw',
     },
   })
@@ -441,8 +440,8 @@ export const createTransfer = async (inputData: any) => {
       user: Number(user_id), // User Created
       amount: Number(amount),
       status: 'completed',
-      account_from: account_from,
-      account_to: account_to,
+      account_from: Number(account_from),
+      account_to: Number(account_to),
       type: 'transfer', // Owner Transfer
     },
   })

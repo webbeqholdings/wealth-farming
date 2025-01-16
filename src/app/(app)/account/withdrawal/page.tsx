@@ -29,6 +29,7 @@ import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { TabMenu } from '@/components/w88/TabMenu'
 import { accountConfig } from '@/config/accounts'
+import { createWithdrawal } from '@/lib/transaction'
 import { toast } from '@/hooks/use-toast'
 import { notifyWithdrawl } from '@/lib/telegram'
 import { getPaymentTransfer } from '@/lib/paymentTransfer'
@@ -80,7 +81,7 @@ function Steps({ currentStep, className, children }: StepsProps) {
 }
 
 export default function WithdrawPage() {
-  const { isLoggedIn, loading, user } = UserStatus();
+  const { isLoggedIn, loading, user } = UserStatus()
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [amount, setAmount] = useState('')
@@ -88,26 +89,25 @@ export default function WithdrawPage() {
   const [method, setMethod] = useState('bank')
   const [cardNumber, setCardNumber] = useState('')
   const [banks, setBanks] = useState([])
-  const [accounts, setAccounts] = useState([]);
+  const [accounts, setAccounts] = useState([])
   const [selectBank, setSelectBank] = useState(null)
 
-  const handleNextStep = async() => {
-
+  const handleNextStep = async () => {
     if (step === 1) {
-      const paymentTransfer = await getPaymentTransfer();
+      const paymentTransfer = await getPaymentTransfer()
       if (Number(amount) < paymentTransfer.minWithdrawal) {
         toast({
           title: `Error`,
-          description: `The amount must be greater than or equal to the minimum withdrawal amount of ${paymentTransfer.minWithdrawal} USD.`
+          description: `The amount must be greater than or equal to the minimum withdrawal amount of ${paymentTransfer.minWithdrawal} USD.`,
         })
-        return;
+        return
       }
     }
 
     if (step === 2 && method === 'bank' && !selectBank) {
       toast({
         title: 'Error',
-        description: 'Please select a bank account to proceed.'
+        description: 'Please select a bank account to proceed.',
       })
       return
     }
@@ -120,95 +120,112 @@ export default function WithdrawPage() {
   }
 
   const handleBankChange = (bankId: string) => {
-    setSelectBank(bankId.toString());
-  };
+    setSelectBank(bankId.toString())
+  }
 
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
-        const response = await fetch(`/api/accounts?where[user][equals]=${user.id}&where[type][equals]=main`); // Replace with dynamic user ID if necessary
+        const response = await fetch(
+          `/api/accounts?where[user][equals]=${user.id}&where[type][equals]=main`,
+        ) // Replace with dynamic user ID if necessary
         if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+          throw new Error(`HTTP error! Status: ${response.status}`)
         }
-        const data = await response.json();
-        setAccounts(data.docs); // Store the accounts in state
+        const data = await response.json()
+        setAccounts(data.docs) // Store the accounts in state
       } catch (error) {
-        console.error('Failed to fetch accounts:', error);
+        console.error('Failed to fetch accounts:', error)
       }
-    };
+    }
 
-    fetchAccounts();
-  }, [loading]);
+    fetchAccounts()
+  }, [loading])
 
   useEffect(() => {
     const fetchBanks = async () => {
       try {
-        const response = await fetch(`/api/banks?where[user][equals]=${user.id}`); // Replace with dynamic user ID if necessary
+        const response = await fetch(`/api/banks?where[user][equals]=${user.id}`) // Replace with dynamic user ID if necessary
         if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+          throw new Error(`HTTP error! Status: ${response.status}`)
         }
-        const data = await response.json();
-        setBanks(data.docs); // Store the accounts in state
+        const data = await response.json()
+        setBanks(data.docs) // Store the accounts in state
       } catch (error) {
-        console.error('Failed to fetch accounts:', error);
+        console.error('Failed to fetch accounts:', error)
       }
-    };
+    }
 
-    fetchBanks();
-  }, [loading]);
+    fetchBanks()
+  }, [loading])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     // In a real application, this would process the withdrawal
     try {
-      const response = await fetch('/api/transaction/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json', // Specify JSON content type
-        },
-        body: JSON.stringify({
-          user_id: user.id,
-          bank_id: selectBank,
-          amount: -amount,
-          status: "pending",
-          from_account: accounts[0].id,
-          type: "withdraw",
-          currency: currency
-        }), // Convert the request body to JSON
-      });
-      let data = await response.json()
-      if (!response.ok) {
-        // Parse the error response to retrieve the error message
-        const errorMessage = data.response?.error || 'An unknown error occurred';
+      // const response = await fetch('/api/transaction/create', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json', // Specify JSON content type
+      //   },
+      //   body: JSON.stringify({
+      //     user_id: user.id,
+      //     bank_id: selectBank,
+      //     amount: -amount,
+      //     status: 'pending',
+      //     from_account: Number(accounts[0].id),
+      //     type: 'withdraw',
+      //     currency: currency,
+      //   }), // Convert the request body to JSON
+      // })
+      // let data = await response.json()
+      // if (!response.ok) {
+      //   // Parse the error response to retrieve the error message
+      //   const errorMessage = data.response?.error || 'An unknown error occurred'
+      //   toast({
+      //     title: 'Error',
+      //     description: `${errorMessage}`,
+      //   })
+      //   throw new Error(errorMessage)
+      // }
+      const response = await createWithdrawal({
+        user_id: user.id,
+        bank_id: selectBank,
+        amount: -amount,
+        account_from: Number(accounts[0].id),
+      })
+      if (!response.isSuccess) {
+        // Nếu không thành công, hiển thị thông báo lỗi
         toast({
           title: 'Error',
-          description: `${errorMessage}`
+          description: response.msg,
         })
-        throw new Error(errorMessage);
+        throw new Error(response.msg)
       }
-      notifyWithdrawl(data.data)
+      console.log(response)
+      notifyWithdrawl(response.data)
       toast({
         title: 'Transaction created successfully',
       })
       router.push('/account/history/withdraw') // Assuming there's a dashboard page to redirect to
     } catch (error) {
-      console.log('Error creating transaction:', error);
+      console.log('Error creating transaction:', error)
       toast({
         title: 'Error',
-        description: `${error}`
+        description: `${error}`,
       })
     }
   }
 
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
-    return <Spinner/>; // You can replace this with a loading spinner component if desired
+    return <Spinner /> // You can replace this with a loading spinner component if desired
   }
 
   // If the user is not logged in, redirect to the join page
   if (!isLoggedIn) {
-    router.push('/join');
-    return <Spinner/>; // Optional: Show a redirect message
+    router.push('/join')
+    return <Spinner /> // Optional: Show a redirect message
   }
 
   return (
@@ -296,7 +313,9 @@ export default function WithdrawPage() {
                           </SelectContent>
                         </Select>
                         {!selectBank && step === 2 && (
-                          <p className="text-red-600 text-sm mt-1">Please select a bank account to proceed.</p>
+                          <p className="text-red-600 text-sm mt-1">
+                            Please select a bank account to proceed.
+                          </p>
                         )}
                       </div>
                     </div>

@@ -150,11 +150,10 @@ export const getWithdrawals = async (
     })
 
     const withdrawals = response.docs
-
     return {
       docs: withdrawals.map((withdrawal: any) => ({
         id: withdrawal.id,
-        productName: withdrawal.contract?.product_log?.name,
+        productName: withdrawal.contract?.product_log?.data?.product_name,
         amount: withdrawal.amount,
         date: withdrawal.createdAt,
         status: withdrawal.status,

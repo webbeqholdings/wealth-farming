@@ -33,6 +33,7 @@ import { ArrowDownIcon, ArrowRightIcon } from 'lucide-react'
 import { ReCaptcha } from '@/components/ReCaptcha'
 import { ReCaptchaV3 } from '@/components/ReCaptchaV3'
 import { getAccountsByUserId } from '@/lib/account'
+import { createTransfer } from '@/lib/transaction'
 import Spinner from '@/components/Spinner'
 
 const formSchema = z.object({
@@ -121,13 +122,13 @@ export default function TransferPage() {
 
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
-    return <Spinner/> // You can replace this with a loading spinner component if desired
+    return <Spinner /> // You can replace this with a loading spinner component if desired
   }
 
   // If the user is not logged in, redirect to the join page
   if (!isLoggedIn) {
     router.push('/join')
-    return <Spinner/> // Optional: Show a redirect message
+    return <Spinner /> // Optional: Show a redirect message
   }
 
   const handleTransfer = async (e: React.FormEvent) => {
@@ -142,35 +143,45 @@ export default function TransferPage() {
     //   return
     // }
     try {
-      const response = await fetch('/api/transaction/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json', // Specify JSON content type
-        },
-        body: JSON.stringify({
-          user_id: user.id,
-          amount: amount,
-          status: 'completed',
-          from_account: fromAccount,
-          to_account: toAccount,
-          type: 'transfer',
-        }), // Convert the request body to JSON
+      // const response = await fetch('/api/transaction/create', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json', // Specify JSON content type
+      //   },
+      //   body: JSON.stringify({
+      //     user_id: user.id,
+      //     amount: amount,
+      //     status: 'completed',
+      //     from_account: fromAccount,
+      //     to_account: toAccount,
+      //     type: 'transfer',
+      //   }), // Convert the request body to JSON
+      // })
+
+      // if (!response.ok) {
+      //   // Parse the error response to retrieve the error message
+      //   const errorResponse = await response.json()
+      //   console.error('Error creating transaction:', errorResponse)
+      //   const errorMessage = errorResponse.response?.error || 'An unknown error occurred'
+      //   throw new Error(errorMessage)
+      // }
+      const response = await createTransfer({
+        user_id: user.id,
+        amount: amount,
+        account_from: fromAccount,
+        account_to: toAccount,
       })
 
-      if (!response.ok) {
-        // Parse the error response to retrieve the error message
-        const errorResponse = await response.json()
-        const errorMessage = errorResponse.response?.error || 'An unknown error occurred'
-        throw new Error(errorMessage)
+      if (response.isSuccess) {
+        toast({
+          title: 'Transfer Successful',
+        })
       }
-      toast({
-        title: 'Transfer Successful',
-      })
     } catch (error) {
       console.error('Error creating transaction:', error)
       toast({
         title: 'Error',
-        description: `${error}`
+        description: `${error}`,
       })
     }
     router.push('/account/history/transfer')
@@ -189,7 +200,7 @@ export default function TransferPage() {
             <CardDescription>Move money between your accounts</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleTransfer}>
+            <form>
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="fromAccount">From Account</Label>
