@@ -77,7 +77,7 @@ export function SiteHeader() {
           <nav className="flex items-center space-x-2">
             {isLoggedIn ? (
               <>
-                <div className="hidden md:flex items-center space-x-2 bg-muted p-2 rounded-md">
+                <div className="flex items-center space-x-2 bg-muted p-2 rounded-md">
                   <DollarSign className="h-4 w-4 text-green-500" />
                   <span className="font-medium">
                     {balance.toLocaleString('en-US', {
@@ -87,7 +87,7 @@ export function SiteHeader() {
                 </div>
                 <Button
                   variant="default"
-                  className="hidden md:inline-flex bg-green-500 hover:bg-green-600 text-white"
+                  className="inline-flex bg-green-500 hover:bg-green-600 text-white"
                   onClick={() => router.push('/account/deposit')}
                 >
                   Deposit
