@@ -47,6 +47,7 @@ export const getTransactions = async (
         unit_code: transaction?.unit?.unit_code,
         product_name: transaction?.investment_product?.product_name,
         status: transaction?.status,
+        message: transaction?.message
       })),
       totalPages: response.totalPages,
       totalDocs: response.totalDocs,
@@ -155,7 +156,7 @@ export async function createTransactionInvestment(formData: any) {
     }
     if (amount < investmentProduct.docs[0].min_investment) {
       return {
-        message: 'Amount not allowed investment',
+        message: `The investment amount must be greater than ${investmentProduct.docs[0].min_investment}.`,
         error: true,
       }
     }

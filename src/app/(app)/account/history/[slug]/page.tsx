@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useRouter } from 'next/navigation'
@@ -54,10 +54,20 @@ const chartData = [
   { name: 'Jun', deposits: 3490, withdrawals: 1500 },
 ]
 
-export default function HistoryPage() {
+export default function HistoryPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
   const router = useRouter()
+  
+  const slug = use(params).slug
+  const tab = slug === "withdraw" || slug === "transfer" || slug ==="bonus" || slug === "investment" 
+    ? slug 
+    : 'deposit' // Deposit tab as default
+
   const { isLoggedIn, loading, user } = UserStatus()
-  const [activeTab, setActiveTab] = useState('all')
+  const [activeTab, setActiveTab] = useState(tab) 
   const [transactions, setTransactions] = useState([])
   const [accounts, setAccounts] = useState([])
   const [totalPages, setTotalPages] = useState(1)
@@ -260,15 +270,6 @@ export default function HistoryPage() {
 
               <div className="flex space-x-2 items-center">
                 <Button
-                  variant={activeTab === 'all' ? 'default' : 'outline'}
-                  onClick={() => {
-                    setActiveTab('all');
-                    setCurrentPage(1);
-                  }}
-                >
-                  All
-                </Button>
-                <Button
                   variant={activeTab === 'deposit' ? 'default' : 'outline'}
                   onClick={() => {
                     setActiveTab('deposit');
@@ -304,6 +305,15 @@ export default function HistoryPage() {
                 >
                   Investments
                 </Button>
+                <Button
+                  variant={activeTab === 'bonus' ? 'default' : 'outline'}
+                  onClick={() => {
+                    setActiveTab('bonus');
+                    setCurrentPage(1);
+                  }}
+                >
+                  Bonus
+                </Button>
                 <div
                   className="p-2 cursor-pointer hover:bg-gray-200 rounded-md"
                   onClick={() => handleExportPdf('tableContent')}
@@ -319,13 +329,13 @@ export default function HistoryPage() {
                 <TableRow>
                   <TableHead>Date</TableHead>
                   <TableHead>Type</TableHead>
-                  {activeTab === 'all' || activeTab === 'investment' ? (
+                  {activeTab === 'investment' ? (
                     <TableHead>Product</TableHead>
                   ) : (
                     ''
                   )}
                   <TableHead>Amount</TableHead>
-                  {activeTab === 'all' || activeTab === 'investment' ? (
+                  {activeTab === 'investment' ? (
                     <TableHead>Profit</TableHead>
                   ) : (
                     ''
@@ -333,8 +343,13 @@ export default function HistoryPage() {
                   {activeTab !== 'transfer' ? <TableHead>Account</TableHead> : ''}
                   {activeTab === 'transfer' ? <TableHead>From Account</TableHead> : ''}
                   {activeTab === 'transfer' ? <TableHead>To Account</TableHead> : ''}
-                  {activeTab === 'all' || activeTab === 'deposit' || activeTab === 'withdraw' ? (
+                  {activeTab === 'deposit' || activeTab === 'withdraw' || activeTab === 'bonus' ? (
                     <TableHead>Status</TableHead>
+                  ) : (
+                    ''
+                  )}
+                  {activeTab === 'bonus' ? (
+                    <TableHead>Message</TableHead>
                   ) : (
                     ''
                   )}
@@ -344,11 +359,11 @@ export default function HistoryPage() {
                 {transactions
                   .filter(
                     (t) =>
-                      activeTab === 'all' ||
                       (activeTab === 'deposit' && t.type == 'deposit') ||
                       (activeTab === 'withdraw' && t.type == 'withdraw') ||
                       (activeTab === 'transfer' && t.type == 'transfer') ||
-                      (activeTab === 'investment' && t.type == 'investment'),
+                      (activeTab === 'investment' && t.type == 'investment') ||
+                      (activeTab === 'bonus' && t.type == 'bonus'),
                   )
                   .map((transaction) => (
                     <TableRow key={transaction.id}>
@@ -357,18 +372,22 @@ export default function HistoryPage() {
                         {transaction.type.charAt(0).toUpperCase() +
                           transaction.type.slice(1).toLowerCase()}
                       </TableCell>
-                      {activeTab === 'all' || activeTab === 'investment' ? (
+                      {activeTab === 'investment' ? (
                         <TableHead>{transaction.product_name}</TableHead>
                       ) : (
                         ''
                       )}
                       <TableCell>
                         <span
-                          className={
-                            transaction.amount >= 0 && transaction.profit_or_loss >= 0
-                              ? 'text-green-600'
-                              : 'text-red-600'
-                          }
+                          // className={
+                          //   transaction.amount >= 0 && transaction.profit_or_loss >= 0
+                          //     ? 'text-green-600'
+                          //     : 'text-red-600'
+                          // }
+                          className={clsx({
+                            'text-green-600': transaction.amount >= 0 && transaction.profit_or_loss >= 0,
+                            'text-red-600': transaction.status === 'failed' || transaction.amount < 0, 
+                          })}
                         >
                           {transaction.amount.toLocaleString('en-US', {
                             style: 'currency',
@@ -376,7 +395,7 @@ export default function HistoryPage() {
                           })}
                         </span>
                       </TableCell>
-                      {activeTab === 'all' || activeTab === 'investment' ? (
+                      {activeTab === 'investment' ? (
                         <TableCell>
                           <span
                             className={
@@ -393,14 +412,14 @@ export default function HistoryPage() {
                         ''
                       )}
                       <TableCell>{transaction.account}</TableCell>
-                      {activeTab === 'transfers' ? (
+                      {activeTab === 'transfer' ? (
                         <TableCell>{transaction.to_account}</TableCell>
                       ) : (
                         ''
                       )}
-                      {activeTab === 'all' ||
-                        activeTab === 'deposit' ||
-                        activeTab === 'withdraw' ? (
+                      {activeTab === 'deposit' ||
+                        activeTab === 'withdraw' ||
+                        activeTab === 'bonus' ? (
                         <TableCell
                           className={clsx({
                             'text-yellow-500': transaction.status === 'pending', // Yellow font
@@ -410,6 +429,11 @@ export default function HistoryPage() {
                         >
                           {transaction.status}
                         </TableCell>
+                      ) : (
+                        ''
+                      )}
+                      {activeTab === 'bonus' ? (
+                        <TableHead>{transaction.message}</TableHead>
                       ) : (
                         ''
                       )}
