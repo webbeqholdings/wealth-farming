@@ -12,20 +12,7 @@ interface Withdrawal {
   message: string
 }
 
-const findFirstEligibleContract = (contracts: any[], today: Date) => {
-
-  for (let i = 0; i < contracts.length; i++) {
-    const contract = contracts[i];
-    const timeElapsed = today.getTime() - new Date(contract.start_date).getTime();
-    if (timeElapsed > 90 * 24 * 60 * 60 * 1000 && contract.status == 'active') {
-      return contract; 
-    }
-  }
-
-  return null; // No eligible contract found
-};
-
-export const getContracts = async (page: number, limit: number): Promise<{ docs: any; totalPages: number; totalDocs: number; contractWithMinDate: any}> => {
+export const getContracts = async (page: number, limit: number): Promise<{ docs: any; totalPages: number; totalDocs: number}> => {
   try {
     const payload = await getPayload({
       config,
@@ -41,7 +28,6 @@ export const getContracts = async (page: number, limit: number): Promise<{ docs:
       limit, // Pass the number of items per page
     });
     const contracts = response.docs;
-    const contractWithMinStartDate = findFirstEligibleContract(contracts, new Date())
 
     return {
       docs: contracts.map((contract: any) => ({
@@ -65,12 +51,11 @@ export const getContracts = async (page: number, limit: number): Promise<{ docs:
       })),
       totalPages: response.totalPages,
       totalDocs: response.totalDocs,
-      contractWithMinDate: contractWithMinStartDate,
     };
   } catch (error) {
     console.error('Transaction error:', error);
 
-    return { docs: [], totalPages: 0, totalDocs: 0, contractWithMinDate: null };
+    return { docs: [], totalPages: 0, totalDocs: 0 };
   }
 };
 
@@ -128,23 +113,7 @@ export const getContractsWithDate = async (
   }
 };
 
-
-const findFirstEligibleWithdraw = (withdrawals: any[], today: Date) => {
-  for (let i = 0; i < withdrawals.length; i++) {
-    const withdrawal = withdrawals[i];
-    const timeElapsedComplete = new Date(withdrawal.createdAt).getTime() - new Date(withdrawal.contract.start_date).getTime();
-    const timeElapsedPending = today.getTime() - new Date(withdrawal.contract.start_date).getTime();
-    if (timeElapsedComplete > 90 * 24 * 60 * 60 * 1000 && withdrawal.status == 'completed') {
-      return withdrawal; 
-    }
-    else if (timeElapsedPending > 90 * 24 * 60 * 60 * 1000 && withdrawal.status == 'pending') {
-      return withdrawal; 
-    }
-  }
-  return null; // No eligible contract found
-};
-
-export const getWithdrawals = async (page: number, limit: number): Promise<{ docs: Withdrawal[]; totalPages: number; totalDocs: number; withdrawWithMinDate: any }> => {
+export const getWithdrawals = async (page: number, limit: number): Promise<{ docs: Withdrawal[]; totalPages: number; totalDocs: number; }> => {
   try {
     const payload = await getPayload({
       config,
@@ -163,9 +132,6 @@ export const getWithdrawals = async (page: number, limit: number): Promise<{ doc
 
     const withdrawals = response.docs;
 
-    // Find the contract with the minimum start_date
-    const withdrawWithMinStartDate = findFirstEligibleWithdraw(withdrawals, new Date())
-
     return {
       docs: withdrawals.map((withdrawal: any) => ({
         id: withdrawal.id,
@@ -177,12 +143,11 @@ export const getWithdrawals = async (page: number, limit: number): Promise<{ doc
       })),
       totalPages: response.totalPages,
       totalDocs: response.totalDocs,
-      withdrawWithMinDate: withdrawWithMinStartDate,
     };
   } catch (error) {
     console.error('Withdraw error:', error);
 
-    return { docs: [], totalPages: 0, totalDocs: 0, withdrawWithMinDate: null};
+    return { docs: [], totalPages: 0, totalDocs: 0};
   }
 };
 
