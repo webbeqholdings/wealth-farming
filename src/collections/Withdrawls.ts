@@ -59,7 +59,7 @@ const Withdrawals: CollectionConfig = {
         {
             name: 'image',
             label: 'Image',
-            type: 'relationship',
+            type: 'upload',
             relationTo: 'media',
         },
     ],

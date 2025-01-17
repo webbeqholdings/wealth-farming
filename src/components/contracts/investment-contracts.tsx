@@ -15,7 +15,7 @@ import { WithdrawDialog } from '@/components/withdraw-dialog'
 import { TerminationDialog } from '../termination-dialog'
 import userStatus from '@/lib/userStatus'
 import { useRouter } from 'next/navigation'
-import { getContracts, getWithdrawals, updateSetting, getContractsWithDate, getWithdrawalsWithDate } from '@/lib/contract'
+import { getContracts, getWithdrawals, updateSetting, getContractsWithDate, getWithdrawalsWithDate, checkContractLarger90Days } from '@/lib/contract'
 import {
     Pagination,
     PaginationContent,
@@ -100,14 +100,13 @@ export function InvestmentContracts() {
     // Unified fetchData function
 
     useEffect(() => {
-        async function fetchMyData() {
-            const { contractWithMinDate } = await getContracts(currentPage, 10);
-            const { withdrawWithMinDate } = await getWithdrawals(currentPage, 10);
-            if (contractWithMinDate || withdrawWithMinDate){
+        async function fetchTerminateAvaibility() {
+            const avail = await checkContractLarger90Days()
+            if (avail == true){
                 setTerminatedAvaibility(true);
             }
         }
-        fetchMyData()
+        fetchTerminateAvaibility()
     })
 
     const fetchData = useCallback(async () => {
