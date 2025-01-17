@@ -15,7 +15,7 @@ import { WithdrawDialog } from '@/components/withdraw-dialog'
 import { TerminationDialog } from '../termination-dialog'
 import userStatus from '@/lib/userStatus'
 import { useRouter } from 'next/navigation'
-import { getContracts, getWithdrawals, updateSetting, getContractsWithDate, getWithdrawalsWithDate } from '@/lib/contract'
+import { getContracts, getWithdrawals, updateSetting, getContractsWithDate, getWithdrawalsWithDate, checkContractLarger90Days } from '@/lib/contract'
 import {
     Pagination,
     PaginationContent,
@@ -45,8 +45,7 @@ import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Calendar } from "@/components/ui/calendar"
-
-
+import { useTranslation } from 'react-i18next';
 interface Investment {
     id: string
     userId: string
@@ -96,8 +95,19 @@ export function InvestmentContracts() {
     const [checkedStates, setCheckedStates] = useState<any>({});
     const [startDate, setStartDate] = useState<Date>()
     const [endDate, setEndDate] = useState<Date>()
-    // Handle tab switch and data fetching
-    // Unified fetchData function
+    const [terminatedAvaibility, setTerminatedAvaibility] = useState(false)
+    const { t } = useTranslation();
+
+    useEffect(() => {
+        async function fetchTerminateAvaibility() {
+            const avail = await checkContractLarger90Days()
+            if (avail == true){
+                setTerminatedAvaibility(true);
+            }
+        }
+        fetchTerminateAvaibility()
+    })
+
     const fetchData = useCallback(async () => {
         if (activeTab === 'investment') {
             const { docs, totalPages } = await getContracts(currentPage, 10);
@@ -121,57 +131,57 @@ export function InvestmentContracts() {
     }, [fetchData]);
 
     useEffect(() => {
-      if (startDate && endDate) {
-        if (!(startDate instanceof Date) || !(endDate instanceof Date)) {
-          console.error("Start date or end date is not a valid Date object.");
-          return;
+        if (startDate && endDate) {
+            if (!(startDate instanceof Date) || !(endDate instanceof Date)) {
+                console.error("Start date or end date is not a valid Date object.");
+                return;
+            }
+            if (startDate > endDate) {
+                console.error("Start date must be earlier than or equal to end date");
+                return;
+            }
+            filterDate();
         }
-        if (startDate > endDate) {
-          console.error("Start date must be earlier than or equal to end date");
-          return;
+        else {
+            fetchData();
         }
-          filterDate();
-      }
-      else{
-          fetchData();
-      }
     }, [startDate, endDate, activeTab]);
 
     // Update Start Date & End Date
     const handleEndDateSelect = (date: Date) => {
-        if (date){
+        if (date) {
             const updatedEndDate = new Date(date);
             updatedEndDate.setHours(23, 59, 59, 999);
             setEndDate(updatedEndDate);
         }
-        else{
+        else {
             setEndDate(date);
         }
     };
 
     function filterDate() {
-      const fetchContracts = async () => {
-      try {
-          if (activeTab === 'investment') {
-              const { docs, totalPages } = await getContractsWithDate(currentPage, 10, startDate.toISOString(), endDate.toISOString());
-              setInvestments(docs);
-              setTotalPagesInvestment(totalPages);
-              const initialCheckedStates = docs.reduce((acc: any, investment: any) => {
-                  acc[investment.id] = investment.setting?.extend_contract === true || false;
-                  return acc;
-              }, {});
-              setCheckedStates(initialCheckedStates);
-          } else if (activeTab === 'withdraw') {
-              const { docs, totalPages } = await getWithdrawalsWithDate(currentPage, 10, startDate.toISOString(), endDate.toISOString());
-              setWithdrawals(docs);
-              setTotalPagesWithdrawl(totalPages);
-          }
-      } catch (error) {
-          console.error('Failed to fetch contracts:', error);
-      }
-      };
-      fetchContracts();
-  }
+        const fetchContracts = async () => {
+            try {
+                if (activeTab === 'investment') {
+                    const { docs, totalPages } = await getContractsWithDate(currentPage, 10, startDate.toISOString(), endDate.toISOString());
+                    setInvestments(docs);
+                    setTotalPagesInvestment(totalPages);
+                    const initialCheckedStates = docs.reduce((acc: any, investment: any) => {
+                        acc[investment.id] = investment.setting?.extend_contract === true || false;
+                        return acc;
+                    }, {});
+                    setCheckedStates(initialCheckedStates);
+                } else if (activeTab === 'withdraw') {
+                    const { docs, totalPages } = await getWithdrawalsWithDate(currentPage, 10, startDate.toISOString(), endDate.toISOString());
+                    setWithdrawals(docs);
+                    setTotalPagesWithdrawl(totalPages);
+                }
+            } catch (error) {
+                console.error('Failed to fetch contracts:', error);
+            }
+        };
+        fetchContracts();
+    }
 
     // Calculate ROI
     const calculateROI = () => {
@@ -220,7 +230,6 @@ export function InvestmentContracts() {
 
         // Prevent the browser from reloading the page
         e.preventDefault();
-
         // Read the form data
         const formData = new FormData(e.target);
         const formJson = Object.fromEntries(formData.entries());
@@ -288,12 +297,13 @@ export function InvestmentContracts() {
     }
 
     return (
+
         <div className="min-h-screen p-6">
             <div className="max-w-7xl mx-auto space-y-6">
                 <div className="flex flex-col md:flex-row justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold">Portfolio</h1>
-                        <p className="">Manage your investments and withdrawals</p>
+                        <h1 className="text-2xl font-bold">{t('portfolio_title')}</h1>
+                        <p className="">{t('portfolio_decs')}</p>
                     </div>
                 </div>
 
@@ -301,7 +311,7 @@ export function InvestmentContracts() {
                     <Card className="  shadow-sm">
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm font-medium ">
-                                Total Invested
+                                {t("portfolio_cell_1")}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -315,7 +325,7 @@ export function InvestmentContracts() {
                     <Card className="  shadow-sm">
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm font-medium ">
-                                Total Available Balance
+                                {t("portfolio_cell_2")}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -329,7 +339,7 @@ export function InvestmentContracts() {
                     <Card className="  shadow-sm">
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm font-medium ">
-                                Active Investments
+                                {t("portfolio_cell_3")}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -341,7 +351,7 @@ export function InvestmentContracts() {
                     <Card className="  shadow-sm">
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm font-medium ">
-                                Expected ROI
+                                {t("portfolio_cell_4")}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -353,69 +363,69 @@ export function InvestmentContracts() {
                 </div>
 
                 <div className='grid grid-cols-2'>
-                <div className="flex space-x-2 justify-start">
-                    <Popover>
-                    <PopoverTrigger asChild>
-                        <Button
-                        variant={"outline"}
-                        className={cn(
-                            "w-[240px] justify-start text-left font-normal",
-                            !Date && "text-muted-foreground"
-                        )}
-                        >
-                        <CalendarIcon />
-                        {startDate ? format(startDate, "PPP") : <span>Start Date</span>}
-                        </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                        mode="single"
-                        selected={startDate}
-                        onSelect={setStartDate}
-                        initialFocus
-                        />
-                    </PopoverContent>
-                    </Popover>
-                    <Popover>
-                    <PopoverTrigger asChild>
-                        <Button
-                        variant={"outline"}
-                        className={cn(
-                            "w-[240px] justify-start text-left font-normal",
-                            !Date && "text-muted-foreground"
-                        )}
-                        >
-                        <CalendarIcon />
-                        {endDate ? format(endDate, "PPP") : <span>End Date</span>}
-                        </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                        mode="single"
-                        selected={endDate}
-                        onSelect={(date) => {
-                              handleEndDateSelect(date);
-                        }}
-                        initialFocus
-                        />
-                    </PopoverContent>
-                    </Popover>
-                </div>
+                    <div className="flex space-x-2 justify-start">
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                        "w-[240px] justify-start text-left font-normal",
+                                        !Date && "text-muted-foreground"
+                                    )}
+                                >
+                                    <CalendarIcon />
+                                    {startDate ? format(startDate, "PPP") : <span>{t("start_date")}</span>}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                                <Calendar
+                                    mode="single"
+                                    selected={startDate}
+                                    onSelect={setStartDate}
+                                    initialFocus
+                                />
+                            </PopoverContent>
+                        </Popover>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                        "w-[240px] justify-start text-left font-normal",
+                                        !Date && "text-muted-foreground"
+                                    )}
+                                >
+                                    <CalendarIcon />
+                                    {endDate ? format(endDate, "PPP") : <span>{t("end_date")}</span>}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                                <Calendar
+                                    mode="single"
+                                    selected={endDate}
+                                    onSelect={(date) => {
+                                        handleEndDateSelect(date);
+                                    }}
+                                    initialFocus
+                                />
+                            </PopoverContent>
+                        </Popover>
+                    </div>
 
-                <div className="flex justify-end space-x-2">
-                    <Button
-                        variant={activeTab === 'investment' ? 'default' : 'outline'}
-                        onClick={() => { setActiveTab('investment'); setCurrentPage(1) }}
-                    >
-                        Investment
-                    </Button>
-                    <Button
-                        variant={activeTab === 'withdraw' ? 'default' : 'outline'}
-                        onClick={() => { setActiveTab('withdraw'); setCurrentPage(1) }}
-                    >
-                        Withdraw
-                    </Button>
-                </div>
+                    <div className="flex justify-end space-x-2">
+                        <Button
+                            variant={activeTab === 'investment' ? 'default' : 'outline'}
+                            onClick={() => { setActiveTab('investment'); setCurrentPage(1) }}
+                        >
+                           {t('portfolio_tab_investment')}
+                        </Button>
+                        <Button
+                            variant={activeTab === 'withdraw' ? 'default' : 'outline'}
+                            onClick={() => { setActiveTab('withdraw'); setCurrentPage(1) }}
+                        >
+                            {t('portfolio_tab_withdraw')}
+                        </Button>
+                    </div>
                 </div>
 
                 <Card className=" shadow-sm">
@@ -425,17 +435,17 @@ export function InvestmentContracts() {
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
-                                            <TableHead>Product Name</TableHead>
-                                            <TableHead>Invested Amount</TableHead>
-                                            <TableHead>Expected Return</TableHead>
-                                            <TableHead>Available Balance</TableHead>
-                                            <TableHead>Profit</TableHead>
-                                            <TableHead>Rate</TableHead>
-                                            <TableHead>Term</TableHead>
-                                            <TableHead>Start Date</TableHead>
-                                            <TableHead>End Date</TableHead>
-                                            <TableHead>Status</TableHead>
-                                            <TableHead className="text-center">Actions</TableHead>
+                                            <TableHead>{t('portfolio_productName')}</TableHead>
+                                            <TableHead>{t('portfolio_investedAmount')}</TableHead>
+                                            <TableHead>{t('portfolio_expectedReturn')}</TableHead>
+                                            <TableHead>{t('portfolio_availableBalance')}</TableHead>
+                                            <TableHead>{t('portfolio_profit')}</TableHead>
+                                            <TableHead>{t('portfolio_rate')}</TableHead>
+                                            <TableHead>{t('portfolio_term')}</TableHead>
+                                            <TableHead>{t('portfolio_startDate')}</TableHead>
+                                            <TableHead>{t('portfolio_endDate')}</TableHead>
+                                            <TableHead>{t('portfolio_status')}</TableHead>
+                                            <TableHead className="text-center">{t('portfolio_actions')}</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -449,16 +459,16 @@ export function InvestmentContracts() {
                                                 </TableCell>
                                                 <TableCell>{formatCurrency(investment.profit)}</TableCell>
                                                 <TableCell>{(investment.rateOfReturn * 100).toFixed(2)}%</TableCell>
-                                                <TableCell>{investment.term}</TableCell>
+                                                <TableCell className="whitespace-nowrap overflow-hidden text-ellipsis">{t("portfolio_term_" + investment.term)}</TableCell>
                                                 <TableCell>{new Date(investment.startDate).toLocaleDateString()}</TableCell>
                                                 <TableCell>{new Date(investment.endDate).toLocaleDateString()}</TableCell>
                                                 <TableCell>
                                                     <span
-                                                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                                                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap overflow-hidden text-ellipsis ${getStatusColor(
                                                             investment.status
                                                         )}`}
                                                     >
-                                                        {investment.status.charAt(0).toUpperCase() + investment.status.slice(1)}
+                                                        {t(investment.status)}
                                                     </span>
                                                 </TableCell>
 
@@ -474,7 +484,7 @@ export function InvestmentContracts() {
                                                                 <div className="grid gap-2 ">
                                                                     <input name={"id"} defaultValue={investment.id} hidden />
                                                                     <div className="grid grid-cols-4 items-center gap-4 font-medium">
-                                                                        <Label className="col-span-2">Profit Withdraw</Label>
+                                                                        <Label className="col-span-2">{t('portfolio_setting_profitWithdraw')}</Label>
                                                                         <div className="col-span-2 flex items-center  rounded-md ">
                                                                             <span className="px-3 text-gray-500">$</span>
                                                                             <input
@@ -486,14 +496,14 @@ export function InvestmentContracts() {
                                                                         </div>
                                                                         <Label className="col-span-2">
                                                                             <div className="relative flex items-center space-x-2 cursor-pointer">
-                                                                                <span>Extend Contract</span>
+                                                                                <span>{t('portfolio_setting_excontract')}</span>
                                                                                 <TooltipProvider>
                                                                                     <Tooltip>
                                                                                         <TooltipTrigger asChild>
                                                                                             <CircleHelp size={16} strokeWidth={1.25} />
                                                                                         </TooltipTrigger>
                                                                                         <TooltipContent>
-                                                                                            <p>Enable automatic profit withdrawal for each term by extending your contract.</p>
+                                                                                            <p>{t('portfolio_setting_excontract_help')}</p>
                                                                                         </TooltipContent>
                                                                                     </Tooltip>
                                                                                 </TooltipProvider>
@@ -526,7 +536,7 @@ export function InvestmentContracts() {
                                                                                 className='col-span-2 mt-2 py-2 px-4 bg-primary rounded-md font-semibold '
                                                                                 type="submit"
                                                                             >
-                                                                                Update
+                                                                                {t('update')}
                                                                             </button>
                                                                         </div>
                                                                     </div>
@@ -561,7 +571,6 @@ export function InvestmentContracts() {
                                             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                                             className="text-sm font-medium rounded-lg hover:bg-gray-100"
                                         >
-                                            Previous
                                         </PaginationPrevious>
                                         <PaginationContent>
                                             {[...Array(totalPageInvestments)].map((_, index) => (
@@ -583,13 +592,12 @@ export function InvestmentContracts() {
                                             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPageInvestments))}
                                             className="px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-100"
                                         >
-                                            Next
                                         </PaginationNext>
                                     </Pagination>
                                 </div> : (
                                     <TableRow>
                                         <TableCell colSpan={11} className="text-center py-4">
-                                            There are no contracts in your portfolio.
+                                            {t('portfolio_empty_contract')}
                                         </TableCell>
                                     </TableRow>
                                 )}
@@ -599,11 +607,11 @@ export function InvestmentContracts() {
                                 <Table>
                                     <TableHeader>
                                         <TableRow className=" ">
-                                            <TableHead>Product Name</TableHead>
-                                            <TableHead>Amount</TableHead>
-                                            <TableHead>Date</TableHead>
-                                            <TableHead>Status</TableHead>
-                                            <TableHead>Message</TableHead>
+                                            <TableHead>{t('portfolio_productName')}</TableHead>
+                                            <TableHead>{t('portfolio_withdraw_amount')}</TableHead>
+                                            <TableHead>{t('portfolio_withdraw_date')}</TableHead>
+                                            <TableHead>{t('portfolio_status')}</TableHead>
+                                            <TableHead>{t('portfolio_withdraw_message')}</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -622,11 +630,11 @@ export function InvestmentContracts() {
                                                             withdrawal.status
                                                         )}`}
                                                     >
-                                                        {withdrawal.status.charAt(0).toUpperCase() + withdrawal.status.slice(1)}
+                                                        {t(withdrawal.status.charAt(0).toUpperCase() + withdrawal.status.slice(1))}
                                                     </span>
                                                 </TableCell>
                                                 <TableCell>
-                                                    {withdrawal.message}
+                                                    {t(withdrawal.message)}
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -638,7 +646,7 @@ export function InvestmentContracts() {
                                             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                                             className="text-sm font-medium rounded-lg hover:bg-gray-100"
                                         >
-                                            Previous
+                                            {t('previous')}
                                         </PaginationPrevious>
                                         <PaginationContent>
                                             {[...Array(totalPageWithdrawl)].map((_, index) => (
@@ -660,12 +668,12 @@ export function InvestmentContracts() {
                                             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPageWithdrawl))}
                                             className="px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-100"
                                         >
-                                            Next
+                                            {t('next')}
                                         </PaginationNext>
                                     </Pagination>
                                 </div> : <TableRow>
                                     <TableCell colSpan={11} className="text-center py-4">
-                                        There are no withdrawal contracts in your portfolio.
+                                            {t('portfolio_empty_contract_withdraw')}
                                     </TableCell>
                                 </TableRow>}
                             </>
@@ -679,6 +687,7 @@ export function InvestmentContracts() {
                     isOpen={withdrawDialogOpen}
                     onClose={() => setWithdrawDialogOpen(false)}
                     contract={selectedContract}
+                    terminated_avail={terminatedAvaibility}
                     setActiveTab={setActiveTab}
                 />
             )}
@@ -687,9 +696,11 @@ export function InvestmentContracts() {
                     isOpen={terminationDialogOpen}
                     onClose={() => setTerminationDialogOpen(false)}
                     contract={selectedContract}
+                    terminated_avail={terminatedAvaibility}
                     setActiveTab={setActiveTab}
                 />
             )}
         </div>
+
     )
 }
