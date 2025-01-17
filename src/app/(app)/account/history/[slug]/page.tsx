@@ -43,6 +43,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { useTranslation } from 'react-i18next';
 
 // Mock data for chart
 const chartData = [
@@ -60,14 +61,14 @@ export default function HistoryPage({
   params: Promise<{ slug: string }>
 }) {
   const router = useRouter()
-  
-  const slug = use(params).slug
-  const tab = slug === "withdraw" || slug === "transfer" || slug ==="bonus" || slug === "investment" 
-    ? slug 
-    : 'deposit' // Deposit tab as default
 
+  const slug = use(params).slug
+  const tab = slug === "withdraw" || slug === "transfer" || slug === "bonus" || slug === "investment"
+    ? slug
+    : 'deposit' // Deposit tab as default
+  const { t } = useTranslation();
   const { isLoggedIn, loading, user } = UserStatus()
-  const [activeTab, setActiveTab] = useState(tab) 
+  const [activeTab, setActiveTab] = useState(tab)
   const [transactions, setTransactions] = useState([])
   const [accounts, setAccounts] = useState([])
   const [totalPages, setTotalPages] = useState(1)
@@ -131,7 +132,7 @@ export default function HistoryPage({
   }
 
   const handleEndDateSelect = (date: Date) => {
-    if(date){
+    if (date) {
       const updatedEndDate = new Date(date);
       updatedEndDate.setHours(23, 59, 59, 999);
       setEndDate(updatedEndDate);
@@ -141,22 +142,22 @@ export default function HistoryPage({
   };
 
   useEffect(() => {
-  if (startDate && endDate) {
-    if (!(startDate instanceof Date) || !(endDate instanceof Date)) {
-      console.error("Start date or end date is not a valid Date object.");
-      return;
-    }
-    if (startDate > endDate) {
-      console.error("Start date must be earlier than or equal to end date");
-      return;
-    }
+    if (startDate && endDate) {
+      if (!(startDate instanceof Date) || !(endDate instanceof Date)) {
+        console.error("Start date or end date is not a valid Date object.");
+        return;
+      }
+      if (startDate > endDate) {
+        console.error("Start date must be earlier than or equal to end date");
+        return;
+      }
 
-    filterDate();
-  } else {
-    fetchData();
-  }
-}, [startDate, endDate, activeTab]);
-  
+      filterDate();
+    } else {
+      fetchData();
+    }
+  }, [startDate, endDate, activeTab]);
+
   function filterDate() {
     const fetchTransactions = async () => {
       try {
@@ -194,7 +195,7 @@ export default function HistoryPage({
     <>
       <SiteHeader />
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Transaction History</h1>
+        <h1 className="text-3xl font-bold mb-8">{t('tranfer_history_Header_title')}</h1>
         <TabMenu items={accountConfig.tabList} defaultValue="history" />
         {/* Wallet Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 mt-6">
@@ -211,7 +212,7 @@ export default function HistoryPage({
                     currency: 'USD',
                   })}
                 </div>
-                <p className="text-xs text-muted-foreground">Balance</p>
+                <p className="text-xs text-muted-foreground">{t('balance')}</p>
               </CardContent>
             </Card>
           ))}
@@ -261,7 +262,7 @@ export default function HistoryPage({
                     <Calendar
                       mode="single"
                       selected={endDate}
-                      onSelect={(date) => {handleEndDateSelect(date)}}
+                      onSelect={(date) => { handleEndDateSelect(date) }}
                       initialFocus
                     />
                   </PopoverContent>
@@ -276,7 +277,7 @@ export default function HistoryPage({
                     setCurrentPage(1);
                   }}
                 >
-                  Deposits
+                  {t('tranfer_history_table_button_1')}
                 </Button>
                 <Button
                   variant={activeTab === 'withdraw' ? 'default' : 'outline'}
@@ -285,7 +286,7 @@ export default function HistoryPage({
                     setCurrentPage(1);
                   }}
                 >
-                  Withdrawals
+                  {t('tranfer_history_table_button_2')}
                 </Button>
                 <Button
                   variant={activeTab === 'transfer' ? 'default' : 'outline'}
@@ -294,7 +295,7 @@ export default function HistoryPage({
                     setCurrentPage(1);
                   }}
                 >
-                  Transfers
+                  {t('tranfer_history_table_button_3')}
                 </Button>
                 <Button
                   variant={activeTab === 'investment' ? 'default' : 'outline'}
@@ -303,7 +304,7 @@ export default function HistoryPage({
                     setCurrentPage(1);
                   }}
                 >
-                  Investments
+                  {t('tranfer_history_table_button_4')}
                 </Button>
                 <Button
                   variant={activeTab === 'bonus' ? 'default' : 'outline'}
@@ -312,7 +313,7 @@ export default function HistoryPage({
                     setCurrentPage(1);
                   }}
                 >
-                  Bonus
+                  {t('tranfer_history_table_button_5')}
                 </Button>
                 <div
                   className="p-2 cursor-pointer hover:bg-gray-200 rounded-md"
@@ -327,29 +328,29 @@ export default function HistoryPage({
             <Table id="tableContent">
               <TableHeader>
                 <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Type</TableHead>
+                  <TableHead>{t('date')}</TableHead>
+                  <TableHead>{t('type')}</TableHead>
                   {activeTab === 'investment' ? (
-                    <TableHead>Product</TableHead>
+                    <TableHead>{t('product')}</TableHead>
                   ) : (
                     ''
                   )}
-                  <TableHead>Amount</TableHead>
+                  <TableHead>{t('money_amount')}</TableHead>
                   {activeTab === 'investment' ? (
-                    <TableHead>Profit</TableHead>
+                    <TableHead>{t('portfolio_profit')}</TableHead>
                   ) : (
                     ''
                   )}
-                  {activeTab !== 'transfer' ? <TableHead>Account</TableHead> : ''}
-                  {activeTab === 'transfer' ? <TableHead>From Account</TableHead> : ''}
-                  {activeTab === 'transfer' ? <TableHead>To Account</TableHead> : ''}
+                  {activeTab !== 'transfer' ? <TableHead>{t('account')}</TableHead> : ''}
+                  {activeTab === 'transfer' ? <TableHead> {t('tranfer_from')}</TableHead> : ''}
+                  {activeTab === 'transfer' ? <TableHead> {t('tranfer_to')}</TableHead> : ''}
                   {activeTab === 'deposit' || activeTab === 'withdraw' || activeTab === 'bonus' ? (
-                    <TableHead>Status</TableHead>
+                    <TableHead>{t('status')}</TableHead>
                   ) : (
                     ''
                   )}
                   {activeTab === 'bonus' ? (
-                    <TableHead>Message</TableHead>
+                    <TableHead>{t('portfolio_withdraw_message')}</TableHead>
                   ) : (
                     ''
                   )}
@@ -386,7 +387,7 @@ export default function HistoryPage({
                           // }
                           className={clsx({
                             'text-green-600': transaction.amount >= 0 && transaction.profit_or_loss >= 0,
-                            'text-red-600': transaction.status === 'failed' || transaction.amount < 0, 
+                            'text-red-600': transaction.status === 'failed' || transaction.amount < 0,
                           })}
                         >
                           {transaction.amount.toLocaleString('en-US', {
@@ -448,7 +449,7 @@ export default function HistoryPage({
                     onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                     className="text-sm font-medium rounded-lg hover:bg-gray-100"
                   >
-                    Previous
+                    {t("previous")}
                   </PaginationPrevious>
                   <PaginationContent>
                     {[...Array(totalPages)].map((_, index) => (
@@ -468,7 +469,7 @@ export default function HistoryPage({
                     onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                     className="px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-100"
                   >
-                    Next
+                    {t("next")}
                   </PaginationNext>
                 </Pagination>
               </div>

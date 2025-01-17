@@ -1,13 +1,9 @@
 import '@/styles/globals.css'
 import { Metadata, Viewport } from 'next'
 import { Open_Sans } from 'next/font/google'
-
 import { siteConfig } from '@/config/site'
 import { cn } from '@/lib/utils'
-
-import { ThemeProvider } from '@/components/theme-provider'
-import { Toaster } from '@/components/ui/toaster'
-
+import RootProvider from './provider'
 export const metadata: Metadata = {
   title: {
     default: siteConfig.name,
@@ -76,21 +72,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
           suppressHydrationWarning
           className={cn('min-h-screen bg-background', openSans.className)}
         >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <div vaul-drawer-wrapper="">
-              <div className="relative flex min-h-screen flex-col bg-background">
-                {/* <AuthProvider> */}
-                {children}
-                <Toaster />
-                {/* </AuthProvider> */}
-              </div>
-            </div>
-          </ThemeProvider>
+          <RootProvider>
+            {children}
+          </RootProvider>
         </body>
       </html>
     </>
