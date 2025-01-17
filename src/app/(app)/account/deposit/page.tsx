@@ -448,8 +448,7 @@ export default function DepositPage() {
                           }}
                           className="text-blue-600 hover:text-blue-800 cursor-pointer"
                         >
-                          {t('')}
-                          
+                          {t('deposit_no_bank')}
                         </div>
                       </div>
                     ) : (
