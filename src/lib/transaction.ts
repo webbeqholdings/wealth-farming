@@ -266,6 +266,70 @@ export const IsInvest = async (user_id: number): Promise<Boolean> => {
   return !!res.totalDocs
 }
 
+export const createInvestment = async (formData: any) => {
+  const { userId, amount, startDate, productId } = formData
+
+  if (amount <= 0) {
+    return {
+      isSuccess: false,
+      msg: 'invalid amount',
+    }
+  }
+
+  const product_doc = await payload.findByID({
+    collection: 'investment-products',
+    id: productId,
+  })
+
+  if (!product_doc) {
+    return {
+      isSuccess: false,
+      msg: 'invalid product',
+    }
+  }
+
+  const account_id = await getAccountIdInvestmentByUser(userId)
+
+  const transaction_doc = await payload.create({
+    collection: 'transactions',
+    data: {
+      user: Number(userId),
+      amount: Number(amount),
+      investment_product: productId,
+      status: 'completed',
+      account_from: account_id,
+      type: 'investment',
+    },
+  })
+
+  const contract_doc = await payload.create({
+    collection: 'contracts',
+    data: {
+      user: Number(userId),
+      amount: Number(amount),
+      balance: Number(amount),
+      expected_return: product_doc.rate_of_return,
+      status: 'active',
+      term: product_doc.term,
+      profit: 0,
+      start_date: startDate,
+      product_log: {
+        data: product_doc,
+      },
+    },
+  })
+
+  return {
+    isSuccess: true,
+    msg: 'Deal Success',
+    data: {
+      transaction: transaction_doc,
+      contract: contract_doc,
+      product: product_doc,
+    },
+  }
+}
+
 export const getTotalBonusByProduct = async (
   product_id: number,
   user_id: number,

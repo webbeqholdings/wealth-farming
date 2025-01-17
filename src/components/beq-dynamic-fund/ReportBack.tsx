@@ -1,23 +1,27 @@
 import { Term } from '@/lib/investment-products/dynamicFund'
 import { format } from 'date-fns'
 import { Bird } from 'lucide-react'
-import { Separator } from '../ui/separator'
+import { useDynamicFundData } from '@/components/beq-dynamic-fund/DataProvider'
 
-const ReportBack = ({
-  amount,
-  term,
-  startDate,
-  endDate,
-  periods,
-  dataExtra,
-}: {
-  amount: number
-  term: Term
-  startDate: Date
-  endDate: Date
-  periods: number
-  dataExtra?: object
-}) => {
+const ReportBack = () => {
+  const { data } = useDynamicFundData()
+  const {
+    productId,
+    startDate,
+    endDate,
+    contractEndAt,
+    canCancelContractAt,
+    periods,
+    profitData,
+    productSelected,
+    amount,
+    publicProducts,
+  } = data
+  console.log('productSelected', productSelected)
+  console.log('startDate', startDate)
+  console.log('endDate', endDate)
+  if (!startDate || !endDate || !productSelected) return '...'
+
   let termDescriptionConfig = [
     {
       termKey: 'monthly',
@@ -53,20 +57,17 @@ const ReportBack = ({
     },
   ]
 
-  let termDescription: any = termDescriptionConfig.filter((item) => {
-    return item.termKey == term
-  })[0]
+  let termDescription: any = termDescriptionConfig.find((item) => {
+    return item.termKey == productSelected.term
+  })
 
-  if (!startDate || !endDate) return '...'
+  console.log('termDescription', termDescription)
+  console.log('productSelected.term', productSelected)
 
-  let yearsObject = (dataExtra as { profitData: any })?.profitData
+  let yearsObject = profitData
   let years = Object.keys(yearsObject).length
 
-  let canCancelContractAt = (dataExtra as { canCancelContractAt: any })?.canCancelContractAt
-  let standardApplyProgramDays = (dataExtra as { standardApplyProgramDays: any })
-    ?.standardApplyProgramDays
-
-  let rateConfig = (dataExtra as { rateConfig: any })?.rateConfig
+  let standardApplyProgramDays = 90
 
   return (
     <div className="mb-3">
@@ -83,9 +84,8 @@ const ReportBack = ({
         <li>
           Mức lãi suất WF áp dụng
           <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
-            {rateConfig.map((item: any) => {
+            {publicProducts.map((item: any) => {
               let _termDescription: any = termDescriptionConfig.filter((x) => {
-                console.log('report back item', item)
                 return x.termKey == item.term
               })[0]
 
@@ -117,7 +117,7 @@ const ReportBack = ({
         </li>
         <li>
           Lãi suất của kì hạn được áp dụng khi tham gia tối thiểu{' '}
-          <span className="text-primary mx-1 font-bold">{90}</span> ngày
+          <span className="text-primary mx-1 font-bold">{standardApplyProgramDays}</span> ngày
         </li>
         <li>
           Lãi suất của kì hạn được áp dụng vào ngày

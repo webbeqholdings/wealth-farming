@@ -191,7 +191,7 @@ export default function WithdrawPage() {
       const response = await createWithdrawal({
         user_id: user.id,
         bank_id: selectBank,
-        amount: -amount,
+        amount: amount,
         account_from: Number(accounts[0].id),
       })
       if (!response.isSuccess) {
