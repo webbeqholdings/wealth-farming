@@ -1,3 +1,5 @@
+"use client"
+
 import { Suspense } from 'react'
 import { InvestmentContracts } from '@/components/contracts/investment-contracts'
 import { SiteHeader } from '@/components/site-header'

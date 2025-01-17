@@ -17,14 +17,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Facebook, Gift, DollarSign, UserCircle, LogOut, Wallet } from 'lucide-react'
+import { Facebook, Gift, DollarSign, UserCircle, Settings, LogOut, Wallet } from 'lucide-react'
 import { getBalanceAmountByUser } from '@/lib/account'
+import LanguageSwitch from './LanguageSwitcher'
+import { useTranslation } from 'react-i18next';
 import { me } from '@/lib/me'
 export function SiteHeader() {
   const { isLoggedIn, loading, user } = userStatus()
   const [balance, setBalance] = useState(0)
-  const router = useRouter()
-
+  const router = useRouter() // Use Next.js router for navigation
+  const { t } = useTranslation(); 
   useEffect(() => {
     const fetchData: any = async () => {
       const user = await me()
@@ -77,10 +79,10 @@ export function SiteHeader() {
                 </div>
                 <Button
                   variant="default"
-                  className="hidden md:inline-flex bg-green-500 hover:bg-green-600 text-white"
+                  className="inline-flex bg-green-500 hover:bg-green-600 text-white"
                   onClick={() => router.push('/account/deposit')}
                 >
-                  Deposit
+                  {t('deposit')}
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -92,21 +94,21 @@ export function SiteHeader() {
                   <DropdownMenuContent align="end" className="w-56">
                     <DropdownMenuItem onClick={() => router.push('/user-profile')}>
                       <UserCircle className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
+                      <span>{t('profile')}</span>
                     </DropdownMenuItem>
 
                     <DropdownMenuItem onClick={() => router.push('/account/referral')}>
                       <Gift className="mr-2 h-4 w-4" />
-                      <span>Referral Reward</span>
+                      <span>{t('referral_reward')}</span>
                     </DropdownMenuItem>
 
                     <DropdownMenuItem onClick={() => router.push('/investment-contracts')}>
                       <DollarSign className="mr-2 h-4 w-4" />
-                      <span>Portfolio</span>
+                      <span>{t('portfolio_title')}</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleLogout}>
                       <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
+                      <span>{t('log_out')}</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -127,6 +129,7 @@ export function SiteHeader() {
                 <span className="sr-only">Facebook</span>
               </div>
             </Link>
+            <LanguageSwitch/>
             <ModeToggle />
           </nav>
         </div>

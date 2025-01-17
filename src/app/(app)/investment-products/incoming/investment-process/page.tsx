@@ -6,8 +6,13 @@ import { ProfitTable } from '@/components/beq-dynamic-fund/ProfitTable'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import ReportBack from '@/components/beq-dynamic-fund/ReportBack'
-import { Term } from '@/lib/investment-products/dynamicFund'
 import { DataDynamicFundProvider } from '@/components/beq-dynamic-fund/DataProvider'
+import { useTranslation } from 'react-i18next';
+
+interface ProfitItem {
+  date: Date
+  balance: number
+}
 
 export default function InvestmentProcessPage() {
   return (

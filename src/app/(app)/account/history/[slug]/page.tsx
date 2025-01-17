@@ -34,11 +34,16 @@ import {
 import Spinner from '@/components/Spinner'
 import { printPdf } from '@/components/printPdf'
 import { useTheme } from 'next-themes'
-import { format } from 'date-fns'
-import { CalendarIcon, ArrowDownToLine } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { Calendar } from '@/components/ui/calendar'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { format } from "date-fns"
+import { CalendarIcon, ArrowDownToLine } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { Calendar } from "@/components/ui/calendar"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { useTranslation } from 'react-i18next';
 
 // Mock data for chart
 const chartData = [
@@ -54,11 +59,10 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
   const router = useRouter()
 
   const slug = use(params).slug
-  const tab =
-    slug === 'withdraw' || slug === 'transfer' || slug === 'bonus' || slug === 'investment'
-      ? slug
-      : 'deposit' // Deposit tab as default
-
+  const tab = slug === "withdraw" || slug === "transfer" || slug === "bonus" || slug === "investment"
+    ? slug
+    : 'deposit' // Deposit tab as default
+  const { t } = useTranslation();
   const { isLoggedIn, loading, user } = UserStatus()
   const [activeTab, setActiveTab] = useState(tab)
   const [transactions, setTransactions] = useState([])
@@ -193,7 +197,7 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
     <>
       <SiteHeader />
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Transaction History</h1>
+        <h1 className="text-3xl font-bold mb-8">{t('tranfer_history_Header_title')}</h1>
         <TabMenu items={accountConfig.tabList} defaultValue="history" />
         {/* Wallet Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 mt-6">
@@ -210,7 +214,7 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
                     currency: 'USD',
                   })}
                 </div>
-                <p className="text-xs text-muted-foreground">Balance</p>
+                <p className="text-xs text-muted-foreground">{t('balance')}</p>
               </CardContent>
             </Card>
           ))}
@@ -260,9 +264,7 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
                     <Calendar
                       mode="single"
                       selected={endDate}
-                      onSelect={(date) => {
-                        handleEndDateSelect(date)
-                      }}
+                      onSelect={(date) => { handleEndDateSelect(date) }}
                       initialFocus
                     />
                   </PopoverContent>
@@ -277,7 +279,7 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
                     setCurrentPage(1)
                   }}
                 >
-                  Deposits
+                  {t('tranfer_history_table_button_1')}
                 </Button>
                 <Button
                   variant={activeTab === 'withdraw' ? 'default' : 'outline'}
@@ -286,7 +288,7 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
                     setCurrentPage(1)
                   }}
                 >
-                  Withdrawals
+                  {t('tranfer_history_table_button_2')}
                 </Button>
                 <Button
                   variant={activeTab === 'transfer' ? 'default' : 'outline'}
@@ -295,7 +297,7 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
                     setCurrentPage(1)
                   }}
                 >
-                  Transfers
+                  {t('tranfer_history_table_button_3')}
                 </Button>
                 <Button
                   variant={activeTab === 'investment' ? 'default' : 'outline'}
@@ -304,7 +306,7 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
                     setCurrentPage(1)
                   }}
                 >
-                  Investments
+                  {t('tranfer_history_table_button_4')}
                 </Button>
                 <Button
                   variant={activeTab === 'bonus' ? 'default' : 'outline'}
@@ -313,7 +315,7 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
                     setCurrentPage(1)
                   }}
                 >
-                  Bonus
+                  {t('tranfer_history_table_button_5')}
                 </Button>
                 <div
                   className="p-2 cursor-pointer hover:bg-gray-200 rounded-md"
@@ -328,24 +330,28 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
             <Table id="tableContent">
               <TableHeader>
                 <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Type</TableHead>
+                  <TableHead>{t('date')}</TableHead>
+                  <TableHead>{t('type')}</TableHead>
                   {activeTab === 'all' || activeTab === 'investment' || activeTab === 'bonus' ? (
-                    <TableHead>Product</TableHead>
+                    <TableHead>{t('product')}</TableHead>
                   ) : (
                     ''
                   )}
-                  <TableHead>Amount</TableHead>
-                  {activeTab === 'investment' ? <TableHead>Profit</TableHead> : ''}
-                  {activeTab !== 'transfer' ? <TableHead>Account</TableHead> : ''}
-                  {activeTab === 'transfer' ? <TableHead>From Account</TableHead> : ''}
-                  {activeTab === 'transfer' ? <TableHead>To Account</TableHead> : ''}
+                  <TableHead>{t('money_amount')}</TableHead>
+                  {activeTab === 'investment' ? <TableHead>{t('portfolio_profit')}</TableHead> : ''}
+                  {activeTab !== 'transfer' ? <TableHead>{t('account')}</TableHead> : ''}
+                  {activeTab === 'transfer' ? <TableHead>{t('tranfer_from')}</TableHead> : ''}
+                  {activeTab === 'transfer' ? <TableHead>{t('tranfer_to')}</TableHead> : ''}
                   {activeTab === 'deposit' || activeTab === 'withdraw' || activeTab === 'bonus' ? (
-                    <TableHead>Status</TableHead>
+                    <TableHead>{t('status')}</TableHead>
                   ) : (
                     ''
                   )}
-                  {activeTab === 'bonus' ? <TableHead>Message</TableHead> : ''}
+                  {activeTab === 'bonus' ? (
+                    <TableHead>{t('portfolio_withdraw_message')}</TableHead>
+                  ) : (
+                    ''
+                  )}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -380,10 +386,8 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
                           //     : 'text-red-600'
                           // }
                           className={clsx({
-                            'text-green-600':
-                              transaction.amount >= 0 && transaction.profit_or_loss >= 0,
-                            'text-red-600':
-                              transaction.status === 'failed' || transaction.amount < 0,
+                            'text-green-600': transaction.amount >= 0 && transaction.profit_or_loss >= 0,
+                            'text-red-600': transaction.status === 'failed' || transaction.amount < 0,
                           })}
                         >
                           {transaction.amount.toLocaleString('en-US', {
@@ -446,7 +450,7 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
                     onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                     className="text-sm font-medium rounded-lg hover:bg-gray-100"
                   >
-                    Previous
+                    {t("previous")}
                   </PaginationPrevious>
                   <PaginationContent>
                     {[...Array(totalPages)].map((_, index) => (
@@ -467,7 +471,7 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
                     onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                     className="px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-100"
                   >
-                    Next
+                    {t("next")}
                   </PaginationNext>
                 </Pagination>
               </div>

@@ -35,6 +35,7 @@ import { ReCaptchaV3 } from '@/components/ReCaptchaV3'
 import { getAccountsByUserId } from '@/lib/account'
 import { createTransfer } from '@/lib/transaction'
 import Spinner from '@/components/Spinner'
+import { useTranslation } from 'react-i18next';
 
 const formSchema = z.object({
   fromAccount: z.string().min(1, { message: 'Please select the source account' }),
@@ -47,7 +48,8 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>
 
 export default function TransferPage() {
-  const { isLoggedIn, loading, user } = UserStatus()
+  const { isLoggedIn, loading, user } = UserStatus();
+  const { t } = useTranslation(); 
   const router = useRouter()
   const [fromBalance, setFromBalance] = useState(0)
   const [toBalance, setToBalance] = useState(0)
@@ -196,14 +198,14 @@ export default function TransferPage() {
         <TabMenu items={accountConfig.tabList} defaultValue="transfer" />
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle>Transfer Funds</CardTitle>
-            <CardDescription>Move money between your accounts</CardDescription>
+            <CardTitle>{t('tranfer_title')}</CardTitle>
+            <CardDescription>{t('tranfer_decs')}</CardDescription>
           </CardHeader>
           <CardContent>
             <form>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="fromAccount">From Account</Label>
+                  <Label htmlFor="fromAccount">{t('tranfer_from')}</Label>
                   <Select value={fromAccount} onValueChange={handleFromAccountChange}>
                     <SelectTrigger id="fromAccount">
                       <SelectValue placeholder="Select account" />
@@ -217,7 +219,7 @@ export default function TransferPage() {
                     </SelectContent>
                   </Select>
                   <p className="text-sm text-muted-foreground">
-                    Balance:{' '}
+                  {t('balance')}:{' '}
                     {fromBalance.toLocaleString('en-US', {
                       style: 'currency',
                       currency: 'USD',
@@ -230,7 +232,7 @@ export default function TransferPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="toAccount">To Account</Label>
+                  <Label htmlFor="toAccount">{t('tranfer_to')}</Label>
                   <Select value={toAccount} onValueChange={handleToAccountChange}>
                     <SelectTrigger id="toAccount">
                       <SelectValue placeholder="Select account" />
@@ -244,7 +246,7 @@ export default function TransferPage() {
                     </SelectContent>
                   </Select>
                   <p className="text-sm text-muted-foreground">
-                    Balance:{' '}
+                    {t('balance')}:{' '}
                     {toBalance.toLocaleString('en-US', {
                       style: 'currency',
                       currency: 'USD',
@@ -253,7 +255,7 @@ export default function TransferPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="amount">Amount</Label>
+                  <Label htmlFor="amount">{t('money_amount')}</Label>
                   <Input
                     id="amount"
                     placeholder="Enter amount"
@@ -270,7 +272,7 @@ export default function TransferPage() {
           </CardContent>
           <CardFooter>
             <Button className="w-full" onClick={handleTransfer}>
-              Transfer
+              {t('tranfer_confirm')}
             </Button>
           </CardFooter>
         </Card>

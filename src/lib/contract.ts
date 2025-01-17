@@ -73,10 +73,7 @@ export const getContracts = async (
 }
 
 export const getContractsWithDate = async (
-  page: number,
-  limit: number,
-  startDateFilter: string,
-  endDateFilter: string,
+  page: number, limit: number, startDateFilter: string, endDateFilter: string
 ): Promise<{ docs: any; totalPages: number; totalDocs: number }> => {
   try {
     const payload = await getPayload({
@@ -170,10 +167,7 @@ export const getWithdrawals = async (
 }
 
 export const getWithdrawalsWithDate = async (
-  page: number,
-  limit: number,
-  startDateFilter: string,
-  endDateFilter: string,
+  page: number, limit: number, startDateFilter: string, endDateFilter: string
 ): Promise<{ docs: Withdrawal[]; totalPages: number; totalDocs: number }> => {
   try {
     const payload = await getPayload({
@@ -287,7 +281,7 @@ export async function updateSetting(formData: any) {
       collection: 'contracts',
       id: formData.id,
       data: {
-        config_log: formData.setting ?? {},
+        config_log: formData.setting ?? {}
       },
     })
     // Simulate API call delay
@@ -358,5 +352,69 @@ export const getEligibleContracts = async (): Promise<{ docs: EligibleContract[]
   } catch (error) {
     console.error('Error fetching eligible contracts:', error)
     return { docs: [] }
+  }
+}
+
+export async function checkContractLarger90Days() {
+  try {
+    const payload = await getPayload({
+      config,
+    });
+    const headers = await nextHeaders();
+    const auth = await payload.auth({ headers });
+    var test_data = false
+
+    // Check active contract
+    const query_activeContract = {
+      user: { equals: auth.user.id },
+      status: { equals: 'active' }
+    }
+    const response_activeContract = await payload.find({
+      collection: 'contracts',
+      where: { ...query_activeContract, },
+      sort: 'start_date',
+      limit: 10000
+    });
+    response_activeContract.docs.forEach(element => {
+      const constract_date = new Date(element.start_date);
+      const return_date = new Date(constract_date.getFullYear(), constract_date.getMonth(), constract_date.getDate() + 90)
+      const today = new Date()
+      if ((return_date <= today) == true) {
+        test_data = true
+        return true
+      }
+    })
+
+    if (test_data) {
+      return true
+    }
+
+    // Check inactive contract
+    const query_inactiveContract = {
+      user: { equals: auth.user.id },
+      'contract.status': { not_equals: 'active' }
+    }
+    const response_inactiveContract = await payload.find({
+      collection: 'withdrawals',
+      where: { ...query_inactiveContract, },
+      sort: 'createdAt',
+      limit: 10000
+    });
+
+    response_inactiveContract.docs.forEach(element => {
+      if (typeof element.contract !== 'number') {
+        const constract_start_date = new Date(element.contract.start_date)
+        const return_date = new Date(constract_start_date.getFullYear(), constract_start_date.getMonth(), constract_start_date.getDate() + 90)
+        const constract_termination_date = new Date(element.createdAt)
+        if ((return_date <= constract_termination_date) == true) {
+          test_data = true
+          return true
+        }
+      }
+    });
+    return test_data
+  }
+  catch (erorr) {
+    console.error(erorr)
   }
 }

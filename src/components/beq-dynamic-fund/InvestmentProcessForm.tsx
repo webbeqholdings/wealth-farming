@@ -36,6 +36,7 @@ import { useRouter } from 'next/navigation'
 import userStatus from '@/lib/userStatus'
 import { me } from '@/lib/me'
 import { useDynamicFundData } from '@/components/beq-dynamic-fund/DataProvider'
+import { checkContractLarger90Days } from '@/lib/contract'
 
 const minRangeDays = 5
 const now = new Date()
@@ -53,7 +54,7 @@ export function InvestmentProcessForm() {
   const [productId, setProductId] = useState(null)
   const [depositAmount, setDepositAmount] = useState<number>(10000)
   const [periods, setPeriods] = useState<number>(1)
-
+  const [rateConfig, setRateConfig] = useState([])
   const [isSiteLoading, setIsSiteLoading] = useState(true)
   const [products, setProducts] = useState([])
   const [productSelected, setProductSelected] = useState(null)
@@ -70,8 +71,16 @@ export function InvestmentProcessForm() {
       const fetchRates = async () => {
         try {
           setIsSiteLoading(true)
+          const MonthlyAvalable = await checkContractLarger90Days()
           const response: any = await getPublicProducts()
           setProducts(response)
+          if (MonthlyAvalable) {
+            setRateConfig(response)
+          }
+          else {
+            const no90Term = response.slice(1, 4)
+            setRateConfig(no90Term)
+          }
         } finally {
           setIsSiteLoading(false)
         }
@@ -256,9 +265,8 @@ export function InvestmentProcessForm() {
               <PopoverTrigger asChild>
                 <Button
                   variant={'outline'}
-                  className={`w-full justify-start text-left font-normal ${
-                    !startDate && 'text-muted-foreground'
-                  }`}
+                  className={`w-full justify-start text-left font-normal ${!startDate && 'text-muted-foreground'
+                    }`}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {startDate ? format(startDate, 'PPP') : 'Pick a date'}
@@ -285,9 +293,8 @@ export function InvestmentProcessForm() {
               <PopoverTrigger asChild>
                 <Button
                   variant={'outline'}
-                  className={`w-full justify-start text-left font-normal ${
-                    !endDate && 'text-muted-foreground'
-                  }`}
+                  className={`w-full justify-start text-left font-normal ${!endDate && 'text-muted-foreground'
+                    }`}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {endDate ? format(endDate, 'PPP') : 'Pick a date'}
