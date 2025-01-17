@@ -366,7 +366,7 @@ export function InvestmentContracts() {
                                     )}
                                 >
                                     <CalendarIcon />
-                                    {startDate ? format(startDate, "PPP") : <span>Start Date</span>}
+                                    {startDate ? format(startDate, "PPP") : <span>{t("start_date")}</span>}
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0" align="start">
@@ -388,7 +388,7 @@ export function InvestmentContracts() {
                                     )}
                                 >
                                     <CalendarIcon />
-                                    {endDate ? format(endDate, "PPP") : <span>End Date</span>}
+                                    {endDate ? format(endDate, "PPP") : <span>{t("end_date")}</span>}
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0" align="start">
@@ -563,7 +563,6 @@ export function InvestmentContracts() {
                                             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                                             className="text-sm font-medium rounded-lg hover:bg-gray-100"
                                         >
-                                             {t('previous')}
                                         </PaginationPrevious>
                                         <PaginationContent>
                                             {[...Array(totalPageInvestments)].map((_, index) => (
@@ -585,7 +584,6 @@ export function InvestmentContracts() {
                                             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPageInvestments))}
                                             className="px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-100"
                                         >
-                                            {t('next')}
                                         </PaginationNext>
                                     </Pagination>
                                 </div> : (
@@ -624,11 +622,11 @@ export function InvestmentContracts() {
                                                             withdrawal.status
                                                         )}`}
                                                     >
-                                                        {withdrawal.status.charAt(0).toUpperCase() + withdrawal.status.slice(1)}
+                                                        {t(withdrawal.status.charAt(0).toUpperCase() + withdrawal.status.slice(1))}
                                                     </span>
                                                 </TableCell>
                                                 <TableCell>
-                                                    {withdrawal.message}
+                                                    {t(withdrawal.message)}
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -640,7 +638,7 @@ export function InvestmentContracts() {
                                             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                                             className="text-sm font-medium rounded-lg hover:bg-gray-100"
                                         >
-                                            Previous
+                                            {t('previous')}
                                         </PaginationPrevious>
                                         <PaginationContent>
                                             {[...Array(totalPageWithdrawl)].map((_, index) => (
@@ -662,7 +660,7 @@ export function InvestmentContracts() {
                                             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPageWithdrawl))}
                                             className="px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-100"
                                         >
-                                            Next
+                                            {t('next')}
                                         </PaginationNext>
                                     </Pagination>
                                 </div> : <TableRow>

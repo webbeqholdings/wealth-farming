@@ -93,6 +93,7 @@ export const en = {
     portfolio_cell_4: 'Expected ROI',
     portfolio_tab_investment: 'Investment',
     portfolio_tab_withdraw: 'Withdraw',
+    portfolio_withdraw_amount: 'Amount',
 
     //  /investment-contracts -contracts table
     portfolio_empty_contract: "There are no contracts in your portfolio",
@@ -113,6 +114,9 @@ export const en = {
     portfolio_actions: "Actions",
     portfolio_setting_excontract: "Extend Contract",
     portfolio_setting_excontract_help: "Enable automatic profit withdrawal for each term by extending your contract",
+    start_date: "From Date",
+    end_date: "To Date",
+
     portfolio_setting_profitWithdraw: "Profit Withdraw",
     //  /investment-contracts -withdraw table
     portfolio_empty_contract_withdraw: "There are no withdrawal contracts in your portfolio",

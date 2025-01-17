@@ -18,11 +18,14 @@ export const vi = {
     // General action
     deposit: "Nạp tiền",
     back: "Trở về",
-    previous: "Sau",
+    previous: "Trước",
     Next: "Tiếp theo",
-    next: "Trước",
-    active: "Active",
-    inactive: "Inactive",
+    next: "Sau",
+    active: "Hoạt động",
+    inactive: "Không hoạt động",
+    Completed: "Hoàn thành",
+    Pending:"Chờ xử lý",
+    Failed:"Thất bại",
     update: "Cập nhật",
     confirm: "Xác nhận",
     // site-header
@@ -93,6 +96,8 @@ export const vi = {
     portfolio_cell_4: 'ROI Dự kiến',
     portfolio_tab_investment: 'Hợp đồng đầu tư',
     portfolio_tab_withdraw: 'Lịch sử rút tiền',
+    start_date: "Từ ngày",
+    end_date: "Đến ngày",
 
     //  -/investment-contracts -contracts table
     portfolio_empty_contract: "Không có hợp đồng nào trong danh mục đầu tư của bạn",
@@ -118,5 +123,8 @@ export const vi = {
     portfolio_empty_contract_withdraw: "Không có hợp đồng rút tiền nào trong danh mục đầu tư của bạn.",
     portfolio_withdraw_date: "Ngày tạo giao dịch",
     portfolio_withdraw_message: "Lời nhắn",
-
+    portfolio_withdraw_amount: "Số tiền rút",
+    'Withdrawal request submitted successfully. Awaiting admin approval.': "Yêu cầu rút tiền đã được gửi thành công. Đang chờ quản trị viên phê duyệt.",
+    'Withdrawal completed successfully.':"Rút tiền thành công.",
+    "Withdrawal failed. The contract has been reactivated with a balance of {{amount}}.": "Quá trình rút tiền không thành công. Hợp đồng đã được kích hoạt lại với số dư là {{amount}}."
 }
