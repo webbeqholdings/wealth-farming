@@ -62,7 +62,7 @@ export const vi = {
     withdraw_title: "Rút tiền",
     withdraw_decs: "Rút tiền an toàn từ tài khoản của bạn",
     withdraw_limit_title: "Giới hạn rút tiền",
-    withdraw_limit_decs: "Giới hạn hàng ngày: 10.000 đô la. Giới hạn hàng tháng: 50.000 đô la. Đảm bảo bạn có đủ tiền trong tài khoản của mình.",
+    withdraw_limit_decs: "Vui lòng đảm bảo rằng bạn có đủ tiền trong tài khoản trước khi tiếp tục.",
     withdraw_nobank_warning: "Vui lòng chọn một tài khoản ngân hàng để tiến hành.",
     withdraw_withdraw_notice: "Lưu ý rút tiền bằng thẻ",
     withdraw_notice_desc: "Việc rút tiền vào thẻ có thể mất 3-5 ngày làm việc để xử lý. Một số ngân hàng có thể tính thêm phí.",

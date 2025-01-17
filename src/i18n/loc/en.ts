@@ -62,7 +62,7 @@ export const en = {
     withdraw_title: "Transfer Funds",
     withdraw_decs: "Securely withdraw money from your account",
     withdraw_limit_title: "Withdrawal Limits",
-    withdraw_limit_decs: "Daily limit: $10,000. Monthly limit: $50,000. Ensure you have sufficient funds in your account.",
+    withdraw_limit_decs: "Please ensure you have sufficient funds available in your acount before proceeding.",
     withdraw_nobank_warning: "Please select a bank account to proceed.",
     withdraw_withdraw_notice: "Card Withdrawal Notice",
     withdraw_notice_desc: "Withdrawals to cards may take 3-5 business days to process. Some banks may charge additional fees.",
