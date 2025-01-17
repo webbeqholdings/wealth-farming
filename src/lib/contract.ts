@@ -23,6 +23,49 @@ interface EligibleContract {
   eligible: boolean
 }
 
+export const getInvestmentDetailsById = async (investmentId: number) => {
+  try {
+    const payload = await getPayload({ config })
+    const headers = await nextHeaders()
+    const auth = await payload.auth({ headers })
+
+    const response = await payload.find({
+      collection: 'contracts',
+      where: {
+        user: { equals: auth.user.id },
+        id: { equals: investmentId },
+      },
+    })
+    const contracts = response.docs
+
+    return {
+      docs: contracts.map((contract: any) => ({
+        id: contract.id,
+        userId: contract.user.id,
+        minInvestment: contract?.product_log?.min_investment,
+        productName: contract?.product_log?.data?.product_name,
+        investedAmount: contract.amount,
+        expectedReturn: contract.expected_return,
+        availableBalance: Number(contract.balance),
+        term: contract.term,
+        periods: contract.periods,
+        profit: contract.profit,
+        rateOfReturn: contract?.product_log?.data?.rate_of_return,
+        startDate: contract.start_date,
+        endDate: contract.end_date,
+        status: contract.status,
+        extendContract: contract.extend_contract,
+        setting: contract.config_log,
+        lastWithdrawal: contract.updatedAt || null,
+      })),
+      totalPages: response.totalPages,
+      totalDocs: response.totalDocs,
+    }
+  } catch (error) {
+    console.error('Transaction error:', error)
+  }
+}
+
 export const getContracts = async (
   page: number,
   limit: number,

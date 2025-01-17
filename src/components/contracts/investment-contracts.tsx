@@ -33,11 +33,7 @@ import {
 } from '@/components/ui/pagination'
 import Spinner from '../Spinner'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Label } from '@/components/ui/label'
 import { LucideBan, LucideBanknote, Settings } from 'lucide-react'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { CircleHelp } from 'lucide-react'
-import { getPaymentTransfer } from '@/lib/paymentTransfer'
 import { useToast } from '@/hooks/use-toast'
 import { format } from 'date-fns'
 import { CalendarIcon } from 'lucide-react'
@@ -80,9 +76,9 @@ export function InvestmentContracts() {
   const router = useRouter()
   const { isLoggedIn, loading, user } = userStatus()
   const { toast } = useToast()
-  const [selectedContract, setSelectedContract] = useState<Investment | null>(null)
-  const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false)
-  const [terminationDialogOpen, setTerminationDialogOpen] = useState(false)
+  // const [selectedContract, setSelectedContract] = useState<Investment | null>(null)
+  // const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false)
+  // const [terminationDialogOpen, setTerminationDialogOpen] = useState(false)
   const [investments, setInvestments] = useState<Investment[]>()
   const [withdrawals, setWithdrawals] = useState<Withdrawal[]>()
   const [currentPage, setCurrentPage] = useState(1)
@@ -191,14 +187,14 @@ export function InvestmentContracts() {
     return ((totalExpected - totalInvested) / totalInvested) * 100
   }
 
-  const handleWithdraw = (investment: Investment) => {
-    setSelectedContract(investment)
-    setWithdrawDialogOpen(true)
-  }
-  const handleTerminate = (investment: Investment) => {
-    setSelectedContract(investment)
-    setTerminationDialogOpen(true)
-  }
+  // const handleWithdraw = (investment: Investment) => {
+  //   setSelectedContract(investment)
+  //   setWithdrawDialogOpen(true)
+  // }
+  // const handleTerminate = (investment: Investment) => {
+  //   setSelectedContract(investment)
+  //   setTerminationDialogOpen(true)
+  // }
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -221,61 +217,8 @@ export function InvestmentContracts() {
     }
   }
 
-  // Handle Press Update in Setting
-  async function handleChangeSetting(e: any) {
-    // Prevent the browser from reloading the page
-    e.preventDefault()
-
-    // Read the form data
-    const formData = new FormData(e.target)
-    const formJson = Object.fromEntries(formData.entries())
-
-    try {
-      const paymentTransfer = await getPaymentTransfer()
-      const minWithdrawal = paymentTransfer.minWithdrawal
-
-      if (parseFloat(formJson.monthlyProfit.toString()) >= 10) {
-        const formData = {
-          id: formJson.id,
-          setting: {
-            auto_profit: formJson.monthlyProfit,
-            extend_contract: formJson.extend_contract == 'on' ? true : false,
-          },
-        }
-
-        const response = await updateSetting(formData)
-        if (!response.success) {
-          throw new Error('Failed to update setting')
-        }
-        fetchData()
-        toast({
-          title: 'Update setting successful',
-        })
-      } else {
-        toast({
-          title: 'Error',
-          description: `The amount must be greater than or equal to the minimum withdrawal amount of ${minWithdrawal} USD.`,
-        })
-        fetchData()
-        return
-      }
-    } catch (error) {
-      console.error('Failed to update setting:', error)
-      fetchData()
-      // Revert state if API call fails
-    }
-  }
-
-  // Handle toggle switch and API update
-  const handleSwitchExtend = async (investment: any) => {
-    const investmentId = investment.id
-    const newCheckedState = !checkedStates[investmentId] // Toggle state
-
-    // Optimistically update UI
-    setCheckedStates((prevState: any) => ({
-      ...prevState,
-      [investmentId]: newCheckedState,
-    }))
+  const handleInvestmentClick = (investment: Investment) => {
+    router.push(`/investment-contracts/contract-details?type=investment&id=${investment.id}`)
   }
 
   if (loading) {
@@ -433,7 +376,7 @@ export function InvestmentContracts() {
                     {investments &&
                       investments.map((investment) => (
                         <TableRow key={investment.id}>
-                          <TableCell className="font-medium">{investment.productName}</TableCell>
+                          <TableCell className="font-medium ">{investment.productName}</TableCell>
                           <TableCell>{formatCurrency(investment.investedAmount)}</TableCell>
                           <TableCell>{formatCurrency(investment.expectedReturn)}</TableCell>
                           <TableCell className="text-green-500">
@@ -461,100 +404,11 @@ export function InvestmentContracts() {
                             </span>
                           </TableCell>
 
-                          <TableCell className="text-right relative flex items-center space-x-2">
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <Button variant="ghost">
-                                  <Settings />
-                                </Button>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-80 ">
-                                <form method="POST" onSubmit={handleChangeSetting}>
-                                  <div className="grid gap-2 ">
-                                    <input name={'id'} defaultValue={investment.id} hidden />
-                                    <div className="grid grid-cols-4 items-center gap-4 font-medium">
-                                      <Label className="col-span-2">Profit Withdraw</Label>
-                                      <div className="col-span-2 flex items-center  rounded-md ">
-                                        <span className="px-3 text-gray-500">$</span>
-                                        <input
-                                          name="monthlyProfit"
-                                          defaultValue={investment.setting?.auto_profit ?? 0}
-                                          className="h-8 w-24 rounded-md"
-                                          type="number"
-                                        />
-                                      </div>
-                                      <Label className="col-span-2">
-                                        <div className="relative flex items-center space-x-2 cursor-pointer">
-                                          <span>Extend Contract</span>
-                                          <TooltipProvider>
-                                            <Tooltip>
-                                              <TooltipTrigger asChild>
-                                                <CircleHelp size={16} strokeWidth={1.25} />
-                                              </TooltipTrigger>
-                                              <TooltipContent>
-                                                <p>
-                                                  Enable automatic profit withdrawal for each term
-                                                  by extending your contract.
-                                                </p>
-                                              </TooltipContent>
-                                            </Tooltip>
-                                          </TooltipProvider>
-                                        </div>
-                                      </Label>
-
-                                      <div>
-                                        <label className="flex items-center justify-center space-x-2 cursor-pointer">
-                                          <div className="relative">
-                                            <input
-                                              type="checkbox"
-                                              name="extend_contract"
-                                              className="sr-only"
-                                              onChange={() => handleSwitchExtend(investment)}
-                                              checked={checkedStates[investment.id] || false}
-                                            />
-                                            <div
-                                              className={`w-10 h-6 bg-gray-200 rounded-full shadow-inner ${
-                                                checkedStates[investment.id]
-                                                  ? 'bg-green-500'
-                                                  : 'bg-gray-300'
-                                              }`}
-                                            ></div>
-                                            <div
-                                              className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transform transition-transform ${
-                                                checkedStates[investment.id] ? 'translate-x-4' : ''
-                                              }`}
-                                            ></div>
-                                          </div>
-                                        </label>
-                                      </div>
-                                      <div className="col-span-4 flex justify-center">
-                                        <button
-                                          className="col-span-2 mt-2 py-2 px-4 bg-primary rounded-md font-semibold "
-                                          type="submit"
-                                        >
-                                          Update
-                                        </button>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </form>
-                              </PopoverContent>
-                            </Popover>
-                            <Button
-                              variant="ghost"
-                              onClick={() => handleWithdraw(investment)}
-                              className="hover:text-black "
-                            >
-                              <LucideBanknote />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleTerminate(investment)}
-                              className="hover:text-red-500 ml-2"
-                            >
-                              <LucideBan color={'#f00505'} />
-                            </Button>
+                          <TableCell
+                            className="text-right relative flex items-center space-x-2 cursor-pointer hover:underline"
+                            onClick={() => handleInvestmentClick(investment)}
+                          >
+                            Investment Details
                           </TableCell>
                         </TableRow>
                       ))}
@@ -684,7 +538,7 @@ export function InvestmentContracts() {
         </Card>
       </div>
 
-      {selectedContract && (
+      {/* {selectedContract && (
         <WithdrawDialog
           isOpen={withdrawDialogOpen}
           onClose={() => setWithdrawDialogOpen(false)}
@@ -699,7 +553,7 @@ export function InvestmentContracts() {
           contract={selectedContract}
           setActiveTab={setActiveTab}
         />
-      )}
+      )} */}
     </div>
   )
 }
