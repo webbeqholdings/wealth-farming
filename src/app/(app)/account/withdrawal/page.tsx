@@ -259,7 +259,6 @@ export default function WithdrawPage() {
                   </div>
                   <Alert>
                     <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>{t('withdraw_limit_title')}</AlertTitle>
                     <AlertDescription>
                       {t('withdraw_limit_decs')}
                     </AlertDescription>

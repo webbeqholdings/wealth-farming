@@ -24,6 +24,9 @@ export const printPdf = async (elementProps: string, isHideElement: boolean) => 
         .toPdf()
         .get('pdf')
         .then((pdf: jsPDF) => {
+          pdf.setProperties({
+            title: 'History Transaction',
+          })
           // Generate a Blob from the PDF content
           const pdfBlob = pdf.output('blob')
 
