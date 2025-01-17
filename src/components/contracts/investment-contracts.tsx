@@ -15,7 +15,7 @@ import { WithdrawDialog } from '@/components/withdraw-dialog'
 import { TerminationDialog } from '../termination-dialog'
 import userStatus from '@/lib/userStatus'
 import { useRouter } from 'next/navigation'
-import { getContracts, getWithdrawals, updateSetting, getContractsWithDate, getWithdrawalsWithDate } from '@/lib/contract'
+import { getContracts, getWithdrawals, updateSetting, getContractsWithDate, getWithdrawalsWithDate, checkContractLarger90Days } from '@/lib/contract'
 import {
     Pagination,
     PaginationContent,
@@ -95,9 +95,19 @@ export function InvestmentContracts() {
     const [checkedStates, setCheckedStates] = useState<any>({});
     const [startDate, setStartDate] = useState<Date>()
     const [endDate, setEndDate] = useState<Date>()
+    const [terminatedAvaibility, setTerminatedAvaibility] = useState(false)
     const { t } = useTranslation();
-    // Handle tab switch and data fetching
-    // Unified fetchData function
+
+    useEffect(() => {
+        async function fetchTerminateAvaibility() {
+            const avail = await checkContractLarger90Days()
+            if (avail == true){
+                setTerminatedAvaibility(true);
+            }
+        }
+        fetchTerminateAvaibility()
+    })
+
     const fetchData = useCallback(async () => {
         if (activeTab === 'investment') {
             const { docs, totalPages } = await getContracts(currentPage, 10);
@@ -677,6 +687,7 @@ export function InvestmentContracts() {
                     isOpen={withdrawDialogOpen}
                     onClose={() => setWithdrawDialogOpen(false)}
                     contract={selectedContract}
+                    terminated_avail={terminatedAvaibility}
                     setActiveTab={setActiveTab}
                 />
             )}
@@ -685,6 +696,7 @@ export function InvestmentContracts() {
                     isOpen={terminationDialogOpen}
                     onClose={() => setTerminationDialogOpen(false)}
                     contract={selectedContract}
+                    terminated_avail={terminatedAvaibility}
                     setActiveTab={setActiveTab}
                 />
             )}
