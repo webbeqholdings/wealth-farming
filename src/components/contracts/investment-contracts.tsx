@@ -106,7 +106,7 @@ export function InvestmentContracts() {
             }
         }
         fetchTerminateAvaibility()
-    })
+    }, [loading])
 
     const fetchData = useCallback(async () => {
         if (activeTab === 'investment') {
@@ -123,7 +123,7 @@ export function InvestmentContracts() {
             setWithdrawals(docs);
             setTotalPagesWithdrawl(totalPages);
         }
-    }, [activeTab, currentPage]);
+    }, [activeTab, currentPage, loading]);
 
     // Call fetchData in useEffect
     useEffect(() => {
