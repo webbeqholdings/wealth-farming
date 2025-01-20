@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import dynamic from 'next/dynamic'
 import createGlobe from 'cobe'
 import { GlobeGithub } from '@/components/GlobeGithub'
+import { useTranslation } from 'react-i18next';
 
 import {
   PageHeaderHeading,
@@ -15,6 +16,7 @@ import {
 import Link from 'next/link'
 
 export function MinimalHero() {
+  const { t } = useTranslation();
   return (
     <section className="w-full">
       <div className="container px-4 md:px-6">
@@ -23,12 +25,11 @@ export function MinimalHero() {
             <PageHeader>
               <PageHeaderHeading>Your wealth, our mission</PageHeaderHeading>
               <PageHeaderDescription>
-                Customized investment solutions to optimize your cash flow. Transparent and secure
-                programs delivering steady monthly returns.
+                {t('Customized investment solutions to optimize your cash flow. Transparent and secure programs delivering steady monthly returns.')}
               </PageHeaderDescription>
               <PageActions>
                 <Button asChild size="sm">
-                  <Link href="/investment-products/incoming/investment-process">How it works</Link>
+                  <Link href="/investment-products/incoming/investment-process">{t('How it works')}</Link>
                 </Button>
                 {/* <Link href="/docs/components/chart">Documentation</Link> */}
               </PageActions>
