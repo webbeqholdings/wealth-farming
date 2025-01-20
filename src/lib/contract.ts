@@ -19,6 +19,9 @@ export const getContracts = async (page: number, limit: number): Promise<{ docs:
     });
     const headers = await nextHeaders();
     const auth = await payload.auth({ headers });
+    if(!auth.user){
+      return
+    }
     const response = await payload.find({
       collection: 'contracts',
       where: {
@@ -68,6 +71,9 @@ export const getContractsWithDate = async (
     });
     const headers = await nextHeaders();
     const auth = await payload.auth({ headers });
+    if(!auth.user){
+      return
+    }
     const query = {
       user: { equals: auth.user.id },
       start_date: {
@@ -120,7 +126,9 @@ export const getWithdrawals = async (page: number, limit: number): Promise<{ doc
     });
     const headers = await nextHeaders();
     const auth = await payload.auth({ headers });
-
+    if(!auth.user){
+      return
+    }
     const response = await payload.find({
       collection: 'withdrawals',
       where: {
@@ -160,7 +168,9 @@ export const getWithdrawalsWithDate = async (
     });
     const headers = await nextHeaders();
     const auth = await payload.auth({ headers });
-
+    if(!auth.user){
+      return
+    }
     const query = {
       user: { equals: auth.user.id },
       createdAt: {
@@ -297,6 +307,9 @@ export async function checkContractLarger90Days() {
     });
     const headers = await nextHeaders();
     const auth = await payload.auth({ headers });
+    if(!auth.user){
+      return
+    }
     var test_data = false
 
     // Check active contract
