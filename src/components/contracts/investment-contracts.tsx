@@ -106,7 +106,7 @@ export function InvestmentContracts() {
             }
         }
         fetchTerminateAvaibility()
-    })
+    }, [loading])
 
     const fetchData = useCallback(async () => {
         if (activeTab === 'investment') {
