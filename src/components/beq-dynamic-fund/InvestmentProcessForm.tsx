@@ -26,6 +26,7 @@ import {
   contractMultiPeriodEndAt,
   standardApplyProgramDays,
   canCancelContractAt,
+  getlastBalance,
 } from '@/lib/investment-products/dynamicFund'
 import { createInvestment } from '@/lib/transaction'
 import { getPublicProducts } from '@/lib/investment-products/dynamicFundQuery'
@@ -59,6 +60,7 @@ export function InvestmentProcessForm() {
   const [products, setProducts] = useState([])
   const [productSelected, setProductSelected] = useState(null)
   const [user, setUser] = useState(null)
+  const [profitData, setProfitData] = useState([])
 
   const { toast } = useToast()
 
@@ -76,8 +78,7 @@ export function InvestmentProcessForm() {
           setProducts(response)
           if (MonthlyAvalable) {
             setRateConfig(response)
-          }
-          else {
+          } else {
             const no90Term = response.slice(1, 4)
             setRateConfig(no90Term)
           }
@@ -155,7 +156,6 @@ export function InvestmentProcessForm() {
       if (term == 'monthly') {
         profitData = buildProfitRecordsMonthly(depositAmount, startDate, endDate)
       }
-
       setData({
         profitData: profitData,
         productId: productId,
@@ -177,6 +177,24 @@ export function InvestmentProcessForm() {
       router.push('../../join')
       return // Optional: Show a redirect message
     }
+    let profitData: any = []
+    if (term == 'annually') {
+      profitData = buildProfitRecordsAnnualy(depositAmount, startDate, endDate)
+    }
+
+    if (term == 'semester') {
+      profitData = buildProfitRecordsSemester(depositAmount, startDate, endDate)
+    }
+
+    if (term == 'quarterly') {
+      profitData = buildProfitRecordsQuarterly(depositAmount, startDate, endDate)
+    }
+
+    if (term == 'monthly') {
+      profitData = buildProfitRecordsMonthly(depositAmount, startDate, endDate)
+    }
+
+    const expected_return = await getlastBalance(profitData)
 
     if (startDate && endDate && depositAmount > 0) {
       const formData = {
@@ -185,6 +203,7 @@ export function InvestmentProcessForm() {
         term: term,
         startDate: startDate,
         userId: user.id,
+        expected_return: expected_return,
       }
       const response: any = await createInvestment(formData)
 
@@ -265,8 +284,9 @@ export function InvestmentProcessForm() {
               <PopoverTrigger asChild>
                 <Button
                   variant={'outline'}
-                  className={`w-full justify-start text-left font-normal ${!startDate && 'text-muted-foreground'
-                    }`}
+                  className={`w-full justify-start text-left font-normal ${
+                    !startDate && 'text-muted-foreground'
+                  }`}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {startDate ? format(startDate, 'PPP') : 'Pick a date'}
@@ -293,8 +313,9 @@ export function InvestmentProcessForm() {
               <PopoverTrigger asChild>
                 <Button
                   variant={'outline'}
-                  className={`w-full justify-start text-left font-normal ${!endDate && 'text-muted-foreground'
-                    }`}
+                  className={`w-full justify-start text-left font-normal ${
+                    !endDate && 'text-muted-foreground'
+                  }`}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {endDate ? format(endDate, 'PPP') : 'Pick a date'}

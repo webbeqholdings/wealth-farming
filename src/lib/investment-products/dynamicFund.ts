@@ -42,6 +42,32 @@ interface Rate {
   isShowForm: Boolean
 }
 
+interface TradingDay {
+  month: string
+  days: number
+  rate: number
+  valid: boolean
+  gender: string
+}
+
+interface YearData {
+  year: {
+    year: number
+    tradingDaysLayer: TradingDay[]
+  }
+  date: string
+  balance: number
+  profit: number
+  interestEarned: number
+  rate: number
+  termType: string
+  days: number
+}
+
+interface ProfitData {
+  [year: string]: YearData[]
+}
+
 export const rateConfig: Rate[] = [
   { term: 'partialMonth', rate: 0.04, text: 'Partial Month', isShowForm: false },
   { term: 'monthly', rate: 0.0595, text: 'Monthly', isShowForm: true },
@@ -726,4 +752,14 @@ export const calculatePenaltyContractRecords = async (
   if (!months) return false
 
   return root_amount - total_bonus + 0.0167 * 12
+}
+
+export const getlastBalance = async (data: ProfitData): Promise<number> => {
+  const years = Object.keys(data)
+
+  const lastYear = years[years.length - 1]
+
+  const lastEntry = data[lastYear][data[lastYear].length - 1]
+
+  return lastEntry.balance
 }

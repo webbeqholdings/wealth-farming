@@ -308,7 +308,7 @@ export const createInvestment = async (formData: any) => {
       user: Number(userId),
       amount: Number(amount),
       balance: Number(amount),
-      expected_return: product_doc.rate_of_return,
+      expected_return: formData.expected_return,
       status: 'active',
       term: product_doc.term,
       profit: 0,
