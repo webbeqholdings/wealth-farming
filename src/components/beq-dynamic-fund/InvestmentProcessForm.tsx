@@ -34,6 +34,7 @@ import { notifyInvestment } from '@/lib/telegram'
 import { useRouter } from 'next/navigation'
 import userStatus from '@/lib/userStatus'
 import { checkContractLarger90Days } from '@/lib/contract'
+import { useTranslation } from 'react-i18next'
 
 const minRangeDays = 5
 const now = new Date()
@@ -47,6 +48,7 @@ export function InvestmentProcessForm({
   onCalculate: (data: any) => void
   onRequest: (data: any) => void
 }) {
+  const { t } = useTranslation()
   const { isLoggedIn } = userStatus()
   const router = useRouter()
 
@@ -245,12 +247,12 @@ export function InvestmentProcessForm({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Kế hoạch đầu tư</CardTitle>
+        <CardTitle>{t('Kế hoạch đầu tư')}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="depositAmount">Số tiền USD tham gia</Label>
+            <Label htmlFor="depositAmount">{t('Số tiền USD tham gia')}</Label>
             <Input
               id="depositAmount"
               type="number"
@@ -261,7 +263,7 @@ export function InvestmentProcessForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="term">Kì Hạn Rút Lãi</Label>
+            <Label htmlFor="term">{t('Kì Hạn Rút Lãi')}</Label>
             <Select
               value={term}
               onValueChange={(value: string) => {
@@ -281,7 +283,7 @@ export function InvestmentProcessForm({
                     <SelectItem key={rate.term} value={rate.term}>
                       {rate.product_name}
                       <span className="text-gray-400 mx-3">
-                        {(rate.rate_of_return * 100).toFixed(2)}% / Tháng
+                        {(rate.rate_of_return * 100).toFixed(2)}% / {t('Tháng')}
                       </span>
                     </SelectItem>
                   ))}
@@ -290,7 +292,7 @@ export function InvestmentProcessForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="startDate">Ngày tham gia</Label>
+            <Label htmlFor="startDate">{t('Ngày tham gia')}</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -318,7 +320,7 @@ export function InvestmentProcessForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="endDate">Ngày kết thúc hợp đồng</Label>
+            <Label htmlFor="endDate">{t('Ngày kết thúc hợp đồng')}</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -346,7 +348,7 @@ export function InvestmentProcessForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="periods">Số chu kì tham gia</Label>
+            <Label htmlFor="periods">{t('Số chu kì tham gia')}</Label>
             <Input
               id="periods"
               type="number"
@@ -357,7 +359,7 @@ export function InvestmentProcessForm({
           </div>
 
           <Button type="submit" className="w-full">
-            Tính Kết Quả
+            {t('Tính Kết Quả')}
           </Button>
         </form>
         <Button
@@ -365,7 +367,7 @@ export function InvestmentProcessForm({
           onClick={() => handleInvestment()}
           className="w-full mt-2 bg-green-600 text-white hover:bg-green-500"
         >
-          Submit Investment
+          {t('Submit Investment')}
         </Button>
       </CardContent>
     </Card>
