@@ -4,6 +4,7 @@ import { initReactI18next } from 'react-i18next';
 // Import chuỗi dịch
 import { en } from './loc/en';
 import { vi } from './loc/vi';
+const savedLanguage = localStorage.getItem('i18n_language') || 'en';
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -14,7 +15,7 @@ i18n.use(initReactI18next).init({
       translation: vi, // Gán chuỗi dịch tiếng Việt
     },
   },
-  lng: 'en', // Ngôn ngữ mặc định
+  lng: savedLanguage, // Ngôn ngữ mặc định
   supportedLngs: ['en', 'vi'],
   fallbackLng: 'en',
   interpolation: {
@@ -23,7 +24,7 @@ i18n.use(initReactI18next).init({
 });
 export default i18n;
 //
-//    { "data": "dữ liệu" ,...}
+//    { data: "dữ liệu" ,...}
 //    
 //    import { useTranslation } from 'react-i18next';
 //    const { t } = useTranslation(); 

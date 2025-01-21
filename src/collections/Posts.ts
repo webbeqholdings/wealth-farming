@@ -20,12 +20,14 @@ const Posts: CollectionConfig = {
       name: 'title',
       type: 'text',
       required: true,
+      localized: true,
     },
     {
       name: 'author',
       type: 'relationship',
       relationTo: 'users',
       required: true,
+      localized: true,
     },
     {
       name: 'published_date',
@@ -55,6 +57,7 @@ const Posts: CollectionConfig = {
       name: 'content',
       type: 'richText',
       required: true,
+      localized: true,
     },
     {
       name: 'status',

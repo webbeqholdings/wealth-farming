@@ -17,9 +17,11 @@ import {
 } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { SiteHeader } from '@/components/site-header';
+import i18n from '@/i18n/i18n';
 
 export default function NewsDetailPage() {
   const params = useParams();
+  const curentLang = i18n.language
   const [article, setArticle] = useState({
     title: 'The Future of Artificial Intelligence: Promises and Perils',
     author: {
@@ -39,7 +41,7 @@ export default function NewsDetailPage() {
     const loadArticleData = async () => {
       // Fetch the article data from API
       try {
-        const response = await fetch(`/api/posts?where[slug][equals]=${params.slug}`); // API call
+        const response = await fetch(`/api/posts?where[slug][equals]=${params.slug}&locale=`+curentLang); // API call
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -72,7 +74,7 @@ export default function NewsDetailPage() {
     };
 
     loadArticleData();
-  }, []);
+  }, [curentLang]);
 
   return (
     <div>

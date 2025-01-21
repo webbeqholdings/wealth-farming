@@ -417,7 +417,7 @@ export function InvestmentContracts() {
                             variant={activeTab === 'investment' ? 'default' : 'outline'}
                             onClick={() => { setActiveTab('investment'); setCurrentPage(1) }}
                         >
-                           {t('portfolio_tab_investment')}
+                            {t('portfolio_tab_investment')}
                         </Button>
                         <Button
                             variant={activeTab === 'withdraw' ? 'default' : 'outline'}
@@ -634,7 +634,13 @@ export function InvestmentContracts() {
                                                     </span>
                                                 </TableCell>
                                                 <TableCell>
-                                                    {t(withdrawal.message)}
+                                                    {withdrawal.status == 'pending' ?
+                                                        t('withdrawals.pending') : ''
+                                                    }
+                                                    {withdrawal.status == 'completed' ?
+                                                        t('withdrawals.completed', {amount: withdrawal.amount}) : ''}
+                                                    {withdrawal.status == 'failed' ?
+                                                        t('withdrawals.failed' ,{amount: withdrawal.amount})  : ''}
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -673,7 +679,7 @@ export function InvestmentContracts() {
                                     </Pagination>
                                 </div> : <TableRow>
                                     <TableCell colSpan={11} className="text-center py-4">
-                                            {t('portfolio_empty_contract_withdraw')}
+                                        {t('portfolio_empty_contract_withdraw')}
                                     </TableCell>
                                 </TableRow>}
                             </>

@@ -12,7 +12,9 @@ export const I18nProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const { i18n } = useTranslation();
 
   const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng); // Thay đổi ngôn ngữ
+    i18n.changeLanguage(lng).then(() => {
+      localStorage.setItem('i18n_language', lng);
+    });
   };
 
   return (

@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/carousel'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import i18n from '@/i18n/i18n'
 
 const newsItems = [
   {
@@ -69,11 +70,12 @@ type Blog = {
 
 export function BreakingNewsCarousel() {
   const [newsItems, setNewsItems] = useState([]);
+  const curentLang = i18n.language
   useEffect(() => {
     // Fetch data from API
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/posts'); // Replace with your actual API endpoint
+        const response = await fetch('/api/posts?locale='+curentLang); // Replace with your actual API endpoint
         const data = await response.json();
 
         // Transform API response to the desired format
@@ -91,7 +93,7 @@ export function BreakingNewsCarousel() {
     };
 
     fetchData();
-  }, []); // Empty dependency array to run only once
+  }, [curentLang]); // Empty dependency array to run only once
   return (
     <section className="py-16 bg-secondary/10">
       <div className="container mx-auto px-4">

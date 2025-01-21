@@ -137,6 +137,26 @@ export default buildConfig({
       },
     ],
   },
+  localization: {
+    defaultLocale: 'en',
+    locales: [
+      {
+        label: {
+          en: "English",
+          vi: "Tiếng Anh"
+        },
+        code: 'en',
+      },
+      {
+        label: {
+          en: "Vietnamese",
+          vi: "Tiếng Việt"
+        },
+        code: 'vi',
+        fallbackLocale: 'en'
+      }
+    ]
+  },
   plugins: [
     seoPlugin({
       collections: ['posts'],

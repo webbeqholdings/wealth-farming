@@ -34,7 +34,7 @@ export const en = {
     investment_process_title: "Financial Planning Simulator",
     investment_process_table: "Profit Table",
     investment_process_chart_decs: "Representation of balance over time",
-    
+
     // /transaction
     // /menu-label
     menu_Deposit: "Deposit",
@@ -122,5 +122,11 @@ export const en = {
     portfolio_empty_contract_withdraw: "There are no withdrawal contracts in your portfolio",
     portfolio_withdraw_date: "Date",
     portfolio_withdraw_message: "Message",
-
+    withdrawfail: "Quá trình rút tiền không thành công. Hợp đồng đã được kích hoạt lại với số dư là ",
+    // withdraw collection
+    withdrawals: {
+        pending: "Withdrawal request submitted successfully. Awaiting admin approval.",
+        completed: "Withdrawal completed successfully. Amount: {{amount}}.",
+        failed: "Withdrawal failed. The contract has been reactivated with a balance of {{amount}}."
+    },
 }

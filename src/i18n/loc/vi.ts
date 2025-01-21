@@ -24,8 +24,8 @@ export const vi = {
     active: "Hoạt động",
     inactive: "Không hoạt động",
     Completed: "Hoàn thành",
-    Pending:"Chờ xử lý",
-    Failed:"Thất bại",
+    Pending: "Chờ xử lý",
+    Failed: "Thất bại",
     update: "Cập nhật",
     confirm: "Xác nhận",
     // site-header
@@ -37,7 +37,7 @@ export const vi = {
     investment_process_title: "Giả lập kế hoạch tài chính",
     investment_process_table: "Bảng Lãi",
     investment_process_chart_decs: "Biểu diễn sự cân bằng theo thời gian",
-    
+
     // /transaction
     // /menu-label
     menu_Deposit: "Nạp tiền",
@@ -125,8 +125,15 @@ export const vi = {
     portfolio_withdraw_message: "Lời nhắn",
     portfolio_withdraw_amount: "Số tiền rút",
     'Withdrawal request submitted successfully. Awaiting admin approval.': "Yêu cầu rút tiền đã được gửi thành công. Đang chờ quản trị viên phê duyệt.",
-    'Withdrawal completed successfully.':"Rút tiền thành công.",
-    'Withdrawal failed. The contract has been reactivated with a balance of {{amount}}.': "Quá trình rút tiền không thành công. Hợp đồng đã được kích hoạt lại với số dư là {{amount}}.",
+    'Withdrawal completed successfully.': "Rút tiền thành công.",
+    withdrawfail: "Quá trình rút tiền không thành công. Hợp đồng đã được kích hoạt lại với số dư là ",
+
+    withdrawals: {
+        pending: "Yêu cầu rút tiền đã được gửi thành công. Đang chờ quản trị viên phê duyệt.",
+        completed: "Rút tiền thành công. Số tiền: {{amount}}.",
+        failed: "Rút tiền không thành công. Hợp đồng đã được kích hoạt lại với số dư {{amount}}."
+    },
+
 
     // user-profile
     Phone: "Số điện thoại",
@@ -170,13 +177,13 @@ export const vi = {
     'Wallet Address': 'Địa Chỉ Ví',
     'Enter wallet address': 'Nhập địa chỉ ví',
     'Your crypto wallet address.': 'Địa chỉ ví điện tử của bạn',
-    'The blockchain network of your wallet.':'Mạng blockchain của ví của bạn.',
+    'The blockchain network of your wallet.': 'Mạng blockchain của ví của bạn.',
     'Your Crypto Wallets': 'Các Ví Điện Tử',
     'Manage your registered crypto wallets': 'Quản lý các ví điện tử đã đăng kí',
     'Security Settings': 'Cài Đặt Bảo Mật',
-    'Manage your account security':'Quản lý bảo mật tài khoản',
-    'Two-Factor Authentication':'Bảo Mật Hai Lớp',
-    'Enable':'Bật',
+    'Manage your account security': 'Quản lý bảo mật tài khoản',
+    'Two-Factor Authentication': 'Bảo Mật Hai Lớp',
+    'Enable': 'Bật',
     'Login Activity': 'Hoạt động đăng nhập',
     'View': 'Xem',
     'Invite & Earn': 'Mời và Nhận',
@@ -192,24 +199,24 @@ export const vi = {
     'Disconnect Telegram': 'Ngưng kết nối Telegram',
     'Connect your Telegram account to receive notifications': 'Kết nối với tài khoản Telegram và nhận thông báo',
     'Telegram Notifications': 'Thông báo Telegram',
-    
+
     // Homepage
-    'Get Started in 30 Seconds!':'Bắt Đầu Trong 30 Giây!',
+    'Get Started in 30 Seconds!': 'Bắt Đầu Trong 30 Giây!',
     'Provide your email address and check your inbox for a 6-digit verification code.': 'Cung cấp địa chỉ email và kiểm tra hộp thư để nhận mã xác nhận 6 chữ số',
     'Wealth Farming | Cultivate wealth, harvest results': 'Wealth Farming | Gieo mầm thịnh vượng, gặt hái thành công',
     'Create Account': 'Tạo Tài Khoản',
     'Make Deposit': 'Nạp Tiền',
     'Start Investing': 'Bắt Đầu Đầu Tư',
-    'Simply enter the code on the verification page to complete your signup.':'Chỉ cần nhập mã trên trang xác minh để hoàn tất đăng ký của bạn',
+    'Simply enter the code on the verification page to complete your signup.': 'Chỉ cần nhập mã trên trang xác minh để hoàn tất đăng ký của bạn',
     'Fund your account easily on the BeQ Web or App.': 'Nạp tiền vào tài khoản của bạn dễ dàng trên web hoặc ứng dụng BeQ',
-    'Kick off your journey with your favorite Spot pairs or Futures contracts!':'Khởi đầu hành trình của bạn với các cặp Spot và hợp đồng Future!',
+    'Kick off your journey with your favorite Spot pairs or Futures contracts!': 'Khởi đầu hành trình của bạn với các cặp Spot và hợp đồng Future!',
     'Sign Up Now': 'Đăng Kí Ngay',
     'Deposit Now': 'Nạp Tiền Ngay',
     'Trade Now': 'Giao Dịch Ngay',
-    'All investing involves risk.':'Tất cả các hình thức đầu tư đều có rủi ro.',
-    'With Wealth Farming, that is not very risky.':'Với Wealth Farming, rủi ro đó là không quá lớn.',
+    'All investing involves risk.': 'Tất cả các hình thức đầu tư đều có rủi ro.',
+    'With Wealth Farming, that is not very risky.': 'Với Wealth Farming, rủi ro đó là không quá lớn.',
     'Personal Investment Dashboard': 'Dashboard Đầu Tư Cá Nhân',
-    'Displays asset status, interest rates, current investments, and portfolio performance.':'Hiển thị trạng thái tài sản, lãi suất, các khoản đầu tư hiện tại và hiệu suất danh mục đầu tư',
+    'Displays asset status, interest rates, current investments, and portfolio performance.': 'Hiển thị trạng thái tài sản, lãi suất, các khoản đầu tư hiện tại và hiệu suất danh mục đầu tư',
     'Estimated Profit Calculator': 'Lợi Nhuận Ước Tính',
     'A tool that helps users estimate projected profits based on their investment amount and duration.': 'Công cụ giúp người dùng ước tính lợi nhuận dựa trên số tiền đầu tư và thời gian đầu tư.',
     'Fund Information and Historical Performance': 'Thông Tin Quỹ và Lịch Sử Hiệu Suất',
@@ -224,7 +231,7 @@ export const vi = {
     'Provides news and market analysis to help investors keep up with trends and opportunities.': 'Cung cấp tin tức và phân tích thị trường để giúp nhà đầu tư theo kịp các xu hướng và cơ hội.',
     'Investment Promotions and Rewards Programs': 'Khuyến Mại Đầu Tư và Chương Trình Phần Thưởng',
     'Integrates promotions, discounts, or reward points for customers.': 'Tích hợp các chương trình khuyến mãi, giảm giá hoặc điểm thưởng cho khách hàng',
-    'Frequently Asked Questions':'Câu Hỏi Thường Gặp',
+    'Frequently Asked Questions': 'Câu Hỏi Thường Gặp',
     'What is BeQ Wealth Farming Fund?': 'BeQ Wealth Farming Fund là gì?',
     'BeQ Wealth Farming Fund is an innovative investment platform that focuses on agricultural and sustainable farming projects. We combine traditional farming wisdom with cutting-edge technology to offer unique investment opportunities.': 'BeQ Wealth Farming Fund là một nền tảng đầu tư sáng tạo tập trung vào các dự án nông nghiệp và nông nghiệp bền vững. Chúng tôi kết hợp trí tuệ nông nghiệp truyền thống với công nghệ tiên tiến để cung cấp cơ hội đầu tư độc đáo.',
     'How do I start investing with BeQ?': 'Làm thế nào để bắt đầu đầu tư với BeQ?',
@@ -244,10 +251,10 @@ export const vi = {
     'Status': 'Trạng thái',
     'Share your referral link': 'Chia sẻ liên kết giới thiệu',
     'Invite friends and earn rewards!': 'Mời bạn bè và nhận thưởng!',
-    'Total Referrals':'Tổng Số Lời Mời',
-    'Pending Referrals':'Đang Chờ Xác Nhận Lời Mời',
-    'Completed Referrals':'Lời Mời Đã Hoàn Thành',
-    'Total Earnings':'Tổng Thu Nhập',
+    'Total Referrals': 'Tổng Số Lời Mời',
+    'Pending Referrals': 'Đang Chờ Xác Nhận Lời Mời',
+    'Completed Referrals': 'Lời Mời Đã Hoàn Thành',
+    'Total Earnings': 'Tổng Thu Nhập',
     'Your Referrals': 'Lời Mời Của Bạn',
     'User Profile': 'Hồ Sơ Người Dùng',
     'Join BeQ Wealth Farming Fund and start growing your investments with sustainable, innovative agricultural projects.': 'Tham gia BeQ Wealth Farming Fund và bắt đầu phát triển khoản đầu tư của bạn với các dự án nông nghiệp bền vững và sáng tạo.'
