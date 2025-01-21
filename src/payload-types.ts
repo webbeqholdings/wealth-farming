@@ -546,6 +546,8 @@ export interface Withdrawal {
   amount: number;
   status: 'completed' | 'pending' | 'failed';
   message?: string | null;
+  note?: string | null;
+  image?: (number | null) | Media;
   updatedAt: string;
   createdAt: string;
 }
@@ -1105,6 +1107,8 @@ export interface WithdrawalsSelect<T extends boolean = true> {
   amount?: T;
   status?: T;
   message?: T;
+  note?: T;
+  image?: T;
   updatedAt?: T;
   createdAt?: T;
 }
