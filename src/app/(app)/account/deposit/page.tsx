@@ -511,7 +511,7 @@ export default function DepositPage() {
                         <div className="flex justify-center">
                           <img
                             //src={bankQRCode || "https://via.placeholder.com/300"  }
-                            src={ process.env.PAYMENT_QR_API_VN+"?accountName=TA%20THI%20MY%20PHUONG&amount=" + convertUSDtoVND(USDCurrency, 0)+ "&addInfo=" + encodeURIComponent(user.first_name + ' ' + user.last_name +  ' ' + user.phone_contact + " Deposit WF")}
+                            src={ "https://img.vietqr.io/image/VCB-1026934108-YKiPZgV.jpg?accountName=TA%20THI%20MY%20PHUONG&amount=" + convertUSDtoVND(USDCurrency, 0)+ "&addInfo=" + encodeURIComponent(user.first_name + ' ' + user.last_name +  ' ' + user.phone_contact + " deposit WF")}
                             alt="Bank Transfer QR Code"
                             width={400}
                             height={400}
