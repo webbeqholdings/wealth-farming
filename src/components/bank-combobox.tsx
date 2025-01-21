@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import bankvn from '@/config/bank-vn.json'
+import { useTranslation } from 'react-i18next';
 const banks = bankvn.data
 
 export function BankCombobox({
@@ -25,6 +26,7 @@ export function BankCombobox({
   onChange: (value: string) => void
 }) {
   const [open, setOpen] = React.useState(false)
+  const { t } = useTranslation();
 
   return (
     <div className="w-100">
@@ -37,9 +39,9 @@ export function BankCombobox({
             className="flex h-9 w-full justify-between items-center rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
           >
             <span className="text-left flex-1">
-              {value
+              {t(value
                 ? `${banks.find((bank) => bank.code === value)?.name} (${banks.find((bank) => bank.code === value)?.code})`
-                : 'Select bank...'}
+                : 'Select bank...')}
             </span>
             <ChevronsUpDown className="ml-2 opacity-100" />
           </Button>
