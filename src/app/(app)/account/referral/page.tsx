@@ -70,6 +70,9 @@ export default function ReferralPage() {
 
   // Update Start Date & End Date
   const fetchData = async () => {
+    if(!user?.id){
+      return
+    }
     const { docs, totalPages, referral_code } = await getReferralsByParentId(
       user.id,
       currentPage,
@@ -93,6 +96,9 @@ export default function ReferralPage() {
   useEffect(() =>{
     if (nameFilter!='' && (startDate && endDate)){
       const fetchReferralData = async () => {
+        if(!user?.id){
+          return
+        }
         const { docs, totalPages, referral_code } = await getReferralsByParentIdWithFilter(
           user.id,
           currentPage,
@@ -109,6 +115,9 @@ export default function ReferralPage() {
     }
     else if (nameFilter != ''){
       const fetchReferralData = async () => {
+        if(!user?.id){
+          return
+        }
         const { docs, totalPages, referral_code } = await getReferralsByParentIdWithFilter(
           user.id,
           currentPage,
@@ -125,6 +134,9 @@ export default function ReferralPage() {
     }
     else if ((startDate && endDate)){
       const fetchReferralData = async () => {
+        if(!user?.id){
+          return
+        }
         const { docs, totalPages, referral_code } = await getReferralsByParentIdWithFilter(
           user.id,
           currentPage,
@@ -236,7 +248,7 @@ export default function ReferralPage() {
                 )}
               >
                 <CalendarIcon />
-                {startDate ? format(startDate, "PPP") : <span>{t('Start Date')}</span>}
+                {startDate ? format(startDate, "PPP") : <span>{t('start_date')}</span>}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -258,7 +270,7 @@ export default function ReferralPage() {
                 )}
               >
                 <CalendarIcon />
-                {endDate ? format(endDate, "PPP") : <span>{t('End Date')}</span>}
+                {endDate ? format(endDate, "PPP") : <span>{t('end_date')}</span>}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">

@@ -442,8 +442,8 @@ export function InvestmentContracts() {
                                             <TableHead>{t('portfolio_profit')}</TableHead>
                                             <TableHead>{t('portfolio_rate')}</TableHead>
                                             <TableHead>{t('portfolio_term')}</TableHead>
-                                            <TableHead>{t('portfolio_startDate')}</TableHead>
-                                            <TableHead>{t('portfolio_endDate')}</TableHead>
+                                            <TableHead>{t('Start Date')}</TableHead>
+                                            <TableHead>{t('End Date')}</TableHead>
                                             <TableHead>{t('portfolio_status')}</TableHead>
                                             <TableHead className="text-center">{t('portfolio_actions')}</TableHead>
                                         </TableRow>
