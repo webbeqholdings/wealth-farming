@@ -32,11 +32,12 @@ import { TabMenu } from '@/components/w88/TabMenu'
 import { accountConfig } from '@/config/accounts'
 import { toast } from '@/hooks/use-toast'
 import { notifyDeposit } from '@/lib/telegram'
-import CurrencyConverter , { useCurrencyConverter }from '@/components/CurrencyConverter'
+import CurrencyConverter, { useCurrencyConverter } from '@/components/CurrencyConverter'
 import { getAccountsByUserId } from '../../../../lib/account'
 import { getPaymentTransfer } from '@/lib/paymentTransfer'
 import Spinner from '@/components/Spinner'
 import { generateTranferMessageCode } from '@/utilities/referralCode'
+import { useTranslation } from 'react-i18next';
 
 // Steps component definition
 interface StepProps {
@@ -86,7 +87,8 @@ function Steps({ currentStep, className, children }: StepsProps) {
 
 export default function DepositPage() {
   const { isLoggedIn, loading, user } = userStatus()
-  const { convertUSDtoVND } = useCurrencyConverter(() => {});
+  const { convertUSDtoVND } = useCurrencyConverter(() => { });
+  const { t } = useTranslation();
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [amount, setAmount] = useState('')
@@ -224,7 +226,7 @@ export default function DepositPage() {
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
-        if (user && user.id) {
+        if (user && user?.id) {
           const accountsData = await getAccountsByUserId(user.id)
           if (accountsData) {
             setAccounts(accountsData)
@@ -241,6 +243,9 @@ export default function DepositPage() {
   useEffect(() => {
     const fetchBanks = async () => {
       try {
+        if (!user?.id) {
+          return
+        }
         const response = await fetch(`/api/banks?where[user][equals]=${user.id}`) // Replace with dynamic user ID if necessary
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`)
@@ -257,13 +262,13 @@ export default function DepositPage() {
 
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
-    return <Spinner/>
+    return <Spinner />
   }
 
   // If the user is not logged in, redirect to the join page
   if (!isLoggedIn) {
     router.push('/join')
-    return <Spinner/> // Optional: Show a redirect message
+    return <Spinner /> // Optional: Show a redirect message
   }
 
   const handleDepositScreenshotChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -382,8 +387,8 @@ export default function DepositPage() {
         <TabMenu items={accountConfig.tabList} defaultValue="deposit" />
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle>Deposit Funds</CardTitle>
-            <CardDescription>Add money to your account securely</CardDescription>
+            <CardTitle>{t('deposit_title')}</CardTitle>
+            <CardDescription>{t('deposit_decs')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Steps currentStep={step} className="mb-8">
@@ -395,7 +400,7 @@ export default function DepositPage() {
               {step === 1 && (
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="fromAccount">Account</Label>
+                    <Label htmlFor="fromAccount">{t('account')}</Label>
                     <Select value={fromAccount} onValueChange={handleFromAccountChange}>
                       <SelectTrigger id="fromAccount">
                         <SelectValue placeholder="Select account" />
@@ -409,7 +414,7 @@ export default function DepositPage() {
                       </SelectContent>
                     </Select>
                     <p className="text-sm text-muted-foreground">
-                      Balance:{' '}
+                      {t('balance')}:{' '}
                       {selectedBalance.toLocaleString('en-US', {
                         style: 'currency',
                         currency: 'USD',
@@ -425,7 +430,7 @@ export default function DepositPage() {
                     <p className="text-red-500 text-sm">{errors.USDCurrency}</p>
                   )}
                   <div className="space-y-2">
-                    <Label htmlFor="fromAccount">Your Bank Account</Label>
+                    <Label htmlFor="fromAccount">{t('bank_account')}</Label>
                     <Select value={selectBank} onValueChange={handleBankChange}>
                       <SelectTrigger id="bank">
                         <SelectValue placeholder="Select bank" />
@@ -446,7 +451,7 @@ export default function DepositPage() {
                           }}
                           className="text-blue-600 hover:text-blue-800 cursor-pointer"
                         >
-                          Don&apos;t see your bank? Register
+                          {t('deposit_no_bank')}
                         </div>
                       </div>
                     ) : (
@@ -506,8 +511,8 @@ export default function DepositPage() {
                         </Label>
                         <div className="flex justify-center">
                           <img
-                            //src={bankQRCode || "https://via.placeholder.com/300"}
-                            src={process.env.PAYMENT_QR_API_VN + "?accountName=TA%20THI%20MY%20PHUONG&amount="+ convertUSDtoVND(USDCurrency,0) +"&addInfo="+encodeURIComponent("Wealth Farming - "+generateTranferMessageCode(6))+""}
+                            //src={bankQRCode || "https://via.placeholder.com/300"  }
+                            src={ process.env.PAYMENT_QR_API_VN+"?accountName=TA%20THI%20MY%20PHUONG&amount=" + convertUSDtoVND(USDCurrency, 0)+ "&addInfo=" + encodeURIComponent(user.first_name + ' ' + user.last_name +  ' ' + user.phone_contact + " Deposit WF")}
                             alt="Bank Transfer QR Code"
                             width={400}
                             height={400}
@@ -532,7 +537,7 @@ export default function DepositPage() {
                           className="border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         />
                         <p className="text-xs text-gray-500">
-                          Please upload a screenshot showing your deposit transaction. Accepted formats: JPG, PNG, with a maximum size of 5MB.
+                          {t('deposit_form_file_notice')}
                         </p>
                         {errors.depositScreenshot && (
                           <p className="text-red-500 text-sm">{errors.depositScreenshot}</p>
@@ -564,7 +569,7 @@ export default function DepositPage() {
 
                       <div className="space-y-4">
                         <Label htmlFor="deposit_screenshot" className="text-sm font-medium text-gray-700">
-                          Upload Your Deposit
+                          {t("deposit_form_file")}
                         </Label>
                         <Input
                           id="deposit_screenshot"
@@ -574,7 +579,7 @@ export default function DepositPage() {
                           className="border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         />
                         <p className="text-xs text-gray-500">
-                          Please upload a screenshot showing your deposit transaction. Accepted formats: JPG, PNG, with a maximum size of 5MB.
+                          {t("deposit_form_file_notice")}
                         </p>
                         {errors.depositScreenshot && (
                           <p className="text-red-500 text-sm">{errors.depositScreenshot}</p>
@@ -588,24 +593,24 @@ export default function DepositPage() {
                 <div className="space-y-4">
                   <Alert>
                     <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>Confirm your deposit</AlertTitle>
+                    <AlertTitle>{t("deposit_cofirm_alert")}</AlertTitle>
                     <AlertDescription>
-                      Please review the details below before confirming your deposit.
+                      {t('deposit_cofirm_alert_decs')}
                     </AlertDescription>
                   </Alert>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span>Amount:</span>
+                      <span>{t('money_amount')}:</span>
                       <span className="font-semibold">
                         {currency} {Number(USDCurrency).toLocaleString()}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Method:</span>
+                      <span>{t('method')}:</span>
                       <span className="font-semibold">{method == 'bank' ? 'Bank Transfer' : 'Crypto Wallet'}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Account Number:</span>
+                      <span>{t("card_number")}:</span>
                       <span className="font-semibold">
                         **** **** **** {accountNumber.slice(-4)}
                       </span>
@@ -618,11 +623,11 @@ export default function DepositPage() {
           <CardFooter className="flex justify-between">
             {step > 1 && (
               <Button variant="outline" onClick={handlePreviousStep}>
-                Back
+                {t('back')}
               </Button>
             )}
             {step < 3 ? (
-              <Button onClick={handleNextStep}>Next</Button>
+              <Button onClick={handleNextStep}>{t("Next")}</Button>
             ) : (
               <Button
                 type="submit"

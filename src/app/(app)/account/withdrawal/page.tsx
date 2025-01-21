@@ -33,6 +33,7 @@ import { toast } from '@/hooks/use-toast'
 import { notifyWithdrawl } from '@/lib/telegram'
 import { getPaymentTransfer } from '@/lib/paymentTransfer'
 import Spinner from '@/components/Spinner'
+import { useTranslation } from 'react-i18next';
 // Steps component definition
 interface StepProps {
   title: string
@@ -81,6 +82,7 @@ function Steps({ currentStep, className, children }: StepsProps) {
 
 export default function WithdrawPage() {
   const { isLoggedIn, loading, user } = UserStatus();
+  const { t } = useTranslation(); 
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [amount, setAmount] = useState('')
@@ -125,6 +127,9 @@ export default function WithdrawPage() {
 
   useEffect(() => {
     const fetchAccounts = async () => {
+      if(!user?.id){
+        return
+      }
       try {
         const response = await fetch(`/api/accounts?where[user][equals]=${user.id}&where[type][equals]=main`); // Replace with dynamic user ID if necessary
         if (!response.ok) {
@@ -142,6 +147,9 @@ export default function WithdrawPage() {
 
   useEffect(() => {
     const fetchBanks = async () => {
+      if(!user?.id){
+        return
+      }
       try {
         const response = await fetch(`/api/banks?where[user][equals]=${user.id}`); // Replace with dynamic user ID if necessary
         if (!response.ok) {
@@ -219,8 +227,8 @@ export default function WithdrawPage() {
         <TabMenu items={accountConfig.tabList} defaultValue="withdrawal" />
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle>Withdraw Funds</CardTitle>
-            <CardDescription>Securely withdraw money from your account</CardDescription>
+            <CardTitle>{t('withdraw_title')}</CardTitle>
+            <CardDescription>{t('withdraw_decs')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Steps currentStep={step} className="mb-8">
@@ -233,7 +241,7 @@ export default function WithdrawPage() {
               {step === 1 && (
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="amount">Withdrawal Amount</Label>
+                    <Label htmlFor="amount">{t('money_amount')}</Label>
                     <div className="flex space-x-2">
                       <Select value={currency} onValueChange={setCurrency}>
                         <SelectTrigger className="w-[100px]">
@@ -257,10 +265,8 @@ export default function WithdrawPage() {
                   </div>
                   <Alert>
                     <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>Withdrawal Limits</AlertTitle>
                     <AlertDescription>
-                      Daily limit: $10,000. Monthly limit: $50,000. Ensure you have sufficient funds
-                      in your account.
+                      {t('withdraw_limit_decs')}
                     </AlertDescription>
                   </Alert>
                 </div>
@@ -282,7 +288,7 @@ export default function WithdrawPage() {
                   {method === 'bank' && (
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="fromAccount">Your Bank Account</Label>
+                        <Label htmlFor="fromAccount">{t('bank_account')}</Label>
                         <Select value={selectBank} onValueChange={handleBankChange}>
                           <SelectTrigger id="bank">
                             <SelectValue placeholder="Select bank" />
@@ -296,7 +302,7 @@ export default function WithdrawPage() {
                           </SelectContent>
                         </Select>
                         {!selectBank && step === 2 && (
-                          <p className="text-red-600 text-sm mt-1">Please select a bank account to proceed.</p>
+                          <p className="text-red-600 text-sm mt-1">{t('withdraw_nobank_warning')}</p>
                         )}
                       </div>
                     </div>
@@ -305,7 +311,7 @@ export default function WithdrawPage() {
                   {method === 'card' && (
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="cardNumber">Card Number</Label>
+                        <Label htmlFor="cardNumber">{t('card_number')}</Label>
                         <Input
                           id="cardNumber"
                           type="text"
@@ -316,10 +322,9 @@ export default function WithdrawPage() {
                       </div>
                       <Alert>
                         <AlertCircle className="h-4 w-4" />
-                        <AlertTitle>Card Withdrawal Notice</AlertTitle>
+                        <AlertTitle>{t('withdraw_withdraw_notice')}</AlertTitle>
                         <AlertDescription>
-                          Withdrawals to cards may take 3-5 business days to process. Some banks may
-                          charge additional fees.
+                          {t('withdraw_notice_desc')}
                         </AlertDescription>
                       </Alert>
                     </div>
@@ -331,9 +336,9 @@ export default function WithdrawPage() {
                 <div className="space-y-4">
                   <Alert>
                     <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>Confirm your withdrawal</AlertTitle>
+                    <AlertTitle>{t('withdraw_confirm_title')}</AlertTitle>
                     <AlertDescription>
-                      Please review the details below before confirming your withdrawal request.
+                      {t('withdraw_confirm_decs')}
                     </AlertDescription>
                   </Alert>
                   <div className="space-y-2">
@@ -351,17 +356,16 @@ export default function WithdrawPage() {
                     </div>
                     {method === 'card' && (
                       <div className="flex justify-between">
-                        <span>Card Number:</span>
+                        <span>{t('card_number')}:</span>
                         <span className="font-semibold">**** **** **** {cardNumber.slice(-4)}</span>
                       </div>
                     )}
                   </div>
                   <Alert variant="destructive">
                     <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>Important</AlertTitle>
+                    <AlertTitle>{t('withdraw_important_title')}</AlertTitle>
                     <AlertDescription>
-                      By confirming, you agree to our withdrawal terms and conditions. This action
-                      cannot be undone.
+                      {t('withdraw_important_decs')}
                     </AlertDescription>
                   </Alert>
                 </div>
@@ -371,7 +375,7 @@ export default function WithdrawPage() {
           <CardFooter className="flex justify-between">
             {step > 1 && (
               <Button variant="outline" onClick={handlePreviousStep}>
-                Back
+                 {t("back")}
               </Button>
             )}
             {step < 3 ? (
@@ -379,7 +383,7 @@ export default function WithdrawPage() {
             ) : (
               <Button onClick={handleSubmit} className="bg-primary hover:bg-primary/90">
                 <ArrowDownCircle className="mr-2 h-4 w-4" />
-                Confirm Withdrawal
+                {t('withdraw_comfirm_button')}
               </Button>
             )}
           </CardFooter>

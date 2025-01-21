@@ -39,6 +39,7 @@ import {
 import { useToast } from '@/hooks/use-toast'
 import { Trash2 } from 'lucide-react'
 import UserStatus from '@/lib/userStatus'
+import { useTranslation } from 'react-i18next';
 
 const formSchema = z.object({
   accountName: z.string().min(2, {
@@ -62,6 +63,7 @@ export function BankAccountForm({
   accounts: any[]
   setAccounts: React.Dispatch<React.SetStateAction<any[]>>
 }) {
+  const { t } = useTranslation();
   const [bankId, setBankId] = useState('')
   const [isDialogOpen, setIsDialogOpen] = useState(false) // Manage dialog visibility
   const { toast } = useToast()
@@ -170,9 +172,9 @@ export function BankAccountForm({
     <div>
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>Add Bank Account</CardTitle>
+          <CardTitle>{t('Add Bank Account')}</CardTitle>
           <CardDescription>
-            Enter your bank account details for deposits and withdrawals.
+            {t('Enter your bank account details for deposits and withdrawals.')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -183,11 +185,11 @@ export function BankAccountForm({
                 name="accountName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Account Name</FormLabel>
+                    <FormLabel>{t('Account Name')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter account name" {...field} />
+                      <Input placeholder={t("Enter account name")} {...field} />
                     </FormControl>
-                    <FormDescription>The name as it appears on your bank account.</FormDescription>
+                    <FormDescription>{t('The name as it appears on your bank account.')}</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -197,11 +199,11 @@ export function BankAccountForm({
                 name="accountNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Account Number</FormLabel>
+                    <FormLabel>{t('Account Number')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter account number" {...field} />
+                      <Input placeholder={t("Enter account number")} {...field} />
                     </FormControl>
-                    <FormDescription>Your bank account number.</FormDescription>
+                    <FormDescription>{t('Your bank account number.')}</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -214,11 +216,11 @@ export function BankAccountForm({
                   name="bankName"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>Bank Name</FormLabel>
+                      <FormLabel>{t('Bank Name')}</FormLabel>
                       <FormControl>
                         <BankCombobox value={field.value} onChange={field.onChange} />
                       </FormControl>
-                      <FormDescription>Your bank name.</FormDescription>
+                      <FormDescription>{t('Your bank name.')}</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -228,36 +230,36 @@ export function BankAccountForm({
                   name="branch"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>Branch</FormLabel>
+                      <FormLabel>{t('Branch')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter branch name" {...field} />
+                        <Input placeholder={t("Enter branch name")} {...field} />
                       </FormControl>
-                      <FormDescription>Your branch.</FormDescription>
+                      <FormDescription>{t('Your branch.')}</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
               <Button type="submit" className="bg-primary hover:bg-primary/90 text-black">
-                Add Bank Account
+                {t('Add Bank Account')}
               </Button>
             </form>
           </Form>
         </CardContent>
         <Separator />
         <CardHeader>
-          <CardTitle>Your Bank Accounts</CardTitle>
-          <CardDescription>Manage your registered bank accounts.</CardDescription>
+          <CardTitle>{t('Your Bank Accounts')}</CardTitle>
+          <CardDescription>{t('Manage your registered bank accounts.')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Account Name</TableHead>
-                <TableHead>Account Number</TableHead>
-                <TableHead>Bank Name</TableHead>
-                <TableHead>Branch</TableHead>
-                <TableHead>Action</TableHead> {/* Add action column */}
+                <TableHead>{t('Account Name')}</TableHead>
+                <TableHead>{t('Account Number')}</TableHead>
+                <TableHead>{t('Bank Name')}</TableHead>
+                <TableHead>{t('Branch')}</TableHead>
+                <TableHead>{t('Action')}</TableHead> {/* Add action column */}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -284,17 +286,17 @@ export function BankAccountForm({
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Are you sure?</DialogTitle>
+            <DialogTitle>{t('Are you sure?')}</DialogTitle>
             <DialogDescription>
-              This action will permanently delete the bank account. Do you want to proceed?
+              {t('This action will permanently delete the bank account. Do you want to proceed?')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button onClick={handleCancel} color="gray" size="sm">
-              Cancel
+              {t('Cancel')}
             </Button>
             <Button onClick={() => handleDelete(bankId)} color="red" size="sm">
-              Delete
+              {t('Delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-
+import { useTranslation } from 'react-i18next';
 interface TabItem {
   label: string
   value: string
@@ -17,6 +17,7 @@ interface TabMenuProps {
 
 export function TabMenu({ items, defaultValue }: TabMenuProps) {
   const router = useRouter()
+  const { t } = useTranslation(); 
   const pathname = usePathname()
   const [activeTab, setActiveTab] = useState(defaultValue || items[0].value)
 
@@ -43,7 +44,7 @@ export function TabMenu({ items, defaultValue }: TabMenuProps) {
       >
         {items.map((item) => (
           <TabsTrigger key={item.value} value={item.value}>
-            {item.label}
+            {t("menu_"+item.label)}
           </TabsTrigger>
         ))}
       </TabsList>

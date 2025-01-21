@@ -12,6 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts'
 import { request } from 'http'
 import { ProfitChart } from '@/components/ProfitChart'
+import { useTranslation } from 'react-i18next';
 
 interface ProfitItem {
   date: Date
@@ -19,6 +20,7 @@ interface ProfitItem {
 }
 
 export default function InvestmentProcessPage() {
+  const { t } = useTranslation(); 
   const [profitData, setProfitData] = useState([])
   const [requestFormData, setRequestFormData] = useState({})
 
@@ -32,7 +34,7 @@ export default function InvestmentProcessPage() {
     <>
       <SiteHeader />
       <div className="container mx-auto py-10">
-        <h1 className="text-3xl font-bold mb-6 text-center">Giả Lập Kế Hoạch Tài Chính</h1>
+        <h1 className="text-3xl font-bold mb-6 text-center">{t('investment_process_title')}</h1>
         <div className="flex flex-col md:flex-row gap-6">
           <div className="w-full md:w-1/3">
             <InvestmentProcessForm onCalculate={setProfitData} onRequest={setRequestFormData} />
@@ -51,8 +53,8 @@ export default function InvestmentProcessPage() {
             {Object.keys(profitData).length > 0 && (
               <Tabs defaultValue="table" className="space-y-4">
                 <TabsList>
-                  <TabsTrigger value="table">Bảng Lãi</TabsTrigger>
-                  <TabsTrigger value="chart">Biểu Đồ</TabsTrigger>
+                  <TabsTrigger value="table">{t('investment_process_table')}</TabsTrigger>
+                  <TabsTrigger value="chart">{t('chart')}</TabsTrigger>
                 </TabsList>
                 <TabsContent value="table" className="space-y-4">
                   {Object.entries(profitData).map(([year, item]) => {
@@ -69,8 +71,8 @@ export default function InvestmentProcessPage() {
                 <TabsContent value="chart">
                   <Card>
                     <CardHeader>
-                      <CardTitle>Biểu Đồ Lợi Nhuận</CardTitle>
-                      <CardDescription>Biểu diễn số dư theo thời gian</CardDescription>
+                      <CardTitle className="capitalize">{t('chart')+' '+t('profit')}</CardTitle>
+                      <CardDescription>{t('investment_process_chart_decs')}</CardDescription>
                     </CardHeader>
                     <CardContent className="pt-2">
                       <ProfitChart profitData={formattedProfitData} />

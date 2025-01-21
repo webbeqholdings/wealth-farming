@@ -18,14 +18,19 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Facebook, Gift, DollarSign, UserCircle, Settings, LogOut } from 'lucide-react'
+import LanguageSwitch from './LanguageSwitcher'
+import { useTranslation } from 'react-i18next';
 
 export function SiteHeader() {
   const { isLoggedIn, loading, user } = userStatus()
   const [balance, setBalance] = useState(0)
   const router = useRouter() // Use Next.js router for navigation
-
+  const { t } = useTranslation(); 
   useEffect(() => {
     const fetchData = async () => {
+      if(!user?.id){
+        return
+      }
       try {
         const response = await fetch(`/api/accounts?where[user][equals]=${user.id}`)
         if (!response.ok) {
@@ -77,7 +82,7 @@ export function SiteHeader() {
           <nav className="flex items-center space-x-2">
             {isLoggedIn ? (
               <>
-                <div className="hidden md:flex items-center space-x-2 bg-muted p-2 rounded-md">
+                <div className="flex items-center space-x-2 bg-muted p-2 rounded-md">
                   <DollarSign className="h-4 w-4 text-green-500" />
                   <span className="font-medium">
                     {balance.toLocaleString('en-US', {
@@ -87,10 +92,10 @@ export function SiteHeader() {
                 </div>
                 <Button
                   variant="default"
-                  className="hidden md:inline-flex bg-green-500 hover:bg-green-600 text-white"
+                  className="inline-flex bg-green-500 hover:bg-green-600 text-white"
                   onClick={() => router.push('/account/deposit')}
                 >
-                  Deposit
+                  {t('deposit')}
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -102,21 +107,21 @@ export function SiteHeader() {
                   <DropdownMenuContent align="end" className="w-56">
                     <DropdownMenuItem onClick={() => router.push('/user-profile')}>
                       <UserCircle className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
+                      <span>{t('profile')}</span>
                     </DropdownMenuItem>
 
                     <DropdownMenuItem onClick={() => router.push('/account/referral')}>
                       <Gift className="mr-2 h-4 w-4" />
-                      <span>Referral Reward</span>
+                      <span>{t('referral_reward')}</span>
                     </DropdownMenuItem>
 
                     <DropdownMenuItem onClick={() => router.push('/investment-contracts')}>
                       <DollarSign className="mr-2 h-4 w-4" />
-                      <span>Portfolio</span>
+                      <span>{t('portfolio_title')}</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleLogout}>
                       <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
+                      <span>{t('log_out')}</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -124,7 +129,7 @@ export function SiteHeader() {
             ) : (
               <Button onClick={() => router.push('/join')}>Login</Button>
             )}
-            <Link href="#" target="_blank" rel="noreferrer">
+            <Link href="https://www.facebook.com/p/BeQ-Holdings-61555802044845/" target="_blank" rel="noreferrer">
               <div
                 className={cn(
                   buttonVariants({
@@ -137,6 +142,7 @@ export function SiteHeader() {
                 <span className="sr-only">Facebook</span>
               </div>
             </Link>
+            <LanguageSwitch/>
             <ModeToggle />
           </nav>
         </div>
