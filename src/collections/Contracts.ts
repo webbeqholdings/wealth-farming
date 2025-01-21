@@ -3,6 +3,9 @@ import type { CollectionConfig } from 'payload'
 
 const Contracts: CollectionConfig = {
   slug: 'contracts',
+  admin: {
+    listSearchableFields: ['user.email', 'amount', 'term'],
+  },
   fields: [
     {
       name: 'user',

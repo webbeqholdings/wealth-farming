@@ -6,6 +6,9 @@ const Notifications: CollectionConfig = {
     read: () => true,
     create: isAdmin,
   },
+  admin: {
+    listSearchableFields: ['title', 'context'],
+  },
   labels: {
     singular: 'Notification',
     plural: 'Notifications',

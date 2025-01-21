@@ -7,6 +7,9 @@ const EconomicCalendar: CollectionConfig = {
     read: () => true,
     create: () => true,
   },
+  admin: {
+    listSearchableFields:['title', 'impact'],  
+  },
   fields: [
     {
       name: 'title',

@@ -8,6 +8,7 @@ const Posts: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'author', 'category', 'tags', 'status'],
+    listSearchableFields: ['title', 'author.email'],
   },
   access: {
     read: () => true,
