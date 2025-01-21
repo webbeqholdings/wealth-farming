@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
+import { useTranslation } from 'react-i18next'
 
 const terms = [
   { name: 'Month', rate: 5.95, months: 24 },
@@ -19,22 +20,23 @@ const terms = [
 export default function InvestmentSimulatorPage() {
   const [principal, setPrincipal] = useState<number>(10000)
   const [months, setMonths] = useState<number>(12)
+  const { t } = useTranslation()
 
   return (
     <div>
       <SiteHeader />
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">Investment Simulator</h1>
+        <h1 className="text-3xl font-bold mb-6">{t('Investment Simulator')}</h1>
         <Card>
           <CardHeader>
-            <CardTitle>Compare Investment Terms</CardTitle>
+            <CardTitle>{t('Compare Investment Terms')}</CardTitle>
             <CardDescription>
-              Adjust the initial deposit and compare different investment terms.
+              {t('Adjust the initial deposit and compare different investment terms.')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="mb-6">
-              <Label htmlFor="principal">Initial Deposit</Label>
+              <Label htmlFor="principal">{t('Initial Deposit')}</Label>
               <Input
                 id="principal"
                 type="number"
@@ -44,7 +46,7 @@ export default function InvestmentSimulatorPage() {
               />
             </div>
             <div className="mb-6">
-              <Label htmlFor="principal">Months</Label>
+              <Label htmlFor="principal">{t('Months')}</Label>
               <Input
                 id="months"
                 type="number"
@@ -57,7 +59,7 @@ export default function InvestmentSimulatorPage() {
               <TabsList className="grid w-full grid-cols-4">
                 {terms.map((term) => (
                   <TabsTrigger key={term.name} value={term.name.toLowerCase().replace(/\s+/g, '-')}>
-                    {term.name}
+                    {t(term.name)}
                   </TabsTrigger>
                 ))}
               </TabsList>
