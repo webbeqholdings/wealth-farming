@@ -5,6 +5,7 @@ export const CryptoWallets: CollectionConfig = {
   slug: 'crypto-wallets',
   admin: {
     useAsTitle: 'wallet_address',
+    listSearchableFields: ['wallet_address', 'network', 'user.email'],
   },
   access: {
     read: isIndividualOrAdmin,

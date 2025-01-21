@@ -21,6 +21,9 @@ const Transactions: CollectionConfig = {
     update: isAdmin,
     delete: isAdmin,
   },
+  admin: {
+    listSearchableFields: ['user.email', 'investment_product.product_name'],
+  },
   fields: [
     {
       name: 'user',
