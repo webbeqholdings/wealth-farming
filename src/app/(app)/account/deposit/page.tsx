@@ -36,7 +36,6 @@ import CurrencyConverter, { useCurrencyConverter } from '@/components/CurrencyCo
 import { getAccountsByUserId } from '../../../../lib/account'
 import { getPaymentTransfer } from '@/lib/paymentTransfer'
 import Spinner from '@/components/Spinner'
-import { generateTranferMessageCode } from '@/utilities/referralCode'
 import { useTranslation } from 'react-i18next';
 
 // Steps component definition
