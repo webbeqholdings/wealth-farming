@@ -23,7 +23,7 @@ export function MinimalHero() {
         <div className="grid gap-6 lg:grid-cols-[1fr_1fr] lg:gap-12 xl:grid-cols-[1fr_1fr] items-center">
           <div className="flex flex-col justify-center space-y-4 text-left order-2 lg:order-1">
             <PageHeader>
-              <PageHeaderHeading>Your wealth, our mission</PageHeaderHeading>
+              <PageHeaderHeading>{t('Your wealth, our mission')}</PageHeaderHeading>
               <PageHeaderDescription>
                 {t('Customized investment solutions to optimize your cash flow. Transparent and secure programs delivering steady monthly returns.')}
               </PageHeaderDescription>

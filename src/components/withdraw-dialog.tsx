@@ -8,6 +8,7 @@ import { withdrawInvestment } from '@/lib/contract';
 import { notifyWithdrawlContracts } from '@/lib/telegram';
 import { getPaymentTransfer } from '@/lib/paymentTransfer'
 import { endOfMonth, addMonths, endOfYear, differenceInDays } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 interface WithdrawDialogProps {
   isOpen: boolean;
@@ -31,6 +32,7 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
   const [amount, setAmount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   // Calculate expected end dates for each term
   const getExpectedEndDate = (term: string, start: Date) => {
@@ -145,6 +147,8 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
     return termDescription;
   };
 
+  const message = toastMessage(contract.term);
+
   const handleDialogClose = () => {
     setAmount('');
     onClose();
@@ -212,19 +216,20 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
     <Dialog open={isOpen} onOpenChange={handleDialogClose}>
       <DialogContent className="sm:max-w-[425px] bg-white border-gray-300 shadow-md">
         <DialogHeader>
-          <DialogTitle className="text-gray-900">Withdraw Funds</DialogTitle>
+          <DialogTitle className="text-gray-900">{t('Withdraw Funds')}</DialogTitle>
           <DialogDescription className="text-gray-600">
-            Withdraw available funds from {contract.productName}
+          {t('Withdraw available funds from {{productName}}', { productName: contract.productName })}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleWithdraw}>
           <div className="grid gap-4">
             <div className="bg-yellow-100 text-yellow-800 text-sm rounded-md p-3">
-              <strong>Note:</strong> Withdrawals profit can only be made after the {toastMessage(contract.term)}.
+              <strong>{t('Note:')}</strong>
+              {t('Withdrawals profit can only be made after the {{condition}}', { condition: t(message) })}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="amount" className="text-gray-700">
-                Amount
+                {t('Amount')}
               </Label>
               <Input
                 id="amount"
@@ -238,7 +243,7 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
                 required
               />
               <p className="text-sm text-gray-500">
-                Profit: ${contract.profit.toFixed(2)}
+                {t('Profit: ${{amount}}', {amount: contract.profit.toFixed(2)})}
               </p>
             </div>
           </div>
@@ -249,7 +254,7 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
               onClick={handleDialogClose}
               className="border-gray-300 text-gray-700"
             >
-              Cancel
+              {t('Cancel')}
             </Button>
             <Button
               type="submit"
@@ -260,7 +265,7 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab }: With
               }
               className="bg-blue-500 text-white hover:bg-blue-600"
             >
-              {isLoading ? 'Processing...' : 'Withdraw'}
+              {t(isLoading ? 'Processing...' : 'Withdraw')}
             </Button>
           </DialogFooter>
         </form>

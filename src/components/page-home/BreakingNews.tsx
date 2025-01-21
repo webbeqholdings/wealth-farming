@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/carousel'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { useTranslation } from 'react-i18next';
 
 const newsItems = [
   {
@@ -69,6 +70,7 @@ type Blog = {
 
 export function BreakingNewsCarousel() {
   const [newsItems, setNewsItems] = useState([]);
+  const { t } = useTranslation();
   useEffect(() => {
     // Fetch data from API
     const fetchData = async () => {
@@ -95,7 +97,7 @@ export function BreakingNewsCarousel() {
   return (
     <section className="py-16 bg-secondary/10">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold mb-8">Breaking News</h2>
+        <h2 className="text-3xl font-bold mb-8">{t('Breaking News')}</h2>
         <Carousel
           opts={{
             align: 'start',
