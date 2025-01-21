@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/table'
 import { format } from 'date-fns'
 import { formatMoney } from '@/utilities/formatMoney'
+import { useTranslation } from 'react-i18next'
 interface ProfitData {
   date: Date
   balance: number
@@ -19,19 +20,20 @@ interface ProfitData {
 }
 
 export function ProfitTable({ data }: { data: ProfitData[] }) {
+  const { t } = useTranslation()
   return (
     <>
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Month</TableHead>
-              <TableHead>Balance</TableHead>
-              <TableHead>Profit</TableHead>
-              <TableHead>Interest Earned</TableHead>
-              <TableHead>rate</TableHead>
-              <TableHead className="text-center">Trading Days</TableHead>
-              <TableHead>Term Type</TableHead>
+              <TableHead>{t('Month')}</TableHead>
+              <TableHead>{t('Balance')}</TableHead>
+              <TableHead>{t('Profit')}</TableHead>
+              <TableHead>{t('Interest Earned')}</TableHead>
+              <TableHead>{t('Rate')}</TableHead>
+              <TableHead className="text-center">{t('Trading Days')}</TableHead>
+              <TableHead>{t('Term Type')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -45,7 +47,7 @@ export function ProfitTable({ data }: { data: ProfitData[] }) {
                 <TableCell>{row.interestEarned.toFixed(2)}</TableCell>
                 <TableCell>{row.rate.toFixed(2) + ' %'}</TableCell>
                 <TableCell className="text-center">{row.days}</TableCell>
-                <TableCell>{row.termType}</TableCell>
+                <TableCell>{t(row.termType)}</TableCell>
               </TableRow>
             ))}
           </TableBody>
