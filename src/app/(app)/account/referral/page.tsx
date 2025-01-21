@@ -236,7 +236,7 @@ export default function ReferralPage() {
                 )}
               >
                 <CalendarIcon />
-                {startDate ? format(startDate, "PPP") : <span>{t('Start Date')}</span>}
+                {startDate ? format(startDate, "PPP") : <span>{t('start_date')}</span>}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -258,7 +258,7 @@ export default function ReferralPage() {
                 )}
               >
                 <CalendarIcon />
-                {endDate ? format(endDate, "PPP") : <span>{t('End Date')}</span>}
+                {endDate ? format(endDate, "PPP") : <span>{t('end_date')}</span>}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">

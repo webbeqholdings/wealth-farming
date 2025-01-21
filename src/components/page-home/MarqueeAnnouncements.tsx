@@ -3,6 +3,7 @@
 import React, { useRef, useEffect, useState } from 'react'
 import { motion, useAnimationFrame, useMotionValue, useTransform } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { useTranslation } from 'react-i18next';
 
 interface MarqueeProps {
   items: string[]
@@ -21,6 +22,7 @@ export function MarqueeAnnouncements({
   const baseX = useMotionValue(0)
   const [containerWidth, setContainerWidth] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (containerRef.current) {
@@ -53,7 +55,7 @@ export function MarqueeAnnouncements({
       <motion.div ref={containerRef} className="flex whitespace-nowrap" style={{ x }}>
         {[...items, ...items].map((item, index) => (
           <React.Fragment key={index}>
-            <span className="text-white px-4 py-2">{item}</span>
+            <span className="text-white px-4 py-2">{t(item)}</span>
             {index !== items.length * 2 - 1 && <span className="text-green-500 px-2">•</span>}
           </React.Fragment>
         ))}
