@@ -9,6 +9,9 @@ const Withdrawals: CollectionConfig = {
         singular: 'Withdrawal Contract',
         plural: 'Withdrawal Contracts',
     },
+    admin: {
+        listSearchableFields: ['user.email', 'amount'],
+    },
     fields: [
         {
             name: 'contract',

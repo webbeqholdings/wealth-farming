@@ -40,6 +40,7 @@ import { useToast } from '@/hooks/use-toast'
 import { Trash2 } from 'lucide-react'
 import UserStatus from '@/lib/userStatus'
 import { CryptoWalletCombobox } from './crypto-wallet-combobox'
+import { useTranslation } from 'react-i18next';
 
 const formSchema = z.object({
   walletAddress: z.string().min(5, {
@@ -62,6 +63,7 @@ export function CryptoWalletForm({
   const { toast } = useToast()
 
   const { user } = UserStatus()
+  const { t } = useTranslation();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -158,9 +160,9 @@ export function CryptoWalletForm({
     <div>
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>Add Crypto Wallet</CardTitle>
+          <CardTitle>{t('Add Crypto Wallet')}</CardTitle>
           <CardDescription>
-            Enter your bank account details for deposits and withdrawals.
+            {t('Enter your bank account details for deposits and withdrawals.')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -173,11 +175,11 @@ export function CryptoWalletForm({
                   name="walletAddress"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>Wallet Address</FormLabel>
+                      <FormLabel>{t('Wallet Address')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter wallet address" {...field} />
+                        <Input placeholder={t("Enter wallet address")} {...field} />
                       </FormControl>
-                      <FormDescription>Your crypto wallet address.</FormDescription>
+                      <FormDescription>{t('Your crypto wallet address.')}</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -187,11 +189,11 @@ export function CryptoWalletForm({
                   name="network"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>Network</FormLabel>
+                      <FormLabel>{t('Network')}</FormLabel>
                       <FormControl>
                         <CryptoWalletCombobox value={field.value} onChange={field.onChange} />
                       </FormControl>
-                      <FormDescription>The blockchain network of your wallet.</FormDescription>
+                      <FormDescription>{t('The blockchain network of your wallet.')}</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -200,23 +202,23 @@ export function CryptoWalletForm({
 
               {/* Submit Button */}
               <Button type="submit" className="bg-primary hover:bg-primary/90 text-black">
-                Add Crypto Wallet
+                {t('Add Crypto Wallet')}
               </Button>
             </form>
           </Form>
         </CardContent>
         <Separator />
         <CardHeader>
-          <CardTitle>Your Crypto Wallets</CardTitle>
-          <CardDescription>Manage your registered crypto wallets.</CardDescription>
+          <CardTitle>{t('Your Crypto Wallets')}</CardTitle>
+          <CardDescription>{t('Manage your registered crypto wallets')}.</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Wallet Address</TableHead>
-                <TableHead>Network</TableHead>
-                <TableHead>Action</TableHead> {/* Add action column */}
+                <TableHead>{t('Wallet Address')}</TableHead>
+                <TableHead>{t('Network')}</TableHead>
+                <TableHead>{t('Action')}</TableHead> {/* Add action column */}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -241,17 +243,17 @@ export function CryptoWalletForm({
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Are you sure?</DialogTitle>
+            <DialogTitle>{t('Are you sure?')}</DialogTitle>
             <DialogDescription>
-              This action will permanently delete the bank account. Do you want to proceed?
+              {t('This action will permanently delete the bank account. Do you want to proceed?')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button onClick={handleCancel} color="gray" size="sm">
-              Cancel
+              {t('Cancel')}
             </Button>
             <Button onClick={() => handleDelete(cryptoWalletId)} color="red" size="sm">
-              Delete
+              {t('Delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

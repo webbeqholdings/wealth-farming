@@ -1,3 +1,4 @@
+'use client'
 import { CoverText } from '@/components/page-home/CoverText'
 import { MarqueeClients } from '@/components/page-home/MarqueeClients'
 import Link from 'next/link'
@@ -11,6 +12,7 @@ import { MarqueeAnnouncements } from '@/components/page-home/MarqueeAnnouncement
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Mail, Wallet, BarChart3 } from 'lucide-react'
+import { useTranslation } from 'react-i18next';
 
 import {
   Accordion,
@@ -23,12 +25,13 @@ import { BreakingNewsCarousel } from '@/components/page-home/BreakingNews'
 import CryptoDashboard from '@/components/crypto/CryptoDashboard'
 import WorldIndicesDashboard from '@/components/crypto/WorldIndicesDashboard'
 
-export const metadata: Metadata = {
+const metadata: Metadata = {
   title: 'Wealth Farming | Cultivate wealth, harvest results',
   description: 'Example music app using the components.',
 }
 
 export default function IndexPage() {
+  const { t } = useTranslation();
   const announcements = [
     'Welcome to BeQ Wealth Farming Fund!',
     'New investment opportunity: Green Energy Farms',
@@ -109,10 +112,10 @@ export default function IndexPage() {
 
         <div className="container mx-auto px-0 md:py-14">
           <div className="mt-10 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">
-            Get Started in 30 Seconds!
+            {t('Get Started in 30 Seconds!')}
           </div>
           <p className="leading-7 [&:not(:first-child)]:mt-6">
-            Provide your email address and check your inbox for a 6-digit verification code.
+            {t('Provide your email address and check your inbox for a 6-digit verification code.')}
           </p>
 
           <div className="grid gap-8 md:grid-cols-3">
@@ -123,14 +126,14 @@ export default function IndexPage() {
                     <span className="text-xl font-bold">{step.number}</span>
                   </div>
                   <step.icon className="w-16 h-16 mb-4 text-primary" />
-                  <CardTitle className="text-xl font-bold">{step.title}</CardTitle>
+                  <CardTitle className="text-xl font-bold">{t(step.title)}</CardTitle>
                 </CardHeader>
                 <CardContent className="flex-grow">
-                  <p className="text-sm text-muted-foreground">{step.description}</p>
+                  <p className="text-sm text-muted-foreground">{t(step.description)}</p>
                 </CardContent>
                 <CardFooter className="mt-auto">
                   <Button className="w-full font-bold" variant="secondary" asChild>
-                    <a href={step.buttonHref}>{step.buttonText}</a>
+                    <a href={step.buttonHref}>{t(step.buttonText)}</a>
                   </Button>
                 </CardFooter>
               </Card>
@@ -141,20 +144,20 @@ export default function IndexPage() {
         <div className="container mx-auto px-0 md:py-14">
           <div className="mt-10 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">
             <div className="text-xl font-semibold tracking-tight pb-1">
-              All investing involves risk.
+              {t('All investing involves risk.')}
             </div>
-            With Wealth Farming, that is not very risky.
+            {t('With Wealth Farming, that is not very risky.')}
           </div>
           <FeaturesSection />
         </div>
 
         <div className="container mx-auto px-0 md:py-14">
-          <h2 className="text-3xl font-bold mb-8">Frequently Asked Questions</h2>
+          <h2 className="text-3xl font-bold mb-8">{t('Frequently Asked Questions')}</h2>
           <Accordion type="single" collapsible className="w-full">
             {faqs.map((faq, index) => (
               <AccordionItem key={index} value={`item-${index}`}>
-                <AccordionTrigger>{faq.question}</AccordionTrigger>
-                <AccordionContent>{faq.answer}</AccordionContent>
+                <AccordionTrigger>{t(faq.question)}</AccordionTrigger>
+                <AccordionContent>{t(faq.answer)}</AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>

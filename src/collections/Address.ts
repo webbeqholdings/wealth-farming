@@ -7,6 +7,9 @@ export const Address: CollectionConfig = {
     read: isIndividualOrAdmin,
     update: isIndividualOrAdmin,
   },
+  admin: {
+    listSearchableFields: ['user.email', 'city', 'country'],
+  },
   fields: [
     {
       name: 'user',

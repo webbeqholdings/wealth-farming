@@ -4,6 +4,7 @@ const Companies: CollectionConfig = {
   slug: 'companies',
   admin: {
     useAsTitle: 'name',
+    listSearchableFields: ['name', 'registration_number', 'address', 'contact_person'],
   },
   fields: [
     {

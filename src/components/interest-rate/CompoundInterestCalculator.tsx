@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { CustomTooltip } from '../CustomTooltip'
+import { useTranslation } from 'react-i18next'
 
 interface CompoundInterestCalculatorProps {
   principal: number
@@ -34,14 +35,15 @@ export function CompoundInterestCalculator({
 
   const finalAmount = chartData[chartData.length - 1].amount
   const totalInterestEarned = finalAmount - principal
+  const { t } = useTranslation()
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{termName} Investment Growth</CardTitle>
+        <CardTitle>{t(termName)} {t('Investment Growth')}</CardTitle>
         <CardDescription>
-          Initial Deposit: ${principal.toLocaleString()}, Monthly Rate: {monthlyRate.toFixed(2)}%,
-          Term: {months} months
+          {t('Initial Deposit: ${{init}}, Monthly Rate: {{month}}%, Term: {{term}} months', 
+          {init: principal.toLocaleString(), month: monthlyRate.toFixed(2), term: months })}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -51,7 +53,7 @@ export function CompoundInterestCalculator({
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis
                 dataKey="month"
-                label={{ value: 'Months', position: 'insideBottom', offset: -5 }}
+                label={{ value: t('Months'), position: 'insideBottom', offset: -5 }}
                 ticks={[
                   0,
                   Math.floor(months / 4),
@@ -60,7 +62,7 @@ export function CompoundInterestCalculator({
                   months,
                 ]}
               />
-              <YAxis label={{ value: 'Amount ($)', angle: -90, position: 'insideLeft' }} />
+              <YAxis label={{ value: t('Amount ($)'), angle: -90, position: 'insideLeft' }} />
               <Tooltip content={<CustomTooltip />} />
               <Legend />
               <Line type="monotone" dataKey="amount" stroke="blue" activeDot={{ r: 8 }} />
@@ -68,12 +70,12 @@ export function CompoundInterestCalculator({
           </ResponsiveContainer>
         </div>
         <div className="mt-4">
-          <p className="text-sm font-semibold">Final Amount: ${finalAmount.toLocaleString()}</p>
+          <p className="text-sm font-semibold">{t('Final Amount: ${{final}}', {final: finalAmount.toLocaleString()})}</p>
           <p className="text-sm font-semibold">
-            Total Interest Earned: ${totalInterestEarned.toLocaleString()}
+            {t('Total Interest Earned: ${{total}}', {total: totalInterestEarned.toLocaleString()})}
           </p>
           <p className="text-sm font-semibold">
-            X times: {(finalAmount / principal).toLocaleString()}
+            {t('X times:')} {(finalAmount / principal).toLocaleString()}
           </p>
         </div>
       </CardContent>
