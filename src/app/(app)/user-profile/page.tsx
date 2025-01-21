@@ -37,8 +37,10 @@ import UserStatus from '@/lib/userStatus'
 import TelegramButton from '@/components/TelegramButton'
 import Spinner from '@/components/Spinner'
 import { getAccountsByUser } from '@/lib/account'
+import { useTranslation } from 'react-i18next';
 
 export default function UserProfile() {
+  const { t } = useTranslation();
   const { isLoggedIn, loading, user } = UserStatus()
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -330,12 +332,12 @@ export default function UserProfile() {
     <>
       <SiteHeader />
       <div className="container mx-auto p-4">
-        <h1 className="text-3xl font-bold mb-6">User Profile</h1>
+        <h1 className="text-3xl font-bold mb-6">{t('User Profile')}</h1>
         <div className="grid gap-6 md:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>Personal Information</CardTitle>
-              <CardDescription>Manage your personal details</CardDescription>
+              <CardTitle>{t('Personal Information')}</CardTitle>
+              <CardDescription>{t("Manage your personal details")}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -345,7 +347,7 @@ export default function UserProfile() {
                     <AvatarFallback>{userInfo.firstName + ' ' + userInfo.lastName}</AvatarFallback>
                   </Avatar>
                   <Button variant="outline" onClick={handleButtonClick}>
-                    Change Avatar
+                    {t('Change Avatar')}
                   </Button>
                   <input
                     ref={fileInputRef} // Assign the ref to the input
@@ -357,7 +359,7 @@ export default function UserProfile() {
                 <form onSubmit={handleUpdateProfile} className="space-y-4">
                   <div className="flex space-x-4">
                     <div className="space-y-2 flex-1">
-                      <Label htmlFor="first_name">First Name</Label>
+                      <Label htmlFor="first_name">{t('First Name')}</Label>
                       <Input
                         id="first_name"
                         name="first_name"
@@ -366,7 +368,7 @@ export default function UserProfile() {
                       />
                     </div>
                     <div className="space-y-2 flex-1">
-                      <Label htmlFor="last_name">Last Name</Label>
+                      <Label htmlFor="last_name">{t('Last Name')}</Label>
                       <Input
                         id="last_name"
                         name="last_name"
@@ -387,7 +389,7 @@ export default function UserProfile() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Phone</Label>
+                    <Label htmlFor="phone">{t('Phone')}</Label>
                     <Input
                       id="phone"
                       name="phone"
@@ -397,7 +399,7 @@ export default function UserProfile() {
                     />
                   </div>
                   <Button type="submit" className="mt-5">
-                    Update Profile
+                    {t("Update Profile")}
                   </Button>
                 </form>
               </div>
@@ -406,14 +408,14 @@ export default function UserProfile() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Account Information</CardTitle>
-              <CardDescription>View your account details and recent transactions</CardDescription>
+              <CardTitle>{t('Account Information')}</CardTitle>
+              <CardDescription>{t('View your account details and recent transactions')}</CardDescription>
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="details">
                 <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="details">Account Details</TabsTrigger>
-                  <TabsTrigger value="transactions">Recent Transactions</TabsTrigger>
+                  <TabsTrigger value="details">{t('Account Details')}</TabsTrigger>
+                  <TabsTrigger value="transactions">{t('Recent Transactions')}</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="details">
@@ -422,7 +424,7 @@ export default function UserProfile() {
                         <>
                         <div className="flex items-center space-x-4 mt-4">
                           <CreditCard className="h-5 w-5 text-muted-foreground" />
-                          <span>{account.name}</span>
+                          <span>{t(account.name)}</span>
                         </div>
                         <div className="flex items-center space-x-4 mt-2">
                           <DollarSign className="h-5 w-5 text-muted-foreground" />
@@ -442,8 +444,8 @@ export default function UserProfile() {
                       transactions.map((transaction) => (
                         <li key={transaction.id} className="flex justify-between items-center">
                           <span>
-                            {transaction.type.charAt(0).toUpperCase() +
-                              transaction.type.slice(1).toLowerCase()}
+                            {t(transaction.type.charAt(0).toUpperCase() +
+                              transaction.type.slice(1).toLowerCase())}
                           </span>
                           <span
                             className={transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'}
@@ -465,7 +467,7 @@ export default function UserProfile() {
                 variant="outline"
                 className="w-full"
               >
-                View Full Statement
+                {t('View Full Statement')}
               </Button>
             </CardFooter>
           </Card>
@@ -477,56 +479,56 @@ export default function UserProfile() {
 
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle>Security Settings</CardTitle>
-            <CardDescription>Manage your account security</CardDescription>
+            <CardTitle>{t('Security Settings')}</CardTitle>
+            <CardDescription>{t('Manage your account security')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-4">
                 <Lock className="h-5 w-5 text-muted-foreground" />
-                <span>Two-Factor Authentication</span>
+                <span>{t('Two-Factor Authentication')}</span>
               </div>
-              <Button variant="outline">Enable</Button>
+              <Button variant="outline">{t('Enable')}</Button>
             </div>
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-4">
                 <LineChart className="h-5 w-5 text-muted-foreground" />
-                <span>Login Activity</span>
+                <span>{t('Login Activity')}</span>
               </div>
-              <Button variant="outline">View</Button>
+              <Button variant="outline">{t('View')}</Button>
             </div>
           </CardContent>
         </Card>
 
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle>Invite & Earn</CardTitle>
-            <CardDescription>Invite friends and earn rewards</CardDescription>
+            <CardTitle>{t('Invite & Earn')}</CardTitle>
+            <CardDescription>{t('Invite friends and earn rewards')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="referral-code">Your Referral Code</Label>
+              <Label htmlFor="referral-code">{t('Your Referral Code')}</Label>
               <div className="flex space-x-2">
                 <Input id="referral-code" value={user.referral_code} readOnly />
                 <Button variant="outline" size="icon" onClick={copyReferralCode}>
                   <Copy className="h-4 w-4" />
-                  <span className="sr-only">Copy referral code</span>
+                  <span className="sr-only">{t('Copy referral code')}</span>
                 </Button>
                 <Button variant="outline" size="icon" onClick={shareReferralCode}>
                   <Share2 className="h-4 w-4" />
-                  <span className="sr-only">Share referral code</span>
+                  <span className="sr-only">{t('Share referral code')}</span>
                 </Button>
               </div>
             </div>
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <span>Referral Progress</span>
+                <span>{t('Referral Progress')}</span>
                 <span>{referralInfo.referralProgress}%</span>
               </div>
               <Progress value={referralInfo.referralProgress} className="w-full" />
             </div>
             <div className="space-y-2">
-              <h4 className="font-semibold">Your Referrals</h4>
+              <h4 className="font-semibold">{t('Your Referral')}s</h4>
               <ul className="space-y-2">
                 {referralInfo.referrals.map((referral, index) => (
                   <li key={index} className="flex justify-between items-center">
@@ -542,15 +544,15 @@ export default function UserProfile() {
           <CardFooter>
             <Button className="w-full">
               <UserPlus className="mr-2 h-4 w-4" />
-              Invite More Friends
+              {t('Invite More Friends')}
             </Button>
           </CardFooter>
         </Card>
 
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle>Telegram Notifications</CardTitle>
-            <CardDescription>Manage your Telegram notification settings</CardDescription>
+            <CardTitle>{t('Telegram Notifications')}</CardTitle>
+            <CardDescription>{t('Manage your Telegram notification settings')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {telegramNotifications.connected ? (
@@ -558,7 +560,7 @@ export default function UserProfile() {
                 <div className="flex justify-between items-center">
                   <div className="flex items-center space-x-4">
                     <Bell className="h-5 w-5 text-muted-foreground" />
-                    <span>Connected to Telegram</span>
+                    <span>{t('Connected to Telegram')}</span>
                   </div>
                   <Badge>{telegramNotifications.username}</Badge>
                 </div>
@@ -577,8 +579,8 @@ export default function UserProfile() {
                 </div>
 
                 <div className="space-y-4 mt-4">
-                  <div className="flex items-center justify-between space-x-2">
-                    <Label htmlFor="transactions">Transaction Notifications</Label>
+                  <div className="flex items-center justify-between spaddce-x-2">
+                    <Label htmlFor="transactions">{t('Transaction Notifications')}</Label>
                     <Switch
                       id="transactions"
                       checked={telegramNotifications.settings.transactions}
@@ -593,13 +595,13 @@ export default function UserProfile() {
                     className="w-full"
                   >
                     <AlertTriangle className="mr-2 h-4 w-4" />
-                    Disconnect Telegram
+                    {t('Disconnect Telegram')}
                   </Button>
                 </div>
               </>
             ) : (
               <div className="text-center space-y-4">
-                <p className="mb-4">Connect your Telegram account to receive notifications</p>
+                <p className="mb-4">{t('Connect your Telegram account to receive notifications')}</p>
                 <TelegramButton userId={user.id} />
               </div>
             )}

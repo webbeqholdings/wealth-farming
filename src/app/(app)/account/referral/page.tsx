@@ -44,6 +44,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { useTranslation } from 'react-i18next';
 
 export default function ReferralPage() {
   const router = useRouter()
@@ -55,6 +56,7 @@ export default function ReferralPage() {
   const [startDate, setStartDate] = useState<Date>()
   const [endDate, setEndDate] = useState<Date>()
   const [nameFilter, setNameFilter] = useState('')
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchData()
@@ -157,20 +159,20 @@ export default function ReferralPage() {
     <>
       <SiteHeader />
       <div className="container mx-auto py-10">
-        <h1 className="text-3xl font-bold mb-8">Your Referrals</h1>
+        <h1 className="text-3xl font-bold mb-8">{t('Your Referrals')}</h1>
 
         {/* Banner */}
         <Card className="mb-8">
           <CardContent className="flex items-center justify-between p-6">
             <div>
-              <h2 className="text-2xl font-semibold mb-2">Share your referral link</h2>
-              <p className="text-muted-foreground">Invite friends and earn rewards!</p>
+              <h2 className="text-2xl font-semibold mb-2">{t('Share your referral link')}</h2>
+              <p className="text-muted-foreground">{t('Invite friends and earn rewards!')}</p>
             </div>
             <div className="flex items-center space-x-2">
               <Input value={referralLink} readOnly className="w-64" />
               <Button onClick={copyReferralLink}>
                 <Link className="mr-2 h-4 w-4" />
-                Copy
+                {t('Copy')}
               </Button>
             </div>
           </CardContent>
@@ -180,7 +182,7 @@ export default function ReferralPage() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Referrals</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('Total Referrals')}</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -189,7 +191,7 @@ export default function ReferralPage() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pending Referrals</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('Pending Referrals')}</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -198,7 +200,7 @@ export default function ReferralPage() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Completed Referrals</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('Completed Referrals')}</CardTitle>
               <Award className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -207,7 +209,7 @@ export default function ReferralPage() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Earnings</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('Total Earnings')}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -221,7 +223,7 @@ export default function ReferralPage() {
             <div className=''>
             <Input 
               type="text" 
-              placeholder="Name" 
+              placeholder={t("Name")} 
               onChange={(e) => setNameFilter(e.target.value)} 
             />
             </div>
@@ -234,7 +236,7 @@ export default function ReferralPage() {
                 )}
               >
                 <CalendarIcon />
-                {startDate ? format(startDate, "PPP") : <span>Start Date</span>}
+                {startDate ? format(startDate, "PPP") : <span>{t('Start Date')}</span>}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -256,7 +258,7 @@ export default function ReferralPage() {
                 )}
               >
                 <CalendarIcon />
-                {endDate ? format(endDate, "PPP") : <span>End Date</span>}
+                {endDate ? format(endDate, "PPP") : <span>{t('End Date')}</span>}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -275,16 +277,16 @@ export default function ReferralPage() {
         {/* Referrals Table */}
         <Card>
           <CardHeader>
-            <CardTitle>Your Referrals</CardTitle>
+            <CardTitle>{t('Your Referrals')}</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>{t('Name')}</TableHead>
+                  <TableHead>{t('Email')}</TableHead>
+                  <TableHead>{t('Date')}</TableHead>
+                  <TableHead>{t('Status')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -301,7 +303,7 @@ export default function ReferralPage() {
                               : 'bg-yellow-100 text-yellow-800'
                             }`}
                         >
-                          {referral.status}
+                          {t(referral.status)}
                         </span>
                       </TableCell>
                     </TableRow>
