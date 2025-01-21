@@ -28,6 +28,9 @@ export function SiteHeader() {
   const { t } = useTranslation(); 
   useEffect(() => {
     const fetchData = async () => {
+      if(!user?.id){
+        return
+      }
       try {
         const response = await fetch(`/api/accounts?where[user][equals]=${user.id}`)
         if (!response.ok) {

@@ -226,7 +226,7 @@ export default function DepositPage() {
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
-        if (user && user.id) {
+        if (user && user?.id) {
           const accountsData = await getAccountsByUserId(user.id)
           if (accountsData) {
             setAccounts(accountsData)
@@ -243,6 +243,9 @@ export default function DepositPage() {
   useEffect(() => {
     const fetchBanks = async () => {
       try {
+        if(!user?.id){
+          return
+        }
         const response = await fetch(`/api/banks?where[user][equals]=${user.id}`) // Replace with dynamic user ID if necessary
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`)

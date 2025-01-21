@@ -85,6 +85,9 @@ export default function UserProfile() {
   useEffect(() => {
     // Fetch data from your API
     const fetchData = async () => {
+      if (!user?.id) {
+        return
+      }
       try {
         // Delete the cookies stel_ssid and stel_token
         const totalAmount = localStorage.getItem('total_amount')
@@ -122,6 +125,9 @@ export default function UserProfile() {
 
   useEffect(() => {
     const fetchTransactions = async () => {
+      if (!user?.id) {
+        return
+      }
       const response = await fetch(`/api/transaction/recent?user_id=${user.id}`)
       const data = await response.json()
       setTransactions(data.data)
@@ -148,6 +154,9 @@ export default function UserProfile() {
     }
 
     try {
+      if (!user?.id) {
+        return
+      }
       const response = await fetch(`/api/users/${user.id}`, {
         method: 'PATCH',
         headers: {
@@ -184,7 +193,7 @@ export default function UserProfile() {
     }
   }
 
-  const uploadAvatar = async (formData: FormData, avatarId?: string) => {
+  const uploadAvatar: any = async (formData: FormData, avatarId?: string) => {
     try {
       // Define the appropriate URL for media upload and PATCH request
       const mediaUrl = avatarId ? `/api/media/${avatarId}` : '/api/media'
@@ -217,6 +226,9 @@ export default function UserProfile() {
           const uploadedAvatar = await uploadAvatar(formData) // Upload new avatar
 
           // Update user info with the new avatar
+          if (!user?.id) {
+            return
+          }
           const updateUserResponse = await fetch(`/api/users/${user.id}`, {
             method: 'PATCH',
             headers: {
@@ -277,6 +289,9 @@ export default function UserProfile() {
   // Wallet Accounts
   useEffect(() => {
     const fetchAccounts = async () => {
+      if (!user?.id) {
+        return
+      }
       try {
         const response = await getAccountsByUser(user.id)
         // Transform API response into desired format
@@ -296,13 +311,13 @@ export default function UserProfile() {
 
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
-    return <Spinner/> // You can replace this with a loading spinner component if desired
+    return <Spinner /> // You can replace this with a loading spinner component if desired
   }
 
   // If the user is not logged in, redirect to the join page
   if (!isLoggedIn) {
     router.push('/join')
-    return <Spinner/> // Optional: Show a redirect message
+    return <Spinner /> // Optional: Show a redirect message
   }
 
   // Placeholder for disconnect logic (unchanged)
@@ -417,11 +432,10 @@ export default function UserProfile() {
                   <TabsTrigger value="details">{t('Account Details')}</TabsTrigger>
                   <TabsTrigger value="transactions">{t('Recent Transactions')}</TabsTrigger>
                 </TabsList>
-
                 <TabsContent value="details">
-                  {/* Wallet Accounts */}
-                      {accounts.map((account) => (
-                        <>
+                  {accounts &&
+                    accounts.map((account) => (
+                      <div key={account.id}> {/* Ensure a unique key is provided */}
                         <div className="flex items-center space-x-4 mt-4">
                           <CreditCard className="h-5 w-5 text-muted-foreground" />
                           <span>{t(account.name)}</span>
@@ -435,8 +449,8 @@ export default function UserProfile() {
                             })}
                           </span>
                         </div>
-                        </>
-                      ))}
+                      </div>
+                    ))}
                 </TabsContent>
                 <TabsContent value="transactions">
                   <ul className="space-y-2">
