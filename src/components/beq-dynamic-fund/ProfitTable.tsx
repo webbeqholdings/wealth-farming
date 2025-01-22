@@ -21,19 +21,30 @@ interface ProfitData {
 
 export function ProfitTable({ data }: { data: ProfitData[] }) {
   const { t } = useTranslation()
+  const getMessage = (messageField: string | object): string => {
+    if (typeof messageField === 'string') {
+      try {
+        const messageData = JSON.parse(messageField);
+        return t(messageData.key, messageData.params || {}) as string;
+      } catch (e) {
+        return t(messageField);
+      }
+    }
+    return '';
+  };
   return (
     <>
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t('Month')}</TableHead>
-              <TableHead>{t('Balance')}</TableHead>
-              <TableHead>{t('Profit')}</TableHead>
-              <TableHead>{t('Interest Earned')}</TableHead>
-              <TableHead>{t('Rate')}</TableHead>
-              <TableHead className="text-center">{t('Trading Days')}</TableHead>
-              <TableHead>{t('Term Type')}</TableHead>
+              <TableHead>{t('month')}</TableHead>
+              <TableHead>{t('balance')}</TableHead>
+              <TableHead>{t('profit')}</TableHead>
+              <TableHead>{t('interest_earned')}</TableHead>
+              <TableHead>{t('rate')}</TableHead>
+              <TableHead className="text-center">{t('trading_days')}</TableHead>
+              <TableHead>{t('term_type')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -47,7 +58,7 @@ export function ProfitTable({ data }: { data: ProfitData[] }) {
                 <TableCell>{row.interestEarned.toFixed(2)}</TableCell>
                 <TableCell>{row.rate.toFixed(2) + ' %'}</TableCell>
                 <TableCell className="text-center">{row.days}</TableCell>
-                <TableCell>{t(row.termType)}</TableCell>
+                <TableCell>{getMessage(row.termType)}</TableCell>
               </TableRow>
             ))}
           </TableBody>

@@ -388,12 +388,12 @@ export default function UserProfile() {
     <>
       <SiteHeader />
       <div className="container mx-auto p-4">
-        <h1 className="text-3xl font-bold mb-6">{t('User Profile')}</h1>
+        <h1 className="text-3xl font-bold mb-6">{t('user_profile')}</h1>
         <div className="grid gap-6 md:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>{t('Personal Information')}</CardTitle>
-              <CardDescription>{t("Manage your personal details")}</CardDescription>
+              <CardTitle>{t('personal_information')}</CardTitle>
+              <CardDescription>{t("manage_personal_details")}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -403,7 +403,7 @@ export default function UserProfile() {
                     <AvatarFallback>{userInfo.firstName + ' ' + userInfo.lastName}</AvatarFallback>
                   </Avatar>
                   <Button variant="outline" onClick={handleButtonClick}>
-                    {t('Change Avatar')}
+                    {t('change_avatar')}
                   </Button>
                   <input
                     ref={fileInputRef} // Assign the ref to the input
@@ -415,7 +415,7 @@ export default function UserProfile() {
                 <form onSubmit={handleUpdateProfile} className="space-y-4">
                   <div className="flex space-x-4">
                     <div className="space-y-2 flex-1">
-                      <Label htmlFor="first_name">{t('First Name')}</Label>
+                      <Label htmlFor="first_name">{t('first_name')}</Label>
                       <Input
                         id="first_name"
                         name="first_name"
@@ -424,7 +424,7 @@ export default function UserProfile() {
                       />
                     </div>
                     <div className="space-y-2 flex-1">
-                      <Label htmlFor="last_name">{t('Last Name')}</Label>
+                      <Label htmlFor="last_name">{t('last_name')}</Label>
                       <Input
                         id="last_name"
                         name="last_name"
@@ -435,7 +435,7 @@ export default function UserProfile() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">{t('Email')}</Label>
                     <Input
                       id="email"
                       name="email"
@@ -445,7 +445,7 @@ export default function UserProfile() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="phone">{t('Phone')}</Label>
+                    <Label htmlFor="phone">{t('phone')}</Label>
                     <Input
                       id="phone"
                       name="phone"
@@ -455,7 +455,7 @@ export default function UserProfile() {
                     />
                   </div>
                   <Button type="submit" className="mt-5">
-                    {t("Update Profile")}
+                    {t("update_profile")}
                   </Button>
                 </form>
               </div>
@@ -464,14 +464,14 @@ export default function UserProfile() {
 
           <Card>
             <CardHeader>
-              <CardTitle>{t('Account Information')}</CardTitle>
-              <CardDescription>{t('View your account details and recent transactions')}</CardDescription>
+              <CardTitle>{t('account_information')}</CardTitle>
+              <CardDescription>{t('view_account_details')}</CardDescription>
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="details">
                 <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="details">{t('Account Details')}</TabsTrigger>
-                  <TabsTrigger value="transactions">{t('Recent Transactions')}</TabsTrigger>
+                  <TabsTrigger value="details">{t('account_details')}</TabsTrigger>
+                  <TabsTrigger value="transactions">{t('recent_transactions')}</TabsTrigger>
                 </TabsList>
                 <TabsContent value="details">
                   {accounts &&
@@ -522,7 +522,7 @@ export default function UserProfile() {
                 variant="outline"
                 className="w-full"
               >
-                {t('View Full Statement')}
+                {t('view_full_statement')}
               </Button>
             </CardFooter>
           </Card>
@@ -534,44 +534,44 @@ export default function UserProfile() {
 
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle>{t('Security Settings')}</CardTitle>
-            <CardDescription>{t('Manage your account security')}</CardDescription>
+            <CardTitle>{t('security_settings')}</CardTitle>
+            <CardDescription>{t('manage_account_security')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-4">
                 <Lock className="h-5 w-5 text-muted-foreground" />
-                <span>{t('Two-Factor Authentication')}</span>
+                <span>{t('two_factor_auth')}</span>
               </div>
-              <Button variant="outline">{t('Enable')}</Button>
+              <Button variant="outline">{t('enable')}</Button>
             </div>
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-4">
                 <LineChart className="h-5 w-5 text-muted-foreground" />
-                <span>{t('Login Activity')}</span>
+                <span>{t('login_activity')}</span>
               </div>
-              <Button variant="outline">{t('View')}</Button>
+              <Button variant="outline">{t('view')}</Button>
             </div>
           </CardContent>
         </Card>
 
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle>{t('Invite & Earn')}</CardTitle>
-            <CardDescription>{t('Invite friends and earn rewards')}</CardDescription>
+            <CardTitle>{t('invite_and_earn')}</CardTitle>
+            <CardDescription>{t('invite_friends_rewards')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="referral-code">{t('Your Referral Code')}</Label>
+              <Label htmlFor="referral-code">{t('referral_code')}</Label>
               <div className="flex space-x-2">
                 <Input id="referral-code" value={user.referral_code} readOnly />
                 <Button variant="outline" size="icon" onClick={copyReferralCode}>
                   <Copy className="h-4 w-4" />
-                  <span className="sr-only">{t('Copy referral code')}</span>
+                  <span className="sr-only">{t('copy_referral_code')}</span>
                 </Button>
                 <Button variant="outline" size="icon" onClick={() => { shareReferralCode() }}>
                   <Share2 className="h-4 w-4" />
-                  <span className="sr-only">{t('Share referral code')}</span>
+                  <span className="sr-only">{t('share_referral_code')}</span>
                 </Button>
               </div>
             </div>
@@ -592,15 +592,15 @@ export default function UserProfile() {
           <CardFooter>
             <Button className="w-full">
               <UserPlus className="mr-2 h-4 w-4" />
-              {t('Invite More Friends')}
+              {t('invite_more_friends')}
             </Button>
           </CardFooter>
         </Card>
 
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle>{t('Telegram Notifications')}</CardTitle>
-            <CardDescription>{t('Manage your Telegram notification settings')}</CardDescription>
+            <CardTitle>{t('telegram_notifications')}</CardTitle>
+            <CardDescription>{t('manage_telegram_notifications')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {telegramNotifications.connected ? (
@@ -608,7 +608,7 @@ export default function UserProfile() {
                 <div className="flex justify-between items-center">
                   <div className="flex items-center space-x-4">
                     <Bell className="h-5 w-5 text-muted-foreground" />
-                    <span>{t('Connected to Telegram')}</span>
+                    <span>{t('connected_to_telegram')}</span>
                   </div>
                   <Badge>{telegramNotifications.username}</Badge>
                 </div>
@@ -643,13 +643,13 @@ export default function UserProfile() {
                     className="w-full"
                   >
                     <AlertTriangle className="mr-2 h-4 w-4" />
-                    {t('Disconnect Telegram')}
+                    {t('disconnect_telegram')}
                   </Button>
                 </div>
               </>
             ) : (
               <div className="text-center space-y-4">
-                <p className="mb-4">{t('Connect your Telegram account to receive notifications')}</p>
+                <p className="mb-4">{t('connect_telegram:')}</p>
                 <TelegramButton userId={user.id} />
               </div>
             )}

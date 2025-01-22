@@ -98,6 +98,18 @@ export function InvestmentContracts() {
     const [terminatedAvaibility, setTerminatedAvaibility] = useState(false)
     const { t } = useTranslation();
 
+    const getMessage = (messageField: string | object): string => {
+        if (typeof messageField === 'string') {
+          try {
+            const messageData = JSON.parse(messageField);
+            return t(messageData.key, messageData.params || {}) as string;
+          } catch (e) {
+            return t(messageField);
+          }
+        }
+        return '';
+      };
+
     useEffect(() => {
         async function fetchTerminateAvaibility() {
             const avail = await checkContractLarger90Days()
@@ -634,7 +646,7 @@ export function InvestmentContracts() {
                                                     </span>
                                                 </TableCell>
                                                 <TableCell>
-                                                    {t(withdrawal.message)}
+                                                    {getMessage(withdrawal.message)}
                                                 </TableCell>
                                             </TableRow>
                                         ))}

@@ -44,9 +44,9 @@ export default function ReferralsIntroductionPage() {
     <div>
       <SiteHeader/>
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold mb-6 text-center">{t('Grow Your Wealth Together')}</h1>
+        <h1 className="text-4xl font-bold mb-6 text-center">{t('grow_wealth')}</h1>
         <p className="text-xl text-muted-foreground mb-8 text-center">
-          {t('Invite your friends to BeQ Wealth Farming Fund and earn rewards!')}
+          {t('invite_friends_description')}
         </p>
 
         <div className="grid gap-6 md:grid-cols-3 mb-12">
@@ -54,12 +54,12 @@ export default function ReferralsIntroductionPage() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Users className="mr-2 h-6 w-6" />
-                {t('Invite Friends')}
+                {t('invite_friends')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p>
-                {t('Share your unique referral link with friends and family interested in smart investing.')}
+                {t('share_referral_link2')}
               </p>
             </CardContent>
           </Card>
@@ -68,12 +68,12 @@ export default function ReferralsIntroductionPage() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <CheckCircle className="mr-2 h-6 w-6" />
-                {t('They Join')}
+                {t('they_join')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p>
-                {t('When your friends sign up and make their first investment, you both qualify for rewards.')}
+                {t('friends_sign_up')}
               </p>
             </CardContent>
           </Card>
@@ -82,12 +82,12 @@ export default function ReferralsIntroductionPage() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <DollarSign className="mr-2 h-6 w-6" />
-                {t('Earn Rewards')}
+                {t('earn_rewards')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p>
-                {t('Receive a bonus on your next investment and ongoing benefits for each successful referral.')}
+                {t('receive_bonus')}
               </p>
             </CardContent>
           </Card>
@@ -95,16 +95,16 @@ export default function ReferralsIntroductionPage() {
 
         <Card className="mb-12">
           <CardHeader>
-            <CardTitle>{t('Referral Program Benefits')}</CardTitle>
+            <CardTitle>{t('referral_benefits')}</CardTitle>
 
-            <CardDescription>{t('Here what you and your friends can earn')}</CardDescription>
+            <CardDescription>{t('earn_with_friends')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ul className="list-disc pl-6 space-y-2">
-              <li>{t('5% bonus on your next investment for each successful referral')}</li>
-              <li>{t('Your friends get a 2% bonus on their first investment')}</li>
-              <li>{t('Earn 0.5% of your referrals is investment profits for the first year')}</li>
-              <li>{t('Unlock exclusive investment opportunities after 5 successful referrals')}</li>
+              <li>{t('five_percent_bonus')}</li>
+              <li>{t('friends_get_bonus')}</li>
+              <li>{t('earn_percent_from_referrals')}</li>
+              <li>{t('unlock_opportunities')}</li>
             </ul>
           </CardContent>
         </Card>
@@ -113,18 +113,18 @@ export default function ReferralsIntroductionPage() {
           <CardHeader>
             <CardTitle className="flex items-center">
               <Trophy className="mr-2 h-6 w-6" />
-              {t('Top Referrers')}
+              {t('top_referrers')}
             </CardTitle>
-            <CardDescription>{t('See how you stack up against our top performers')}</CardDescription>
+            <CardDescription>{t('compare_performers')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[100px]">{t('Rank')}</TableHead>
-                  <TableHead>{t('User')}</TableHead>
-                  <TableHead>{t('Referrals')}</TableHead>
-                  <TableHead>{t('Rewards Earned')}</TableHead>
+                  <TableHead className="w-[100px]">{t('rank')}</TableHead>
+                  <TableHead>{t('user')}</TableHead>
+                  <TableHead>{t('referrals')}</TableHead>
+                  <TableHead>{t('rewards')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -145,7 +145,7 @@ export default function ReferralsIntroductionPage() {
           <CardHeader>
             <CardTitle className="flex items-center">
               <Network className="mr-2 h-6 w-6" />
-              {t('Referral Levels')}
+              {t('referral_levels')}
             </CardTitle>
             {/* <CardDescription></CardDescription> */}
           </CardHeader>
@@ -153,10 +153,10 @@ export default function ReferralsIntroductionPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[100px]">{t('Name')}</TableHead>
-                  <TableHead>{t('Min')}</TableHead>
-                  <TableHead>{t('Max')}</TableHead>
-                  <TableHead>{t('Rate')}</TableHead>
+                  <TableHead className="w-[100px]">{t('name')}</TableHead>
+                  <TableHead>{t('min')}</TableHead>
+                  <TableHead>{t('max')}</TableHead>
+                  <TableHead>{t('rate')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -175,15 +175,15 @@ export default function ReferralsIntroductionPage() {
 
         <Card className="bg-primary text-primary-foreground">
           <CardHeader>
-            <CardTitle>{t('Ready to Start Referring?')}</CardTitle>
+            <CardTitle>{t('ready_to_refer')}</CardTitle>
             <CardDescription className="text-primary-foreground/80">
-              {t('Get your unique referral link and start earning rewards today!')}
+              {t('get_referral_link')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Button asChild variant="secondary" size="lg">
               <Link href="/account/referral">
-                {t('Go to Your Referral Dashboard')}
+                {t('go_to_dashboard')}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>

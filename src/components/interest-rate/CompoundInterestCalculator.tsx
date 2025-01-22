@@ -40,9 +40,9 @@ export function CompoundInterestCalculator({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t(termName)} {t('Investment Growth')}</CardTitle>
+        <CardTitle>{t(termName)} {t('inv_growth')}</CardTitle>
         <CardDescription>
-          {t('Initial Deposit: ${{init}}, Monthly Rate: {{month}}%, Term: {{term}} months', 
+          {t('init_deposit_summary', 
           {init: principal.toLocaleString(), month: monthlyRate.toFixed(2), term: months })}
         </CardDescription>
       </CardHeader>
@@ -53,7 +53,7 @@ export function CompoundInterestCalculator({
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis
                 dataKey="month"
-                label={{ value: t('Months'), position: 'insideBottom', offset: -5 }}
+                label={{ value: t('months'), position: 'insideBottom', offset: -5 }}
                 ticks={[
                   0,
                   Math.floor(months / 4),
@@ -62,7 +62,7 @@ export function CompoundInterestCalculator({
                   months,
                 ]}
               />
-              <YAxis label={{ value: t('Amount ($)'), angle: -90, position: 'insideLeft' }} />
+              <YAxis label={{ value: t('amount_usd'), angle: -90, position: 'insideLeft' }} />
               <Tooltip content={<CustomTooltip />} />
               <Legend />
               <Line type="monotone" dataKey="amount" stroke="blue" activeDot={{ r: 8 }} />
@@ -70,12 +70,12 @@ export function CompoundInterestCalculator({
           </ResponsiveContainer>
         </div>
         <div className="mt-4">
-          <p className="text-sm font-semibold">{t('Final Amount: ${{final}}', {final: finalAmount.toLocaleString()})}</p>
+          <p className="text-sm font-semibold">{t('final_amount', {final: finalAmount.toLocaleString()})}</p>
           <p className="text-sm font-semibold">
-            {t('Total Interest Earned: ${{total}}', {total: totalInterestEarned.toLocaleString()})}
+            {t('total_interest', {total: totalInterestEarned.toLocaleString()})}
           </p>
           <p className="text-sm font-semibold">
-            {t('X times:')} {(finalAmount / principal).toLocaleString()}
+            {t('x_times')} {(finalAmount / principal).toLocaleString()}
           </p>
         </div>
       </CardContent>

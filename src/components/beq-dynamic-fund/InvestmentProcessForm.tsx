@@ -247,12 +247,12 @@ export function InvestmentProcessForm({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t('Kế hoạch đầu tư')}</CardTitle>
+        <CardTitle>{t('investment_plan')}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="depositAmount">{t('Số tiền USD tham gia')}</Label>
+            <Label htmlFor="depositAmount">{t('usd_amount_invested')}</Label>
             <Input
               id="depositAmount"
               type="number"
@@ -263,7 +263,7 @@ export function InvestmentProcessForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="term">{t('Kì Hạn Rút Lãi')}</Label>
+            <Label htmlFor="term">{t('interest_withdrawal_period')}</Label>
             <Select
               value={term}
               onValueChange={(value: string) => {
@@ -292,7 +292,7 @@ export function InvestmentProcessForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="startDate">{t('Ngày tham gia')}</Label>
+            <Label htmlFor="startDate">{t('join_date')}</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -320,7 +320,7 @@ export function InvestmentProcessForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="endDate">{t('Ngày kết thúc hợp đồng')}</Label>
+            <Label htmlFor="endDate">{t('contract_end_date')}</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -329,7 +329,7 @@ export function InvestmentProcessForm({
                     }`}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {endDate ? format(endDate, 'PPP') : 'Pick a date'}
+                  {endDate ? format(endDate, 'PPP') : t('pick_date')}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -348,7 +348,7 @@ export function InvestmentProcessForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="periods">{t('Số chu kì tham gia')}</Label>
+            <Label htmlFor="periods">{t('investment_cycles')}</Label>
             <Input
               id="periods"
               type="number"
@@ -359,7 +359,7 @@ export function InvestmentProcessForm({
           </div>
 
           <Button type="submit" className="w-full">
-            {t('Tính Kết Quả')}
+            {t('calculate_result')}
           </Button>
         </form>
         <Button
@@ -367,7 +367,7 @@ export function InvestmentProcessForm({
           onClick={() => handleInvestment()}
           className="w-full mt-2 bg-green-600 text-white hover:bg-green-500"
         >
-          {t('Submit Investment')}
+          {t('submit_investment')}
         </Button>
       </CardContent>
     </Card>
