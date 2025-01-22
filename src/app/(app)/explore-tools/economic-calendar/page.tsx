@@ -128,7 +128,7 @@ export default function EconomicCalendar() {
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>{t('Eecon_events')}</CardTitle>
+              <CardTitle>{t('econ_events')}</CardTitle>
               <CardDescription>
                 {t('showing_events_for', {day: t(date ? date.toDateString() : 'all_dates')})}
               </CardDescription>
