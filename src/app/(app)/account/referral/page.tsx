@@ -28,7 +28,7 @@ import {
 } from '@/components/ui/pagination'
 import Spinner from '@/components/Spinner'
 
-interface Referral {
+export interface Referral {
   id: string
   name: string
   email: string
