@@ -12,14 +12,16 @@ interface Withdrawal {
   message: string
 }
 
-
-export const getContracts = async (page: number, limit: number): Promise<{ docs: any; totalPages: number; totalDocs: number }> => {
+export const getContracts = async (page: number, limit: number): Promise<{ docs: any; totalPages: number; totalDocs: number}> => {
   try {
     const payload = await getPayload({
       config,
     });
     const headers = await nextHeaders();
     const auth = await payload.auth({ headers });
+    if(!auth.user){
+      return
+    }
     const response = await payload.find({
       collection: 'contracts',
       where: {
@@ -69,6 +71,9 @@ export const getContractsWithDate = async (
     });
     const headers = await nextHeaders();
     const auth = await payload.auth({ headers });
+    if(!auth.user){
+      return
+    }
     const query = {
       user: { equals: auth.user.id },
       start_date: {
@@ -114,15 +119,16 @@ export const getContractsWithDate = async (
   }
 };
 
-
-export const getWithdrawals = async (page: number, limit: number): Promise<{ docs: Withdrawal[]; totalPages: number; totalDocs: number }> => {
+export const getWithdrawals = async (page: number, limit: number): Promise<{ docs: Withdrawal[]; totalPages: number; totalDocs: number; }> => {
   try {
     const payload = await getPayload({
       config,
     });
     const headers = await nextHeaders();
     const auth = await payload.auth({ headers });
-
+    if(!auth.user){
+      return
+    }
     const response = await payload.find({
       collection: 'withdrawals',
       where: {
@@ -149,7 +155,7 @@ export const getWithdrawals = async (page: number, limit: number): Promise<{ doc
   } catch (error) {
     console.error('Withdraw error:', error);
 
-    return { docs: [], totalPages: 0, totalDocs: 0 };
+    return { docs: [], totalPages: 0, totalDocs: 0};
   }
 };
 
@@ -162,7 +168,9 @@ export const getWithdrawalsWithDate = async (
     });
     const headers = await nextHeaders();
     const auth = await payload.auth({ headers });
-
+    if(!auth.user){
+      return
+    }
     const query = {
       user: { equals: auth.user.id },
       createdAt: {
@@ -208,6 +216,9 @@ export async function withdrawInvestment(formData: any) {
     const amount = formData.amount
     const contractId = formData.contractId
     const userId = formData.userId
+    const note = formData.note
+    const image = formData.image
+
     const response = await payload.create({
       collection: 'withdrawals',
       data: {
@@ -215,6 +226,8 @@ export async function withdrawInvestment(formData: any) {
         user: Number(userId),
         amount: Number(amount),
         status: 'pending',
+        ...(note && { note }),
+        ...(image && { image })
       },
     })
 
@@ -294,6 +307,9 @@ export async function checkContractLarger90Days() {
     });
     const headers = await nextHeaders();
     const auth = await payload.auth({ headers });
+    if(!auth.user){
+      return
+    }
     var test_data = false
 
     // Check active contract

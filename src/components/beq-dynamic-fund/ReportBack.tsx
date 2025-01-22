@@ -2,6 +2,7 @@ import { Term } from '@/lib/investment-products/dynamicFund'
 import { format } from 'date-fns'
 import { Bird } from 'lucide-react'
 import { Separator } from '../ui/separator'
+import { useTranslation } from 'react-i18next'
 
 const ReportBack = ({
   amount,
@@ -18,38 +19,39 @@ const ReportBack = ({
   periods: number
   dataExtra?: object
 }) => {
+  const { t } = useTranslation()
   let termDescriptionConfig = [
     {
       termKey: 'monthly',
-      note: 'Mỗi cuối tháng dương lịch',
-      termName: 'Hàng Tháng',
+      note: t('end_of_each_calendar_month'),
+      termName: t('monthly'),
     },
     {
       termKey: 'quarterly',
-      note: 'Kết thúc mỗi quý dương lịch, ví dụ Quý 2 (01/04 đến hết 30/6)',
-      termName: 'Hàng Quý',
+      note: t('end_of_each_quarter'),
+      termName: t('quarterly'),
     },
     {
       termKey: 'semester',
-      note: 'Kết thúc kì hạn nửa năm dương lịch (01/01 đến 31/05 & 01/06 đến hết 31/12)',
-      termName: 'Nửa Năm Dương Lịch',
+      note: t('end_of_six_month_term'),
+      termName: t('semesterly'),
     },
 
     {
       termKey: 'annually',
-      note: 'Kết thúc kì hạn 1 năm dương lịch (01/01 đến 31/12)',
-      termName: 'Hàng Năm',
+      note: t('end_of_one_year_term'),
+      termName: t('annually'),
     },
 
     {
       termKey: 'BeforeStandard',
-      note: '20% / năm',
-      termName: 'Khi kết thúc hợp đồng trước 90 ngày',
+      note: t('twenty_percent_per_year'),
+      termName: t('before_standard'),
     },
     {
       termKey: 'partialMonth',
-      note: 'Ngày tham gia | Ngày kết thúc không trọn vẹn. Chỉ tính số ngày tham gia trong tháng đó',
-      termName: 'Tháng không trọn vẹn',
+      note: t('incomplete_join_end_date'),
+      termName: t('partial_month'),
     },
   ]
 
@@ -71,17 +73,17 @@ const ReportBack = ({
   return (
     <div className="mb-3">
       <h3 className="mt-8 mb-2 scroll-m-20 text-4xl font-semibold tracking-tight">
-        Mô tả thỏa thuận
+        {t('agreement_description')}
       </h3>
       <div></div>
       <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
         <li>
-          Tôi sẵn lòng đầu tư <span className="text-primary mx-1 font-semibold">{amount}</span> USD
-          vào chương trình đầu tư BEQ Dynamic. Rút lãi với kì hạn
-          <span className="text-primary mx-1 font-semibold">{termDescription.termName}</span>
+          {t('willing_to_invest')} <span className="text-primary mx-1 font-semibold">{amount}</span> 
+          {t('usd_investment_program')}
+          <span className="text-primary mx-1 font-semibold">{t(termDescription.termName)}</span>
         </li>
         <li>
-          Mức lãi suất WF áp dụng
+          {t('wf_interest_rate_applied')}
           <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
             {rateConfig.map((item: any) => {
               let _termDescription: any = termDescriptionConfig.filter((x) => {
@@ -91,12 +93,12 @@ const ReportBack = ({
 
               return (
                 <li key={item.term}>
-                  {_termDescription.termName}{' '}
+                  {t(_termDescription.termName)}{' '}
                   <span className=" mx-1 font-semibold">
-                    {(item.rate_of_return * 100).toFixed(2)}% / tháng trọn vẹn
+                    {(item.rate_of_return * 100).toFixed(2)}{t('percent_full_month')}
                   </span>
                   <div className="text-gray-400">
-                    <Bird className="inline" /> {_termDescription.note}
+                    <Bird className="inline" /> {t(_termDescription.note)}
                   </div>
                 </li>
               )
@@ -104,25 +106,26 @@ const ReportBack = ({
           </ul>
         </li>
         <li>
-          Hợp Đồng của tôi bắt đầu từ ngày{' '}
+          {t('my_contract_starts_from')}{' '}
           <span className="text-primary mx-1 font-semibold">
             {format(startDate, 'd MMM, yyyy')}
           </span>{' '}
-          đến
+          {t('to')}
           <span className="text-primary mx-1 font-semibold">
             {format(endDate, 'd MMM, yyyy')}
           </span>{' '}
-          với <span className="text-primary mx-1 font-bold">{periods}</span> chu kì đầu tư, thời
-          gian kéo dài trong vòng <span className="text-primary mx-1 font-bold">{years} năm</span>
+          {t('with')} <span className="text-primary mx-1 font-bold">{periods}</span> 
+          {t('investment_period')}
+          <span className="text-primary mx-1 font-bold">{years} {t('năm')}</span>
         </li>
         <li>
-          Lãi suất của kì hạn được áp dụng khi tham gia tối thiểu{' '}
-          <span className="text-primary mx-1 font-bold">{90}</span> ngày
+          {t('interest_rate_minimum')}{' '}
+          <span className="text-primary mx-1 font-bold">{90}</span> {t('day')}
         </li>
         <li>
-          Lãi suất của kì hạn được áp dụng vào ngày
+          {t('interest_rate_on_date')}
           <span className="text-primary mx-1 font-semibold">
-            (thứ {standardApplyProgramDays + 1})
+            ({t('day_num', {num: standardApplyProgramDays + 1})})
           </span>
           <span className="text-primary mx-1 font-semibold">
             {format(canCancelContractAt, 'd MMM, yyyy')}

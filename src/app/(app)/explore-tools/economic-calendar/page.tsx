@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
+import { useTranslation } from 'react-i18next'
 
 type Event = {
   id: string
@@ -28,6 +29,7 @@ type Event = {
 export default function EconomicCalendar() {
   const [events, setEvents] = useState<Event[]>([])
   const [date, setDate] = useState<Date | undefined>(new Date())
+  const { t } = useTranslation()
 
   useEffect(() => {
     // Fetch data from the API based on the selected date
@@ -105,12 +107,12 @@ export default function EconomicCalendar() {
     <>
       <SiteHeader />
       <div className='container mx-auto py-8'>
-        <h1 className='text-3xl font-bold mb-6'>Economic Calendar</h1>
+        <h1 className='text-3xl font-bold mb-6'>{t('econ_calendar')}</h1>
         <div className='grid gap-6 md:grid-cols-[300px_1fr]'>
           <Card>
             <CardHeader>
-              <CardTitle>Filters</CardTitle>
-              <CardDescription>Select date and currency</CardDescription>
+              <CardTitle>{t('filters')}</CardTitle>
+              <CardDescription>{t('select_date_currency')}</CardDescription>
             </CardHeader>
             <CardContent className='space-y-4'>
               <Calendar
@@ -120,26 +122,26 @@ export default function EconomicCalendar() {
                 className='rounded-md border shadow'
               />
               <Button onClick={clearFilters} variant='outline' className='w-full'>
-                Clear Filters
+                {t('clear_filters')}
               </Button>
             </CardContent>
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>Economic Events</CardTitle>
+              <CardTitle>{t('econ_events')}</CardTitle>
               <CardDescription>
-                Showing events for {date ? date.toDateString() : 'all dates'}
+                {t('showing_events_for', {day: t(date ? date.toDateString() : 'all_dates')})}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Time</TableHead>
-                    <TableHead>Currency</TableHead>
-                    <TableHead>Event</TableHead>
-                    <TableHead>Impact</TableHead>
+                    <TableHead>{t('date')}</TableHead>
+                    <TableHead>{t('time')}</TableHead>
+                    <TableHead>{t('currency')}</TableHead>
+                    <TableHead>{t('event')}</TableHead>
+                    <TableHead>{t('impact')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -168,7 +170,7 @@ export default function EconomicCalendar() {
                   ) : (
                     <TableRow>
                       <TableCell colSpan={8} className='text-center'>
-                        No events found for the selected date.
+                        {t('no_events_found')}
                       </TableCell>
                     </TableRow>
                   )}

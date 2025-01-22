@@ -127,6 +127,9 @@ export default function WithdrawPage() {
 
   useEffect(() => {
     const fetchAccounts = async () => {
+      if(!user?.id){
+        return
+      }
       try {
         const response = await fetch(`/api/accounts?where[user][equals]=${user.id}&where[type][equals]=main`); // Replace with dynamic user ID if necessary
         if (!response.ok) {
@@ -144,6 +147,9 @@ export default function WithdrawPage() {
 
   useEffect(() => {
     const fetchBanks = async () => {
+      if(!user?.id){
+        return
+      }
       try {
         const response = await fetch(`/api/banks?where[user][equals]=${user.id}`); // Replace with dynamic user ID if necessary
         if (!response.ok) {

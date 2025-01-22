@@ -79,6 +79,9 @@ export default function HistoryPage({
 
   useEffect(() => {
     const fetchAccounts = async () => {
+      if(!user?.id){
+        return
+      }
       try {
         const response = await fetch(`/api/accounts?where[user][equals]=${user.id}`) // Replace with dynamic user ID if necessary
         if (!response.ok) {

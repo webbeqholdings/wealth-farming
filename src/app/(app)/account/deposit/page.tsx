@@ -32,7 +32,7 @@ import { TabMenu } from '@/components/w88/TabMenu'
 import { accountConfig } from '@/config/accounts'
 import { toast } from '@/hooks/use-toast'
 import { notifyDeposit } from '@/lib/telegram'
-import CurrencyConverter from '@/components/CurrencyConverter'
+import CurrencyConverter, { useCurrencyConverter } from '@/components/CurrencyConverter'
 import { getAccountsByUserId } from '../../../../lib/account'
 import { getPaymentTransfer } from '@/lib/paymentTransfer'
 import Spinner from '@/components/Spinner'
@@ -86,7 +86,8 @@ function Steps({ currentStep, className, children }: StepsProps) {
 
 export default function DepositPage() {
   const { isLoggedIn, loading, user } = userStatus()
-  const { t } = useTranslation(); 
+  const { convertUSDtoVND } = useCurrencyConverter(() => { });
+  const { t } = useTranslation();
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [amount, setAmount] = useState('')
@@ -109,7 +110,6 @@ export default function DepositPage() {
   const [cryptoWalletAddress, setCryptoWalletAddress] = useState();
   const [cryptoWalletNetwork, setCryptoWalletNetwork] = useState();
   const [minDeposit, setMinDeposit] = useState(0);
-
   const quickAmounts = [
     { label: '500K', value: 500000 },
     { label: '1M', value: 1000000 },
@@ -178,7 +178,6 @@ export default function DepositPage() {
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
-
   useEffect(() => {
     const fetchPaymentTransfer = async () => {
       const paymentTransfer = await getPaymentTransfer();
@@ -226,7 +225,7 @@ export default function DepositPage() {
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
-        if (user && user.id) {
+        if (user && user?.id) {
           const accountsData = await getAccountsByUserId(user.id)
           if (accountsData) {
             setAccounts(accountsData)
@@ -243,6 +242,9 @@ export default function DepositPage() {
   useEffect(() => {
     const fetchBanks = async () => {
       try {
+        if (!user?.id) {
+          return
+        }
         const response = await fetch(`/api/banks?where[user][equals]=${user.id}`) // Replace with dynamic user ID if necessary
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`)
@@ -259,13 +261,13 @@ export default function DepositPage() {
 
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
-    return <Spinner/>
+    return <Spinner />
   }
 
   // If the user is not logged in, redirect to the join page
   if (!isLoggedIn) {
     router.push('/join')
-    return <Spinner/> // Optional: Show a redirect message
+    return <Spinner /> // Optional: Show a redirect message
   }
 
   const handleDepositScreenshotChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -507,11 +509,12 @@ export default function DepositPage() {
                           SCAN THIS QR CODE
                         </Label>
                         <div className="flex justify-center">
-                          <Image
-                            src={bankQRCode || "https://via.placeholder.com/300"}
+                          <img
+                            //src={bankQRCode || "https://via.placeholder.com/300"  }
+                            src={ "https://img.vietqr.io/image/VCB-1026934108-YKiPZgV.jpg?accountName=TA%20THI%20MY%20PHUONG&amount=" + convertUSDtoVND(USDCurrency, 0)+ "&addInfo=" + encodeURIComponent(user.first_name + ' ' + user.last_name +  ' ' + user.phone_contact + " deposit WF")}
                             alt="Bank Transfer QR Code"
-                            width={300}
-                            height={300}
+                            width={400}
+                            height={400}
                             className="border rounded-lg shadow-md"
                           />
                         </div>
@@ -575,7 +578,7 @@ export default function DepositPage() {
                           className="border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         />
                         <p className="text-xs text-gray-500">
-                        {t("deposit_form_file_notice")}
+                          {t("deposit_form_file_notice")}
                         </p>
                         {errors.depositScreenshot && (
                           <p className="text-red-500 text-sm">{errors.depositScreenshot}</p>
