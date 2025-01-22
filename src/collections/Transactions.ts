@@ -18,6 +18,7 @@ const Transactions: CollectionConfig = {
   slug: 'transactions',
   admin: {
     defaultColumns: ['type', 'id', 'user', 'amount', 'investment_product', 'status'],
+    listSearchableFields: ['user.email', 'investment_product.product_name'],
     group: 'BeQ Dynamic Fund',
   },
   access: {
@@ -25,9 +26,6 @@ const Transactions: CollectionConfig = {
     create: isIndividualOrAdmin,
     update: isAdmin,
     delete: isAdmin,
-  },
-  admin: {
-    listSearchableFields: ['user.email', 'investment_product.product_name'],
   },
   fields: [
     {
