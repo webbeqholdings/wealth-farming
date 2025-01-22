@@ -55,7 +55,14 @@ import TelegramButton from '@/components/TelegramButton'
 import Spinner from '@/components/Spinner'
 import { getAccountsByUser } from '@/lib/account'
 import { useTranslation } from 'react-i18next';
-import { Referral } from '../account/referral/page'
+
+interface Referral {
+  id: string
+  name: string
+  email: string
+  date: string
+  status: 'Pending' | 'Completed'
+}
 
 export default function UserProfile() {
   const { t } = useTranslation();
