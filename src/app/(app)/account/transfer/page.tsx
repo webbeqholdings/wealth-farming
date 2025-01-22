@@ -33,9 +33,9 @@ import { ArrowDownIcon, ArrowRightIcon } from 'lucide-react'
 import { ReCaptcha } from '@/components/ReCaptcha'
 import { ReCaptchaV3 } from '@/components/ReCaptchaV3'
 import { getAccountsByUserId } from '@/lib/account'
-import { createTransfer } from '@/lib/transaction'
+import { createTransfer, getSumAmountBalanceByAccount } from '@/lib/transaction'
 import Spinner from '@/components/Spinner'
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next'
 
 const formSchema = z.object({
   fromAccount: z.string().min(1, { message: 'Please select the source account' }),
@@ -48,8 +48,8 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>
 
 export default function TransferPage() {
-  const { isLoggedIn, loading, user } = UserStatus();
-  const { t } = useTranslation(); 
+  const { isLoggedIn, loading, user } = UserStatus()
+  const { t } = useTranslation()
   const router = useRouter()
   const [fromBalance, setFromBalance] = useState(0)
   const [toBalance, setToBalance] = useState(0)
@@ -70,10 +70,11 @@ export default function TransferPage() {
     },
   })
 
-  const handleFromAccountChange = (accountId: string) => {
+  const handleFromAccountChange = async (accountId: string) => {
     const selectedAccount = listAccounts.find((account) => account.id === Number(accountId))
     setFromAccount(accountId.toString())
-    setFromBalance(selectedAccount?.amount || 0)
+    const accountBalance = await getSumAmountBalanceByAccount(Number(accountId))
+    setFromBalance(accountBalance)
 
     if (toAccount === accountId) {
       const availableToAccounts = listAccounts.filter((account) => account.id !== Number(accountId))
@@ -87,10 +88,11 @@ export default function TransferPage() {
     }
   }
 
-  const handleToAccountChange = (accountId: string) => {
+  const handleToAccountChange = async (accountId: string) => {
     const selectedAccount = listAccounts.find((account) => account.id === Number(accountId))
     setToAccount(accountId.toString())
-    setToBalance(selectedAccount?.amount || 0)
+    const accountBalance = await getSumAmountBalanceByAccount(Number(accountId))
+    setToBalance(accountBalance)
 
     if (fromAccount === accountId) {
       const availableFromAccounts = listAccounts.filter(
@@ -219,7 +221,7 @@ export default function TransferPage() {
                     </SelectContent>
                   </Select>
                   <p className="text-sm text-muted-foreground">
-                  {t('balance')}:{' '}
+                    {t('balance')}:{' '}
                     {fromBalance.toLocaleString('en-US', {
                       style: 'currency',
                       currency: 'USD',

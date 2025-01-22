@@ -202,6 +202,7 @@ export function InvestmentProcessForm() {
         amount: depositAmount,
         term: term,
         startDate: startDate,
+        endDate: endDate,
         userId: user.id,
         expected_return: expected_return,
       }

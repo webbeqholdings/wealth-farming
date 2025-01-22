@@ -95,6 +95,7 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
       }
 
       setAccountData(_accountData)
+      console.log(accountData)
 
       // Update Code
 

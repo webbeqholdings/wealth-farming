@@ -267,7 +267,7 @@ export const IsInvest = async (user_id: number): Promise<Boolean> => {
 }
 
 export const createInvestment = async (formData: any) => {
-  const { userId, amount, startDate, productId } = formData
+  const { userId, amount, startDate, endDate, productId } = formData
 
   if (amount <= 0) {
     return {
@@ -313,6 +313,7 @@ export const createInvestment = async (formData: any) => {
       term: product_doc.term,
       profit: 0,
       start_date: startDate,
+      end_date: endDate,
       product_log: {
         data: product_doc,
       },
@@ -457,30 +458,41 @@ export const createWithdrawal = async (inputData: any) => {
       data: {},
     }
   }
-  const response = await payload.create({
-    collection: 'transactions',
-    data: {
-      user: Number(user_id), // User Created
-      amount: Number(amount),
-      status: 'pending',
-      account_from: account_from,
-      bank: Number(bank_id),
-      type: 'withdraw',
-    },
-  })
 
-  if (!response) {
+  const amountAvailable = await getSumAmountBalanceByAccount(account_from)
+  console.log(amountAvailable)
+  if (amountAvailable >= amount) {
+    const response = await payload.create({
+      collection: 'transactions',
+      data: {
+        user: Number(user_id), // User Created
+        amount: Number(amount),
+        status: 'pending',
+        account_from: account_from,
+        bank: Number(bank_id),
+        type: 'withdraw',
+      },
+    })
+
+    if (!response) {
+      return {
+        isSuccess: false,
+        msg: 'Withdraw Failed',
+        data: {},
+      }
+    }
+
+    return {
+      isSuccess: true,
+      msg: 'Withdraw Success',
+      data: response,
+    }
+  } else {
     return {
       isSuccess: false,
-      msg: 'Withdraw Failed',
+      msg: 'Insufficient amount in the account',
       data: {},
     }
-  }
-
-  return {
-    isSuccess: true,
-    msg: 'Withdraw Success',
-    data: response,
   }
 }
 

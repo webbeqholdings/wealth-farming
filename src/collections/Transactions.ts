@@ -14,7 +14,6 @@ import { getAccountsByUserId } from '@/lib/admin-side/account'
 import { sendEmailDeposit } from '@/utilities/emailDeposit'
 import { sendEmailWithdraw } from '@/utilities/emailWithdraw'
 
-
 const Transactions: CollectionConfig = {
   slug: 'transactions',
   admin: {
@@ -141,10 +140,23 @@ const Transactions: CollectionConfig = {
         const handleSendEmail = async (user: any, amount: any, status: any, type: any) => {
           try {
             if (type === 'deposit') {
-              await sendEmailDeposit(user.email, `Deposit ${status}`, user.first_name, user.last_name, amount, status)
-            }
-            else if (type === 'withdraw') {
-              await sendEmailWithdraw(user.email, `Withdrawal ${status}`, user.first_name, user.last_name, amount, status)
+              await sendEmailDeposit(
+                user.email,
+                `Deposit ${status}`,
+                user.first_name,
+                user.last_name,
+                amount,
+                status,
+              )
+            } else if (type === 'withdraw') {
+              await sendEmailWithdraw(
+                user.email,
+                `Withdrawal ${status}`,
+                user.first_name,
+                user.last_name,
+                amount,
+                status,
+              )
             }
           } catch (error) {
             console.error(`Error sending ${type} ${status} email:`, error)
@@ -161,7 +173,6 @@ const Transactions: CollectionConfig = {
             const accountReferral = await getAccountsByUserId(payload, doc.user, [
               'referral_reward',
             ])
-            console.log('accountReferral', accountReferral)
             // Get total deposit
             const totalAmount = await getTotalDeposit(payload, doc.user)
 
@@ -221,7 +232,8 @@ const Transactions: CollectionConfig = {
         }
 
         if (operation === 'update' && doc.type === 'withdraw' && doc.status === 'failed') {
-          const fromAccountId = doc.from_account
+          console.log(doc)
+          const fromAccountId = doc.account_from
           const transactionAmount = doc.amount
           // Fetch the existing account details
           const fromAccount = await payload.findByID({
