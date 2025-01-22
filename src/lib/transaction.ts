@@ -529,8 +529,16 @@ export const getSumAmountAccountFrom = async (account_from: number) => {
   const transactions = await payload.find({
     collection: 'transactions',
     where: {
-      status: { equals: 'completed' },
-      account_from: { equals: account_from },
+      OR: [
+        {
+          status: { equals: 'completed' },
+          account_from: { equals: account_from },
+        },
+        {
+          status: { equals: 'pending' },
+          account_from: { equals: account_from },
+        },
+      ],
     },
   })
 

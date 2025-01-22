@@ -34,7 +34,7 @@ import { toast } from '@/hooks/use-toast'
 import { notifyWithdrawl } from '@/lib/telegram'
 import { getPaymentTransfer } from '@/lib/paymentTransfer'
 import Spinner from '@/components/Spinner'
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next'
 // Steps component definition
 interface StepProps {
   title: string
@@ -82,8 +82,8 @@ function Steps({ currentStep, className, children }: StepsProps) {
 }
 
 export default function WithdrawPage() {
-  const { isLoggedIn, loading, user } = UserStatus();
-  const { t } = useTranslation(); 
+  const { isLoggedIn, loading, user } = UserStatus()
+  const { t } = useTranslation()
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [amount, setAmount] = useState('')
@@ -204,7 +204,6 @@ export default function WithdrawPage() {
         })
         throw new Error(response.msg)
       }
-      console.log(response)
       notifyWithdrawl(response.data)
       toast({
         title: 'Transaction created successfully',
@@ -277,9 +276,7 @@ export default function WithdrawPage() {
                   <Alert>
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>{t('withdraw_limit_title')}</AlertTitle>
-                    <AlertDescription>
-                      {t('withdraw_limit_decs')}
-                    </AlertDescription>
+                    <AlertDescription>{t('withdraw_limit_decs')}</AlertDescription>
                   </Alert>
                 </div>
               )}
@@ -314,7 +311,9 @@ export default function WithdrawPage() {
                           </SelectContent>
                         </Select>
                         {!selectBank && step === 2 && (
-                          <p className="text-red-600 text-sm mt-1">{t('withdraw_nobank_warning')}</p>
+                          <p className="text-red-600 text-sm mt-1">
+                            {t('withdraw_nobank_warning')}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -335,9 +334,7 @@ export default function WithdrawPage() {
                       <Alert>
                         <AlertCircle className="h-4 w-4" />
                         <AlertTitle>{t('withdraw_withdraw_notice')}</AlertTitle>
-                        <AlertDescription>
-                          {t('withdraw_notice_desc')}
-                        </AlertDescription>
+                        <AlertDescription>{t('withdraw_notice_desc')}</AlertDescription>
                       </Alert>
                     </div>
                   )}
@@ -349,9 +346,7 @@ export default function WithdrawPage() {
                   <Alert>
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>{t('withdraw_confirm_title')}</AlertTitle>
-                    <AlertDescription>
-                      {t('withdraw_confirm_decs')}
-                    </AlertDescription>
+                    <AlertDescription>{t('withdraw_confirm_decs')}</AlertDescription>
                   </Alert>
                   <div className="space-y-2">
                     <div className="flex justify-between">
@@ -376,9 +371,7 @@ export default function WithdrawPage() {
                   <Alert variant="destructive">
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>{t('withdraw_important_title')}</AlertTitle>
-                    <AlertDescription>
-                      {t('withdraw_important_decs')}
-                    </AlertDescription>
+                    <AlertDescription>{t('withdraw_important_decs')}</AlertDescription>
                   </Alert>
                 </div>
               )}
@@ -387,7 +380,7 @@ export default function WithdrawPage() {
           <CardFooter className="flex justify-between">
             {step > 1 && (
               <Button variant="outline" onClick={handlePreviousStep}>
-                 {t("back")}
+                {t('back')}
               </Button>
             )}
             {step < 3 ? (
