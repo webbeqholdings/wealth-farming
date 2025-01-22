@@ -106,7 +106,7 @@ const Withdrawals: CollectionConfig = {
 
                 if (data.status === 'pending') {
                     // Set message for pending status
-                    data.message = 'Withdrawal request submitted successfully. Awaiting admin approval.';
+                    data.message = 'withdrawal_request_submitted';
                 } else if (data.status === 'completed') {
                     const account = await getAccount(data)
                     // Update user's account balance
@@ -118,7 +118,7 @@ const Withdrawals: CollectionConfig = {
                         },
                     });
                     // Set message for completed status
-                    data.message = 'Withdrawal completed successfully.';
+                    data.message = 'withdrawal_completed';
 
                     await payload.create({
                         collection: 'transactions',
@@ -161,10 +161,13 @@ const Withdrawals: CollectionConfig = {
                         },
                     });
 
-                    data.message = `Withdrawal failed. The contract has been reactivated with a balance of ${data.amount.toLocaleString('en-US', {
-                        style: 'currency',
-                        currency: 'USD',
-                    })}.`;
+                    data.message = JSON.stringify({
+                        key: 'withdrawal_failed',
+                        params: { amount: data.amount.toLocaleString('en-US', {
+                            style: 'currency',
+                            currency: 'USD',
+                          }), },
+                    });
 
                     // Set custom message for failed status
                     await payload.create({

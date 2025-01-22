@@ -61,7 +61,7 @@ export default function InvestmentProcessPage() {
                     return (
                       <div key={year} className="mb-10">
                         <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
-                          {t('Year {{y}}', {y: year})}
+                          {t('year_y', {y: year})}
                         </h2>
                         <ProfitTable data={item} />
                       </div>

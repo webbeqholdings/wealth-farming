@@ -195,36 +195,36 @@ export function TerminationDialog({ isOpen, onClose, contract, setActiveTab, ter
       <DialogContent className="sm:max-w-[500px] bg-white border border-gray-300 rounded-lg shadow-lg">
         <DialogHeader className="mb-4">
           <DialogTitle className="text-lg font-semibold text-gray-900">
-            {t('Terminate Contract')}
+            {t('terminate_contract')}
           </DialogTitle>
           <DialogDescription className="text-sm text-gray-600">
-            {t('You are about to terminate the contract for {{contract}}. Please review the details below before proceeding.', {contract: contract.productName})}
+            {t('terminate_contract_details', {contract: contract.productName})}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleWithdraw}>
           <div className="grid gap-6">
             {daysSinceStart < standardApplyProgramDays && (
               <div className="bg-yellow-100 text-yellow-800 text-sm rounded-md p-3">
-                <strong>{t('Note:')}</strong> {t('Withdrawals made within the first 90 days will be subject to a profit rate of')} <strong>{t('20% annually')}</strong>.
+                <strong>{t('note')}</strong> {t('withdrawal_within_90_days')} <strong>{t('annual_rate_20')}</strong>.
               </div>
             )}
             <div className="bg-yellow-50 text-yellow-800 text-sm rounded-md p-3">
-              <strong>{t('Warning:')}</strong> {t('Terminating this contract will result in no further benefits. Proceed with caution.')}
+              <strong>{t('warning')}</strong> {t('termination_warning')}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="amount" className="font-medium text-gray-800">
-                {t('Withdrawal Amount')}
+                {t('withdrawal_amount')}
               </Label>
               <Input
                 id="amount"
                 value={daysSinceStart < standardApplyProgramDays ? caculatedTerminationTotal(): contract.availableBalance.toFixed(2) }
-                placeholder="Enter amount to withdraw"
+                placeholder={t('withdrawal_amount_input')}
                 className="bg-gray-100 border border-gray-300 rounded-lg p-2.5"
                 required
                 disabled
               />
               <p className="text-sm text-gray-600 mt-1">
-                {t('Balance Available: ')}<strong>${daysSinceStart < standardApplyProgramDays ? caculatedTerminationTotal(): contract.availableBalance.toFixed(2)}</strong>
+                {t('balance_available')}<strong>${daysSinceStart < standardApplyProgramDays ? caculatedTerminationTotal(): contract.availableBalance.toFixed(2)}</strong>
               </p>
             </div>
           </div>
@@ -232,7 +232,7 @@ export function TerminationDialog({ isOpen, onClose, contract, setActiveTab, ter
             <>
               <div className="space-y-4 mt-3">
                 <Label htmlFor="deposit_screenshot" className="text-sm font-medium text-gray-700">
-                  Note
+                  {t('terminated_note')}
                 </Label>
                 <Input
                   id="note1"
@@ -244,7 +244,7 @@ export function TerminationDialog({ isOpen, onClose, contract, setActiveTab, ter
               </div>
               <div className="space-y-4 mt-3">
                 <Label htmlFor="deposit_screenshot" className="text-sm font-medium text-gray-700">
-                  Upload Photo
+                  {t('upload_photo')}
                 </Label>
                 <Input
                   id="deposit_screenshot"
@@ -255,7 +255,7 @@ export function TerminationDialog({ isOpen, onClose, contract, setActiveTab, ter
                   required
                 />
                 <p className="text-xs text-gray-500">
-                  Please upload a screenshot showing the photo. Accepted formats: JPG, PNG, with a maximum size of 5MB.
+                  {t('photo_requirement')}
                 </p>
               </div> </>}
           </>
@@ -273,7 +273,7 @@ export function TerminationDialog({ isOpen, onClose, contract, setActiveTab, ter
               disabled={isLoading}
               className="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700"
             >
-              {t(isLoading ? 'Processing...' : 'Confirm Termination')}
+              {t(isLoading ? 'processing' : 'confirm_termination')}
             </Button>
           </DialogFooter>
         </form>

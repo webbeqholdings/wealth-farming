@@ -33,7 +33,7 @@ interface Referral {
   name: string
   email: string
   date: string
-  status: 'Pending' | 'Completed'
+  status: 'Pending' | 'Completed',
 }
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
@@ -171,14 +171,14 @@ export default function ReferralPage() {
     <>
       <SiteHeader />
       <div className="container mx-auto py-10">
-        <h1 className="text-3xl font-bold mb-8">{t('Your Referrals')}</h1>
+        <h1 className="text-3xl font-bold mb-8">{t('your_referrals')}</h1>
 
         {/* Banner */}
         <Card className="mb-8">
           <CardContent className="flex items-center justify-between p-6">
             <div>
-              <h2 className="text-2xl font-semibold mb-2">{t('Share your referral link')}</h2>
-              <p className="text-muted-foreground">{t('Invite friends and earn rewards!')}</p>
+              <h2 className="text-2xl font-semibold mb-2">{t('share_referral_link')}</h2>
+              <p className="text-muted-foreground">{t('invite_friends_earn_rewards')}</p>
             </div>
             <div className="flex items-center space-x-2">
               <Input value={referralLink} readOnly className="w-64" />
@@ -194,7 +194,7 @@ export default function ReferralPage() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('Total Referrals')}</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('total_referrals')}</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -203,7 +203,7 @@ export default function ReferralPage() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('Pending Referrals')}</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('pending_referrals')}</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -212,7 +212,7 @@ export default function ReferralPage() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('Completed Referrals')}</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('completed_referrals')}</CardTitle>
               <Award className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -221,7 +221,7 @@ export default function ReferralPage() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('Total Earnings')}</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('total_earnings')}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -235,7 +235,7 @@ export default function ReferralPage() {
             <div className=''>
             <Input 
               type="text" 
-              placeholder={t("Name")} 
+              placeholder={t("name")} 
               onChange={(e) => setNameFilter(e.target.value)} 
             />
             </div>
@@ -289,16 +289,16 @@ export default function ReferralPage() {
         {/* Referrals Table */}
         <Card>
           <CardHeader>
-            <CardTitle>{t('Your Referrals')}</CardTitle>
+            <CardTitle>{t('your_referrals')}</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('Name')}</TableHead>
+                  <TableHead>{t('name')}</TableHead>
                   <TableHead>{t('Email')}</TableHead>
-                  <TableHead>{t('Date')}</TableHead>
-                  <TableHead>{t('Status')}</TableHead>
+                  <TableHead>{t('date')}</TableHead>
+                  <TableHead>{t('status')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

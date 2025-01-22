@@ -41,7 +41,7 @@ export function BankCombobox({
             <span className="text-left flex-1">
               {t(value
                 ? `${banks.find((bank) => bank.code === value)?.name} (${banks.find((bank) => bank.code === value)?.code})`
-                : 'Select bank...')}
+                : 'select_bank')}
             </span>
             <ChevronsUpDown className="ml-2 opacity-100" />
           </Button>

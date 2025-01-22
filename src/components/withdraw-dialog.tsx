@@ -219,43 +219,43 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab, termin
 
       <>{!terminated_avail && <> 
         <DialogHeader>
-          <DialogTitle className="text-gray-900">Withdraw Funds</DialogTitle>
+          <DialogTitle className="text-gray-900">{t('withdraw_funds')}</DialogTitle>
           <DialogDescription className="text-gray-600">
-            Your account does not meet the requirements for withdrawal.
+            {t('withdrawal_condition')}
           </DialogDescription>
           </DialogHeader>
       </>}</>
 
       <>{terminated_avail && <>
         <DialogHeader>
-          <DialogTitle className="text-gray-900">{t('Withdraw Funds')}</DialogTitle>
+          <DialogTitle className="text-gray-900">{t('withdraw_funds')}</DialogTitle>
           <DialogDescription className="text-gray-600">
-          {t('Withdraw available funds from {{productName}}', { productName: contract.productName })}
+          {t('withdraw_funds_available', { productName: contract.productName })}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleWithdraw}>
           <div className="grid gap-4">
             <div className="bg-yellow-100 text-yellow-800 text-sm rounded-md p-3">
-              <strong>{t('Note:')}</strong>
-              {t('Withdrawals profit can only be made after the {{condition}}', { condition: t(message) })}
+              <strong>{t('note')}</strong>
+              {t('withdrawal_profit_condition', { condition: t(message) })}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="amount" className="text-gray-700">
-                {t('Amount')}
+                {t('amount')}
               </Label>
               <Input
                 id="amount"
                 type="number"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                placeholder="Enter amount to withdraw"
+                placeholder={t('withdrawal_amount_input')}
                 className="bg-white border-gray-300"
                 min={0}
                 max={contract.profit}
                 required
               />
               <p className="text-sm text-gray-500">
-                {t('Profit: ${{amount}}', {amount: contract.profit.toFixed(2)})}
+                {t('profit_amount', {amount: contract.profit.toFixed(2)})}
               </p>
             </div>
           </div>
@@ -277,7 +277,7 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab, termin
               }
               className="bg-blue-500 text-white hover:bg-blue-600"
             >
-              {t(isLoading ? 'Processing...' : 'Withdraw')}
+              {t(isLoading ? 'processing' : 'portfolio_tab_withdraw')}
             </Button>
           </DialogFooter>
         </form>

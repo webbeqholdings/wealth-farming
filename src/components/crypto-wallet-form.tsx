@@ -160,9 +160,9 @@ export function CryptoWalletForm({
     <div>
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>{t('Add Crypto Wallet')}</CardTitle>
+          <CardTitle>{t('add_crypto_wallet')}</CardTitle>
           <CardDescription>
-            {t('Enter your bank account details for deposits and withdrawals.')}
+            {t('crypto_details')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -175,11 +175,11 @@ export function CryptoWalletForm({
                   name="walletAddress"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>{t('Wallet Address')}</FormLabel>
+                      <FormLabel>{t('wallet_address')}</FormLabel>
                       <FormControl>
-                        <Input placeholder={t("Enter wallet address")} {...field} />
+                        <Input placeholder={t("enter_wallet_address")} {...field} />
                       </FormControl>
-                      <FormDescription>{t('Your crypto wallet address.')}</FormDescription>
+                      <FormDescription>{t('crypto_wallet_address')}</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -193,7 +193,7 @@ export function CryptoWalletForm({
                       <FormControl>
                         <CryptoWalletCombobox value={field.value} onChange={field.onChange} />
                       </FormControl>
-                      <FormDescription>{t('The blockchain network of your wallet.')}</FormDescription>
+                      <FormDescription>{t('blockchain_network')}</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -202,23 +202,23 @@ export function CryptoWalletForm({
 
               {/* Submit Button */}
               <Button type="submit" className="bg-primary hover:bg-primary/90 text-black">
-                {t('Add Crypto Wallet')}
+                {t('add_crypto_wallet')}
               </Button>
             </form>
           </Form>
         </CardContent>
         <Separator />
         <CardHeader>
-          <CardTitle>{t('Your Crypto Wallets')}</CardTitle>
-          <CardDescription>{t('Manage your registered crypto wallets')}.</CardDescription>
+          <CardTitle>{t('your_crypto_wallets')}</CardTitle>
+          <CardDescription>{t('manage_crypto_wallets')}.</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{t('Wallet Address')}</TableHead>
+                <TableHead>{t('wallet_address')}</TableHead>
                 <TableHead>{t('Network')}</TableHead>
-                <TableHead>{t('Action')}</TableHead> {/* Add action column */}
+                <TableHead>{t('action')}</TableHead> {/* Add action column */}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -243,17 +243,17 @@ export function CryptoWalletForm({
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t('Are you sure?')}</DialogTitle>
+            <DialogTitle>{t('are_you_sure')}</DialogTitle>
             <DialogDescription>
-              {t('This action will permanently delete the bank account. Do you want to proceed?')}
+              {t('delete_account_warning')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button onClick={handleCancel} color="gray" size="sm">
-              {t('Cancel')}
+              {t('cancel')}
             </Button>
             <Button onClick={() => handleDelete(cryptoWalletId)} color="red" size="sm">
-              {t('Delete')}
+              {t('delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

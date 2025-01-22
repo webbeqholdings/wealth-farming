@@ -7,12 +7,12 @@ export function CTASection() {
   return (
     <section className="py-16 bg-primary/5">
       <div className="container mx-auto px-4 text-center">
-        <h2 className="text-4xl font-bold mb-6">{t('Embark on Your Wealth Journey Today!')}</h2>
+        <h2 className="text-4xl font-bold mb-6">{t('embark_journey')}</h2>
         <p className="text-xl mb-8 max-w-2xl mx-auto">
-          {t('Join BeQ Wealth Farming Fund and start growing your investments with sustainable, innovative agricultural projects.')}
+          {t('embark_journey_description')}
         </p>
         <Button size="lg" className="font-semibold text-lg px-8" asChild>
-          <Link href="/investment-products/incoming/investment-process">{t('How it works')}</Link>
+          <Link href="/investment-products/incoming/investment-process">{t('how_it_works')}</Link>
         </Button>
       </div>
     </section>

@@ -39,7 +39,7 @@ export function CryptoWalletCombobox({
           >
             {t(value
               ? networks.find((network) => network.value === value)?.label
-              : 'Select network...')}
+              : 'select_network')}
             <ChevronsUpDown className="opacity-100" />
           </Button>
         </PopoverTrigger>
