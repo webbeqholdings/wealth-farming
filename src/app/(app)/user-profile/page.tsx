@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { getReferralsByParentId } from '@/lib/referrals'
 import {
   Card,
   CardContent,
@@ -16,7 +17,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Switch } from '@/components/ui/switch'
-import { Progress } from '@/components/ui/progress'
 import { toast } from '@/hooks/use-toast'
 import {
   CreditCard,
@@ -39,12 +39,22 @@ import Spinner from '@/components/Spinner'
 import { getAccountsByUser } from '@/lib/account'
 import { useTranslation } from 'react-i18next';
 
+interface Referral {
+  id: string
+  name: string
+  email: string
+  date: string
+  status: 'Pending' | 'Completed'
+}
+
 export default function UserProfile() {
   const { t } = useTranslation();
   const { isLoggedIn, loading, user } = UserStatus()
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [accounts, setAccounts] = useState([]);
+  const [referrals, setReferrals] = useState<Referral[]>([])
+  const [referralLink, setReferralLink] = useState('')
   const [userInfo, setUserInfo] = useState({
     firstName: '',
     lastName: '',
@@ -63,16 +73,6 @@ export default function UserProfile() {
     { id: 4, type: 'Investment', amount: 0, date: '2024-03-05' },
   ])
 
-  const [referralInfo, setReferralInfo] = useState({
-    referralCode: 'ALICE2024',
-    referrals: [
-      { name: 'Bob Smith', status: 'Signed Up' },
-      { name: 'Charlie Brown', status: 'Pending' },
-      { name: 'David Jones', status: 'Active' },
-    ],
-    referralProgress: 60,
-  })
-
   const [telegramNotifications, setTelegramNotifications] = useState({
     id: null,
     connected: false,
@@ -82,6 +82,21 @@ export default function UserProfile() {
     },
   })
 
+  useEffect(() => {
+    const fetchReferralData = async () => {
+      if (!user?.id) {
+        return
+      }
+      const { docs, totalPages, referral_code } = await getReferralsByParentId(
+        user.id,
+        1,
+        3,
+      )
+      setReferrals(docs)
+      setReferralLink(`https://wealthfarming.org/join/${user.referral_code}`)
+    }
+    fetchReferralData()
+  }, [loading])
   useEffect(() => {
     // Fetch data from your API
     const fetchData = async () => {
@@ -268,11 +283,37 @@ export default function UserProfile() {
 
   const copyReferralCode = () => {
     navigator.clipboard.writeText(user.referral_code)
-    alert('Referral code copied to clipboard!')
+    toast({
+      title: 'Copied !',
+      description: 'Your referral code copied to clipboard!'
+    })
+
   }
 
   const shareReferralCode = () => {
     // In a real application, this would open a share dialog
+    const shared_data = {
+      title: "MDN",
+      text: "Learn web development on MDN!",
+      url: referralLink
+    }
+    try {
+      navigator.share(shared_data)
+      toast({
+        title: 'Open sharing dialog !',
+      })
+      
+    } catch (error) {
+      navigator.clipboard.writeText(referralLink)
+      toast({
+        title: 'Copied !',
+        description: 'Sharing dialog unavailable Your referral link will be copied to clipboard!'
+      })
+    }
+    
+
+
+
     alert('Opening share dialog...')
   }
 
@@ -528,26 +569,19 @@ export default function UserProfile() {
                   <Copy className="h-4 w-4" />
                   <span className="sr-only">{t('Copy referral code')}</span>
                 </Button>
-                <Button variant="outline" size="icon" onClick={shareReferralCode}>
+                <Button variant="outline" size="icon" onClick={() => { shareReferralCode() }}>
                   <Share2 className="h-4 w-4" />
                   <span className="sr-only">{t('Share referral code')}</span>
                 </Button>
               </div>
             </div>
             <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span>{t('Referral Progress')}</span>
-                <span>{referralInfo.referralProgress}%</span>
-              </div>
-              <Progress value={referralInfo.referralProgress} className="w-full" />
-            </div>
-            <div className="space-y-2">
               <h4 className="font-semibold">{t('Your Referral')}s</h4>
               <ul className="space-y-2">
-                {referralInfo.referrals.map((referral, index) => (
+                {referrals.map((referral, index) => (
                   <li key={index} className="flex justify-between items-center">
                     <span>{referral.name}</span>
-                    <Badge variant={referral.status === 'Active' ? 'default' : 'secondary'}>
+                    <Badge variant={referral.status === 'Completed' ? 'default' : 'secondary'}>
                       {referral.status}
                     </Badge>
                   </li>
