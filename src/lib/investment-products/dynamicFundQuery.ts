@@ -33,7 +33,6 @@ export const getPublicProducts = async () => {
 export const getPublicProductsIDs = async () => {
   const data = await getPublicProducts()
   return data.map((prod: any) => {
-    console.log('product id', (prod as { id: number }).id)
     return (prod as { id: number }).id
   })
 }
