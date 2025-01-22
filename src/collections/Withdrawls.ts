@@ -119,7 +119,7 @@ const Withdrawals: CollectionConfig = {
               amount: data.amount,
               user: Number(data.user),
               status: 'completed',
-              account_from: account.id,
+              account_to: account.id,
               type: 'bonus',
               message: data.message,
             },
