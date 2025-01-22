@@ -54,7 +54,7 @@ export default function IndexPage() {
       title: t('make_deposit'),
       description: t('fund_account'),
       icon: Wallet,
-      buttonText: 'Deposit Now',
+      buttonText: t('deposit_now'),
       buttonHref: '/account/deposit',
     },
     {

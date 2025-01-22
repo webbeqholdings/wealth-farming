@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { useTranslation } from 'react-i18next'
+import { format } from 'date-fns'
 
 type Event = {
   id: string
@@ -128,9 +129,9 @@ export default function EconomicCalendar() {
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>{t('Eecon_events')}</CardTitle>
+              <CardTitle>{t('econ_events')}</CardTitle>
               <CardDescription>
-                {t('showing_events_for', {day: t(date ? date.toDateString() : 'all_dates')})}
+                {t('showing_events_for', {day: t(date ? format(date, 'd/MM/yyy') : 'all_dates')})}
               </CardDescription>
             </CardHeader>
             <CardContent>

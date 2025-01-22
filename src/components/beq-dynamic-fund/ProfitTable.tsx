@@ -26,12 +26,17 @@ export function ProfitTable({ data }: { data: ProfitData[] }) {
       try {
         const messageData = JSON.parse(messageField);
         return t(messageData.key, messageData.params || {}) as string;
-      } catch (e) {
+      } catch {
         return t(messageField);
       }
     }
+    if (typeof messageField === 'object') {
+      const { key, params } = messageField as { key: string; params?: Record<string, unknown> };
+      return t(key, params || {});
+    }
     return '';
   };
+  
   return (
     <>
       <div className="overflow-x-auto">

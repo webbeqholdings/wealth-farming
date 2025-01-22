@@ -301,7 +301,7 @@ export function InvestmentProcessForm({
                     }`}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {startDate ? format(startDate, 'PPP') : 'Pick a date'}
+                  {startDate ? format(startDate, 'd/MM/yyyy') : 'Pick a date'}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -329,7 +329,7 @@ export function InvestmentProcessForm({
                     }`}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {endDate ? format(endDate, 'PPP') : t('pick_date')}
+                  {endDate ? format(endDate, 'd/MM/yyyy') : t('pick_date')}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">

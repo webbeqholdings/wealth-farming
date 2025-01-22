@@ -108,11 +108,11 @@ const ReportBack = ({
         <li>
           {t('my_contract_starts_from')}{' '}
           <span className="text-primary mx-1 font-semibold">
-            {format(startDate, 'd MMM, yyyy')}
+            {format(startDate, 'd/MM/yyyy')}
           </span>{' '}
           {t('to')}
           <span className="text-primary mx-1 font-semibold">
-            {format(endDate, 'd MMM, yyyy')}
+            {format(endDate, 'd/MM/yyyy')}
           </span>{' '}
           {t('with')} <span className="text-primary mx-1 font-bold">{periods}</span> 
           {t('investment_period')}
@@ -128,7 +128,7 @@ const ReportBack = ({
             ({t('day_num', {num: standardApplyProgramDays + 1})})
           </span>
           <span className="text-primary mx-1 font-semibold">
-            {format(canCancelContractAt, 'd MMM, yyyy')}
+            {format(canCancelContractAt, 'd/MM/yyyy')}
           </span>
         </li>
       </ul>

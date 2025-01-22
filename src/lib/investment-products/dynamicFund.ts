@@ -293,7 +293,11 @@ export const buildProfitRecordsSemester = (
       let note = monthItem.gender
       let calRate = monthItem.rate
       if (monthItem.gender == 'Partial Month') {
-        note = `(${monthItem.days} / ${findMarketTradingDays(monthItem.month, yearData.year)} days) ${monthItem.gender}`
+        note = JSON.stringify({
+          key: 'partialMonthNote',
+          params: { days: monthItem.days, months: findMarketTradingDays(monthItem.month, yearData.year), gender: monthItem.gender },
+        });
+        // note = `(${monthItem.days} / ${findMarketTradingDays(monthItem.month, yearData.year)} days) ${monthItem.gender}`
         periodInterest =
           (balance * monthItem.rate * monthItem.days) /
           findMarketTradingDays(monthItem.month, yearData.year)
@@ -388,7 +392,10 @@ export const buildProfitRecordsQuarterly = (
       let note = monthItem.gender
       let calRate = monthItem.rate
       if (monthItem.gender == 'Partial Month') {
-        note = `(${monthItem.days} / ${findMarketTradingDays(monthItem.month, yearData.year)} days) ${monthItem.gender}`
+        note = JSON.stringify({
+          key: 'partialMonthNote',
+          params: { days: monthItem.days, months: findMarketTradingDays(monthItem.month, yearData.year), gender: monthItem.gender },
+        });
         periodInterest =
           (balance * monthItem.rate * monthItem.days) /
           findMarketTradingDays(monthItem.month, yearData.year)
@@ -483,7 +490,10 @@ export const buildProfitRecordsMonthly = (
       let note = monthItem.gender
       let calRate = monthItem.rate
       if (monthItem.gender == 'Partial Month') {
-        note = `(${monthItem.days} / ${findMarketTradingDays(monthItem.month, yearData.year)} days) ${monthItem.gender}`
+        note = JSON.stringify({
+          key: 'partialMonthNote',
+          params: { days: monthItem.days, months: findMarketTradingDays(monthItem.month, yearData.year), gender: monthItem.gender },
+        });
         periodInterest =
           (balance * monthItem.rate * monthItem.days) /
           findMarketTradingDays(monthItem.month, yearData.year)

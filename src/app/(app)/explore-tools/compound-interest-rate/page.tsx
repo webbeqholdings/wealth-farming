@@ -48,7 +48,7 @@ export default function InvestmentSimulatorPage() {
             <div className="mb-6">
               <Label htmlFor="principal">{t('months')}</Label>
               <Input
-                id="months"
+                id={"months"}
                 type="number"
                 value={months}
                 onChange={(e) => setMonths(parseFloat(e.target.value) || 12)}
