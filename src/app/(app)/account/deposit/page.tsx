@@ -32,7 +32,7 @@ import { TabMenu } from '@/components/w88/TabMenu'
 import { accountConfig } from '@/config/accounts'
 import { toast } from '@/hooks/use-toast'
 import { notifyDeposit } from '@/lib/telegram'
-import CurrencyConverter from '@/components/CurrencyConverter'
+import CurrencyConverter, { useCurrencyConverter } from '@/components/CurrencyConverter'
 import { getAccountsByUserId } from '../../../../lib/account'
 import { getPaymentTransfer } from '@/lib/paymentTransfer'
 import Spinner from '@/components/Spinner'
@@ -87,7 +87,8 @@ function Steps({ currentStep, className, children }: StepsProps) {
 
 export default function DepositPage() {
   const { isLoggedIn, loading, user } = userStatus()
-  const { t } = useTranslation(); 
+  const { convertUSDtoVND } = useCurrencyConverter(() => { });
+  const { t } = useTranslation();
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [amount, setAmount] = useState('')
@@ -104,14 +105,13 @@ export default function DepositPage() {
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [depositScreenshot, setDepositScreenshot] = useState<FormData>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [bankQRCode, setBankQRCode] = useState()
-  const [bankAccountNumber, setBankAccountNumber] = useState()
-  const [bankAccountName, setBankAccountName] = useState()
-  const [cryptoWalletQrCodeUrl, setCryptoWalletQrCodeUrl] = useState()
-  const [cryptoWalletAddress, setCryptoWalletAddress] = useState()
-  const [cryptoWalletNetwork, setCryptoWalletNetwork] = useState()
-  const [minDeposit, setMinDeposit] = useState(0)
-
+  const [bankQRCode, setBankQRCode] = useState();
+  const [bankAccountNumber, setBankAccountNumber] = useState();
+  const [bankAccountName, setBankAccountName] = useState();
+  const [cryptoWalletQrCodeUrl, setCryptoWalletQrCodeUrl] = useState();
+  const [cryptoWalletAddress, setCryptoWalletAddress] = useState();
+  const [cryptoWalletNetwork, setCryptoWalletNetwork] = useState();
+  const [minDeposit, setMinDeposit] = useState(0);
   const quickAmounts = [
     { label: '500K', value: 500000 },
     { label: '1M', value: 1000000 },
@@ -181,7 +181,6 @@ export default function DepositPage() {
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
-
   useEffect(() => {
     const fetchPaymentTransfer = async () => {
       const paymentTransfer = await getPaymentTransfer()
@@ -250,7 +249,10 @@ export default function DepositPage() {
   useEffect(() => {
     const fetchBanks = async () => {
       try {
-        const response = await fetch(`/api/banks?where[user][equals]=${user?.id}`) // Replace with dynamic user ID if necessary
+        if (!user?.id) {
+          return
+        }
+        const response = await fetch(`/api/banks?where[user][equals]=${user.id}`) // Replace with dynamic user ID if necessary
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`)
         }
@@ -495,11 +497,12 @@ export default function DepositPage() {
                       <div className="space-y-4">
                         <Label className="flex justify-center">SCAN THIS QR CODE</Label>
                         <div className="flex justify-center">
-                          <Image
-                            src={bankQRCode || 'https://via.placeholder.com/300'}
+                          <img
+                            //src={bankQRCode || "https://via.placeholder.com/300"  }
+                            src={ "https://img.vietqr.io/image/VCB-1026934108-YKiPZgV.jpg?accountName=TA%20THI%20MY%20PHUONG&amount=" + convertUSDtoVND(USDCurrency, 0)+ "&addInfo=" + encodeURIComponent(user.first_name + ' ' + user.last_name +  ' ' + user.phone_contact + " deposit WF")}
                             alt="Bank Transfer QR Code"
-                            width={300}
-                            height={300}
+                            width={400}
+                            height={400}
                             className="border rounded-lg shadow-md"
                           />
                         </div>
@@ -564,7 +567,7 @@ export default function DepositPage() {
                           className="border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         />
                         <p className="text-xs text-gray-500">
-                        {t("deposit_form_file_notice")}
+                          {t("deposit_form_file_notice")}
                         </p>
                         {errors.depositScreenshot && (
                           <p className="text-red-500 text-sm">{errors.depositScreenshot}</p>

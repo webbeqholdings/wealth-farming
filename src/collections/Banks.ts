@@ -5,6 +5,7 @@ export const Banks: CollectionConfig = {
   slug: 'banks',
   admin: {
     useAsTitle: 'bank_name',
+    listSearchableFields: ['name', 'account_number', 'bank_name', 'branch', 'user.email'],
   },
   access: {
     read: isIndividualOrAdmin,

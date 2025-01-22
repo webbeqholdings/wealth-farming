@@ -5,6 +5,7 @@ const Contracts: CollectionConfig = {
   slug: 'contracts',
   admin: {
     group: 'BeQ Dynamic Fund',
+    listSearchableFields: ['user.email', 'amount', 'term'],
   },
   fields: [
     {

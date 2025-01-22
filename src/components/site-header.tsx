@@ -116,7 +116,7 @@ export function SiteHeader() {
             ) : (
               <Button onClick={() => router.push('/join')}>Login</Button>
             )}
-            <Link href="#" target="_blank" rel="noreferrer">
+            <Link href="https://www.facebook.com/p/BeQ-Holdings-61555802044845/" target="_blank" rel="noreferrer">
               <div
                 className={cn(
                   buttonVariants({

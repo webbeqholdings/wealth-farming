@@ -146,19 +146,19 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
   useEffect(() => {
     if (startDate && endDate) {
       if (!(startDate instanceof Date) || !(endDate instanceof Date)) {
-        console.error('Start date or end date is not a valid Date object.')
-        return
+        console.error("Start date or end date is not a valid Date object.");
+        return;
       }
       if (startDate > endDate) {
-        console.error('Start date must be earlier than or equal to end date')
-        return
+        console.error("Start date must be earlier than or equal to end date");
+        return;
       }
 
-      filterDate()
+      filterDate();
     } else {
-      fetchData()
+      fetchData();
     }
-  }, [startDate, endDate, activeTab])
+  }, [startDate, endDate, activeTab]);
 
   function filterDate() {
     const fetchTransactions = async () => {
@@ -271,9 +271,7 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
                     <Calendar
                       mode="single"
                       selected={endDate}
-                      onSelect={(date) => {
-                        handleEndDateSelect(date)
-                      }}
+                      onSelect={(date) => { handleEndDateSelect(date) }}
                       initialFocus
                     />
                   </PopoverContent>

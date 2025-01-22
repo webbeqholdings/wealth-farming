@@ -60,7 +60,7 @@ export const getBalanceFromAccount = async (
   return total
 }
 
-export const getAccountsByUser = async (user_id: number): Promise<any> => {
+export const getAccountsByUser: any = async (user_id: number): Promise<any> => {
   const payload = await getPayload({
     config,
   })

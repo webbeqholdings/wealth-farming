@@ -127,6 +127,9 @@ export default function WithdrawPage() {
 
   useEffect(() => {
     const fetchAccounts = async () => {
+      if(!user?.id){
+        return
+      }
       try {
         const response = await fetch(
           `/api/accounts?where[user][equals]=${user.id}&where[type][equals]=main`,
@@ -146,6 +149,9 @@ export default function WithdrawPage() {
 
   useEffect(() => {
     const fetchBanks = async () => {
+      if(!user?.id){
+        return
+      }
       try {
         const response = await fetch(`/api/banks?where[user][equals]=${user.id}`) // Replace with dynamic user ID if necessary
         if (!response.ok) {
@@ -311,9 +317,7 @@ export default function WithdrawPage() {
                           </SelectContent>
                         </Select>
                         {!selectBank && step === 2 && (
-                          <p className="text-red-600 text-sm mt-1">
-                            {t('withdraw_nobank_warning')}
-                          </p>
+                          <p className="text-red-600 text-sm mt-1">{t('withdraw_nobank_warning')}</p>
                         )}
                       </div>
                     </div>
@@ -334,7 +338,9 @@ export default function WithdrawPage() {
                       <Alert>
                         <AlertCircle className="h-4 w-4" />
                         <AlertTitle>{t('withdraw_withdraw_notice')}</AlertTitle>
-                        <AlertDescription>{t('withdraw_notice_desc')}</AlertDescription>
+                        <AlertDescription>
+                          {t('withdraw_notice_desc')}
+                        </AlertDescription>
                       </Alert>
                     </div>
                   )}
@@ -346,7 +352,9 @@ export default function WithdrawPage() {
                   <Alert>
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>{t('withdraw_confirm_title')}</AlertTitle>
-                    <AlertDescription>{t('withdraw_confirm_decs')}</AlertDescription>
+                    <AlertDescription>
+                      {t('withdraw_confirm_decs')}
+                    </AlertDescription>
                   </Alert>
                   <div className="space-y-2">
                     <div className="flex justify-between">
@@ -371,7 +379,9 @@ export default function WithdrawPage() {
                   <Alert variant="destructive">
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>{t('withdraw_important_title')}</AlertTitle>
-                    <AlertDescription>{t('withdraw_important_decs')}</AlertDescription>
+                    <AlertDescription>
+                      {t('withdraw_important_decs')}
+                    </AlertDescription>
                   </Alert>
                 </div>
               )}
@@ -380,7 +390,7 @@ export default function WithdrawPage() {
           <CardFooter className="flex justify-between">
             {step > 1 && (
               <Button variant="outline" onClick={handlePreviousStep}>
-                {t('back')}
+                 {t("back")}
               </Button>
             )}
             {step < 3 ? (

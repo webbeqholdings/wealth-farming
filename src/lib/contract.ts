@@ -78,9 +78,12 @@ export const getContractsWithDate = async (
   try {
     const payload = await getPayload({
       config,
-    })
-    const headers = await nextHeaders()
-    const auth = await payload.auth({ headers })
+    });
+    const headers = await nextHeaders();
+    const auth = await payload.auth({ headers });
+    if(!auth.user){
+      return
+    }
     const query = {
       user: { equals: auth.user.id },
       start_date: {
@@ -126,17 +129,16 @@ export const getContractsWithDate = async (
   }
 }
 
-export const getWithdrawals = async (
-  page: number,
-  limit: number,
-): Promise<{ docs: Withdrawal[]; totalPages: number; totalDocs: number }> => {
+export const getWithdrawals = async (page: number, limit: number): Promise<{ docs: Withdrawal[]; totalPages: number; totalDocs: number; }> => {
   try {
     const payload = await getPayload({
       config,
-    })
-    const headers = await nextHeaders()
-    const auth = await payload.auth({ headers })
-
+    });
+    const headers = await nextHeaders();
+    const auth = await payload.auth({ headers });
+    if(!auth.user){
+      return
+    }
     const response = await payload.find({
       collection: 'withdrawals',
       where: {
@@ -162,7 +164,7 @@ export const getWithdrawals = async (
   } catch (error) {
     console.error('Withdraw error:', error)
 
-    return { docs: [], totalPages: 0, totalDocs: 0 }
+    return { docs: [], totalPages: 0, totalDocs: 0};
   }
 }
 
@@ -172,10 +174,12 @@ export const getWithdrawalsWithDate = async (
   try {
     const payload = await getPayload({
       config,
-    })
-    const headers = await nextHeaders()
-    const auth = await payload.auth({ headers })
-
+    });
+    const headers = await nextHeaders();
+    const auth = await payload.auth({ headers });
+    if(!auth.user){
+      return
+    }
     const query = {
       user: { equals: auth.user.id },
       createdAt: {
@@ -220,6 +224,9 @@ export async function withdrawInvestment(formData: any) {
     const amount = formData.amount
     const contractId = formData.contractId
     const userId = formData.userId
+    const note = formData.note
+    const image = formData.image
+
     const response = await payload.create({
       collection: 'withdrawals',
       data: {
@@ -227,6 +234,8 @@ export async function withdrawInvestment(formData: any) {
         user: Number(userId),
         amount: Number(amount),
         status: 'pending',
+        ...(note && { note }),
+        ...(image && { image })
       },
     })
 
@@ -298,62 +307,6 @@ export async function updateSetting(formData: any) {
   }
 }
 
-export const getEligibleContracts = async (): Promise<{ docs: EligibleContract[] }> => {
-  try {
-    const payload = await getPayload({
-      config,
-    })
-    const headers = await nextHeaders()
-    const auth = await payload.auth({ headers })
-
-    const response = await payload.find({
-      collection: 'contracts',
-      where: {
-        user: { equals: auth.user.id },
-      },
-    })
-
-    const contracts = response.docs
-    const today = new Date()
-
-    const eligibleContracts = contracts
-      .filter((contract) => {
-        const startDate = new Date(contract.start_date)
-        let daysDifference
-
-        if (contract.status === 'active') {
-          daysDifference = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 3600 * 24))
-        } else if (contract.status === 'closed') {
-          const endDate = new Date(contract.end_date)
-          daysDifference = Math.floor(
-            (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24),
-          )
-        }
-
-        return daysDifference >= 90
-      })
-      .map((contract) => {
-        const productLog = contract.product_log
-        if (
-          productLog &&
-          typeof productLog === 'object' &&
-          'data' in productLog &&
-          typeof productLog.data === 'object'
-        ) {
-          const productName = (productLog.data as { product_name?: string })?.product_name
-          return {
-            productName,
-            eligible: true,
-          }
-        }
-      })
-
-    return { docs: eligibleContracts }
-  } catch (error) {
-    console.error('Error fetching eligible contracts:', error)
-    return { docs: [] }
-  }
-}
 
 export async function checkContractLarger90Days() {
   try {
@@ -362,6 +315,9 @@ export async function checkContractLarger90Days() {
     });
     const headers = await nextHeaders();
     const auth = await payload.auth({ headers });
+    if(!auth.user){
+      return
+    }
     var test_data = false
 
     // Check active contract

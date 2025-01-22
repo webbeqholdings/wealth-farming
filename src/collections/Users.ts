@@ -11,6 +11,7 @@ export const Users: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'email',
+    listSearchableFields: ['email', 'first_name', 'last_name', 'phone_contact', 'referral_code'],
   },
   access: {
     read: () => true,

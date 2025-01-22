@@ -5,6 +5,7 @@ const InvestmentFunds: CollectionConfig = {
   slug: 'investment-funds',
   admin: {
     useAsTitle: 'name',
+    listSearchableFields: ['name', 'category', 'fund_manager.email'],
   },
   access: {
     read: () => true, // Publicly readable

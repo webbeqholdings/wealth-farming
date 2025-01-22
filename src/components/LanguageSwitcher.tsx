@@ -37,7 +37,7 @@ export default function LanguageSwitch() {
 
                 <DropdownMenuItem onClick={() => changeLanguage('vi')}>
                     {language == 'vi' ? <LucideCheck size={16} className="mr-2 h-4 w-4" /> : <div className="mr-2 h-4 w-4"> </div>}
-                    <span>VietNamese</span>
+                    <span>Vietnamese</span>
 
                 </DropdownMenuItem>
 

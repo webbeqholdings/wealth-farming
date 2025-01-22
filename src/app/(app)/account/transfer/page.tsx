@@ -112,7 +112,7 @@ export default function TransferPage() {
     const fetchAccounts = async () => {
       try {
         let accountsData = []
-        if (user && user.id) {
+        if (user && user?.id) {
           accountsData = await getAccountsByUserId(user.id)
         }
         setListAccounts(accountsData)
