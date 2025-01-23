@@ -9,6 +9,7 @@ import {
 import { format } from 'date-fns'
 import { formatMoney } from '@/utilities/formatMoney'
 import { useTranslation } from 'react-i18next'
+import { formatText } from '@/utilities/formatText'
 interface ProfitData {
   date: Date
   balance: number
@@ -49,28 +50,14 @@ export function ProfitTable({ data }: { data: ProfitLogItem[] }) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{(t('start_date')).split(' ').map(word =>
-                    word.charAt(0).toUpperCase() + word.slice(1)
-                  ).join(' ')}</TableHead>
-              <TableHead>{(t('end_date')).split(' ').map(word =>
-                    word.charAt(0).toUpperCase() + word.slice(1)
-                  ).join(' ')}</TableHead>
-              <TableHead className="text-center">{t('trading_days')}</TableHead>
-              <TableHead>{(t('balance')).split(' ').map(word =>
-                    word.charAt(0).toUpperCase() + word.slice(1)
-                  ).join(' ')}</TableHead>
-              <TableHead>{(t('profit')).split(' ').map(word =>
-                    word.charAt(0).toUpperCase() + word.slice(1)
-                  ).join(' ')}</TableHead>
-              <TableHead>{(t('rate').split(' ').map(word =>
-                    word.charAt(0).toUpperCase() + word.slice(1)
-                  ).join(' '))}</TableHead>
-              <TableHead>{(t('term_type')).split(' ').map(word =>
-                    word.charAt(0).toUpperCase() + word.slice(1)
-                  ).join(' ')}</TableHead>
-              <TableHead>{(t('message')).split(' ').map(word =>
-                    word.charAt(0).toUpperCase() + word.slice(1)
-                  ).join(' ')}</TableHead>
+              <TableHead>{formatText(t('start_date'))}</TableHead>
+              <TableHead>{formatText(t('end_date'))}</TableHead>
+              <TableHead className="text-center">{formatText(t('trading_days'))}</TableHead>
+              <TableHead>{formatText(t('balance'))}</TableHead>
+              <TableHead>{formatText(t('profit'))}</TableHead>
+              <TableHead>{formatText(t('rate'))}</TableHead>
+              <TableHead>{formatText(t('term_type'))}</TableHead>
+              <TableHead>{formatText(t('message'))}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

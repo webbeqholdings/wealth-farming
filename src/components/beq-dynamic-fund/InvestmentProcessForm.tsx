@@ -154,12 +154,12 @@ export function InvestmentProcessForm({
       }
 
       if (term == 'quarterly') {
-        profitLog = buildProfitLogsQuarterly(depositAmount, startDate, endDate)
+        profitLog = await buildProfitLogsQuarterly(depositAmount, startDate, endDate)
         profitData.push(profitLog)
       }
 
       if (term == 'monthly') {
-        profitLog = buildProfitLogsMonthly(depositAmount, startDate, endDate)
+        profitLog = await buildProfitLogsMonthly(depositAmount, startDate, endDate)
         profitData.push(profitLog)
       }
 
