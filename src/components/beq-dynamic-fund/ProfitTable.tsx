@@ -18,8 +18,18 @@ interface ProfitData {
   termType: string
   days?: number
 }
+interface ProfitLogItem {
+  fromDate: Date
+  toDate: Date
+  rate: number
+  balance: number
+  profit: number
+  days: number
+  term: string
+  message: string
+}
 
-export function ProfitTable({ data }: { data: ProfitData[] }) {
+export function ProfitTable({ data }: { data: ProfitLogItem[] }) {
   const { t } = useTranslation()
   const getMessage = (messageField: string | object): string => {
     if (typeof messageField === 'string') {
@@ -32,33 +42,34 @@ export function ProfitTable({ data }: { data: ProfitData[] }) {
     }
     return '';
   };
+  console.log("data:", typeof data);
   return (
     <>
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t('month')}</TableHead>
+              <TableHead>{t('from_date')}</TableHead>
               <TableHead>{t('balance')}</TableHead>
               <TableHead>{t('profit')}</TableHead>
-              <TableHead>{t('interest_earned')}</TableHead>
               <TableHead>{t('rate')}</TableHead>
               <TableHead className="text-center">{t('trading_days')}</TableHead>
               <TableHead>{t('term_type')}</TableHead>
+              <TableHead>{t('message')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {data.map((row, index) => (
               <TableRow key={index}>
-                <TableCell>{format(row.date, 'MM, yyyy')}</TableCell>
+                <TableCell>{format(row.fromDate, 'd/MM/yyyy')}</TableCell>
                 <TableCell>
                   {formatMoney(row.balance, { symbol: ' USD', symbolPosition: 'after' })}
                 </TableCell>
                 <TableCell>{row.profit.toFixed(2)}</TableCell>
-                <TableCell>{row.interestEarned.toFixed(2)}</TableCell>
                 <TableCell>{row.rate.toFixed(2) + ' %'}</TableCell>
                 <TableCell className="text-center">{row.days}</TableCell>
-                <TableCell>{getMessage(row.termType)}</TableCell>
+                <TableCell>{getMessage(row.term)}</TableCell>
+                <TableCell>{row.message}</TableCell>
               </TableRow>
             ))}
           </TableBody>

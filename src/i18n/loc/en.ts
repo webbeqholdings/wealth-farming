@@ -319,7 +319,7 @@ export const en = {
     month: "Month",
     year_y: "Year {{y}}",
     interest_earned: "Interest Earned",
-    trading_days: "Trading Days",
+    trading_days: "Number of Days",
     term_type: "Term Type",
     pick_date: 'Pick a date',
     Monthly: "Monthly",
@@ -329,6 +329,8 @@ export const en = {
     day_num : 'day {{num}}',
     rate: 'Rate',
     partialMonthNote: "({{days}} / {{months}} days) {{gender}}",
+    from_date: "From Date",
+    message: 'Message',
 
     // referral
     grow_wealth: 'Grow Your Wealth Together',
