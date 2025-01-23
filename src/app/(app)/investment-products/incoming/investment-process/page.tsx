@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns'
 
 interface ProfitItem {
-  date: Date
+  fromDate: Date
   balance: number
 }
 
@@ -25,12 +25,13 @@ export default function InvestmentProcessPage() {
   const [profitData, setProfitData] = useState([])
   const [requestFormData, setRequestFormData] = useState({})
 
-  // const formattedProfitData = Object.entries(profitData).flatMap(([year, items]) =>
-  //   items.map((item: ProfitItem) => ({
-  //     time: item.date,
-  //     balance: item.balance,
-  //   })),
-  // )
+  const formattedProfitData = Object.entries(profitData).flatMap(([, value]) =>
+    value.profitLogs.map((item: ProfitItem) => ({
+      time: item.fromDate,
+      balance: item.balance,
+    })),
+  )
+
   return (
     <>
       <SiteHeader />
@@ -71,7 +72,7 @@ export default function InvestmentProcessPage() {
                       <CardDescription>{t('investment_process_chart_decs')}</CardDescription>
                     </CardHeader>
                     <CardContent className="pt-2">
-                      {/* <ProfitChart profitData={formattedProfitData} /> */}
+                      <ProfitChart profitData={formattedProfitData} />
                     </CardContent>
                   </Card>
                 </TabsContent>
