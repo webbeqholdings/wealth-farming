@@ -49,14 +49,28 @@ export function ProfitTable({ data }: { data: ProfitLogItem[] }) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t('start_date')}</TableHead>
-              <TableHead>{t('end_date')}</TableHead>
+              <TableHead>{(t('start_date')).split(' ').map(word =>
+                    word.charAt(0).toUpperCase() + word.slice(1)
+                  ).join(' ')}</TableHead>
+              <TableHead>{(t('end_date')).split(' ').map(word =>
+                    word.charAt(0).toUpperCase() + word.slice(1)
+                  ).join(' ')}</TableHead>
               <TableHead className="text-center">{t('trading_days')}</TableHead>
-              <TableHead>{t('balance')}</TableHead>
-              <TableHead>{t('profit')}</TableHead>
-              <TableHead>{t('rate')}</TableHead>
-              <TableHead>{t('term_type')}</TableHead>
-              <TableHead>{t('message')}</TableHead>
+              <TableHead>{(t('balance')).split(' ').map(word =>
+                    word.charAt(0).toUpperCase() + word.slice(1)
+                  ).join(' ')}</TableHead>
+              <TableHead>{(t('profit')).split(' ').map(word =>
+                    word.charAt(0).toUpperCase() + word.slice(1)
+                  ).join(' ')}</TableHead>
+              <TableHead>{(t('rate').split(' ').map(word =>
+                    word.charAt(0).toUpperCase() + word.slice(1)
+                  ).join(' '))}</TableHead>
+              <TableHead>{(t('term_type')).split(' ').map(word =>
+                    word.charAt(0).toUpperCase() + word.slice(1)
+                  ).join(' ')}</TableHead>
+              <TableHead>{(t('message')).split(' ').map(word =>
+                    word.charAt(0).toUpperCase() + word.slice(1)
+                  ).join(' ')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
