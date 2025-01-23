@@ -2,6 +2,10 @@
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { headers as nextHeaders } from 'next/headers'
+import { getCurrentLevelRate, getParentIdByUser } from './referrals'
+import { getAccountsByUserId } from './account'
+import { getTotalDeposit } from './transaction'
+import { getReferralProducts } from './investment-products/dynamicFundQuery'
 
 interface Withdrawal {
   id: string
@@ -73,15 +77,18 @@ export const getContracts = async (
 }
 
 export const getContractsWithDate = async (
-  page: number, limit: number, startDateFilter: string, endDateFilter: string
+  page: number,
+  limit: number,
+  startDateFilter: string,
+  endDateFilter: string,
 ): Promise<{ docs: any; totalPages: number; totalDocs: number }> => {
   try {
     const payload = await getPayload({
       config,
-    });
-    const headers = await nextHeaders();
-    const auth = await payload.auth({ headers });
-    if(!auth.user){
+    })
+    const headers = await nextHeaders()
+    const auth = await payload.auth({ headers })
+    if (!auth.user) {
       return
     }
     const query = {
@@ -129,14 +136,17 @@ export const getContractsWithDate = async (
   }
 }
 
-export const getWithdrawals = async (page: number, limit: number): Promise<{ docs: Withdrawal[]; totalPages: number; totalDocs: number; }> => {
+export const getWithdrawals = async (
+  page: number,
+  limit: number,
+): Promise<{ docs: Withdrawal[]; totalPages: number; totalDocs: number }> => {
   try {
     const payload = await getPayload({
       config,
-    });
-    const headers = await nextHeaders();
-    const auth = await payload.auth({ headers });
-    if(!auth.user){
+    })
+    const headers = await nextHeaders()
+    const auth = await payload.auth({ headers })
+    if (!auth.user) {
       return
     }
     const response = await payload.find({
@@ -164,20 +174,23 @@ export const getWithdrawals = async (page: number, limit: number): Promise<{ doc
   } catch (error) {
     console.error('Withdraw error:', error)
 
-    return { docs: [], totalPages: 0, totalDocs: 0};
+    return { docs: [], totalPages: 0, totalDocs: 0 }
   }
 }
 
 export const getWithdrawalsWithDate = async (
-  page: number, limit: number, startDateFilter: string, endDateFilter: string
+  page: number,
+  limit: number,
+  startDateFilter: string,
+  endDateFilter: string,
 ): Promise<{ docs: Withdrawal[]; totalPages: number; totalDocs: number }> => {
   try {
     const payload = await getPayload({
       config,
-    });
-    const headers = await nextHeaders();
-    const auth = await payload.auth({ headers });
-    if(!auth.user){
+    })
+    const headers = await nextHeaders()
+    const auth = await payload.auth({ headers })
+    if (!auth.user) {
       return
     }
     const query = {
@@ -235,7 +248,7 @@ export async function withdrawInvestment(formData: any) {
         amount: Number(amount),
         status: 'pending',
         ...(note && { note }),
-        ...(image && { image })
+        ...(image && { image }),
       },
     })
 
@@ -290,7 +303,7 @@ export async function updateSetting(formData: any) {
       collection: 'contracts',
       id: formData.id,
       data: {
-        config_log: formData.setting ?? {}
+        config_log: formData.setting ?? {},
       },
     })
     // Simulate API call delay
@@ -307,15 +320,14 @@ export async function updateSetting(formData: any) {
   }
 }
 
-
 export async function checkContractLarger90Days() {
   try {
     const payload = await getPayload({
       config,
-    });
-    const headers = await nextHeaders();
-    const auth = await payload.auth({ headers });
-    if(!auth.user){
+    })
+    const headers = await nextHeaders()
+    const auth = await payload.auth({ headers })
+    if (!auth.user) {
       return
     }
     var test_data = false
@@ -323,19 +335,23 @@ export async function checkContractLarger90Days() {
     // Check active contract
     const query_activeContract = {
       user: { equals: auth.user.id },
-      status: { equals: 'active' }
+      status: { equals: 'active' },
     }
     const response_activeContract = await payload.find({
       collection: 'contracts',
-      where: { ...query_activeContract, },
+      where: { ...query_activeContract },
       sort: 'start_date',
-      limit: 10000
-    });
-    response_activeContract.docs.forEach(element => {
-      const constract_date = new Date(element.start_date);
-      const return_date = new Date(constract_date.getFullYear(), constract_date.getMonth(), constract_date.getDate() + 90)
+      limit: 10000,
+    })
+    response_activeContract.docs.forEach((element) => {
+      const constract_date = new Date(element.start_date)
+      const return_date = new Date(
+        constract_date.getFullYear(),
+        constract_date.getMonth(),
+        constract_date.getDate() + 90,
+      )
       const today = new Date()
-      if ((return_date <= today) == true) {
+      if (return_date <= today == true) {
         test_data = true
         return true
       }
@@ -348,29 +364,89 @@ export async function checkContractLarger90Days() {
     // Check inactive contract
     const query_inactiveContract = {
       user: { equals: auth.user.id },
-      'contract.status': { not_equals: 'active' }
+      'contract.status': { not_equals: 'active' },
     }
     const response_inactiveContract = await payload.find({
       collection: 'withdrawals',
-      where: { ...query_inactiveContract, },
+      where: { ...query_inactiveContract },
       sort: 'createdAt',
-      limit: 10000
-    });
+      limit: 10000,
+    })
 
-    response_inactiveContract.docs.forEach(element => {
+    response_inactiveContract.docs.forEach((element) => {
       if (typeof element.contract !== 'number') {
         const constract_start_date = new Date(element.contract.start_date)
-        const return_date = new Date(constract_start_date.getFullYear(), constract_start_date.getMonth(), constract_start_date.getDate() + 90)
+        const return_date = new Date(
+          constract_start_date.getFullYear(),
+          constract_start_date.getMonth(),
+          constract_start_date.getDate() + 90,
+        )
         const constract_termination_date = new Date(element.createdAt)
-        if ((return_date <= constract_termination_date) == true) {
+        if (return_date <= constract_termination_date == true) {
           test_data = true
           return true
         }
       }
-    });
+    })
     return test_data
-  }
-  catch (erorr) {
+  } catch (erorr) {
     console.error(erorr)
+  }
+}
+
+export async function createReferral(userId: number, amount: number) {
+  const payload = await getPayload({
+    config,
+  })
+  // ... Update Referral Process
+  const parentUser = await getParentIdByUser(userId)
+  // const referralRate: any = await getCurrentLevelRate(payload, amount)
+  const parentId = (parentUser as { id: number }).id
+
+  if (parentId) {
+    const accountReferral = await getAccountsByUserId(userId, ['referral_reward'])
+    // Get total deposit
+    const totalAmount = await getTotalDeposit(userId)
+
+    const referralRate = await getCurrentLevelRate(totalAmount)
+    const referralAmount = amount * referralRate
+
+    const referralProducts = await getReferralProducts()
+    const referralProduct = referralProducts.find((prod: any) => {
+      return prod.term == 'monthly'
+    })
+
+    if (!referralProduct) return
+
+    await payload.create({
+      collection: 'transactions',
+      data: {
+        amount: Number(referralAmount),
+        user: Number(parentId),
+        status: 'completed',
+        account_to: Number(accountReferral.id),
+        type: 'referral_reward',
+      },
+    })
+
+    await payload.create({
+      collection: 'contracts',
+      data: {
+        user: Number(parentId),
+        amount: Number(referralAmount),
+        balance: Number(referralAmount),
+        expected_return: referralProduct.rate_of_return,
+        status: 'active',
+        term: referralProduct.term,
+        profit: 0,
+        periods: 1,
+        start_date: new Date().toISOString(),
+        end_date: null,
+        product_log: {
+          data: referralProduct,
+        },
+        note_log: ['Contract by Referral'],
+      },
+    })
   }
 }
