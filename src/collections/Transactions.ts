@@ -199,18 +199,6 @@ const Transactions: CollectionConfig = {
             })
 
             await payload.create({
-              collection: 'transactions',
-              data: {
-                amount: Number(referralAmount),
-                user: Number(parentId),
-                investment_product: referralProduct.id,
-                status: 'completed',
-                from_account: Number(accountReferral.id),
-                type: 'investment',
-              },
-            })
-
-            await payload.create({
               collection: 'contracts',
               data: {
                 user: Number(parentId),
