@@ -43,7 +43,6 @@ export function ProfitTable({ data }: { data: ProfitLogItem[] }) {
     }
     return ''
   }
-  console.log('data:', typeof data)
   return (
     <>
       <div className="overflow-x-auto">

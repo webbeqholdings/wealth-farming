@@ -9,11 +9,8 @@ import ReportBack from '@/components/beq-dynamic-fund/ReportBack'
 import { Term } from '@/lib/investment-products/dynamicFund'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts'
-import { request } from 'http'
 import { ProfitChart } from '@/components/ProfitChart'
 import { useTranslation } from 'react-i18next';
-import { format } from 'date-fns'
 
 interface ProfitItem {
   fromDate: Date
