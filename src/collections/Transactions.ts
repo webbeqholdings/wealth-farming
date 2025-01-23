@@ -165,59 +165,6 @@ const Transactions: CollectionConfig = {
         }
 
         if (operation === 'update' && type === 'deposit' && status === 'completed') {
-          // ... Update Referral Process
-          const parentUser = await getParentIdByUser(payload, doc.user)
-          // const referralRate: any = await getCurrentLevelRate(payload, amount)
-          const parentId = (parentUser as { id: number }).id
-
-          if (parentId) {
-            const accountReferral = await getAccountsByUserId(payload, doc.user, [
-              'referral_reward',
-            ])
-            // Get total deposit
-            const totalAmount = await getTotalDeposit(payload, doc.user)
-
-            const referralRate = await getCurrentLevelRate(payload, totalAmount)
-            const referralAmount = amount * referralRate
-
-            const referralProducts = await getReferralProducts(payload)
-            const referralProduct = referralProducts.find((prod) => {
-              return prod.term == 'monthly'
-            })
-
-            if (!referralProduct) return
-
-            await payload.create({
-              collection: 'transactions',
-              data: {
-                amount: Number(referralAmount),
-                user: Number(parentId),
-                status: 'completed',
-                account_to: Number(accountReferral.id),
-                type: 'referral_reward',
-              },
-            })
-
-            await payload.create({
-              collection: 'contracts',
-              data: {
-                user: Number(parentId),
-                amount: Number(referralAmount),
-                balance: Number(referralAmount),
-                expected_return: referralProduct.rate_of_return,
-                status: 'active',
-                term: referralProduct.term,
-                profit: 0,
-                periods: 1,
-                start_date: new Date().toISOString(),
-                end_date: null,
-                product_log: {
-                  data: referralProduct,
-                },
-                note_log: ['Contract by Referral'],
-              },
-            })
-          }
         }
 
         if (operation === 'update' && doc.type === 'withdraw' && doc.status === 'failed') {
