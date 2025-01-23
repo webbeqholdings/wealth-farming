@@ -49,11 +49,12 @@ export function ProfitTable({ data }: { data: ProfitLogItem[] }) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t('from_date')}</TableHead>
+              <TableHead>{t('start_date')}</TableHead>
+              <TableHead>{t('end_date')}</TableHead>
+              <TableHead className="text-center">{t('trading_days')}</TableHead>
               <TableHead>{t('balance')}</TableHead>
               <TableHead>{t('profit')}</TableHead>
               <TableHead>{t('rate')}</TableHead>
-              <TableHead className="text-center">{t('trading_days')}</TableHead>
               <TableHead>{t('term_type')}</TableHead>
               <TableHead>{t('message')}</TableHead>
             </TableRow>
@@ -62,12 +63,13 @@ export function ProfitTable({ data }: { data: ProfitLogItem[] }) {
             {data.map((row, index) => (
               <TableRow key={index}>
                 <TableCell>{format(row.fromDate, 'd/MM/yyyy')}</TableCell>
+                <TableCell>{format(row.toDate, 'd/MM/yyyy')}</TableCell>
+                <TableCell className="text-center">{row.days}</TableCell>
                 <TableCell>
                   {formatMoney(row.balance, { symbol: ' USD', symbolPosition: 'after' })}
                 </TableCell>
                 <TableCell>{row.profit.toFixed(2)}</TableCell>
                 <TableCell>{row.rate.toFixed(2) + ' %'}</TableCell>
-                <TableCell className="text-center">{row.days}</TableCell>
                 <TableCell>{getMessage(row.term)}</TableCell>
                 <TableCell>{row.message}</TableCell>
               </TableRow>

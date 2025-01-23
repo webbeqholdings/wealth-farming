@@ -330,7 +330,7 @@ export const en = {
     rate: 'Rate',
     partialMonthNote: "({{days}} / {{months}} days) {{gender}}",
     from_date: "From Date",
-    message: 'Message',
+    message: 'message',
 
     // referral
     grow_wealth: 'Grow Your Wealth Together',
