@@ -25,6 +25,10 @@ import {
   contractMultiPeriodEndAt,
   standardApplyProgramDays,
   canCancelContractAt,
+  buildProfitLogsAnnualy,
+  buildProfitLogsSemester,
+  buildProfitLogsQuarterly,
+  buildProfitLogsMonthly,
 } from '@/lib/investment-products/dynamicFund'
 import { createTransactionInvestment } from '@/lib/transaction'
 import { getPublicProducts } from '@/lib/investment-products/dynamicFundQuery'
@@ -125,7 +129,7 @@ export function InvestmentProcessForm({
     setEndDate(date)
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     let profitData = []
 
@@ -138,20 +142,25 @@ export function InvestmentProcessForm({
         })
       }
 
+      let profitLog
       if (term == 'annually') {
-        profitData = buildProfitRecordsAnnualy(depositAmount, startDate, endDate)
+        profitLog = await buildProfitLogsAnnualy(depositAmount, startDate, endDate)
+        profitData.push(profitLog)
       }
 
       if (term == 'semester') {
-        profitData = buildProfitRecordsSemester(depositAmount, startDate, endDate)
+        profitLog = await buildProfitLogsSemester(depositAmount, startDate, endDate)
+        profitData.push(profitLog)
       }
 
       if (term == 'quarterly') {
-        profitData = buildProfitRecordsQuarterly(depositAmount, startDate, endDate)
+        profitLog = await buildProfitLogsQuarterly(depositAmount, startDate, endDate)
+        profitData.push(profitLog)
       }
 
       if (term == 'monthly') {
-        profitData = buildProfitRecordsMonthly(depositAmount, startDate, endDate)
+        profitLog = await buildProfitLogsMonthly(depositAmount, startDate, endDate)
+        profitData.push(profitLog)
       }
 
       onCalculate(profitData)

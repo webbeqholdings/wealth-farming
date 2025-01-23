@@ -329,6 +329,7 @@ export const vi = {
     day_num: 'thứ {{num}}',
     rate: 'Tỷ Lệ',
     partialMonthNote:'({{days}} / {{months}} ngày) Tháng Không Trọn Vẹn',
+    message: 'ghi chú',
 
     // referral
     grow_wealth: 'Cùng Nhau Đầu Tư',

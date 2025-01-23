@@ -188,8 +188,12 @@ export const buildProfitRecordsAnnualy = (
       if (monthItem.gender == 'Partial Month') {
         note = JSON.stringify({
           key: 'partialMonthNote',
-          params: { days: monthItem.days, months: findMarketTradingDays(monthItem.month, yearData.year), gender: monthItem.gender },
-        });
+          params: {
+            days: monthItem.days,
+            months: findMarketTradingDays(monthItem.month, yearData.year),
+            gender: monthItem.gender,
+          },
+        })
         // note = `(${monthItem.days} / ${findMarketTradingDays(monthItem.month, yearData.year)} days) ${monthItem.gender}`
         periodInterest =
           (balance * monthItem.rate * monthItem.days) /
@@ -768,10 +772,13 @@ export const buildProfitLogsAnnualy = async (principal: number, startDate: Date,
     isPartialContract = true
   }
 
+  let _dayCount = 0
+
   if (periods > 0) {
     for (let mm = 1; mm <= 12 * periods; mm++) {
       let _profit = _balance * rate
       _balance = _balance + _profit
+      _dayCount += unitMonthly
 
       profitLogs.push({
         fromDate: _fromDate,
@@ -779,7 +786,7 @@ export const buildProfitLogsAnnualy = async (principal: number, startDate: Date,
         rate: rate,
         balance: _balance,
         profit: _profit,
-        days: unitMonthly * mm,
+        days: _dayCount,
         term: 'annually',
         message: 'full annually',
       })
@@ -814,14 +821,14 @@ export const buildProfitLogsAnnualy = async (principal: number, startDate: Date,
     for (let mm = 1; mm <= 6 * periods; mm++) {
       let _profit = _balance * rate
       _balance = _balance + _profit
-
+      _dayCount += unitMonthly
       profitLogs.push({
         fromDate: _fromDate,
         toDate: addDays(_fromDate, unitMonthly),
         rate: rate,
         balance: _balance,
         profit: _profit,
-        days: unitMonthly * mm,
+        days: _dayCount,
         term: 'semester',
         message: 'full semester',
       })
@@ -857,14 +864,14 @@ export const buildProfitLogsAnnualy = async (principal: number, startDate: Date,
     for (let mm = 1; mm <= 3 * periods; mm++) {
       let _profit = _balance * rate
       _balance = _balance + _profit
-
+      _dayCount += unitMonthly
       profitLogs.push({
         fromDate: _fromDate,
         toDate: addDays(_fromDate, unitMonthly),
         rate: rate,
         balance: _balance,
         profit: _profit,
-        days: unitMonthly * mm,
+        days: _dayCount,
         term: 'quarterly',
         message: 'full quarterly',
       })
@@ -887,14 +894,14 @@ export const buildProfitLogsAnnualy = async (principal: number, startDate: Date,
     for (let mm = 1; mm <= periods; mm++) {
       let _profit = _balance * rate
       _balance = _balance + _profit
-
+      _dayCount += unitMonthly
       profitLogs.push({
         fromDate: _fromDate,
         toDate: addDays(_fromDate, unitMonthly),
         rate: rate,
         balance: _balance,
         profit: _profit,
-        days: unitMonthly * mm,
+        days: _dayCount,
         term: 'monthly',
         message: 'full monthly',
       })
@@ -912,14 +919,14 @@ export const buildProfitLogsAnnualy = async (principal: number, startDate: Date,
 
     let _profit = (_balance * rate * periodsModDays) / unitMonthly
     _balance = _balance + _profit
-
+    _dayCount += periodsModDays
     profitLogs.push({
       fromDate: _fromDate,
       toDate: endDate,
       rate: rate,
       balance: _balance,
       profit: _profit,
-      days: periodsModDays,
+      days: _dayCount,
       term: 'monthly',
       message: 'partial monthly',
     })
@@ -966,11 +973,13 @@ export const buildProfitLogsSemester = async (
 
   let _fromDate = startDate
   let _balance = principal
+  let _dayCount = 0
 
   if (periods > 0) {
     for (let mm = 1; mm <= 6 * periods; mm++) {
       let _profit = _balance * rate
       _balance = _balance + _profit
+      _dayCount += unitMonthly
 
       profitLogs.push({
         fromDate: _fromDate,
@@ -978,7 +987,7 @@ export const buildProfitLogsSemester = async (
         rate: rate,
         balance: _balance,
         profit: _profit,
-        days: unitMonthly * mm,
+        days: _dayCount,
         term: 'semester',
         message: 'full semester',
       })
@@ -1014,6 +1023,7 @@ export const buildProfitLogsSemester = async (
     for (let mm = 1; mm <= 3 * periods; mm++) {
       let _profit = _balance * rate
       _balance = _balance + _profit
+      _dayCount += unitMonthly
 
       profitLogs.push({
         fromDate: _fromDate,
@@ -1021,7 +1031,7 @@ export const buildProfitLogsSemester = async (
         rate: rate,
         balance: _balance,
         profit: _profit,
-        days: unitMonthly * mm,
+        days: _dayCount,
         term: 'quarterly',
         message: 'full quarterly',
       })
@@ -1044,14 +1054,14 @@ export const buildProfitLogsSemester = async (
     for (let mm = 1; mm <= periods; mm++) {
       let _profit = _balance * rate
       _balance = _balance + _profit
-
+      _dayCount += unitMonthly
       profitLogs.push({
         fromDate: _fromDate,
         toDate: addDays(_fromDate, unitMonthly),
         rate: rate,
         balance: _balance,
         profit: _profit,
-        days: unitMonthly * mm,
+        days: _dayCount,
         term: 'monthly',
         message: 'full monthly',
       })
@@ -1069,13 +1079,14 @@ export const buildProfitLogsSemester = async (
 
     let _profit = (_balance * rate * periodsModDays) / unitMonthly
     _balance = _balance + _profit
+    _dayCount += periodsModDays
     profitLogs.push({
       fromDate: _fromDate,
       toDate: endDate,
       rate: rate,
       balance: _balance,
       profit: _profit,
-      days: periodsModDays,
+      days: _dayCount,
       term: 'monthly',
       message: 'partial monthly',
     })
@@ -1244,11 +1255,13 @@ export const buildProfitLogsMonthly = async (principal: number, startDate: Date,
 
   let _fromDate = startDate
   let _balance = principal
+  let _dayCount = 0
 
   if (periods > 0) {
     for (let mm = 1; mm <= periods; mm++) {
       let _profit = _balance * rate
       _balance = _balance + _profit
+      _dayCount += unitMonthly
 
       profitLogs.push({
         fromDate: _fromDate,
@@ -1256,7 +1269,7 @@ export const buildProfitLogsMonthly = async (principal: number, startDate: Date,
         rate: rate,
         balance: _balance,
         profit: _profit,
-        days: unitMonthly * mm,
+        days: _dayCount,
         term: 'monthly',
         message: 'full monthly',
       })
@@ -1287,13 +1300,14 @@ export const buildProfitLogsMonthly = async (principal: number, startDate: Date,
 
     let _profit = (_balance * rate * periodsModDays) / unitMonthly
     _balance = _balance + _profit
+    _dayCount += periodsModDays
     profitLogs.push({
       fromDate: _fromDate,
       toDate: endDate,
       rate: rate,
       balance: _balance,
       profit: _profit,
-      days: periodsModDays,
+      days: _dayCount,
       term: 'monthly',
       message: 'partial monthly',
     })

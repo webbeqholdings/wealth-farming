@@ -9,13 +9,11 @@ import ReportBack from '@/components/beq-dynamic-fund/ReportBack'
 import { Term } from '@/lib/investment-products/dynamicFund'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts'
-import { request } from 'http'
 import { ProfitChart } from '@/components/ProfitChart'
 import { useTranslation } from 'react-i18next';
 
 interface ProfitItem {
-  date: Date
+  fromDate: Date
   balance: number
 }
 
@@ -24,12 +22,13 @@ export default function InvestmentProcessPage() {
   const [profitData, setProfitData] = useState([])
   const [requestFormData, setRequestFormData] = useState({})
 
-  const formattedProfitData = Object.entries(profitData).flatMap(([year, items]) =>
-    items.map((item: ProfitItem) => ({
-      time: item.date,
+  const formattedProfitData = Object.entries(profitData).flatMap(([, value]) =>
+    value.profitLogs.map((item: ProfitItem) => ({
+      time: item.fromDate,
       balance: item.balance,
     })),
   )
+
   return (
     <>
       <SiteHeader />
@@ -57,16 +56,11 @@ export default function InvestmentProcessPage() {
                   <TabsTrigger value="chart">{t('chart')}</TabsTrigger>
                 </TabsList>
                 <TabsContent value="table" className="space-y-4">
-                  {Object.entries(profitData).map(([year, item]) => {
-                    return (
-                      <div key={year} className="mb-10">
-                        <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
-                          {t('year_y', {y: year})}
-                        </h2>
-                        <ProfitTable data={item} />
-                      </div>
-                    )
-                  })}
+                {profitData?.map((entry, index) => (
+                    <div key={index}>
+                      <ProfitTable data={entry.profitLogs}/>
+                    </div>
+                  ))}
                 </TabsContent>
                 <TabsContent value="chart">
                   <Card>
