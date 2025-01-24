@@ -4,80 +4,77 @@ import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table'
 import { WithdrawDialog } from '@/components/withdraw-dialog'
 import { TerminationDialog } from '../termination-dialog'
 import userStatus from '@/lib/userStatus'
 import { useRouter } from 'next/navigation'
-import { getContracts, getWithdrawals, updateSetting, getContractsWithDate, getWithdrawalsWithDate, checkContractLarger90Days } from '@/lib/contract'
 import {
-    Pagination,
-    PaginationContent,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from "@/components/ui/pagination"
+  getContracts,
+  getWithdrawals,
+  updateSetting,
+  getContractsWithDate,
+  getWithdrawalsWithDate,
+  checkContractLarger90Days
+} from '@/lib/contract'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination'
 import Spinner from '../Spinner'
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
-import { Label } from "@/components/ui/label"
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Label } from '@/components/ui/label'
 import { LucideBan, LucideBanknote, Settings } from 'lucide-react'
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { CircleHelp } from 'lucide-react'
 import { getPaymentTransfer } from '@/lib/paymentTransfer'
 import { useToast } from '@/hooks/use-toast'
-import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Calendar } from "@/components/ui/calendar"
-import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns'
+import { CalendarIcon } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Calendar } from '@/components/ui/calendar'
+import { useTranslation } from 'react-i18next'
 interface Investment {
-    id: string
-    userId: string
-    productName: string
-    investedAmount: number
-    minInvestment: number
-    extendContract: number
-    expectedReturn: number
-    availableBalance: number,
-    rateOfReturn: number,
-    term: string,
-    periods: string,
-    profit: number,
-    startDate: Date,
-    endDate: Date,
-    setting: {
-        auto_profit: number | null,
-        extend_contract: boolean | null,
-    },
-    status: 'active' | 'completed' | 'pending' | 'inactive'
-    lastWithdrawal?: string
+  id: string
+  userId: string
+  productName: string
+  investedAmount: number
+  minInvestment: number
+  extendContract: number
+  expectedReturn: number
+  availableBalance: number
+  rateOfReturn: number
+  term: string
+  periods: string
+  profit: number
+  startDate: Date
+  endDate: Date
+  setting: {
+    auto_profit: number | null
+    extend_contract: boolean | null
+  }
+  status: 'active' | 'completed' | 'pending' | 'inactive'
+  lastWithdrawal?: string
 }
 
 interface Withdrawal {
-    id: string
-    productName: string
-    amount: number
-    date: string
-    status: 'completed' | 'pending' | 'failed'
-    message: string
+  id: string
+  productName: string
+  amount: number
+  date: string
+  status: 'completed' | 'pending' | 'failed'
+  message: string
 }
-
 
 export function InvestmentContracts() {
     const router = useRouter()
@@ -137,10 +134,10 @@ export function InvestmentContracts() {
         }
     }, [activeTab, currentPage]);
 
-    // Call fetchData in useEffect
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+  // Call fetchData in useEffect
+  useEffect(() => {
+    fetchData()
+  }, [fetchData])
 
     useEffect(() => {
         if (startDate && endDate) {
@@ -171,142 +168,152 @@ export function InvestmentContracts() {
         }
     };
 
-    function filterDate() {
-        const fetchContracts = async () => {
-            try {
-                if (activeTab === 'investment') {
-                    const { docs, totalPages } = await getContractsWithDate(currentPage, 10, startDate.toISOString(), endDate.toISOString());
-                    setInvestments(docs);
-                    setTotalPagesInvestment(totalPages);
-                    const initialCheckedStates = docs.reduce((acc: any, investment: any) => {
-                        acc[investment.id] = investment.setting?.extend_contract === true || false;
-                        return acc;
-                    }, {});
-                    setCheckedStates(initialCheckedStates);
-                } else if (activeTab === 'withdraw') {
-                    const { docs, totalPages } = await getWithdrawalsWithDate(currentPage, 10, startDate.toISOString(), endDate.toISOString());
-                    setWithdrawals(docs);
-                    setTotalPagesWithdrawl(totalPages);
-                }
-            } catch (error) {
-                console.error('Failed to fetch contracts:', error);
-            }
-        };
-        fetchContracts();
-    }
-
-    // Calculate ROI
-    const calculateROI = () => {
-        if (!investments || investments.length === 0) return 0;
-
-        const totalInvested = investments.reduce((sum, inv) => sum + inv.investedAmount, 0);
-        const totalExpected = investments.reduce((sum, inv) => sum + inv.expectedReturn, 0);
-
-        if (totalInvested === 0) return 0;
-
-        return ((totalExpected - totalInvested) / totalInvested) * 100;
-    };
-
-    const handleWithdraw = (investment: Investment) => {
-        setSelectedContract(investment)
-        setWithdrawDialogOpen(true)
-    }
-    const handleTerminate = (investment: Investment) => {
-        setSelectedContract(investment)
-        setTerminationDialogOpen(true)
-    }
-
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-        }).format(amount)
-    }
-
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case 'active':
-            case 'completed':
-                return 'bg-green-500/20 text-green-500'
-            case 'pending':
-                return 'bg-yellow-500/20 text-yellow-500'
-            case 'failed':
-                return 'bg-red-500/20 text-red-500'
-            default:
-                return 'bg-gray-500/20 text-gray-500'
+  function filterDate() {
+    const fetchContracts = async () => {
+      try {
+        if (activeTab === 'investment') {
+          const { docs, totalPages } = await getContractsWithDate(
+            currentPage,
+            10,
+            startDate.toISOString(),
+            endDate.toISOString(),
+          )
+          setInvestments(docs)
+          setTotalPagesInvestment(totalPages)
+          const initialCheckedStates = docs.reduce((acc: any, investment: any) => {
+            acc[investment.id] = investment.setting?.extend_contract === true || false
+            return acc
+          }, {})
+          setCheckedStates(initialCheckedStates)
+        } else if (activeTab === 'withdraw') {
+          const { docs, totalPages } = await getWithdrawalsWithDate(
+            currentPage,
+            10,
+            startDate.toISOString(),
+            endDate.toISOString(),
+          )
+          setWithdrawals(docs)
+          setTotalPagesWithdrawl(totalPages)
         }
+      } catch (error) {
+        console.error('Failed to fetch contracts:', error)
+      }
     }
+    fetchContracts()
+  }
 
-    // Handle Press Update in Setting
-    async function handleChangeSetting(e: any) {
+  // Calculate ROI
+  const calculateROI = () => {
+    if (!investments || investments.length === 0) return 0
 
-        // Prevent the browser from reloading the page
-        e.preventDefault();
-        // Read the form data
-        const formData = new FormData(e.target);
-        const formJson = Object.fromEntries(formData.entries());
+    const totalInvested = investments.reduce((sum, inv) => sum + inv.investedAmount, 0)
+    const totalExpected = investments.reduce((sum, inv) => sum + inv.expectedReturn, 0)
 
-        try {
-            const paymentTransfer = await getPaymentTransfer();
-            const minWithdrawal = paymentTransfer.minWithdrawal;
+    if (totalInvested === 0) return 0
 
-            if (parseFloat(formJson.monthlyProfit.toString()) >= 10) {
+    return ((totalExpected - totalInvested) / totalInvested) * 100
+  }
 
-                const formData = {
-                    id: formJson.id,
-                    setting: {
-                        auto_profit: formJson.monthlyProfit,
-                        extend_contract: formJson.extend_contract == 'on' ? true : false
-                    }
-                }
+  const handleWithdraw = (investment: Investment) => {
+    setSelectedContract(investment)
+    setWithdrawDialogOpen(true)
+  }
+  const handleTerminate = (investment: Investment) => {
+    setSelectedContract(investment)
+    setTerminationDialogOpen(true)
+  }
 
-                const response = await updateSetting(formData)
-                if (!response.success) {
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(amount)
+  }
 
-                    throw new Error('Failed to update setting');
-                }
-                fetchData()
-                toast({
-                    title: 'Update setting successful',
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'active':
+      case 'completed':
+        return 'bg-green-500/20 text-green-500'
+      case 'pending':
+        return 'bg-yellow-500/20 text-yellow-500'
+      case 'failed':
+        return 'bg-red-500/20 text-red-500'
+      default:
+        return 'bg-gray-500/20 text-gray-500'
+    }
+  }
 
-                });
-            }
-            else {
-                toast({
-                    title: 'Error',
-                    description: `The amount must be greater than or equal to the minimum withdrawal amount of ${minWithdrawal} USD.`,
-                });
-                fetchData();
-                return;
-            }
-        } catch (error) {
-            console.error('Failed to update setting:', error);
-            fetchData();
-            // Revert state if API call fails
+  // Handle Press Update in Setting
+  async function handleChangeSetting(e: any) {
+    // Prevent the browser from reloading the page
+    e.preventDefault()
+
+    // Read the form data
+    const formData = new FormData(e.target)
+    const formJson = Object.fromEntries(formData.entries())
+
+    try {
+      const paymentTransfer = await getPaymentTransfer()
+      const minWithdrawal = paymentTransfer.minWithdrawal
+
+      if (parseFloat(formJson.monthlyProfit.toString()) >= 10) {
+        const formData = {
+          id: formJson.id,
+          setting: {
+            auto_profit: formJson.monthlyProfit,
+            extend_contract: formJson.extend_contract == 'on' ? true : false,
+          },
         }
+
+        const response = await updateSetting(formData)
+        if (!response.success) {
+          throw new Error('Failed to update setting')
+        }
+        fetchData()
+        toast({
+          title: 'Update setting successful',
+        })
+      } else {
+        toast({
+          title: 'Error',
+          description: `The amount must be greater than or equal to the minimum withdrawal amount of ${minWithdrawal} USD.`,
+        })
+        fetchData()
+        return
+      }
+    } catch (error) {
+      console.error('Failed to update setting:', error)
+      fetchData()
+      // Revert state if API call fails
     }
+  }
 
+  // Handle toggle switch and API update
+  const handleSwitchExtend = async (investment: any) => {
+    const investmentId = investment.id
+    const newCheckedState = !checkedStates[investmentId] // Toggle state
 
-    // Handle toggle switch and API update
-    const handleSwitchExtend = async (investment: any) => {
-        const investmentId = investment.id;
-        const newCheckedState = !checkedStates[investmentId]; // Toggle state
+    // Optimistically update UI
+    setCheckedStates((prevState: any) => ({
+      ...prevState,
+      [investmentId]: newCheckedState,
+    }))
+  }
 
-        // Optimistically update UI
-        setCheckedStates((prevState: any) => ({
-            ...prevState,
-            [investmentId]: newCheckedState,
-        }));
-    };
+  if (loading) {
+    return <Spinner />
+  }
 
-    if (loading) {
-        return <Spinner />;
-    }
+  if (!isLoggedIn) {
+    router.push('/join')
+    return <Spinner />
+  }
 
-    if (!isLoggedIn) {
-        router.push('/join');
-        return <Spinner />;
-    }
+  if (!isLoggedIn) {
+    router.push('/join')
+    return <Spinner />
+  }
 
     return (
 

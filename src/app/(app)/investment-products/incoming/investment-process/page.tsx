@@ -6,6 +6,7 @@ import { ProfitTable } from '@/components/beq-dynamic-fund/ProfitTable'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import ReportBack from '@/components/beq-dynamic-fund/ReportBack'
+import { DataDynamicFundProvider } from '@/components/beq-dynamic-fund/DataProvider'
 import { Term } from '@/lib/investment-products/dynamicFund'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -33,50 +34,19 @@ export default function InvestmentProcessPage() {
     <>
       <SiteHeader />
       <div className="container mx-auto py-10">
-        <h1 className="text-3xl font-bold mb-6 text-center">{t('investment_process_title')}</h1>
-        <div className="flex flex-col md:flex-row gap-6">
-          <div className="w-full md:w-1/3">
-            <InvestmentProcessForm onCalculate={setProfitData} onRequest={setRequestFormData} />
+        <h1 className="text-3xl font-bold mb-6 text-center">Giả Lập Kế Hoạch Tài Chính</h1>
+        <DataDynamicFundProvider>
+          <div className="flex flex-col md:flex-row gap-6">
+            <div className="w-full md:w-1/3">
+              <InvestmentProcessForm />
+            </div>
+            <div className="w-full md:w-2/3">
+              <ReportBack />
+
+              <ProfitTable />
+            </div>
           </div>
-          <div className="w-full md:w-2/3">
-            {requestFormData && (
-              <ReportBack
-                amount={(requestFormData as { amount: number }).amount}
-                term={(requestFormData as { term: Term }).term}
-                startDate={(requestFormData as { startDate: Date }).startDate}
-                endDate={(requestFormData as { endDate: Date }).endDate}
-                periods={(requestFormData as { periods: number }).periods}
-                dataExtra={(requestFormData as { dataExtra: object }).dataExtra}
-              />
-            )}
-            {Object.keys(profitData).length > 0 && (
-              <Tabs defaultValue="table" className="space-y-4">
-                <TabsList>
-                  <TabsTrigger value="table">{t('investment_process_table')}</TabsTrigger>
-                  <TabsTrigger value="chart">{t('chart')}</TabsTrigger>
-                </TabsList>
-                <TabsContent value="table" className="space-y-4">
-                {profitData?.map((entry, index) => (
-                    <div key={index}>
-                      <ProfitTable data={entry.profitLogs}/>
-                    </div>
-                  ))}
-                </TabsContent>
-                <TabsContent value="chart">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="capitalize">{t('chart')+' '+t('profit')}</CardTitle>
-                      <CardDescription>{t('investment_process_chart_decs')}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="pt-2">
-                      <ProfitChart profitData={formattedProfitData} />
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-              </Tabs>
-            )}
-          </div>
-        </div>
+        </DataDynamicFundProvider>
       </div>
       <SiteFooter />
     </>

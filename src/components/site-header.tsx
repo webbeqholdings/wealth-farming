@@ -17,42 +17,29 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Facebook, Gift, DollarSign, UserCircle, Settings, LogOut } from 'lucide-react'
+import { Facebook, Gift, DollarSign, UserCircle, Settings, LogOut, Wallet } from 'lucide-react'
+import { getBalanceAmountByUser } from '@/lib/account'
 import LanguageSwitch from './LanguageSwitcher'
 import { useTranslation } from 'react-i18next';
-
+import { me } from '@/lib/me'
 export function SiteHeader() {
   const { isLoggedIn, loading, user } = userStatus()
   const [balance, setBalance] = useState(0)
   const router = useRouter() // Use Next.js router for navigation
   const { t } = useTranslation(); 
   useEffect(() => {
-    const fetchData = async () => {
-      if(!user?.id){
-        return
-      }
-      try {
-        const response = await fetch(`/api/accounts?where[user][equals]=${user.id}`)
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        const data = await response.json()
-
-        // Calculate the total amount
-        const totalAmount = data.docs.reduce(
-          (sum: number, account: { amount: number }) => sum + account.amount,
-          0,
-        )
-        localStorage.setItem('total_amount', totalAmount)
-        localStorage.setItem('account_number', data.docs[2].account_number)
-        setBalance(totalAmount) // Update the balance state
-      } catch (err) {
-        console.log(err)
-      }
+    const fetchData: any = async () => {
+      const user = await me()
+      if (!user) return
+      const totalAmount: number = await getBalanceAmountByUser(user.id)
+      setBalance(totalAmount)
+      // @ts-nocheck
+      localStorage.setItem('total_amount', String(totalAmount))
+      localStorage.setItem('account_number', '%AccountNumber%')
     }
 
     fetchData() // Call the fetch function
-  }, [loading])
+  }, [loading, balance])
   // Handle logout
   const handleLogout = async () => {
     try {
@@ -82,8 +69,8 @@ export function SiteHeader() {
           <nav className="flex items-center space-x-2">
             {isLoggedIn ? (
               <>
-                <div className="flex items-center space-x-2 bg-muted p-2 rounded-md">
-                  <DollarSign className="h-4 w-4 text-green-500" />
+                <div className="hidden md:flex items-center space-x-2 bg-muted p-2 rounded-md">
+                  <Wallet className="h-4 w-4 text-green-500" />
                   <span className="font-medium">
                     {balance.toLocaleString('en-US', {
                               minimumFractionDigits: 2,

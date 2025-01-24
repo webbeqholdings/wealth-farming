@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { CalendarIcon } from 'lucide-react'
-import { format, differenceInDays, isBefore, addDays, getYear } from 'date-fns'
+import { format, differenceInDays, isBefore, isEqual, addDays, getYear } from 'date-fns'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
@@ -21,22 +21,26 @@ import {
   buildProfitRecordsQuarterly,
   buildProfitRecordsSemester,
   buildProfitRecordsMonthly,
+  // rateConfig,
   contractEndAt,
   contractMultiPeriodEndAt,
   standardApplyProgramDays,
   canCancelContractAt,
+  getlastBalance,
   buildProfitLogsAnnualy,
   buildProfitLogsSemester,
   buildProfitLogsQuarterly,
   buildProfitLogsMonthly,
 } from '@/lib/investment-products/dynamicFund'
-import { createTransactionInvestment } from '@/lib/transaction'
+import { createInvestment } from '@/lib/transaction'
 import { getPublicProducts } from '@/lib/investment-products/dynamicFundQuery'
 
 import { useToast } from '@/hooks/use-toast'
 import { notifyInvestment } from '@/lib/telegram'
 import { useRouter } from 'next/navigation'
 import userStatus from '@/lib/userStatus'
+import { me } from '@/lib/me'
+import { useDynamicFundData } from '@/components/beq-dynamic-fund/DataProvider'
 import { checkContractLarger90Days } from '@/lib/contract'
 import { useTranslation } from 'react-i18next'
 
@@ -45,26 +49,24 @@ const now = new Date()
 const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0)
 const tomorrow = addDays(startOfDay, 1)
 
-export function InvestmentProcessForm({
-  onCalculate,
-  onRequest,
-}: {
-  onCalculate: (data: any) => void
-  onRequest: (data: any) => void
-}) {
+export function InvestmentProcessForm() {
   const { t } = useTranslation()
   const { isLoggedIn } = userStatus()
   const router = useRouter()
+  const { setData } = useDynamicFundData()
 
   const [startDate, setStartDate] = useState<Date | undefined>(tomorrow)
   const [endDate, setEndDate] = useState<Date | undefined>(addDays(startDate, minRangeDays))
   const [term, setTerm] = useState<any>('annually')
-  const [productName, setProductName] = useState('BeQ Dynamic Fund Annually')
+  const [productId, setProductId] = useState(null)
   const [depositAmount, setDepositAmount] = useState<number>(10000)
   const [periods, setPeriods] = useState<number>(1)
-  const [dayCount, setDayCount] = useState<number>(0)
   const [rateConfig, setRateConfig] = useState([])
   const [isSiteLoading, setIsSiteLoading] = useState(true)
+  const [products, setProducts] = useState([])
+  const [productSelected, setProductSelected] = useState(null)
+  const [user, setUser] = useState(null)
+  const [profitData, setProfitData] = useState([])
 
   const { toast } = useToast()
 
@@ -79,10 +81,10 @@ export function InvestmentProcessForm({
           setIsSiteLoading(true)
           const MonthlyAvalable = await checkContractLarger90Days()
           const response: any = await getPublicProducts()
+          setProducts(response)
           if (MonthlyAvalable) {
             setRateConfig(response)
-          }
-          else {
+          } else {
             const no90Term = response.slice(1, 4)
             setRateConfig(no90Term)
           }
@@ -92,6 +94,11 @@ export function InvestmentProcessForm({
       }
 
       fetchRates()
+
+      const fetchUser = async () => {
+        setUser(await me())
+      }
+      fetchUser()
     }
 
     if (startDate && endDate) {
@@ -99,8 +106,6 @@ export function InvestmentProcessForm({
       if (daysDifference < minRangeDays) {
         setEndDate(addDays(startDate, minRangeDays))
       }
-
-      setDayCount(daysDifference)
     }
     setEndDate(contractMultiPeriodEndAt(startDate, term, periods))
   }, [startDate, term, periods])
@@ -131,7 +136,7 @@ export function InvestmentProcessForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    let profitData = []
+    let profitData: any = []
 
     if (startDate && endDate && depositAmount) {
       const daysDifference = differenceInDays(endDate, startDate)
@@ -162,53 +167,19 @@ export function InvestmentProcessForm({
         profitLog = await buildProfitLogsMonthly(depositAmount, startDate, endDate)
         profitData.push(profitLog)
       }
-
-      onCalculate(profitData)
-
-      onRequest({
-        amount: depositAmount,
-        term: term,
+      setData({
+        profitData: profitData,
+        productId: productId,
         startDate: startDate,
         endDate: endDate,
+        contractEndAt: contractEndAt(startDate, term),
+        canCancelContractAt: canCancelContractAt(startDate),
         periods: periods,
-        dataExtra: {
-          rateConfig: rateConfig,
-          standardApplyProgramDays: standardApplyProgramDays,
-          profitData: profitData,
-          contractEndAt: contractEndAt(startDate, term),
-          canCancelContractAt: canCancelContractAt(startDate), // +90 days
-        },
+        amount: depositAmount,
+        productSelected: productSelected,
+        publicProducts: products,
       })
     }
-  }
-
-  const calculateBalance = (term: string) => {
-    let build
-    if (term == 'annually') {
-      build = buildProfitRecordsAnnualy(depositAmount, startDate, endDate)
-    }
-
-    if (term == 'semester') {
-      build = buildProfitRecordsSemester(depositAmount, startDate, endDate)
-    }
-
-    if (term == 'quarterly') {
-      build = buildProfitRecordsQuarterly(depositAmount, startDate, endDate)
-    }
-
-    if (term == 'monthly') {
-      build = buildProfitRecordsMonthly(depositAmount, startDate, endDate)
-    }
-    const year = getYear(endDate)
-    const month = format(endDate, 'MM')
-
-    const dateProfitFilter = build[year].filter((item: any) => {
-      return format(item.date, 'MM') === month
-    })
-    if (!dateProfitFilter.length) {
-      return 0
-    }
-    return dateProfitFilter[0]?.balance
   }
 
   const handleInvestment = async () => {
@@ -217,27 +188,47 @@ export function InvestmentProcessForm({
       router.push('../../join')
       return // Optional: Show a redirect message
     }
+    let profitData: any = []
+    if (term == 'annually') {
+      profitData = buildProfitRecordsAnnualy(depositAmount, startDate, endDate)
+    }
+
+    if (term == 'semester') {
+      profitData = buildProfitRecordsSemester(depositAmount, startDate, endDate)
+    }
+
+    if (term == 'quarterly') {
+      profitData = buildProfitRecordsQuarterly(depositAmount, startDate, endDate)
+    }
+
+    if (term == 'monthly') {
+      profitData = buildProfitRecordsMonthly(depositAmount, startDate, endDate)
+    }
+
+    const expected_return = await getlastBalance(profitData)
 
     if (startDate && endDate && depositAmount > 0) {
       const formData = {
-        productName: productName,
-        expectedReturn: calculateBalance(term),
+        productId: productId,
         amount: depositAmount,
         term: term,
+        periods: periods,
         startDate: startDate,
         endDate: endDate,
-        periods: periods,
+        userId: user.id,
+        expected_return: expected_return,
       }
-      const response: any = await createTransactionInvestment(formData)
-      if (response.error) {
+      const response: any = await createInvestment(formData)
+
+      if (!response.isSuccess) {
         toast({
           title: 'Error',
-          description: response.message,
+          description: response.msg,
         })
         return
       }
 
-      notifyInvestment(response.data)
+      notifyInvestment(response.data.contract)
       toast({
         title: 'Success',
         description: 'Investment request has been submitted.',
@@ -251,7 +242,7 @@ export function InvestmentProcessForm({
     }
   }
 
-  if (isSiteLoading) return <div className="text-center">Loading rate configurations...</div>
+  if (isSiteLoading) return <div className="text-center">Loading Products...</div>
 
   return (
     <Card>
@@ -274,25 +265,25 @@ export function InvestmentProcessForm({
           <div className="space-y-2">
             <Label htmlFor="term">{t('interest_withdrawal_period')}</Label>
             <Select
-              value={term}
+              value={productId}
               onValueChange={(value: string) => {
-                const selectedRate = rateConfig.find((rate) => rate.term === value)
-                if (selectedRate) {
-                  setTerm(selectedRate.term)
-                  setProductName(selectedRate.product_name) // Update the product ID here
+                const selectedProduct = products.find((_prod) => _prod.id === value)
+                if (selectedProduct) {
+                  setProductId(Number(selectedProduct.id))
+                  setProductSelected(selectedProduct)
                 }
               }}
             >
-              <SelectTrigger id="term">
-                <SelectValue placeholder="Select term" />
+              <SelectTrigger id="products">
+                <SelectValue placeholder="Select Product" />
               </SelectTrigger>
               <SelectContent>
-                {rateConfig &&
-                  rateConfig.map((rate) => (
-                    <SelectItem key={rate.term} value={rate.term}>
-                      {rate.product_name}
+                {products &&
+                  products.map((prod: any) => (
+                    <SelectItem key={prod.id} value={prod.id}>
+                      {prod.product_name}
                       <span className="text-gray-400 mx-3">
-                        {(rate.rate_of_return * 100).toFixed(2)}% / {t('Tháng')}
+                        {(prod.rate_of_return * 100).toFixed(2)}% / {t('Tháng')}
                       </span>
                     </SelectItem>
                   ))}
