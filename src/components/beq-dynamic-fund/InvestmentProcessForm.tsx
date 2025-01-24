@@ -21,6 +21,10 @@ import {
   buildProfitRecordsQuarterly,
   buildProfitRecordsSemester,
   buildProfitRecordsMonthly,
+  buildProfitLogsAnnualy,
+  buildProfitLogsQuarterly,
+  buildProfitLogsSemester,
+  buildProfitLogsMonthly,
   contractEndAt,
   contractMultiPeriodEndAt,
   standardApplyProgramDays,
@@ -125,7 +129,7 @@ export function InvestmentProcessForm({
     setEndDate(date)
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     let profitData = []
 
@@ -139,21 +143,24 @@ export function InvestmentProcessForm({
       }
 
       if (term == 'annually') {
-        profitData = buildProfitRecordsAnnualy(depositAmount, startDate, endDate)
+        let data = await buildProfitLogsAnnualy(depositAmount, startDate, endDate)
+        profitData.push(data)
       }
 
       if (term == 'semester') {
-        profitData = buildProfitRecordsSemester(depositAmount, startDate, endDate)
+        let data = await buildProfitLogsSemester(depositAmount, startDate, endDate)
+        profitData.push(data)
       }
 
       if (term == 'quarterly') {
-        profitData = buildProfitRecordsQuarterly(depositAmount, startDate, endDate)
+        let data = await buildProfitLogsQuarterly(depositAmount, startDate, endDate)
+        profitData.push(data)
       }
 
       if (term == 'monthly') {
-        profitData = buildProfitRecordsMonthly(depositAmount, startDate, endDate)
+        let data = await buildProfitLogsMonthly(depositAmount, startDate, endDate)
+        profitData.push(data)
       }
-
       onCalculate(profitData)
 
       onRequest({
@@ -173,33 +180,25 @@ export function InvestmentProcessForm({
     }
   }
 
-  const calculateBalance = (term: string) => {
+  const calculateBalance = async (term: string) => {
     let build
     if (term == 'annually') {
-      build = buildProfitRecordsAnnualy(depositAmount, startDate, endDate)
+      build = await buildProfitLogsAnnualy(depositAmount, startDate, endDate)
     }
 
     if (term == 'semester') {
-      build = buildProfitRecordsSemester(depositAmount, startDate, endDate)
+      build = await buildProfitLogsSemester(depositAmount, startDate, endDate)
     }
 
     if (term == 'quarterly') {
-      build = buildProfitRecordsQuarterly(depositAmount, startDate, endDate)
+      build = await buildProfitLogsQuarterly(depositAmount, startDate, endDate)
     }
 
     if (term == 'monthly') {
-      build = buildProfitRecordsMonthly(depositAmount, startDate, endDate)
+      build = await buildProfitLogsMonthly(depositAmount, startDate, endDate)
     }
-    const year = getYear(endDate)
-    const month = format(endDate, 'MM')
 
-    const dateProfitFilter = build[year].filter((item: any) => {
-      return format(item.date, 'MM') === month
-    })
-    if (!dateProfitFilter.length) {
-      return 0
-    }
-    return dateProfitFilter[0]?.balance
+    return build?.balance
   }
 
   const handleInvestment = async () => {
