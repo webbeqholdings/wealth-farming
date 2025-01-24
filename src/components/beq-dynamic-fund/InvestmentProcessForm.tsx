@@ -58,7 +58,7 @@ export function InvestmentProcessForm() {
   const [startDate, setStartDate] = useState<Date | undefined>(tomorrow)
   const [endDate, setEndDate] = useState<Date | undefined>(addDays(startDate, minRangeDays))
   const [term, setTerm] = useState<any>('annually')
-  const [productId, setProductId] = useState(null)
+  const [productId, setProductId] = useState(9)
   const [depositAmount, setDepositAmount] = useState<number>(10000)
   const [periods, setPeriods] = useState<number>(1)
   const [rateConfig, setRateConfig] = useState([])
@@ -265,9 +265,9 @@ export function InvestmentProcessForm() {
           <div className="space-y-2">
             <Label htmlFor="term">{t('interest_withdrawal_period')}</Label>
             <Select
-              value={productId}
+              value={String(productId)}
               onValueChange={(value: string) => {
-                const selectedProduct = products.find((_prod) => _prod.id === value)
+                const selectedProduct = products.find((_prod) => String(_prod.id) === value); 
                 if (selectedProduct) {
                   setProductId(Number(selectedProduct.id))
                   setProductSelected(selectedProduct)
@@ -280,7 +280,7 @@ export function InvestmentProcessForm() {
               <SelectContent>
                 {products &&
                   products.map((prod: any) => (
-                    <SelectItem key={prod.id} value={prod.id}>
+                    <SelectItem key={prod.id} value={String(prod.id)}>
                       {prod.product_name}
                       <span className="text-gray-400 mx-3">
                         {(prod.rate_of_return * 100).toFixed(2)}% / {t('Tháng')}

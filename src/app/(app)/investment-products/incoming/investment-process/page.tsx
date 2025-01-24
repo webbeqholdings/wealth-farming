@@ -34,7 +34,7 @@ export default function InvestmentProcessPage() {
     <>
       <SiteHeader />
       <div className="container mx-auto py-10">
-        <h1 className="text-3xl font-bold mb-6 text-center">Giả Lập Kế Hoạch Tài Chính</h1>
+        <h1 className="text-3xl font-bold mb-6 text-center">{t('investment_process_title')}</h1>
         <DataDynamicFundProvider>
           <div className="flex flex-col md:flex-row gap-6">
             <div className="w-full md:w-1/3">

@@ -20,7 +20,7 @@ const ReportBack = () => {
     amount,
     publicProducts,
   } = data
-  if (!startDate || !endDate || !productSelected) return '...'
+  if (!startDate || !endDate || !productSelected) return ''
 
   let termDescriptionConfig = [
     {

@@ -39,7 +39,7 @@ type ProfitData = Record<string, ProfitItem[]>
 export function ProfitTable() {
   const { data } = useDynamicFundData()
   const profitData: ProfitData = (data as { profitData: ProfitData }).profitData
-  if (!profitData) return <>No data</>
+  if (!profitData) return <></>
 
   const formattedProfitData = Object.entries(profitData).flatMap(([year, items]) =>
     items.map((item: ProfitItem) => ({
