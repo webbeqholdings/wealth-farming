@@ -267,7 +267,9 @@ export const IsInvest = async (user_id: number): Promise<Boolean> => {
 }
 
 export const createInvestment = async (formData: any) => {
-  const { userId, amount, startDate, endDate, productId, periods, term } = formData
+  const headers = await nextHeaders()
+  const auth = await payload.auth({ headers })
+  const { userId, amount, startDate, endDate, productName, periods, term } = formData
 
   if (amount <= 0) {
     return {
@@ -276,10 +278,15 @@ export const createInvestment = async (formData: any) => {
     }
   }
 
-  const product_doc = await payload.findByID({
+  const product = await payload.find({
     collection: 'investment-products',
-    id: productId,
+    where: {
+      product_name: {
+        equals: productName,
+      },
+    }
   })
+  const product_doc = product.docs[0]
 
   if (!product_doc) {
     return {
@@ -288,14 +295,14 @@ export const createInvestment = async (formData: any) => {
     }
   }
 
-  const account_id = await getAccountIdInvestmentByUser(userId)
+  const account_id = await getAccountIdInvestmentByUser(auth.user.id )
 
   const transaction_doc = await payload.create({
     collection: 'transactions',
     data: {
-      user: Number(userId),
+      user: auth.user.id ,
       amount: Number(amount),
-      investment_product: productId,
+      investment_product: product_doc.id,
       status: 'completed',
       account_from: account_id,
       type: 'investment',
@@ -306,7 +313,7 @@ export const createInvestment = async (formData: any) => {
   const userReferral = await payload.find({
     collection: 'user-referrals',
     where: {
-      child: { equals: userId },
+      child: { equals: auth.user.id  },
     },
   })
  
@@ -333,7 +340,7 @@ export const createInvestment = async (formData: any) => {
   const contract_doc = await payload.create({
     collection: 'contracts',
     data: {
-      user: Number(userId),
+      user: Number(auth.user.id ),
       amount: Number(amount),
       balance: Number(amount),
       expected_return: formData.expected_return,

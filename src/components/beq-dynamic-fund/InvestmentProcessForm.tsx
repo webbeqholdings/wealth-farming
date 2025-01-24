@@ -212,7 +212,7 @@ export function InvestmentProcessForm({
     if (startDate && endDate && depositAmount > 0) {
       const formData = {
         productName: productName,
-        expectedReturn: calculateBalance(term),
+        expected_return: calculateBalance(term),
         amount: depositAmount,
         term: term,
         startDate: startDate,
