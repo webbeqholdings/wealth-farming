@@ -161,8 +161,6 @@ export function InvestmentProcessForm({
         let data = await buildProfitLogsMonthly(depositAmount, startDate, endDate)
         profitData.push(data)
       }
-      console.log(profitData)
-
       onCalculate(profitData)
 
       onRequest({
