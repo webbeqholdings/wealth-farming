@@ -172,9 +172,9 @@ export function BankAccountForm({
     <div>
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>{t('Add Bank Account')}</CardTitle>
+          <CardTitle>{t('add_bank_account')}</CardTitle>
           <CardDescription>
-            {t('Enter your bank account details for deposits and withdrawals.')}
+            {t('bank_account_details')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -185,11 +185,11 @@ export function BankAccountForm({
                 name="accountName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('Account Name')}</FormLabel>
+                    <FormLabel>{t('account_name')}</FormLabel>
                     <FormControl>
-                      <Input placeholder={t("Enter account name")} {...field} />
+                      <Input placeholder={t('enter_account_name')} {...field} />
                     </FormControl>
-                    <FormDescription>{t('The name as it appears on your bank account.')}</FormDescription>
+                    <FormDescription>{t('bank_account_name_note')}</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -199,11 +199,11 @@ export function BankAccountForm({
                 name="accountNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('Account Number')}</FormLabel>
+                    <FormLabel>{t('account_number')}</FormLabel>
                     <FormControl>
-                      <Input placeholder={t("Enter account number")} {...field} />
+                      <Input placeholder={t("enter_account_number")} {...field} />
                     </FormControl>
-                    <FormDescription>{t('Your bank account number.')}</FormDescription>
+                    <FormDescription>{t('bank_account_number_note')}</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -216,11 +216,11 @@ export function BankAccountForm({
                   name="bankName"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>{t('Bank Name')}</FormLabel>
+                      <FormLabel>{t('bank_name')}</FormLabel>
                       <FormControl>
                         <BankCombobox value={field.value} onChange={field.onChange} />
                       </FormControl>
-                      <FormDescription>{t('Your bank name.')}</FormDescription>
+                      <FormDescription>{t('bank_name_note')}</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -230,36 +230,36 @@ export function BankAccountForm({
                   name="branch"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>{t('Branch')}</FormLabel>
+                      <FormLabel>{t('branch')}</FormLabel>
                       <FormControl>
-                        <Input placeholder={t("Enter branch name")} {...field} />
+                        <Input placeholder={t("enter_branch_name")} {...field} />
                       </FormControl>
-                      <FormDescription>{t('Your branch.')}</FormDescription>
+                      <FormDescription>{t('branch_note')}</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
               <Button type="submit" className="bg-primary hover:bg-primary/90 text-black">
-                {t('Add Bank Account')}
+                {t('add_bank_account')}
               </Button>
             </form>
           </Form>
         </CardContent>
         <Separator />
         <CardHeader>
-          <CardTitle>{t('Your Bank Accounts')}</CardTitle>
-          <CardDescription>{t('Manage your registered bank accounts.')}</CardDescription>
+          <CardTitle>{t('your_bank_accounts')}</CardTitle>
+          <CardDescription>{t('manage_registered_banks')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{t('Account Name')}</TableHead>
-                <TableHead>{t('Account Number')}</TableHead>
-                <TableHead>{t('Bank Name')}</TableHead>
-                <TableHead>{t('Branch')}</TableHead>
-                <TableHead>{t('Action')}</TableHead> {/* Add action column */}
+                <TableHead>{t('account_name')}</TableHead>
+                <TableHead>{t('account_number')}</TableHead>
+                <TableHead>{t('bank_name')}</TableHead>
+                <TableHead>{t('branch')}</TableHead>
+                <TableHead>{t('action')}</TableHead> {/* Add action column */}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -286,17 +286,17 @@ export function BankAccountForm({
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t('Are you sure?')}</DialogTitle>
+            <DialogTitle>{t('are_you_sure')}</DialogTitle>
             <DialogDescription>
-              {t('This action will permanently delete the bank account. Do you want to proceed?')}
+              {t('delete_account_warning')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button onClick={handleCancel} color="gray" size="sm">
-              {t('Cancel')}
+              {t('cancel')}
             </Button>
             <Button onClick={() => handleDelete(bankId)} color="red" size="sm">
-              {t('Delete')}
+              {t('delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

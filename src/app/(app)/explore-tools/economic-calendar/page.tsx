@@ -107,12 +107,12 @@ export default function EconomicCalendar() {
     <>
       <SiteHeader />
       <div className='container mx-auto py-8'>
-        <h1 className='text-3xl font-bold mb-6'>{t('Economic Calendar')}</h1>
+        <h1 className='text-3xl font-bold mb-6'>{t('econ_calendar')}</h1>
         <div className='grid gap-6 md:grid-cols-[300px_1fr]'>
           <Card>
             <CardHeader>
-              <CardTitle>{t('Filters')}</CardTitle>
-              <CardDescription>{t('Select date and currency')}</CardDescription>
+              <CardTitle>{t('filters')}</CardTitle>
+              <CardDescription>{t('select_date_currency')}</CardDescription>
             </CardHeader>
             <CardContent className='space-y-4'>
               <Calendar
@@ -122,26 +122,26 @@ export default function EconomicCalendar() {
                 className='rounded-md border shadow'
               />
               <Button onClick={clearFilters} variant='outline' className='w-full'>
-                {t('Clear Filters')}
+                {t('clear_filters')}
               </Button>
             </CardContent>
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>{t('Economic Events')}</CardTitle>
+              <CardTitle>{t('econ_events')}</CardTitle>
               <CardDescription>
-                {t('Showing events for {{day}}', {day: t(date ? date.toDateString() : 'all dates')})}
+                {t('showing_events_for', {day: t(date ? date.toDateString() : 'all_dates')})}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>{t('Date')}</TableHead>
-                    <TableHead>{t('Time')}</TableHead>
-                    <TableHead>{t('Currency')}</TableHead>
-                    <TableHead>{t('Event')}</TableHead>
-                    <TableHead>{t('Impact')}</TableHead>
+                    <TableHead>{t('date')}</TableHead>
+                    <TableHead>{t('time')}</TableHead>
+                    <TableHead>{t('currency')}</TableHead>
+                    <TableHead>{t('event')}</TableHead>
+                    <TableHead>{t('impact')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -170,7 +170,7 @@ export default function EconomicCalendar() {
                   ) : (
                     <TableRow>
                       <TableCell colSpan={8} className='text-center'>
-                        {t('No events found for the selected date.')}
+                        {t('no_events_found')}
                       </TableCell>
                     </TableRow>
                   )}

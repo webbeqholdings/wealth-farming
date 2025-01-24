@@ -33,65 +33,60 @@ const metadata: Metadata = {
 export default function IndexPage() {
   const { t } = useTranslation();
   const announcements = [
-    'Welcome to BeQ Wealth Farming Fund!',
-    'New investment opportunity: Green Energy Farms',
-    'Webinar: Sustainable Investing Strategies - Register Now',
-    'Q2 Performance Report Now Available',
-    'Join our Discord community for daily market insights',
+    t('welcome_message'),
+    t('new_opportunity'),
+    t('webinar'),
+    t('q2_report'),
+    t('join_discord'),
   ]
 
   const steps = [
     {
       number: '1',
-      title: 'Create Account',
-      description: 'Simply enter the code on the verification page to complete your signup.',
+      title: t('create_account'),
+      description: t('enter_code'),
       icon: Mail,
-      buttonText: 'Sign Up Now',
+      buttonText: t('sign_up_now'),
       buttonHref: '/join',
     },
     {
       number: '2',
-      title: 'Make Deposit',
-      description: 'Fund your account easily on the BeQ Web or App.',
+      title: t('make_deposit'),
+      description: t('fund_account'),
       icon: Wallet,
       buttonText: 'Deposit Now',
       buttonHref: '/account/deposit',
     },
     {
       number: '3',
-      title: 'Start Investing',
-      description: 'Kick off your journey with your favorite Spot pairs or Futures contracts!',
+      title: t('start_investing'),
+      description: t('start_journey'),
       icon: BarChart3,
-      buttonText: 'Trade Now',
+      buttonText: t('trade_now'),
       buttonHref: 'investment-products/incoming/investment-process',
     },
   ]
 
   const faqs = [
     {
-      question: 'What is BeQ Wealth Farming Fund?',
-      answer:
-        'BeQ Wealth Farming Fund is an innovative investment platform that focuses on agricultural and sustainable farming projects. We combine traditional farming wisdom with cutting-edge technology to offer unique investment opportunities.',
+      question: t('beq_fund'),
+      answer: t('beq_fund_info'),
     },
     {
-      question: 'How do I start investing with BeQ?',
-      answer:
-        'To start investing with BeQ, you need to create an account, verify your identity, and make an initial deposit. Once your account is funded, you can browse available investment opportunities and allocate your funds according to your preferences.',
+      question: t('start_investing_question'),
+      answer: t('start_investing_info'),
     },
     {
-      question: 'What types of investments does BeQ offer?',
-      answer:
-        'BeQ offers a range of agricultural investments, including crop farming, livestock, sustainable agriculture technologies, and agri-tech startups. Our portfolio is diversified to balance risk and potential returns.',
+      question: t('investment_types'),
+      answer: t('investment_types_info'),
     },
     {
-      question: 'Is there a minimum investment amount?',
-      answer:
-        'Yes, the minimum investment amount varies depending on the specific opportunity. Generally, our entry-level investments start at $500, but some specialized projects may have higher minimums.',
+      question: t('min_investment'),
+      answer: t('min_investment_info'),
     },
     {
-      question: 'How are returns generated and distributed?',
-      answer:
-        'Returns are generated through the successful operation and harvest of our farming projects, as well as the appreciation of agri-tech investments. Profits are distributed to investors based on their stake in each project, typically on a quarterly or annual basis.',
+      question: t('returns'),
+      answer: t('returns_info'),
     },
   ]
 
@@ -112,10 +107,10 @@ export default function IndexPage() {
 
         <div className="container mx-auto px-0 md:py-14">
           <div className="mt-10 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">
-            {t('Get Started in 30 Seconds!')}
+            {t('get_started')}
           </div>
           <p className="leading-7 [&:not(:first-child)]:mt-6">
-            {t('Provide your email address and check your inbox for a 6-digit verification code.')}
+            {t('email_prompt')}
           </p>
 
           <div className="grid gap-8 md:grid-cols-3">
@@ -144,15 +139,15 @@ export default function IndexPage() {
         <div className="container mx-auto px-0 md:py-14">
           <div className="mt-10 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">
             <div className="text-xl font-semibold tracking-tight pb-1">
-              {t('All investing involves risk.')}
+              {t('risk_warning')}
             </div>
-            {t('With Wealth Farming, that is not very risky.')}
+            {t('wealth_farming_risk')}
           </div>
           <FeaturesSection />
         </div>
 
         <div className="container mx-auto px-0 md:py-14">
-          <h2 className="text-3xl font-bold mb-8">{t('Frequently Asked Questions')}</h2>
+          <h2 className="text-3xl font-bold mb-8">{t('faq')}</h2>
           <Accordion type="single" collapsible className="w-full">
             {faqs.map((faq, index) => (
               <AccordionItem key={index} value={`item-${index}`}>

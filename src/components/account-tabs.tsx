@@ -23,8 +23,8 @@ export function AccountTabs({
   return (
     <Tabs defaultValue="bank" className="w-full">
       <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="bank">{t('Bank Account')}</TabsTrigger>
-        <TabsTrigger value="crypto">{t('Crypto Wallet')}</TabsTrigger>
+        <TabsTrigger value="bank">{t('bank_account')}</TabsTrigger>
+        <TabsTrigger value="crypto">{t('crypto_wallet')}</TabsTrigger>
       </TabsList>
       <TabsContent value="bank">
         <BankAccountForm accounts={bankAccounts} setAccounts={setBankAccounts} />

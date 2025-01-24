@@ -26,17 +26,17 @@ export default function InvestmentSimulatorPage() {
     <div>
       <SiteHeader />
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">{t('Investment Simulator')}</h1>
+        <h1 className="text-3xl font-bold mb-6">{t('inv_sim')}</h1>
         <Card>
           <CardHeader>
-            <CardTitle>{t('Compare Investment Terms')}</CardTitle>
+            <CardTitle>{t('compare_term')}</CardTitle>
             <CardDescription>
-              {t('Adjust the initial deposit and compare different investment terms.')}
+              {t('adjust_deposit')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="mb-6">
-              <Label htmlFor="principal">{t('Initial Deposit')}</Label>
+              <Label htmlFor="principal">{t('init_deposit')}</Label>
               <Input
                 id="principal"
                 type="number"
@@ -46,7 +46,7 @@ export default function InvestmentSimulatorPage() {
               />
             </div>
             <div className="mb-6">
-              <Label htmlFor="principal">{t('Months')}</Label>
+              <Label htmlFor="principal">{t('months')}</Label>
               <Input
                 id="months"
                 type="number"

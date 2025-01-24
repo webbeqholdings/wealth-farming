@@ -21,12 +21,16 @@ import {
   buildProfitRecordsQuarterly,
   buildProfitRecordsSemester,
   buildProfitRecordsMonthly,
+  buildProfitLogsAnnualy,
+  buildProfitLogsQuarterly,
+  buildProfitLogsSemester,
+  buildProfitLogsMonthly,
   contractEndAt,
   contractMultiPeriodEndAt,
   standardApplyProgramDays,
   canCancelContractAt,
 } from '@/lib/investment-products/dynamicFund'
-import { createTransactionInvestment } from '@/lib/transaction'
+import { createInvestment } from '@/lib/transaction'
 import { getPublicProducts } from '@/lib/investment-products/dynamicFundQuery'
 
 import { useToast } from '@/hooks/use-toast'
@@ -125,7 +129,7 @@ export function InvestmentProcessForm({
     setEndDate(date)
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     let profitData = []
 
@@ -139,21 +143,24 @@ export function InvestmentProcessForm({
       }
 
       if (term == 'annually') {
-        profitData = buildProfitRecordsAnnualy(depositAmount, startDate, endDate)
+        let data = await buildProfitLogsAnnualy(depositAmount, startDate, endDate)
+        profitData.push(data)
       }
 
       if (term == 'semester') {
-        profitData = buildProfitRecordsSemester(depositAmount, startDate, endDate)
+        let data = await buildProfitLogsSemester(depositAmount, startDate, endDate)
+        profitData.push(data)
       }
 
       if (term == 'quarterly') {
-        profitData = buildProfitRecordsQuarterly(depositAmount, startDate, endDate)
+        let data = await buildProfitLogsQuarterly(depositAmount, startDate, endDate)
+        profitData.push(data)
       }
 
       if (term == 'monthly') {
-        profitData = buildProfitRecordsMonthly(depositAmount, startDate, endDate)
+        let data = await buildProfitLogsMonthly(depositAmount, startDate, endDate)
+        profitData.push(data)
       }
-
       onCalculate(profitData)
 
       onRequest({
@@ -173,33 +180,25 @@ export function InvestmentProcessForm({
     }
   }
 
-  const calculateBalance = (term: string) => {
+  const calculateBalance = async (term: string) => {
     let build
     if (term == 'annually') {
-      build = buildProfitRecordsAnnualy(depositAmount, startDate, endDate)
+      build = await buildProfitLogsAnnualy(depositAmount, startDate, endDate)
     }
 
     if (term == 'semester') {
-      build = buildProfitRecordsSemester(depositAmount, startDate, endDate)
+      build = await buildProfitLogsSemester(depositAmount, startDate, endDate)
     }
 
     if (term == 'quarterly') {
-      build = buildProfitRecordsQuarterly(depositAmount, startDate, endDate)
+      build = await buildProfitLogsQuarterly(depositAmount, startDate, endDate)
     }
 
     if (term == 'monthly') {
-      build = buildProfitRecordsMonthly(depositAmount, startDate, endDate)
+      build = await buildProfitLogsMonthly(depositAmount, startDate, endDate)
     }
-    const year = getYear(endDate)
-    const month = format(endDate, 'MM')
 
-    const dateProfitFilter = build[year].filter((item: any) => {
-      return format(item.date, 'MM') === month
-    })
-    if (!dateProfitFilter.length) {
-      return 0
-    }
-    return dateProfitFilter[0]?.balance
+    return build?.balance
   }
 
   const handleInvestment = async () => {
@@ -212,14 +211,14 @@ export function InvestmentProcessForm({
     if (startDate && endDate && depositAmount > 0) {
       const formData = {
         productName: productName,
-        expectedReturn: calculateBalance(term),
+        expected_return: calculateBalance(term),
         amount: depositAmount,
         term: term,
         startDate: startDate,
         endDate: endDate,
         periods: periods,
       }
-      const response: any = await createTransactionInvestment(formData)
+      const response: any = await createInvestment(formData)
       if (response.error) {
         toast({
           title: 'Error',
@@ -247,12 +246,12 @@ export function InvestmentProcessForm({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t('Kế hoạch đầu tư')}</CardTitle>
+        <CardTitle>{t('investment_plan')}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="depositAmount">{t('Số tiền USD tham gia')}</Label>
+            <Label htmlFor="depositAmount">{t('usd_amount_invested')}</Label>
             <Input
               id="depositAmount"
               type="number"
@@ -263,7 +262,7 @@ export function InvestmentProcessForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="term">{t('Kì Hạn Rút Lãi')}</Label>
+            <Label htmlFor="term">{t('interest_withdrawal_period')}</Label>
             <Select
               value={term}
               onValueChange={(value: string) => {
@@ -283,7 +282,7 @@ export function InvestmentProcessForm({
                     <SelectItem key={rate.term} value={rate.term}>
                       {rate.product_name}
                       <span className="text-gray-400 mx-3">
-                        {(rate.rate_of_return * 100).toFixed(2)}% / {t('Tháng')}
+                        {(rate.rate_of_return * 100).toFixed(2)}% / {t('month')}
                       </span>
                     </SelectItem>
                   ))}
@@ -292,7 +291,7 @@ export function InvestmentProcessForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="startDate">{t('Ngày tham gia')}</Label>
+            <Label htmlFor="startDate">{t('join_date')}</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -301,7 +300,7 @@ export function InvestmentProcessForm({
                     }`}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {startDate ? format(startDate, 'PPP') : 'Pick a date'}
+                  {startDate ? format(startDate, 'd/MM/yyyy') : 'Pick a date'}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -320,7 +319,7 @@ export function InvestmentProcessForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="endDate">{t('Ngày kết thúc hợp đồng')}</Label>
+            <Label htmlFor="endDate">{t('contract_end_date')}</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -329,7 +328,7 @@ export function InvestmentProcessForm({
                     }`}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {endDate ? format(endDate, 'PPP') : 'Pick a date'}
+                  {endDate ? format(endDate, 'd/MM/yyyy') : t('pick_date')}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -348,7 +347,7 @@ export function InvestmentProcessForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="periods">{t('Số chu kì tham gia')}</Label>
+            <Label htmlFor="periods">{t('investment_periods')}</Label>
             <Input
               id="periods"
               type="number"
@@ -359,7 +358,7 @@ export function InvestmentProcessForm({
           </div>
 
           <Button type="submit" className="w-full">
-            {t('Tính Kết Quả')}
+            {t('calculate_result')}
           </Button>
         </form>
         <Button
@@ -367,7 +366,7 @@ export function InvestmentProcessForm({
           onClick={() => handleInvestment()}
           className="w-full mt-2 bg-green-600 text-white hover:bg-green-500"
         >
-          {t('Submit Investment')}
+          {t('submit_investment')}
         </Button>
       </CardContent>
     </Card>

@@ -158,12 +158,46 @@ export const getChildrenByParentId = async (parent_id: number): Promise<object[]
   return referrals.docs
 }
 
-export const getCountChildren = async (parent_id: number) => {}
-export const getCountInvestChildren = async (parent_id: number) => {
+export const getCountChildren = async (parent_id: number): Promise<number> => {
+  return (await getChildrenByParentId(parent_id)).length
+}
+export const getCountDepositedChildren = async (parent_id: number): Promise<number> => {
   const children = await getChildrenByParentId(parent_id)
 
-  const count = 0
-  children.forEach((child: any) => {})
+  return children.filter((child: any) => {
+    return isDeposit(child.id)
+  }).length
+}
+
+export const getTotalEarning = async (parent_id: number) => {
+  const data = await payload.find({
+    collection: 'transactions',
+    where: {
+      user: { equals: parent_id },
+      type: { equals: 'referral_reward' },
+      status: { equals: 'completed' },
+    },
+  })
+
+  let totalEarning = 0
+  data.docs.map((t: any) => {
+    totalEarning += t.amount
+  })
+
+  return totalEarning
+}
+
+export const isDeposit = async (user_id: number): Promise<Boolean> => {
+  const data = await payload.find({
+    collection: 'transactions',
+    where: {
+      user: { equals: user_id },
+      type: { equals: 'deposit' },
+      status: { equals: 'completed' },
+    },
+  })
+
+  return Boolean(data.totalDocs)
 }
 
 export const getCurrentLevelRate = async (total: number) => {
@@ -171,12 +205,25 @@ export const getCurrentLevelRate = async (total: number) => {
 
   for (let rate of config_rates) {
     if (total >= rate.min && total < rate.max) {
-      return rate
+      return rate.rate
     }
   }
 
   if (config_rates[config_rates.length - 1].max < total)
     return config_rates[config_rates.length - 1].rate
+}
+
+export const getCurrentLevelName = async (total: number) => {
+  const config_rates = await getConfigRates()
+
+  for (let rate of config_rates) {
+    if (total >= rate.min && total < rate.max) {
+      return rate.name
+    }
+  }
+
+  if (config_rates[config_rates.length - 1].max < total)
+    return config_rates[config_rates.length - 1].name
 }
 
 export const getInvestmentAmountByParent = async (parent_id: number): Promise<number> => {

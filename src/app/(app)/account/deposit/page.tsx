@@ -36,6 +36,7 @@ import CurrencyConverter, { useCurrencyConverter } from '@/components/CurrencyCo
 import { getAccountsByUserId } from '../../../../lib/account'
 import { getPaymentTransfer } from '@/lib/paymentTransfer'
 import Spinner from '@/components/Spinner'
+import { createDeposit, getSumAmountBalanceByAccount } from '@/lib/transaction'
 import { useTranslation } from 'react-i18next';
 
 // Steps component definition
@@ -98,6 +99,7 @@ export default function DepositPage() {
   const [banks, setBanks] = useState([])
   const [selectBank, setSelectBank] = useState(null)
   const [fromAccount, setFromAccount] = useState(null)
+  const [toAccount, setToAccount] = useState(null)
   const [selectedBalance, setSelectedBalance] = useState(0)
   const [exchangeRate, setExchangeRate] = useState(1) // Default exchange rate
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
@@ -124,13 +126,13 @@ export default function DepositPage() {
     if (!validateStep()) {
       toast({
         title: 'Error',
-        description: 'Some fields are missing or invalid.'
+        description: 'Some fields are missing or invalid.',
       })
     }
     if (USDCurrency < minDeposit && Number(USDCurrency) > 0) {
       toast({
         title: `Error`,
-        description: `The amount must be greater than or equal to the minimum withdrawal amount of ${minDeposit} USD.`
+        description: `The amount must be greater than or equal to the minimum withdrawal amount of ${minDeposit} USD.`,
       })
     } else if (validateStep()) {
       if (step < 3) setStep(step + 1)
@@ -141,11 +143,12 @@ export default function DepositPage() {
     if (step > 1) setStep(step - 1)
   }
 
-  const handleFromAccountChange = (accountId: string) => {
+  const handleToAccountOnChange = (accountId: string) => {
     const numericAccountId = Number(accountId) // Convert the string to a number
     const selectedAccount = accounts.find((account) => account.id === numericAccountId)
-    setFromAccount(numericAccountId.toString()) // Store the numeric ID in state
-    setSelectedBalance(selectedAccount?.amount || 0)
+    setToAccount(numericAccountId.toString()) // Store the numeric ID in state
+
+    setSelectedBalance(selectedAccount?.balance || 0)
   }
 
   const handleBankChange = (bankId: string) => {
@@ -156,7 +159,7 @@ export default function DepositPage() {
     const newErrors: { [key: string]: string } = {}
 
     if (step === 1) {
-      if (!fromAccount) newErrors.fromAccount = 'Please select an account.'
+      if (!toAccount) newErrors.toAccount = 'Please select an account.'
       if (!USDCurrency || Number(USDCurrency) <= 0)
         newErrors.USDCurrency = 'Please enter a valid deposit amount.'
       if (!selectBank) newErrors.selectBank = 'Please select a bank.'
@@ -164,14 +167,14 @@ export default function DepositPage() {
 
     if (step === 2) {
       if (!depositScreenshot) {
-        newErrors.depositScreenshot = 'Please upload a valid deposit screenshot.';
+        newErrors.depositScreenshot = 'Please upload a valid deposit screenshot.'
       }
     }
 
     if (step === 3) {
       if (!USDCurrency || Number(USDCurrency) <= 0)
         newErrors.USDCurrency = 'Amount is required for confirmation.'
-      if (!fromAccount) newErrors.fromAccount = 'Account selection is missing for confirmation.'
+      if (!toAccount) newErrors.toAccount = 'Account selection is missing for confirmation.'
       if (!selectBank) newErrors.selectBank = 'Bank selection is missing for confirmation.'
     }
 
@@ -180,9 +183,9 @@ export default function DepositPage() {
   }
   useEffect(() => {
     const fetchPaymentTransfer = async () => {
-      const paymentTransfer = await getPaymentTransfer();
+      const paymentTransfer = await getPaymentTransfer()
       setMinDeposit(paymentTransfer.minDeposit)
-      setBankQRCode(paymentTransfer.bankQrCode.url)
+      setBankQRCode(paymentTransfer.bankQrCode?.url)
       setCryptoWalletQrCodeUrl(paymentTransfer.cryptoWalletQrCode.url)
       setCryptoWalletNetwork(paymentTransfer.cryptoWalletNetwork)
       setCryptoWalletAddress(paymentTransfer.cryptoWalletAddress)
@@ -225,8 +228,12 @@ export default function DepositPage() {
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
-        if (user && user?.id) {
-          const accountsData = await getAccountsByUserId(user.id)
+        if (user && user.id) {
+          let accountsData = await getAccountsByUserId(user.id)
+          accountsData.map(async (_acc: any) => {
+            _acc.balance = await getSumAmountBalanceByAccount(_acc.id)
+            return _acc
+          })
           if (accountsData) {
             setAccounts(accountsData)
           }
@@ -279,11 +286,10 @@ export default function DepositPage() {
     } else {
       toast({
         title: 'Error',
-        description: 'Please select a file to upload.'
-      });
+        description: 'Please select a file to upload.',
+      })
     }
-  };
-
+  }
 
   const uploadScreenshot = async (formData: FormData) => {
     try {
@@ -319,7 +325,7 @@ export default function DepositPage() {
     if (!validateStep()) {
       toast({
         title: 'Error',
-        description: 'Please review the form and fix errors before submitting.'
+        description: 'Please review the form and fix errors before submitting.',
       })
       return
     }
@@ -332,33 +338,19 @@ export default function DepositPage() {
         depositScreenshotId = await uploadScreenshot(depositScreenshot)
       }
 
-      // Construct the request payload
-      const payload = {
+      const responseDeposit = await createDeposit({
         user_id: Number(user.id),
-        bank_id: Number(selectBank),
+        bank: Number(selectBank),
         amount: Number(USDCurrency),
-        status: 'pending',
-        from_account: Number(fromAccount),
-        type: 'deposit',
-        currency: currency,
+        account_to: Number(toAccount),
+        currency: 'USD',
         deposit_screenshot: depositScreenshotId, // Include the screenshot ID
-      }
-
-      // Make the API request
-      const response = await fetch('/api/transaction/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
       })
 
-      const data = await response.json()
-      notifyDeposit(data.data) // Call notifyDeposit and get its response
+      notifyDeposit(responseDeposit.data) // Call notifyDeposit and get its response
 
-      if (!response.ok) {
-        const errorMessage = data.response?.error || 'An unknown error occurred'
-        throw new Error(errorMessage)
+      if (!responseDeposit.isSuccess) {
+        throw new Error('error Deposit')
       }
 
       toast({
@@ -395,19 +387,19 @@ export default function DepositPage() {
               <Step title="Method" />
               <Step title="Confirm" />
             </Steps>
-            <form>
+            <div>
               {step === 1 && (
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="fromAccount">{t('account')}</Label>
-                    <Select value={fromAccount} onValueChange={handleFromAccountChange}>
-                      <SelectTrigger id="fromAccount">
+                    <Label htmlFor="accountTo">{t('account')}</Label>
+                    <Select value={toAccount} onValueChange={handleToAccountOnChange}>
+                      <SelectTrigger id="accountTo">
                         <SelectValue placeholder="Select account" />
                       </SelectTrigger>
                       <SelectContent>
-                        {accounts.map((account) => (
-                          <SelectItem key={account.id} value={account.id.toString()}>
-                            {account.account_name}
+                        {accounts.map((acc) => (
+                          <SelectItem key={acc.id} value={acc.id.toString()}>
+                            {acc.account_name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -419,9 +411,7 @@ export default function DepositPage() {
                         currency: 'USD',
                       })}
                     </p>
-                    {errors.fromAccount && (
-                      <p className="text-red-500 text-sm">{errors.fromAccount}</p>
-                    )}
+                    {errors.toAccount && <p className="text-red-500 text-sm">{errors.toAccount}</p>}
                   </div>
 
                   <CurrencyConverter setUSDCurrency={setUSDCurrency} />
@@ -429,7 +419,7 @@ export default function DepositPage() {
                     <p className="text-red-500 text-sm">{errors.USDCurrency}</p>
                   )}
                   <div className="space-y-2">
-                    <Label htmlFor="fromAccount">{t('bank_account')}</Label>
+                    <Label htmlFor="bank">{t('bank_account')}</Label>
                     <Select value={selectBank} onValueChange={handleBankChange}>
                       <SelectTrigger id="bank">
                         <SelectValue placeholder="Select bank" />
@@ -505,9 +495,7 @@ export default function DepositPage() {
                   {method === 'bank' && (
                     <div className="space-y-6">
                       <div className="space-y-4">
-                        <Label className="flex justify-center">
-                          SCAN THIS QR CODE
-                        </Label>
+                        <Label className="flex justify-center">SCAN THIS QR CODE</Label>
                         <div className="flex justify-center">
                           <img
                             //src={bankQRCode || "https://via.placeholder.com/300"  }
@@ -525,7 +513,10 @@ export default function DepositPage() {
                       </div>
 
                       <div className="space-y-4">
-                        <Label htmlFor="deposit_screenshot" className="text-sm font-medium text-gray-700">
+                        <Label
+                          htmlFor="deposit_screenshot"
+                          className="text-sm font-medium text-gray-700"
+                        >
                           Upload Your Deposit
                         </Label>
                         <Input
@@ -548,12 +539,10 @@ export default function DepositPage() {
                   {method === 'crypto' && (
                     <div className="space-y-6">
                       <div className="space-y-4">
-                        <Label className="flex justify-center">
-                          SCAN THIS QR CODE
-                        </Label>
+                        <Label className="flex justify-center">SCAN THIS QR CODE</Label>
                         <div className="flex justify-center">
                           <Image
-                            src={cryptoWalletQrCodeUrl || "https://via.placeholder.com/300"}
+                            src={cryptoWalletQrCodeUrl || 'https://via.placeholder.com/300'}
                             alt="Crypto Wallet QR Code"
                             width={300}
                             height={300}
@@ -617,7 +606,7 @@ export default function DepositPage() {
                   </div>
                 </div>
               )}
-            </form>
+            </div>
           </CardContent>
           <CardFooter className="flex justify-between">
             {step > 1 && (
@@ -629,7 +618,7 @@ export default function DepositPage() {
               <Button onClick={handleNextStep}>{t("Next")}</Button>
             ) : (
               <Button
-                type="submit"
+                type="button"
                 onClick={handleSubmit}
                 disabled={isSubmitting}
                 className={cn(isSubmitting && 'cursor-not-allowed opacity-50')}
