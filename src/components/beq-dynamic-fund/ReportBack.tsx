@@ -59,7 +59,7 @@ const ReportBack = ({
     return item.termKey == term
   })[0]
 
-  if (!startDate || !endDate) return '...'
+  if (!startDate || !endDate) return ''
 
   let yearsObject = (dataExtra as { profitData: any })?.profitData
   let years = Object.keys(yearsObject).length
@@ -116,7 +116,7 @@ const ReportBack = ({
           </span>{' '}
           {t('with')} <span className="text-primary mx-1 font-bold">{periods}</span> 
           {t('investment_period')}
-          <span className="text-primary mx-1 font-bold">{years} {t('năm')}</span>
+          <span className="text-primary mx-1 font-bold">{years} {t('year')}</span>
         </li>
         <li>
           {t('interest_rate_minimum')}{' '}

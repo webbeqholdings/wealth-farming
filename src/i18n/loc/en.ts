@@ -313,7 +313,7 @@ export const en = {
     interest_withdrawal_period: "Interest Withdrawal Period",
     join_date: "Join Date",
     contract_end_date: "Contract End Date",
-    investment_cycles: "Number of Investment Cycles",
+    investment_periods: "Number of Investment Periods",
     calculate_result: "Calculate Result",
     submit_investment: "Submit Investment",
     month: "Month",
