@@ -336,6 +336,7 @@ export const createInvestment = async (formData: any) => {
       },
     })
   }
+  const expectedReturnValue = await formData.expected_return;
 
   const contract_doc = await payload.create({
     collection: 'contracts',
@@ -343,7 +344,7 @@ export const createInvestment = async (formData: any) => {
       user: Number(auth.user.id ),
       amount: Number(amount),
       balance: Number(amount),
-      expected_return: formData.expected_return,
+      expected_return: expectedReturnValue,
       status: 'active',
       term: product_doc.term,
       profit: 0,
