@@ -3,7 +3,7 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import { headers as nextHeaders } from 'next/headers'
 import { formatDateTime } from '@/utilities/formatDateTime'
-import { getBalanceFromAccount, getAccountIdInvestmentByUser } from './account'
+import { getAccountIdInvestmentByUser } from './account'
 import {
   getEmployeePlusProducts,
   inArrayEmployeePlusUsersIDs,
@@ -269,7 +269,10 @@ export const IsInvest = async (user_id: number): Promise<Boolean> => {
 export const createInvestment = async (formData: any) => {
   const headers = await nextHeaders()
   const auth = await payload.auth({ headers })
-  const { userId, amount, startDate, endDate, productName, periods, term } = formData
+  if (!auth.user) {
+    return
+  }
+  const { amount, startDate, endDate, productName, periods, term } = formData
 
   if (amount <= 0) {
     return {
