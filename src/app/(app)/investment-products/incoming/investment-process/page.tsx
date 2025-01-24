@@ -10,13 +10,11 @@ import { DataDynamicFundProvider } from '@/components/beq-dynamic-fund/DataProvi
 import { Term } from '@/lib/investment-products/dynamicFund'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts'
-import { request } from 'http'
 import { ProfitChart } from '@/components/ProfitChart'
 import { useTranslation } from 'react-i18next';
 
 interface ProfitItem {
-  date: Date
+  fromDate: Date
   balance: number
 }
 
@@ -25,12 +23,13 @@ export default function InvestmentProcessPage() {
   const [profitData, setProfitData] = useState([])
   const [requestFormData, setRequestFormData] = useState({})
 
-  const formattedProfitData = Object.entries(profitData).flatMap(([year, items]) =>
-    items.map((item: ProfitItem) => ({
-      time: item.date,
+  const formattedProfitData = Object.entries(profitData).flatMap(([, value]) =>
+    value.profitLogs.map((item: ProfitItem) => ({
+      time: item.fromDate,
       balance: item.balance,
     })),
   )
+
   return (
     <>
       <SiteHeader />

@@ -12,7 +12,8 @@ import { useDynamicFundData } from './DataProvider'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ProfitChart } from './ProfitChart'
-
+import { useTranslation } from 'react-i18next'
+import { capitalizeWords } from '@/utilities/formatText'
 interface ProfitItem {
   date: Date
   balance: number
@@ -21,6 +22,16 @@ interface ProfitItem {
   rate: number
   days: number
   termType: string
+}
+interface ProfitLogItem {
+  fromDate: Date
+  toDate: Date
+  rate: number
+  balance: number
+  profit: number
+  days: number
+  term: string
+  message: string
 }
 
 type ProfitData = Record<string, ProfitItem[]>
