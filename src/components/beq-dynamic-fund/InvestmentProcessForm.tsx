@@ -26,7 +26,7 @@ import {
   standardApplyProgramDays,
   canCancelContractAt,
 } from '@/lib/investment-products/dynamicFund'
-import { createTransactionInvestment } from '@/lib/transaction'
+import { createInvestment } from '@/lib/transaction'
 import { getPublicProducts } from '@/lib/investment-products/dynamicFundQuery'
 
 import { useToast } from '@/hooks/use-toast'
@@ -212,14 +212,14 @@ export function InvestmentProcessForm({
     if (startDate && endDate && depositAmount > 0) {
       const formData = {
         productName: productName,
-        expectedReturn: calculateBalance(term),
+        expected_return: calculateBalance(term),
         amount: depositAmount,
         term: term,
         startDate: startDate,
         endDate: endDate,
         periods: periods,
       }
-      const response: any = await createTransactionInvestment(formData)
+      const response: any = await createInvestment(formData)
       if (response.error) {
         toast({
           title: 'Error',
@@ -283,7 +283,7 @@ export function InvestmentProcessForm({
                     <SelectItem key={rate.term} value={rate.term}>
                       {rate.product_name}
                       <span className="text-gray-400 mx-3">
-                        {(rate.rate_of_return * 100).toFixed(2)}% / {t('Tháng')}
+                        {(rate.rate_of_return * 100).toFixed(2)}% / {t('month')}
                       </span>
                     </SelectItem>
                   ))}
@@ -348,7 +348,7 @@ export function InvestmentProcessForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="periods">{t('investment_cycles')}</Label>
+            <Label htmlFor="periods">{t('investment_periods')}</Label>
             <Input
               id="periods"
               type="number"

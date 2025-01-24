@@ -36,7 +36,7 @@ export const vi = {
     //investment process
     investment_process_title: "Giả lập kế hoạch tài chính",
     investment_process_table: "Bảng Lãi",
-    investment_process_chart_decs: "Biểu diễn sự cân bằng theo thời gian",
+    investment_process_chart_decs: "Biểu đồ số dư theo thời gian",
     
     // /transaction
     // /menu-label
@@ -216,7 +216,7 @@ export const vi = {
     select_network: "Chọn network...",
     select_bank: "Chọn ngân hàng...",
     action: "Thao tác",
-    
+
     // Homepage
     get_started: "Bắt Đầu Trong 30 Giây!",
     email_prompt: "Cung cấp địa chỉ email và kiểm tra hộp thư để nhận mã xác nhận 6 chữ số.",
