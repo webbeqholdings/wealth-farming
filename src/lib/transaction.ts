@@ -267,7 +267,7 @@ export const IsInvest = async (user_id: number): Promise<Boolean> => {
 }
 
 export const createInvestment = async (formData: any) => {
-  const { userId, amount, startDate, endDate, productId } = formData
+  const { userId, amount, startDate, endDate, productId, periods, term } = formData
 
   if (amount <= 0) {
     return {
@@ -301,6 +301,34 @@ export const createInvestment = async (formData: any) => {
       type: 'investment',
     },
   })
+
+  // user referrals
+  const userReferral = await payload.find({
+    collection: 'user-referrals',
+    where: {
+      child: { equals: userId },
+    },
+  })
+ 
+  if (userReferral && typeof userReferral.docs[0]?.parent === 'object' && userReferral.docs[0]?.parent !== null) {
+    await payload.create({
+      collection: 'contracts',
+      data: {
+        user: userReferral.docs[0].parent.id,
+        amount: Number(amount * 0.03),
+        balance: Number(amount * 0.03),
+        status: 'active',
+        profit: 0,
+        term: term,
+        periods: periods,
+        start_date: startDate,
+        end_date: endDate,
+        product_log: {
+          data: product_doc
+        },
+      },
+    })
+  }
 
   const contract_doc = await payload.create({
     collection: 'contracts',
