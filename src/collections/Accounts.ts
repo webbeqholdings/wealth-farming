@@ -4,7 +4,7 @@ const Accounts: CollectionConfig = {
   slug: 'accounts',
   admin: {
     useAsTitle: 'account_number',
-    listSearchableFields: ['account_name', 'account_number', 'amount', , 'user.email'],
+    listSearchableFields: ['account_name', 'account_number', 'amount', 'user.email']
   },
   access: {
     read: () => true,
