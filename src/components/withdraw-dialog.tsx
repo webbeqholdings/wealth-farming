@@ -194,7 +194,7 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab, termin
       }
 
       const result = await withdrawInvestment(formData);
-      // notifyWithdrawlContracts(result.data);
+      notifyWithdrawlContracts(result.data);
       if (result.success) {
         toast({
           title: 'Withdrawal Successfully', 

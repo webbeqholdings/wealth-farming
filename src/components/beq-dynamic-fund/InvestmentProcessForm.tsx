@@ -225,8 +225,7 @@ export function InvestmentProcessForm({
         })
         return
       }
-
-      notifyInvestment(response.data)
+      notifyInvestment(response.data.contract)
       toast({
         title: 'Success',
         description: 'Investment request has been submitted.',

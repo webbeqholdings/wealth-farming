@@ -87,7 +87,6 @@ const ReportBack = ({
           <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
             {rateConfig.map((item: any) => {
               let _termDescription: any = termDescriptionConfig.filter((x) => {
-                console.log('report back item', item)
                 return x.termKey == item.term
               })[0]
 
