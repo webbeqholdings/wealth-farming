@@ -553,164 +553,18 @@ export const buildProfitRecordsMonthly = (
 }
 
 export const contractEndAt = (startDate: Date, term: Term): Date => {
-  let endDate
-  if (term == 'monthly') {
-    if (isStartOfMonth(startDate)) {
-      endDate = endOfMonth(startDate)
-    }
+  let endDate = addDays(startDate, 360)
 
-    if (!isStartOfMonth(startDate)) {
-      let nextMonth = addMonths(startDate, 1)
-      let year = getYear(nextMonth)
-      let month = format(nextMonth, 'MM')
-      let endMonthdd = format(endOfMonth(nextMonth), 'dd')
-      endDate = new Date(`${year}-${month}-${endMonthdd}`)
-    }
+  if (term === 'monthly') {
+    endDate = addDays(startDate, 30)
   }
 
-  if (term == 'semester') {
-    const defineSemester = [
-      ['01', '02', '03', '04', '05', '06'],
-      ['07', '08', '09', '10', '11', '12'],
-    ]
-
-    const defineStartSemester = ['01', '07']
-    const month = format(startDate, 'MM')
-
-    if (isStartOfMonth(startDate)) {
-      // Start Semester
-      if (defineStartSemester.includes(month)) {
-        let endMonth = defineSemester.filter((item) => {
-          return item.includes(month)
-        })[0][5]
-
-        let year = getYear(startDate)
-        let endMonthdd = format(endOfMonth(new Date(`${year}-${endMonth}-01`)), 'dd')
-        endDate = new Date(`${year}-${endMonth}-${endMonthdd}`)
-      }
-
-      // not Start Semester
-
-      if (!defineStartSemester.includes(month)) {
-        if (['01', '02', '03', '04', '05', '06'].includes(month)) {
-          let year = getYear(startDate)
-          endDate = new Date(`${year}-12-31`)
-        }
-
-        if (['07', '08', '09', '10', '11', '12'].includes(month)) {
-          let year = getYear(startDate) + 1
-          endDate = new Date(`${year}-06-30`)
-        }
-      }
-    }
-
-    if (!isStartOfMonth(startDate)) {
-      if (['01', '02', '03', '04', '05', '06'].includes(month)) {
-        let year = getYear(startDate)
-        endDate = new Date(`${year}-12-31`)
-      }
-
-      if (['07', '08', '09', '10', '11', '12'].includes(month)) {
-        let year = getYear(startDate) + 1
-        endDate = new Date(`${year}-06-30`)
-      }
-    }
+  if (term === 'semester') {
+    endDate = addDays(startDate, 180)
   }
 
-  if (term == 'quarterly') {
-    const defineQuarterly = [
-      ['01', '02', '03'],
-      ['04', '05', '06'],
-      ['07', '08', '09'],
-      ['10', '11', '12'],
-    ]
-
-    const defineStartQuarterly = ['01', '04', '07', '10']
-    const month = format(startDate, 'MM')
-
-    if (isStartOfMonth(startDate)) {
-      // Start Quarterly
-      if (defineStartQuarterly.includes(month)) {
-        let endMonth = defineQuarterly.filter((item) => {
-          return item.includes(month)
-        })[0][2]
-
-        let year = getYear(startDate)
-        let endMonthdd = format(endOfMonth(new Date(`${year}-${endMonth}-01`)), 'dd')
-        endDate = new Date(`${year}-${endMonth}-${endMonthdd}`)
-      }
-
-      // not Start Quarterly
-      if (!defineStartQuarterly.includes(month)) {
-        let nextQuarterLastMonth
-        let year = getYear(startDate)
-
-        for (let index = 0; index < 3; index++) {
-          let qq = defineQuarterly[index]
-
-          if (qq.includes(month)) {
-            if (index < 3) {
-              nextQuarterLastMonth = defineQuarterly[index + 1][2]
-              break
-            }
-
-            if (index == 3) {
-              nextQuarterLastMonth = defineQuarterly[0][2]
-              year = year + 1
-              break
-            }
-          }
-        }
-
-        let endMonthdd = format(endOfMonth(new Date(`${year}-${nextQuarterLastMonth}-01`)), 'dd')
-        endDate = new Date(`${year}-${nextQuarterLastMonth}-${endMonthdd}`)
-      }
-    }
-
-    if (!isStartOfMonth(startDate)) {
-      // not Start Quarterly
-      if (defineStartQuarterly.includes(month)) {
-        let nextQuarterLastMonth
-        let year = getYear(startDate)
-
-        for (let index = 0; index <= 3; index++) {
-          let qq = defineQuarterly[index]
-
-          if (qq.includes(month)) {
-            if (index < 3) {
-              nextQuarterLastMonth = defineQuarterly[index + 1][2]
-              break
-            }
-
-            if (index == 3) {
-              nextQuarterLastMonth = defineQuarterly[0][2]
-              year = year + 1
-              break
-            }
-          }
-        }
-
-        let endMonthdd = format(endOfMonth(new Date(`${year}-${nextQuarterLastMonth}-01`)), 'dd')
-        endDate = new Date(`${year}-${nextQuarterLastMonth}-${endMonthdd}`)
-      }
-    }
-  }
-
-  if (term == 'annually') {
-    const dd = format(startDate, 'dd')
-
-    console.log('dd', dd)
-    const MM = format(startDate, 'MM')
-    const year = getYear(startDate)
-    const isStartYear = MM == '01' && dd == '01'
-
-    if (isStartYear) {
-      endDate = new Date(`${year}-12-31`)
-    }
-
-    if (!isStartYear) {
-      endDate = new Date(`${year + 1}-12-31`)
-    }
+  if (term === 'quarterly') {
+    endDate = addDays(startDate, 90)
   }
 
   return endDate

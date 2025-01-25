@@ -81,8 +81,7 @@ export function InvestmentProcessForm({
           const response: any = await getPublicProducts()
           if (MonthlyAvalable) {
             setRateConfig(response)
-          }
-          else {
+          } else {
             const no90Term = response.slice(1, 4)
             setRateConfig(no90Term)
           }
@@ -271,6 +270,7 @@ export function InvestmentProcessForm({
                   setTerm(selectedRate.term)
                   setProductName(selectedRate.product_name) // Update the product ID here
                 }
+                setEndDate(contractMultiPeriodEndAt(startDate, term, periods))
               }}
             >
               <SelectTrigger id="term">
@@ -296,8 +296,9 @@ export function InvestmentProcessForm({
               <PopoverTrigger asChild>
                 <Button
                   variant={'outline'}
-                  className={`w-full justify-start text-left font-normal ${!startDate && 'text-muted-foreground'
-                    }`}
+                  className={`w-full justify-start text-left font-normal ${
+                    !startDate && 'text-muted-foreground'
+                  }`}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {startDate ? format(startDate, 'd/MM/yyyy') : 'Pick a date'}
@@ -324,8 +325,9 @@ export function InvestmentProcessForm({
               <PopoverTrigger asChild>
                 <Button
                   variant={'outline'}
-                  className={`w-full justify-start text-left font-normal ${!endDate && 'text-muted-foreground'
-                    }`}
+                  className={`w-full justify-start text-left font-normal ${
+                    !endDate && 'text-muted-foreground'
+                  }`}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {endDate ? format(endDate, 'd/MM/yyyy') : t('pick_date')}
