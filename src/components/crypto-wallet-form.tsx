@@ -127,8 +127,9 @@ export function CryptoWalletForm({
 
       // Check if the response is ok (status 200-299)
       if (response.ok) {
+        const data = await response.json()
         // Update local state with the new account if necessary
-        setCryptoWallets((prevAccounts) => [...prevAccounts, newCryptoWallet])
+        setCryptoWallets((prevAccounts) => [...prevAccounts, data.doc])
 
         // Reset the form and show success message
         form.reset()
