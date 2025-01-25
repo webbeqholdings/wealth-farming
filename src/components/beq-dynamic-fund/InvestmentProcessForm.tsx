@@ -226,8 +226,7 @@ export function InvestmentProcessForm({
         })
         return
       }
-
-      notifyInvestment(response.data)
+      notifyInvestment(response.data.contract)
       toast({
         title: 'Success',
         description: 'Investment request has been submitted.',
@@ -271,6 +270,7 @@ export function InvestmentProcessForm({
                   setTerm(selectedRate.term)
                   setProductName(selectedRate.product_name) // Update the product ID here
                 }
+                setEndDate(contractMultiPeriodEndAt(startDate, term, periods))
               }}
             >
               <SelectTrigger id="term">
