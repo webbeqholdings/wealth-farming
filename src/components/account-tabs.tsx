@@ -4,7 +4,7 @@ import * as React from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { BankAccountForm } from './bank-account-form'
 import { CryptoWalletForm } from './crypto-wallet-form'
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next'
 
 interface AccountTabsProps {
   bankAccounts: any[]
@@ -19,7 +19,7 @@ export function AccountTabs({
   cryptoWallets,
   setCryptoWallets,
 }: AccountTabsProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation()
   return (
     <Tabs defaultValue="bank" className="w-full">
       <TabsList className="grid w-full grid-cols-2">
@@ -27,10 +27,10 @@ export function AccountTabs({
         <TabsTrigger value="crypto">{t('crypto_wallet')}</TabsTrigger>
       </TabsList>
       <TabsContent value="bank">
-        <BankAccountForm accounts={bankAccounts} setAccounts={setBankAccounts} />
+        <BankAccountForm bankAccounts={bankAccounts} setBankAccounts={setBankAccounts} />
       </TabsContent>
       <TabsContent value="crypto">
-        <CryptoWalletForm accounts={cryptoWallets} setAccounts={setCryptoWallets} />
+        <CryptoWalletForm cryptoWallets={cryptoWallets} setCryptoWallets={setCryptoWallets} />
       </TabsContent>
     </Tabs>
   )

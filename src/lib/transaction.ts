@@ -3,7 +3,7 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import { headers as nextHeaders } from 'next/headers'
 import { formatDateTime } from '@/utilities/formatDateTime'
-import { getAccountIdInvestmentByUser } from './account'
+import { getAccountIdInvestmentByUser, getAccountsByUser } from './account'
 import {
   getEmployeePlusProducts,
   inArrayEmployeePlusUsersIDs,
@@ -273,6 +273,8 @@ export const createInvestment = async (formData: any) => {
     return
   }
   const { amount, startDate, endDate, productName, periods, term } = formData
+  const account_invesment = await getAccountsByUser(auth.user.id)
+  const amountAvailable = await getSumAmountBalanceByAccount(Number(account_invesment[0].id))
 
   if (amount <= 0) {
     return {
@@ -287,8 +289,9 @@ export const createInvestment = async (formData: any) => {
       product_name: {
         equals: productName,
       },
-    }
+    },
   })
+
   const product_doc = product.docs[0]
 
   if (!product_doc) {
@@ -298,12 +301,28 @@ export const createInvestment = async (formData: any) => {
     }
   }
 
-  const account_id = await getAccountIdInvestmentByUser(auth.user.id )
+  const min_investment = product.docs[0].min_investment
+
+  if (amountAvailable < min_investment) {
+    return {
+      isSuccess: false,
+      msg: `Minimum amount investment is ${min_investment}`,
+    }
+  }
+
+  if (amount > amountAvailable) {
+    return {
+      isSuccess: false,
+      msg: 'Amount account investment not enough',
+    }
+  }
+
+  const account_id = await getAccountIdInvestmentByUser(auth.user.id)
 
   const transaction_doc = await payload.create({
     collection: 'transactions',
     data: {
-      user: auth.user.id ,
+      user: auth.user.id,
       amount: Number(amount),
       investment_product: product_doc.id,
       status: 'completed',
@@ -316,11 +335,15 @@ export const createInvestment = async (formData: any) => {
   const userReferral = await payload.find({
     collection: 'user-referrals',
     where: {
-      child: { equals: auth.user.id  },
+      child: { equals: auth.user.id },
     },
   })
- 
-  if (userReferral && typeof userReferral.docs[0]?.parent === 'object' && userReferral.docs[0]?.parent !== null) {
+
+  if (
+    userReferral &&
+    typeof userReferral.docs[0]?.parent === 'object' &&
+    userReferral.docs[0]?.parent !== null
+  ) {
     await payload.create({
       collection: 'contracts',
       data: {
@@ -334,17 +357,17 @@ export const createInvestment = async (formData: any) => {
         start_date: startDate,
         end_date: endDate,
         product_log: {
-          data: product_doc
+          data: product_doc,
         },
       },
     })
   }
-  const expectedReturnValue = await formData.expected_return;
+  const expectedReturnValue = await formData.expected_return
 
   const contract_doc = await payload.create({
     collection: 'contracts',
     data: {
-      user: Number(auth.user.id ),
+      user: Number(auth.user.id),
       amount: Number(amount),
       balance: Number(amount),
       expected_return: expectedReturnValue,
@@ -498,7 +521,7 @@ export const createWithdrawal = async (inputData: any) => {
   }
 
   const amountAvailable = await getSumAmountBalanceByAccount(account_from)
-  console.log(amountAvailable)
+
   if (amountAvailable >= amount) {
     const response = await payload.create({
       collection: 'transactions',

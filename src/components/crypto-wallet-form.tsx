@@ -40,7 +40,7 @@ import { useToast } from '@/hooks/use-toast'
 import { Trash2 } from 'lucide-react'
 import UserStatus from '@/lib/userStatus'
 import { CryptoWalletCombobox } from './crypto-wallet-combobox'
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next'
 
 const formSchema = z.object({
   walletAddress: z.string().min(5, {
@@ -52,18 +52,18 @@ const formSchema = z.object({
 })
 
 export function CryptoWalletForm({
-  accounts,
-  setAccounts,
+  cryptoWallets,
+  setCryptoWallets,
 }: {
-  accounts: any[]
-  setAccounts: React.Dispatch<React.SetStateAction<any[]>>
+  cryptoWallets: any[]
+  setCryptoWallets: React.Dispatch<React.SetStateAction<any[]>>
 }) {
   const [cryptoWalletId, setCryptoWalletId] = useState('')
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const { toast } = useToast()
 
   const { user } = UserStatus()
-  const { t } = useTranslation();
+  const { t } = useTranslation()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -87,7 +87,9 @@ export function CryptoWalletForm({
         setIsDialogOpen(false)
 
         // Remove the deleted account from local state
-        setAccounts((prevAccounts) => prevAccounts.filter((account) => account.id !== accountId))
+        setCryptoWallets((prevAccounts) =>
+          prevAccounts.filter((account) => account.id !== accountId),
+        )
 
         // Show success toast message
         toast({
@@ -126,7 +128,7 @@ export function CryptoWalletForm({
       // Check if the response is ok (status 200-299)
       if (response.ok) {
         // Update local state with the new account if necessary
-        setAccounts((prevAccounts) => [...prevAccounts, newCryptoWallet])
+        setCryptoWallets((prevAccounts) => [...prevAccounts, newCryptoWallet])
 
         // Reset the form and show success message
         form.reset()
@@ -161,9 +163,7 @@ export function CryptoWalletForm({
       <Card className="mb-8">
         <CardHeader>
           <CardTitle>{t('add_crypto_wallet')}</CardTitle>
-          <CardDescription>
-            {t('crypto_details')}
-          </CardDescription>
+          <CardDescription>{t('crypto_details')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -177,7 +177,7 @@ export function CryptoWalletForm({
                     <FormItem className="flex-1">
                       <FormLabel>{t('wallet_address')}</FormLabel>
                       <FormControl>
-                        <Input placeholder={t("enter_wallet_address")} {...field} />
+                        <Input placeholder={t('enter_wallet_address')} {...field} />
                       </FormControl>
                       <FormDescription>{t('crypto_wallet_address')}</FormDescription>
                       <FormMessage />
@@ -222,7 +222,7 @@ export function CryptoWalletForm({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {accounts.map((account) => (
+              {cryptoWallets.map((account) => (
                 <TableRow key={account.id}>
                   <TableCell>{account.wallet_address}</TableCell>
                   <TableCell>{account.network}</TableCell>
@@ -244,9 +244,7 @@ export function CryptoWalletForm({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t('are_you_sure')}</DialogTitle>
-            <DialogDescription>
-              {t('delete_account_warning')}
-            </DialogDescription>
+            <DialogDescription>{t('delete_account_warning')}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button onClick={handleCancel} color="gray" size="sm">
