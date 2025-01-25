@@ -218,7 +218,7 @@ export function InvestmentProcessForm({
         periods: periods,
       }
       const response: any = await createInvestment(formData)
-      if (!response.isSuccess) {
+      if (!response?.isSuccess) {
         toast({
           title: 'Error',
           description: response.msg,
