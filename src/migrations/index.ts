@@ -20,6 +20,7 @@ import * as migration_20250102_100344_add_columns_account_from_and_acount_to fro
 import * as migration_20250114_122714_add_field_message_to_transaction from './20250114_122714_add_field_message_to_transaction';
 import * as migration_20250117_111708_add_columns_not_and_image_to_withdrawls from './20250117_111708_add_columns_not_and_image_to_withdrawls';
 import * as migration_20250123_025853_add_account_to_and_account_from_to_transaction from './20250123_025853_add_account_to_and_account_from_to_transaction';
+import * as migration_20250126_082116_delete_from_account_and_to_account_in_transactions from './20250126_082116_delete_from_account_and_to_account_in_transactions';
 
 export const migrations = [
   {
@@ -130,6 +131,11 @@ export const migrations = [
   {
     up: migration_20250123_025853_add_account_to_and_account_from_to_transaction.up,
     down: migration_20250123_025853_add_account_to_and_account_from_to_transaction.down,
-    name: '20250123_025853_add_account_to_and_account_from_to_transaction'
+    name: '20250123_025853_add_account_to_and_account_from_to_transaction',
+  },
+  {
+    up: migration_20250126_082116_delete_from_account_and_to_account_in_transactions.up,
+    down: migration_20250126_082116_delete_from_account_and_to_account_in_transactions.down,
+    name: '20250126_082116_delete_from_account_and_to_account_in_transactions'
   },
 ];
