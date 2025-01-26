@@ -521,7 +521,6 @@ export const createWithdrawal = async (inputData: any) => {
   }
 
   const amountAvailable = await getSumAmountBalanceByAccount(account_from)
-
   if (amountAvailable >= amount) {
     const response = await payload.create({
       collection: 'transactions',
@@ -551,7 +550,7 @@ export const createWithdrawal = async (inputData: any) => {
   } else {
     return {
       isSuccess: false,
-      msg: 'Insufficient amount in the account',
+      msg: 'Amount account main not enough',
       data: {},
     }
   }
