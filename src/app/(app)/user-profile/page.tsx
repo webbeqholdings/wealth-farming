@@ -534,29 +534,6 @@ export default function UserProfile() {
 
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle>{t('security_settings')}</CardTitle>
-            <CardDescription>{t('manage_account_security')}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center space-x-4">
-                <Lock className="h-5 w-5 text-muted-foreground" />
-                <span>{t('two_factor_auth')}</span>
-              </div>
-              <Button variant="outline">{t('enable')}</Button>
-            </div>
-            <div className="flex justify-between items-center">
-              <div className="flex items-center space-x-4">
-                <LineChart className="h-5 w-5 text-muted-foreground" />
-                <span>{t('login_activity')}</span>
-              </div>
-              <Button variant="outline">{t('view')}</Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="mt-6">
-          <CardHeader>
             <CardTitle>{t('invite_and_earn')}</CardTitle>
             <CardDescription>{t('invite_friends_rewards')}</CardDescription>
           </CardHeader>

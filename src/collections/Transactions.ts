@@ -80,18 +80,6 @@ const Transactions: CollectionConfig = {
       required: true,
     },
     {
-      name: 'from_account',
-      type: 'relationship',
-      relationTo: 'accounts',
-      label: 'From Account',
-    },
-    {
-      name: 'to_account',
-      type: 'relationship',
-      relationTo: 'accounts',
-      label: 'To Account',
-    },
-    {
       name: 'account_from', // New Field: Sử dụng field này khi dòng tiền đi ra khỏi accountID
       type: 'relationship',
       relationTo: 'accounts',
@@ -168,7 +156,6 @@ const Transactions: CollectionConfig = {
         }
 
         if (operation === 'update' && doc.type === 'withdraw' && doc.status === 'failed') {
-          console.log(doc)
           const fromAccountId = doc.account_from
           const transactionAmount = doc.amount
           // Fetch the existing account details

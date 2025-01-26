@@ -26,7 +26,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { BankCombobox } from './bank-combobox'
 import { Separator } from '@radix-ui/react-dropdown-menu'
 import {
   Dialog,
@@ -111,7 +110,7 @@ export function CryptoWalletForm({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const newCryptoWallet = {
-      user: Number(user.id),
+      user: Number(user?.id),
       wallet_address: values.walletAddress,
       network: values.network,
     }
@@ -222,7 +221,7 @@ export function CryptoWalletForm({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {cryptoWallets.map((account) => (
+              {cryptoWallets && cryptoWallets.map((account) => (
                 <TableRow key={account.id}>
                   <TableCell>{account.wallet_address}</TableCell>
                   <TableCell>{account.network}</TableCell>
