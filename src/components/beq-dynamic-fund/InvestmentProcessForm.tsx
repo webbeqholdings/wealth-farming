@@ -218,15 +218,14 @@ export function InvestmentProcessForm({
         periods: periods,
       }
       const response: any = await createInvestment(formData)
-      if (!response.isSuccess) {
+      if (!response?.isSuccess) {
         toast({
           title: 'Error',
           description: response.msg,
         })
         return
       }
-
-      notifyInvestment(response.data)
+      notifyInvestment(response.data.contract)
       toast({
         title: 'Success',
         description: 'Investment request has been submitted.',

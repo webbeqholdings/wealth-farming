@@ -202,7 +202,7 @@ export default function WithdrawPage() {
         amount: amount,
         account_from: Number(accounts[0].id),
       })
-      if (!response.isSuccess) {
+      if (!response?.isSuccess) {
         // Nếu không thành công, hiển thị thông báo lỗi
         toast({
           title: 'Error',

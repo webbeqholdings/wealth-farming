@@ -251,7 +251,7 @@ export const vi = {
     promotions_info: "Tích hợp các chương trình khuyến mãi, giảm giá hoặc điểm thưởng cho khách hàng",
     faq: "Câu Hỏi Thường Gặp",
     beq_fund: "BeQ Wealth Farming Fund là gì?",
-    beq_fund_info: "BeQ Wealth Farming Fund là một nền tảng đầu tư sáng tạo tập trung vào các dự án nông nghiệp và nông nghiệp bền vững. Chúng tôi kết hợp trí tuệ nông nghiệp truyền thống với công nghệ tiên tiến để cung cấp cơ hội đầu tư độc đáo.",
+    beq_fund_info: "BeQ Wealth Farming Fund là một nền tảng đầu tư sáng tạo tập trung vào các dự án công nghệ và nông nghiệp bền vững. Chúng tôi kết hợp trí tuệ nông nghiệp truyền thống với công nghệ tiên tiến để cung cấp cơ hội đầu tư độc đáo.",
     start_investing_question: "Làm thế nào để bắt đầu đầu tư với BeQ?",
     start_investing_info: "Để bắt đầu đầu tư với BeQ, bạn cần tạo tài khoản, xác minh danh tính và thực hiện một khoản nạp ban đầu. Sau khi tài khoản của bạn có đủ tiền, bạn có thể duyệt qua các cơ hội đầu tư có sẵn và phân bổ tiền của mình theo sở thích.",
     investment_types: "BeQ cung cấp loại hình đầu tư nào?",
@@ -268,7 +268,7 @@ export const vi = {
     q2_report: "Báo cáo Hiệu suất Quý 2 đã sẵn sàng",
     join_discord: "Tham gia cộng đồng Discord của chúng tôi để cập nhật thông tin thị trường hàng ngày",
     breaking_news: "Tin tức nóng",
-    mission_statement: "Sự giàu có của bạn, sứ mệnh của chúng tôi",
+    mission_statement: "Sự giàu có của bạn là sứ mệnh của chúng tôi",
     embark_journey: "Bắt đầu hành trình đầu tư của bạn ngay hôm nay!",
     embark_journey_description: 'Tham gia BeQ Wealth Farming Fund và bắt đầu phát triển khoản đầu tư của bạn với các dự án nông nghiệp bền vững và sáng tạo.',
 
