@@ -8,6 +8,7 @@ import {
   getEmployeePlusProducts,
   inArrayEmployeePlusUsersIDs,
 } from './investment-products/dynamicFundQuery'
+import { getCurrentLevelRate } from './referrals'
 
 const payload = await getPayload({
   config,
@@ -216,12 +217,13 @@ export const createInvestment = async (formData: any) => {
     typeof userReferral.docs[0]?.parent === 'object' &&
     userReferral.docs[0]?.parent !== null
   ) {
+    const configRate = await getCurrentLevelRate(auth.user.id)
     await payload.create({
       collection: 'contracts',
       data: {
         user: userReferral.docs[0].parent.id,
-        amount: Number(amount * 0.03),
-        balance: Number(amount * 0.03),
+        amount: Number(amount * configRate),
+        balance: Number(amount * configRate),
         status: 'active',
         profit: 0,
         term: term,
