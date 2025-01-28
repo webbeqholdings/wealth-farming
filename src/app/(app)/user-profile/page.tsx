@@ -38,6 +38,7 @@ import TelegramButton from '@/components/TelegramButton'
 import Spinner from '@/components/Spinner'
 import { getAccountsByUser } from '@/lib/account'
 import { useTranslation } from 'react-i18next';
+import { comfortableCash } from '@/lib/contract'
 
 interface Referral {
   id: string
@@ -302,7 +303,7 @@ export default function UserProfile() {
       toast({
         title: 'Open sharing dialog !',
       })
-      
+
     } catch (error) {
       navigator.clipboard.writeText(referralLink)
       toast({
@@ -310,7 +311,7 @@ export default function UserProfile() {
         description: 'Sharing dialog unavailable Your referral link will be copied to clipboard!'
       })
     }
-    
+
 
 
 
@@ -383,6 +384,8 @@ export default function UserProfile() {
       console.error('Error during avatar update process:', error)
     }
   }
+
+  const test = comfortableCash(40)
 
   return (
     <>
