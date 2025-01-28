@@ -142,7 +142,7 @@ export function BankAccountForm({
         setBankAccounts((prevAccounts) => [...prevAccounts, data.doc])
 
         // Reset the form and show success message
-        // form.reset()
+        form.reset()
         toast({
           title: 'Bank Account Added',
           description: 'Your bank account has been successfully added.',
