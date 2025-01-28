@@ -60,7 +60,16 @@ const Transactions: CollectionConfig = {
       name: 'bank',
       type: 'relationship',
       relationTo: 'banks', // Tài khoản đích
-      label: 'Banks',
+      label: 'User Bank Account',
+      filterOptions: ({ data }) => {
+        if (data.user) {
+          return {
+            user: {
+              equals: data.user,
+            },
+          }
+        }
+      },
     },
     {
       name: 'amount',
@@ -80,16 +89,34 @@ const Transactions: CollectionConfig = {
       required: true,
     },
     {
-      name: 'account_from', // New Field: Sử dụng field này khi dòng tiền đi ra khỏi accountID
+      name: 'account_from',
       type: 'relationship',
       relationTo: 'accounts',
-      label: 'Acc From (New)',
+      label: 'Account From (Out)',
+      filterOptions: ({ data }) => {
+        if (data.user) {
+          return {
+            user: {
+              equals: data.user,
+            },
+          }
+        }
+      },
     },
     {
-      name: 'account_to', // New Field: Sử dụng field này khi dòng tiền đi ra vào accountID
+      name: 'account_to',
       type: 'relationship',
       relationTo: 'accounts',
-      label: 'Acc To (New)',
+      label: 'Account To (In)',
+      filterOptions: ({ data }) => {
+        if (data.user) {
+          return {
+            user: {
+              equals: data.user,
+            },
+          }
+        }
+      },
     },
     {
       name: 'deposit_screenshot',
