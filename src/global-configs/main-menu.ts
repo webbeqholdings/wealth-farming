@@ -18,6 +18,7 @@ const MainMenu: GlobalConfig = {
           name: 'title',
           type: 'text',
           required: true,
+          localized: true,
         },
         {
           name: 'url',
@@ -33,6 +34,7 @@ const MainMenu: GlobalConfig = {
               name: 'title',
               type: 'text',
               required: true,
+              localized: true,
             },
             {
               name: 'url',
@@ -42,6 +44,7 @@ const MainMenu: GlobalConfig = {
             {
               name: 'description',
               type: 'textarea',
+              localized: true,
             },
           ],
         },

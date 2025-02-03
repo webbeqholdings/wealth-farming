@@ -314,7 +314,7 @@ export const vi = {
     interest_withdrawal_period: "Kì Hạn Rút Lãi",
     join_date: "Ngày tham gia",
     contract_end_date: "Ngày kết thúc hợp đồng",
-    investment_cycles: "Số chu kì tham gia",
+    investment_periods: "Số chu kì tham gia",
     calculate_result: "Tính Kết Quả",
     submit_investment: "Đầu Tư",
     month: "Tháng",
