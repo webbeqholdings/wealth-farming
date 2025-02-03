@@ -397,4 +397,6 @@ export const vi = {
     //blog
     read_more: "Đọc Thêm",
     lastest_news: "Tin Tức Gần Đây",
+    about_author: 'Về tác giả',
+    related_article: "Các Bài Viết Liên Quan",
 }

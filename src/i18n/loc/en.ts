@@ -397,4 +397,6 @@ export const en = {
     //blog
     read_more: "Read More",
     lastest_news: "Latest News",
+    about_author: "About The Author",
+    related_article: 'Related Articles',
 }
