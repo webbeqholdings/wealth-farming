@@ -25,6 +25,7 @@ import {
 import { CalendarIcon, ClockIcon } from 'lucide-react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
+import { useTranslation } from 'react-i18next'
 
 // Mock data for news articles
 type Author = {
@@ -92,13 +93,18 @@ export default function NewsPage() {
   const indexOfLastArticle = currentPage * articlesPerPage
   const indexOfFirstArticle = indexOfLastArticle - articlesPerPage
   const [newsArticles, setNewsArticles] = useState<NewsArticles>([]);
+  const { t } = useTranslation();
+  const { i18n } = useTranslation();
+  const locale = i18n.language;
 
   // Fetch data from the API when the component mounts
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/posts');
+        const response = await fetch(`/api/posts?locale=${locale}`);
+        console.log("response ", response)
         const data = await response.json();
+        console.log("locale ", locale)
 
         // Assuming the response has a `docs` array with the products
         const articles = data.docs.map((item: Blog) => ({
@@ -126,7 +132,7 @@ export default function NewsPage() {
     };
 
     fetchData();
-  }, []); // Empty dependency array means this will run once when the component mounts
+  }, [locale]); // Empty dependency array means this will run once when the component mounts
   
   const currentArticles = newsArticles.slice(indexOfFirstArticle, indexOfLastArticle)
 
@@ -134,7 +140,7 @@ export default function NewsPage() {
     <>
       <SiteHeader />
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold mb-8">Latest News</h1>
+        <h1 className="text-4xl font-bold mb-8">{t('lastest_news')}</h1>
 
         {/* Featured Article */}
         {newsArticles && newsArticles.length > 0 && (
@@ -159,7 +165,7 @@ export default function NewsPage() {
                     <span>{new Date(newsArticles[0].date).toLocaleDateString('vi-VN')}</span>
                   </div>
                   <Button className="mt-4" asChild>
-                    <Link href={`/blog/${newsArticles[0].slug}`}>Read More</Link>
+                    <Link href={`/blog/${newsArticles[0].slug}`}>{t('read_more')}</Link>
                   </Button>
                 </div>
               </div>
@@ -193,7 +199,7 @@ export default function NewsPage() {
                   <span>{new Date(article.date).toLocaleDateString('vi-VN')}</span>
                 </div>
                 <Button variant="outline" asChild>
-                  <Link href={`/blog/${article.slug}`}>Read More</Link>
+                  <Link href={`/blog/${article.slug}`}>{t('read_more')}</Link>
                 </Button>
               </CardFooter>
             </Card>

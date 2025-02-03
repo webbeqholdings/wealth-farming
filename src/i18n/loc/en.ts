@@ -393,4 +393,8 @@ export const en = {
     total_interest: 'Total Interest Earned: ${{total}}',
     x_times: 'X times:',
     amount_usd: 'Amount ($)',
+
+    //blog
+    read_more: "Read More",
+    lastest_news: "Latest News",
 }

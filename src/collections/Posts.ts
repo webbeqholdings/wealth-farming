@@ -21,6 +21,7 @@ const Posts: CollectionConfig = {
       name: 'title',
       type: 'text',
       required: true,
+      localized: true,
     },
     {
       name: 'author',
@@ -56,6 +57,7 @@ const Posts: CollectionConfig = {
       name: 'content',
       type: 'richText',
       required: true,
+      localized: true,
     },
     {
       name: 'status',

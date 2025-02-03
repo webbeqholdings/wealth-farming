@@ -165,4 +165,8 @@ export default buildConfig({
       enabled: true, // Enable the plugin
     }),
   ],
+  localization: {
+    locales: ['en', 'vi'],
+    defaultLocale: 'en', 
+  },
 })

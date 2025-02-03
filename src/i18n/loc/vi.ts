@@ -394,4 +394,7 @@ export const vi = {
     x_times: 'X Lần:',
     amount_usd: 'Số tiền ($)',
 
+    //blog
+    read_more: "Đọc Thêm",
+    lastest_news: "Tin Tức Gần Đây",
 }
