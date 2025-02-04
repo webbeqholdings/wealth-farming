@@ -36,16 +36,14 @@ interface ProfitLogItem {
 
 export function ProfitTable() {
   const { data } = useDynamicFundData();
+  const { t } = useTranslation()
   const profitData = data?.profitData; // Assuming profitData is an array
-
   // Check if profitData is defined and has at least one entry
   if (!profitData || profitData.length === 0) {
     return <>No data</>;
   }
-
   // Access the first entry's profitLogs
   const profitLogs = profitData[0].profitLogs;
-  const { t } = useTranslation()
   const getMessage = (messageField: string | object): string => {
     if (typeof messageField === 'string') {
       try {
