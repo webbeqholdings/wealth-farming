@@ -518,7 +518,7 @@ export default function UserProfile() {
             </CardContent>
             <CardFooter>
               <Button
-                onClick={() => router.push('/account/history')}
+                onClick={() => router.push('/account/history/deposit')}
                 variant="outline"
                 className="w-full"
               >
