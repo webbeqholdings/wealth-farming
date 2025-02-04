@@ -171,7 +171,7 @@ export const createInvestment = async (formData: any) => {
 
   const min_investment = product.docs[0].min_investment
 
-  if (amountAvailable < min_investment) {
+  if (amount < min_investment) {
     return {
       isSuccess: false,
       msg: `Minimum amount investment is ${min_investment}`,
@@ -186,6 +186,7 @@ export const createInvestment = async (formData: any) => {
   }
 
   const account_id = await getAccountIdInvestmentByUser(userId)
+  console.log('account_id', account_id)
 
   const transaction_doc = await payload.create({
     collection: 'transactions',
