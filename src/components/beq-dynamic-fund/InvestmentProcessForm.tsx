@@ -39,27 +39,22 @@ import { useRouter } from 'next/navigation'
 import userStatus from '@/lib/userStatus'
 import { checkContractLarger90Days } from '@/lib/contract'
 import { useTranslation } from 'react-i18next'
+import { useDynamicFundData } from './DataProvider'
 
 const minRangeDays = 5
 const now = new Date()
 const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0)
 const tomorrow = addDays(startOfDay, 1)
 
-export function InvestmentProcessForm({
-  onCalculate,
-  onRequest,
-}: {
-  onCalculate: (data: any) => void
-  onRequest: (data: any) => void
-}) {
+export function InvestmentProcessForm() {
   const { t } = useTranslation()
-  const { isLoggedIn } = userStatus()
+  const { isLoggedIn, user } = userStatus()
   const router = useRouter()
-
+  const { setData } = useDynamicFundData()
   const [startDate, setStartDate] = useState<Date | undefined>(tomorrow)
   const [endDate, setEndDate] = useState<Date | undefined>(addDays(startDate, minRangeDays))
   const [term, setTerm] = useState<any>('annually')
-  const [productName, setProductName] = useState('BeQ Dynamic Fund Annually')
+  const [productId, setProductId] = useState(null)
   const [depositAmount, setDepositAmount] = useState<number>(10000)
   const [periods, setPeriods] = useState<number>(1)
   const [dayCount, setDayCount] = useState<number>(0)
@@ -84,9 +79,12 @@ export function InvestmentProcessForm({
           } else {
             const no90Term = response.slice(1, 4)
             setRateConfig(no90Term)
+
           }
+
         } finally {
           setIsSiteLoading(false)
+
         }
       }
 
@@ -103,6 +101,13 @@ export function InvestmentProcessForm({
     }
     setEndDate(contractMultiPeriodEndAt(startDate, term, periods))
   }, [startDate, term, periods])
+
+  useEffect(() => {
+    const selectedRate = rateConfig.find((rate) => rate.term === term)
+    if (selectedRate) {
+      setProductId(selectedRate.id)
+    }
+  }, [rateConfig]);
 
   const handleStartDateSelect = (date: Date | undefined) => {
     if (date === undefined) {
@@ -160,9 +165,9 @@ export function InvestmentProcessForm({
         let data = await buildProfitLogsMonthly(depositAmount, startDate, endDate)
         profitData.push(data)
       }
-      onCalculate(profitData)
 
-      onRequest({
+      setData({
+        profitData: profitData,
         amount: depositAmount,
         term: term,
         startDate: startDate,
@@ -176,6 +181,22 @@ export function InvestmentProcessForm({
           canCancelContractAt: canCancelContractAt(startDate), // +90 days
         },
       })
+      // onCalculate(profitData)
+
+      // onRequest({
+      //   amount: depositAmount,
+      //   term: term,
+      //   startDate: startDate,
+      //   endDate: endDate,
+      //   periods: periods,
+      //   dataExtra: {
+      //     rateConfig: rateConfig,
+      //     standardApplyProgramDays: standardApplyProgramDays,
+      //     profitData: profitData,
+      //     contractEndAt: contractEndAt(startDate, term),
+      //     canCancelContractAt: canCancelContractAt(startDate), // +90 days
+      //   },
+      // })
     }
   }
 
@@ -207,9 +228,12 @@ export function InvestmentProcessForm({
       return // Optional: Show a redirect message
     }
 
+
+
     if (startDate && endDate && depositAmount > 0) {
       const formData = {
-        productName: productName,
+        userId: user.id,
+        productId: productId,
         expected_return: calculateBalance(term),
         amount: depositAmount,
         term: term,
@@ -267,7 +291,7 @@ export function InvestmentProcessForm({
                 const selectedRate = rateConfig.find((rate) => rate.term === value)
                 if (selectedRate) {
                   setTerm(selectedRate.term)
-                  setProductName(selectedRate.product_name) // Update the product ID here
+                  setProductId(selectedRate.id)
                 }
                 setEndDate(contractMultiPeriodEndAt(startDate, term, periods))
               }}
@@ -295,9 +319,8 @@ export function InvestmentProcessForm({
               <PopoverTrigger asChild>
                 <Button
                   variant={'outline'}
-                  className={`w-full justify-start text-left font-normal ${
-                    !startDate && 'text-muted-foreground'
-                  }`}
+                  className={`w-full justify-start text-left font-normal ${!startDate && 'text-muted-foreground'
+                    }`}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {startDate ? format(startDate, 'd/MM/yyyy') : 'Pick a date'}
@@ -324,9 +347,8 @@ export function InvestmentProcessForm({
               <PopoverTrigger asChild>
                 <Button
                   variant={'outline'}
-                  className={`w-full justify-start text-left font-normal ${
-                    !endDate && 'text-muted-foreground'
-                  }`}
+                  className={`w-full justify-start text-left font-normal ${!endDate && 'text-muted-foreground'
+                    }`}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {endDate ? format(endDate, 'd/MM/yyyy') : t('pick_date')}

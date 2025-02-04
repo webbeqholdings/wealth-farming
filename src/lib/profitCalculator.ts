@@ -60,14 +60,12 @@ export const buildProfitRecordsAnnualy = (principal: number, startDate: Date, en
   let masterTimeline = dataAnnualy.filter((item) => {
     return item.isValid == true
   })
-  console.log('check masterTimeline: ', masterTimeline)
 
   let invalidYears = dataAnnualy
     .filter((x) => x.isValid === false)
     .map((item: any) => {
       return item.year
     })
-  console.log('check invalidYears: ', invalidYears)
 
   const dataSemester = findTermSemester(startDate, endDate).result
   const dataQuarterly = findTermQuarterly(startDate, endDate).result

@@ -95,8 +95,6 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
       }
 
       setAccountData(_accountData)
-      console.log(accountData)
-
       // Update Code
 
       setAccounts(_accounts) // Store the transformed accounts in state
@@ -445,7 +443,7 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
                       ) : (
                         ''
                       )}
-                      {activeTab === 'bonus' ? <TableHead>{transaction.message}</TableHead> : ''}
+                      {activeTab === 'bonus' ? <TableHead>{t(`${transaction.message}`)}</TableHead> : ''}
                     </TableRow>
                   ))}
               </TableBody>
