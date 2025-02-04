@@ -186,7 +186,6 @@ export const createInvestment = async (formData: any) => {
   }
 
   const account_id = await getAccountIdInvestmentByUser(userId)
-  console.log('account_id', account_id)
 
   const transaction_doc = await payload.create({
     collection: 'transactions',
