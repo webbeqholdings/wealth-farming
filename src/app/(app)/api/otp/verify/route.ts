@@ -43,28 +43,7 @@ export async function POST(req: Request) {
       },
     })
 
-    const accountName = ['Main', 'Referral Reward', 'Investment'] as const
-    const accountTypes: ['main', 'referral_reward', 'investment'] = [
-      'main',
-      'referral_reward',
-      'investment',
-    ]
-
-    // Create accounts associated with the user
-    await Promise.all(
-      accountTypes.map((type, index) =>
-        payload.create({
-          collection: 'accounts',
-          data: {
-            user: user.id,
-            account_name: accountName[index],
-            account_number: Math.floor(Math.random() * 1000000),
-            amount: 0,
-            type: type,
-          },
-        }),
-      ),
-    )
+    
 
     // Return a successful response
     return NextResponse.json({

@@ -33,8 +33,9 @@ import { ArrowDownIcon, ArrowRightIcon } from 'lucide-react'
 import { ReCaptcha } from '@/components/ReCaptcha'
 import { ReCaptchaV3 } from '@/components/ReCaptchaV3'
 import { getAccountsByUserId } from '@/lib/account'
+import { createTransfer, getSumAmountBalanceByAccount } from '@/lib/transaction'
 import Spinner from '@/components/Spinner'
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next'
 
 const formSchema = z.object({
   fromAccount: z.string().min(1, { message: 'Please select the source account' }),
@@ -47,8 +48,8 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>
 
 export default function TransferPage() {
-  const { isLoggedIn, loading, user } = UserStatus();
-  const { t } = useTranslation(); 
+  const { isLoggedIn, loading, user } = UserStatus()
+  const { t } = useTranslation()
   const router = useRouter()
   const [fromBalance, setFromBalance] = useState(0)
   const [toBalance, setToBalance] = useState(0)
@@ -69,10 +70,11 @@ export default function TransferPage() {
     },
   })
 
-  const handleFromAccountChange = (accountId: string) => {
+  const handleFromAccountChange = async (accountId: string) => {
     const selectedAccount = listAccounts.find((account) => account.id === Number(accountId))
     setFromAccount(accountId.toString())
-    setFromBalance(selectedAccount?.amount || 0)
+    const accountBalance = await getSumAmountBalanceByAccount(Number(accountId))
+    setFromBalance(accountBalance)
 
     if (toAccount === accountId) {
       const availableToAccounts = listAccounts.filter((account) => account.id !== Number(accountId))
@@ -86,10 +88,11 @@ export default function TransferPage() {
     }
   }
 
-  const handleToAccountChange = (accountId: string) => {
+  const handleToAccountChange = async (accountId: string) => {
     const selectedAccount = listAccounts.find((account) => account.id === Number(accountId))
     setToAccount(accountId.toString())
-    setToBalance(selectedAccount?.amount || 0)
+    const accountBalance = await getSumAmountBalanceByAccount(Number(accountId))
+    setToBalance(accountBalance)
 
     if (fromAccount === accountId) {
       const availableFromAccounts = listAccounts.filter(
@@ -109,7 +112,7 @@ export default function TransferPage() {
     const fetchAccounts = async () => {
       try {
         let accountsData = []
-        if (user && user.id) {
+        if (user && user?.id) {
           accountsData = await getAccountsByUserId(user.id)
         }
         setListAccounts(accountsData)
@@ -123,13 +126,13 @@ export default function TransferPage() {
 
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
-    return <Spinner/> // You can replace this with a loading spinner component if desired
+    return <Spinner /> // You can replace this with a loading spinner component if desired
   }
 
   // If the user is not logged in, redirect to the join page
   if (!isLoggedIn) {
     router.push('/join')
-    return <Spinner/> // Optional: Show a redirect message
+    return <Spinner /> // Optional: Show a redirect message
   }
 
   const handleTransfer = async (e: React.FormEvent) => {
@@ -144,41 +147,50 @@ export default function TransferPage() {
     //   return
     // }
     try {
-      const response = await fetch('/api/transaction/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json', // Specify JSON content type
-        },
-        body: JSON.stringify({
-          user_id: user.id,
-          amount: amount,
-          status: 'completed',
-          from_account: fromAccount,
-          to_account: toAccount,
-          type: 'transfer',
-        }), // Convert the request body to JSON
+      // const response = await fetch('/api/transaction/create', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json', // Specify JSON content type
+      //   },
+      //   body: JSON.stringify({
+      //     user_id: user.id,
+      //     amount: amount,
+      //     status: 'completed',
+      //     from_account: fromAccount,
+      //     to_account: toAccount,
+      //     type: 'transfer',
+      //   }), // Convert the request body to JSON
+      // })
+
+      // if (!response.ok) {
+      //   // Parse the error response to retrieve the error message
+      //   const errorResponse = await response.json()
+      //   console.error('Error creating transaction:', errorResponse)
+      //   const errorMessage = errorResponse.response?.error || 'An unknown error occurred'
+      //   throw new Error(errorMessage)
+      // }
+      const response = await createTransfer({
+        user_id: user.id,
+        amount: amount,
+        account_from: fromAccount,
+        account_to: toAccount,
       })
 
-      if (!response.ok) {
-        // Parse the error response to retrieve the error message
-        const errorResponse = await response.json()
-        const errorMessage = errorResponse.response?.error || 'An unknown error occurred'
-        throw new Error(errorMessage)
+      if (response.isSuccess) {
+        toast({
+          title: 'Transfer Successful',
+        })
       }
-      toast({
-        title: 'Transfer Successful',
-      })
     } catch (error) {
       console.error('Error creating transaction:', error)
       toast({
         title: 'Error',
-        description: `${error}`
+        description: `${error}`,
       })
     }
     router.push('/account/history/transfer')
     form.reset()
   }
-  console.log(process.env.NEXT_PUBLIC_GOOGLE_RECAPTCHA_V2_KEY)
   return (
     <>
       <SiteHeader />
@@ -191,7 +203,7 @@ export default function TransferPage() {
             <CardDescription>{t('tranfer_decs')}</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleTransfer}>
+            <form>
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="fromAccount">{t('tranfer_from')}</Label>
@@ -208,7 +220,7 @@ export default function TransferPage() {
                     </SelectContent>
                   </Select>
                   <p className="text-sm text-muted-foreground">
-                  {t('balance')}:{' '}
+                    {t('balance')}:{' '}
                     {fromBalance.toLocaleString('en-US', {
                       style: 'currency',
                       currency: 'USD',

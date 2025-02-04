@@ -15,7 +15,16 @@ import {
 import { Users, Link, DollarSign, Award } from 'lucide-react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
-import { getReferralsByParentId, getReferralsByParentIdWithFilter} from '@/lib/referrals'
+import {
+  getLinkReferral,
+  getReferralsByParentId,
+  getCountChildren,
+  getCountDepositedChildren,
+  getTotalEarning,
+  getCurrentLevelRate,
+  getCurrentLevelName,
+  getReferralsByParentIdWithFilter,
+} from '@/lib/referrals'
 import userStatus from '@/lib/userStatus'
 import { useRouter } from 'next/navigation'
 import {
@@ -33,7 +42,7 @@ interface Referral {
   name: string
   email: string
   date: string
-  status: 'Pending' | 'Completed'
+  status: 'Pending' | 'Completed',
 }
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
@@ -44,6 +53,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { useTranslation } from 'react-i18next';
 
 export default function ReferralPage() {
   const router = useRouter()
@@ -55,11 +65,37 @@ export default function ReferralPage() {
   const [startDate, setStartDate] = useState<Date>()
   const [endDate, setEndDate] = useState<Date>()
   const [nameFilter, setNameFilter] = useState('')
+  const { t } = useTranslation();
+
+  const [countChildren, setCountChildren] = useState(0)
+  const [countDepositedChildren, setCountDepositedChildren] = useState(0)
+  const [totalEarning, setTotalEarning] = useState(0)
+  const [currentLevelName, setCurrentLevelName] = useState('Loading...')
+  const [currentLevelRate, setCurrentLevelRate] = useState(0)
 
   useEffect(() => {
-    fetchData()
-  }, [loading, currentPage])
+    // Simulating API call to fetch referral data
+    const fetchReferralData = async () => {
+      const { docs, totalPages } = await getReferralsByParentId(user.id, currentPage, 10)
 
+      const refLink = await getLinkReferral(user.id)
+
+      // Stats
+      setCountChildren(await getCountChildren(user.id))
+      setCountDepositedChildren(await getCountDepositedChildren(user.id))
+      setTotalEarning(await getTotalEarning(user.id))
+
+      // Set Level
+      setCurrentLevelRate(await getCurrentLevelRate(user.id))
+      setCurrentLevelName(await getCurrentLevelName(user.id))
+
+      setReferrals(docs) // Store the accounts in state
+      setTotalPages(totalPages)
+      setReferralLink(`https://wealthfarming.org/join/${user.referral_code}`)
+    }
+
+    fetchReferralData()
+  }, [loading, currentPage])
 
   const copyReferralLink = () => {
     navigator.clipboard.writeText(referralLink)
@@ -68,6 +104,9 @@ export default function ReferralPage() {
 
   // Update Start Date & End Date
   const fetchData = async () => {
+    if(!user?.id){
+      return
+    }
     const { docs, totalPages, referral_code } = await getReferralsByParentId(
       user.id,
       currentPage,
@@ -78,19 +117,21 @@ export default function ReferralPage() {
     setReferralLink(`https://wealthfarming.org/join/${user.referral_code}`)
   }
   const handleEndDateSelect = (date: Date) => {
-    if(date){
-      const updatedEndDate = new Date(date);
-      updatedEndDate.setHours(23, 59, 59, 999);
-      setEndDate(updatedEndDate);
+    if (date) {
+      const updatedEndDate = new Date(date)
+      updatedEndDate.setHours(23, 59, 59, 999)
+      setEndDate(updatedEndDate)
+    } else {
+      setEndDate(date)
     }
-    else {
-      setEndDate(date);
-    }
-  };
-  
-  useEffect(() =>{
-    if (nameFilter!='' && (startDate && endDate)){
+  }
+
+  useEffect(() => {
+    if (nameFilter != '' && startDate && endDate) {
       const fetchReferralData = async () => {
+        if(!user?.id){
+          return
+        }
         const { docs, totalPages, referral_code } = await getReferralsByParentIdWithFilter(
           user.id,
           currentPage,
@@ -104,9 +145,11 @@ export default function ReferralPage() {
         setReferralLink(`https://wealthfarming.org/join/${user.referral_code}`)
       }
       fetchReferralData()
-    }
-    else if (nameFilter != ''){
+    } else if (nameFilter != '') {
       const fetchReferralData = async () => {
+        if(!user?.id){
+          return
+        }
         const { docs, totalPages, referral_code } = await getReferralsByParentIdWithFilter(
           user.id,
           currentPage,
@@ -120,9 +163,11 @@ export default function ReferralPage() {
         setReferralLink(`https://wealthfarming.org/join/${user.referral_code}`)
       }
       fetchReferralData()
-    }
-    else if ((startDate && endDate)){
+    } else if (startDate && endDate) {
       const fetchReferralData = async () => {
+        if(!user?.id){
+          return
+        }
         const { docs, totalPages, referral_code } = await getReferralsByParentIdWithFilter(
           user.id,
           currentPage,
@@ -136,41 +181,40 @@ export default function ReferralPage() {
         setReferralLink(`https://wealthfarming.org/join/${user.referral_code}`)
       }
       fetchReferralData()
-    }
-    else{
+    } else {
       fetchData()
     }
-  }, [nameFilter, startDate, endDate]);
+  }, [nameFilter, startDate, endDate])
 
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
-    return <Spinner/> // You can replace this with a loading spinner component if desired
+    return <Spinner /> // You can replace this with a loading spinner component if desired
   }
 
   // If the user is not logged in, redirect to the join page
   if (!isLoggedIn) {
     router.push('/join')
-    return <Spinner/> // Optional: Show a redirect message
+    return <Spinner /> // Optional: Show a redirect message
   }
 
   return (
     <>
       <SiteHeader />
       <div className="container mx-auto py-10">
-        <h1 className="text-3xl font-bold mb-8">Your Referrals</h1>
+        <h1 className="text-3xl font-bold mb-8">{t('your_referrals')}</h1>
 
         {/* Banner */}
         <Card className="mb-8">
           <CardContent className="flex items-center justify-between p-6">
             <div>
-              <h2 className="text-2xl font-semibold mb-2">Share your referral link</h2>
-              <p className="text-muted-foreground">Invite friends and earn rewards!</p>
+              <h2 className="text-2xl font-semibold mb-2">{t('share_referral_link')}</h2>
+              <p className="text-muted-foreground">{t('invite_friends_earn_rewards')}</p>
             </div>
             <div className="flex items-center space-x-2">
               <Input value={referralLink} readOnly className="w-64" />
               <Button onClick={copyReferralLink}>
                 <Link className="mr-2 h-4 w-4" />
-                Copy
+                {t('Copy')}
               </Button>
             </div>
           </CardContent>
@@ -180,38 +224,38 @@ export default function ReferralPage() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Referrals</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('total_referrals')}</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{referrals.length}</div>
+              <div className="text-2xl font-bold">{countChildren}</div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pending Referrals</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('pending_referrals')}</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{referrals.filter((ref: any) => ref.status === 'Pending').length}</div>
+              <div className="text-2xl font-bold">{countDepositedChildren}</div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Completed Referrals</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('completed_referrals')}</CardTitle>
               <Award className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{referrals.filter((ref: any) => ref.status === 'Completed').length}</div>
+              <div className="text-2xl font-bold">{totalEarning}</div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Earnings</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('total_earnings')}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">$100000</div>
+              <div className="text-2xl font-bold">${(currentLevelRate * 100).toFixed(2)}</div>
             </CardContent>
           </Card>
         </div>
@@ -221,42 +265,37 @@ export default function ReferralPage() {
             <div className=''>
             <Input 
               type="text" 
-              placeholder="Name" 
+              placeholder={t("name")} 
               onChange={(e) => setNameFilter(e.target.value)} 
             />
             </div>
             <PopoverTrigger asChild>
               <Button
-                variant={"outline"}
+                variant={'outline'}
                 className={cn(
-                  "w-[240px] justify-start text-left font-normal",
-                  !Date && "text-muted-foreground"
+                  'w-[240px] justify-start text-left font-normal',
+                  !Date && 'text-muted-foreground',
                 )}
               >
                 <CalendarIcon />
-                {startDate ? format(startDate, "PPP") : <span>Start Date</span>}
+                {startDate ? format(startDate, "PPP") : <span>{t('start_date')}</span>}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={startDate}
-                onSelect={setStartDate}
-                initialFocus
-              />
+              <Calendar mode="single" selected={startDate} onSelect={setStartDate} initialFocus />
             </PopoverContent>
           </Popover>
           <Popover>
             <PopoverTrigger asChild>
               <Button
-                variant={"outline"}
+                variant={'outline'}
                 className={cn(
-                  "w-[240px] justify-start text-left font-normal",
-                  !Date && "text-muted-foreground"
+                  'w-[240px] justify-start text-left font-normal',
+                  !Date && 'text-muted-foreground',
                 )}
               >
                 <CalendarIcon />
-                {endDate ? format(endDate, "PPP") : <span>End Date</span>}
+                {endDate ? format(endDate, "PPP") : <span>{t('end_date')}</span>}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -264,7 +303,7 @@ export default function ReferralPage() {
                 mode="single"
                 selected={endDate}
                 onSelect={(date) => {
-                  handleEndDateSelect(date);
+                  handleEndDateSelect(date)
                 }}
                 initialFocus
               />
@@ -275,16 +314,16 @@ export default function ReferralPage() {
         {/* Referrals Table */}
         <Card>
           <CardHeader>
-            <CardTitle>Your Referrals</CardTitle>
+            <CardTitle>{t('your_referrals')}</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>{t('name')}</TableHead>
+                  <TableHead>{t('Email')}</TableHead>
+                  <TableHead>{t('date')}</TableHead>
+                  <TableHead>{t('status')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -296,12 +335,13 @@ export default function ReferralPage() {
                       <TableCell>{referral.date}</TableCell>
                       <TableCell>
                         <span
-                          className={`px-2 py-1 rounded-full text-xs font-semibold ${referral.status === 'Completed'
+                          className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                            referral.status === 'Completed'
                               ? 'bg-green-100 text-green-800'
                               : 'bg-yellow-100 text-yellow-800'
-                            }`}
+                          }`}
                         >
-                          {referral.status}
+                          {t(referral.status)}
                         </span>
                       </TableCell>
                     </TableRow>
@@ -323,8 +363,9 @@ export default function ReferralPage() {
                         <PaginationLink
                           onClick={() => setCurrentPage(index + 1)}
                           isActive={currentPage === index + 1}
-                          className={`text-sm font-medium rounded-lg ${currentPage === index + 1 ? 'border-gray-400' : ''
-                            }`}
+                          className={`text-sm font-medium rounded-lg ${
+                            currentPage === index + 1 ? 'border-gray-400' : ''
+                          }`}
                         >
                           {index + 1}
                         </PaginationLink>

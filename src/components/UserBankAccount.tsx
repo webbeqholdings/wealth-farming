@@ -44,6 +44,9 @@ export default function UserBankAccount() {
   // Fetch bank account data when the component mounts
   useEffect(() => {
     async function fetchData() {
+      if(!user?.id){
+        return
+      }
       try {
         const bankResponse = await fetch(`/api/banks?where[user][equals]=${user.id}`)
         const bankData = await bankResponse.json()

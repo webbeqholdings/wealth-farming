@@ -3,13 +3,17 @@ import type { CollectionConfig } from 'payload'
 
 const Contracts: CollectionConfig = {
   slug: 'contracts',
+  admin: {
+    group: 'BeQ Dynamic Fund',
+    listSearchableFields: ['user.email', 'amount', 'term'],
+  },
   fields: [
     {
       name: 'user',
       type: 'relationship',
       relationTo: 'users', // Liên kết đến collection accounts
       label: 'User',
-      required: true
+      required: true,
     },
     {
       name: 'amount',
@@ -20,6 +24,8 @@ const Contracts: CollectionConfig = {
       name: 'profit',
       type: 'number',
       label: 'Profit',
+      required: false,
+      defaultValue: 0,
     },
     {
       name: 'balance',
@@ -40,6 +46,8 @@ const Contracts: CollectionConfig = {
       name: 'periods',
       type: 'number',
       label: 'Periods',
+      required: false,
+      defaultValue: null,
     },
     {
       name: 'start_date',
@@ -50,6 +58,8 @@ const Contracts: CollectionConfig = {
       name: 'end_date',
       type: 'date',
       label: 'End Date',
+      required: false,
+      defaultValue: null,
     },
     {
       name: 'status',

@@ -370,6 +370,8 @@ export interface Transaction {
   status: 'pending' | 'completed' | 'failed';
   from_account?: (number | null) | Account;
   to_account?: (number | null) | Account;
+  account_from?: (number | null) | Account;
+  account_to?: (number | null) | Account;
   deposit_screenshot?: (number | null) | Media;
   type: 'deposit' | 'withdraw' | 'bonus' | 'transfer' | 'investment' | 'referral_reward';
   message?: string | null;
@@ -924,6 +926,8 @@ export interface TransactionsSelect<T extends boolean = true> {
   status?: T;
   from_account?: T;
   to_account?: T;
+  account_from?: T;
+  account_to?: T;
   deposit_screenshot?: T;
   type?: T;
   message?: T;

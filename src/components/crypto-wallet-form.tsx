@@ -26,7 +26,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { BankCombobox } from './bank-combobox'
 import { Separator } from '@radix-ui/react-dropdown-menu'
 import {
   Dialog,
@@ -40,6 +39,7 @@ import { useToast } from '@/hooks/use-toast'
 import { Trash2 } from 'lucide-react'
 import UserStatus from '@/lib/userStatus'
 import { CryptoWalletCombobox } from './crypto-wallet-combobox'
+import { useTranslation } from 'react-i18next'
 
 const formSchema = z.object({
   walletAddress: z.string().min(5, {
@@ -51,17 +51,18 @@ const formSchema = z.object({
 })
 
 export function CryptoWalletForm({
-  accounts,
-  setAccounts,
+  cryptoWallets,
+  setCryptoWallets,
 }: {
-  accounts: any[]
-  setAccounts: React.Dispatch<React.SetStateAction<any[]>>
+  cryptoWallets: any[]
+  setCryptoWallets: React.Dispatch<React.SetStateAction<any[]>>
 }) {
   const [cryptoWalletId, setCryptoWalletId] = useState('')
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const { toast } = useToast()
 
   const { user } = UserStatus()
+  const { t } = useTranslation()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -85,7 +86,9 @@ export function CryptoWalletForm({
         setIsDialogOpen(false)
 
         // Remove the deleted account from local state
-        setAccounts((prevAccounts) => prevAccounts.filter((account) => account.id !== accountId))
+        setCryptoWallets((prevAccounts) =>
+          prevAccounts.filter((account) => account.id !== accountId),
+        )
 
         // Show success toast message
         toast({
@@ -107,7 +110,7 @@ export function CryptoWalletForm({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const newCryptoWallet = {
-      user: Number(user.id),
+      user: Number(user?.id),
       wallet_address: values.walletAddress,
       network: values.network,
     }
@@ -123,8 +126,9 @@ export function CryptoWalletForm({
 
       // Check if the response is ok (status 200-299)
       if (response.ok) {
+        const data = await response.json()
         // Update local state with the new account if necessary
-        setAccounts((prevAccounts) => [...prevAccounts, newCryptoWallet])
+        setCryptoWallets((prevAccounts) => [...prevAccounts, data.doc])
 
         // Reset the form and show success message
         form.reset()
@@ -158,10 +162,8 @@ export function CryptoWalletForm({
     <div>
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>Add Crypto Wallet</CardTitle>
-          <CardDescription>
-            Enter your bank account details for deposits and withdrawals.
-          </CardDescription>
+          <CardTitle>{t('add_crypto_wallet')}</CardTitle>
+          <CardDescription>{t('crypto_details')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -173,11 +175,11 @@ export function CryptoWalletForm({
                   name="walletAddress"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>Wallet Address</FormLabel>
+                      <FormLabel>{t('wallet_address')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter wallet address" {...field} />
+                        <Input placeholder={t('enter_wallet_address')} {...field} />
                       </FormControl>
-                      <FormDescription>Your crypto wallet address.</FormDescription>
+                      <FormDescription>{t('crypto_wallet_address')}</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -187,11 +189,11 @@ export function CryptoWalletForm({
                   name="network"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>Network</FormLabel>
+                      <FormLabel>{t('Network')}</FormLabel>
                       <FormControl>
                         <CryptoWalletCombobox value={field.value} onChange={field.onChange} />
                       </FormControl>
-                      <FormDescription>The blockchain network of your wallet.</FormDescription>
+                      <FormDescription>{t('blockchain_network')}</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -200,27 +202,27 @@ export function CryptoWalletForm({
 
               {/* Submit Button */}
               <Button type="submit" className="bg-primary hover:bg-primary/90 text-black">
-                Add Crypto Wallet
+                {t('add_crypto_wallet')}
               </Button>
             </form>
           </Form>
         </CardContent>
         <Separator />
         <CardHeader>
-          <CardTitle>Your Crypto Wallets</CardTitle>
-          <CardDescription>Manage your registered crypto wallets.</CardDescription>
+          <CardTitle>{t('your_crypto_wallets')}</CardTitle>
+          <CardDescription>{t('manage_crypto_wallets')}.</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Wallet Address</TableHead>
-                <TableHead>Network</TableHead>
-                <TableHead>Action</TableHead> {/* Add action column */}
+                <TableHead>{t('wallet_address')}</TableHead>
+                <TableHead>{t('Network')}</TableHead>
+                <TableHead>{t('action')}</TableHead> {/* Add action column */}
               </TableRow>
             </TableHeader>
             <TableBody>
-              {accounts.map((account) => (
+              {cryptoWallets && cryptoWallets.map((account) => (
                 <TableRow key={account.id}>
                   <TableCell>{account.wallet_address}</TableCell>
                   <TableCell>{account.network}</TableCell>
@@ -241,17 +243,15 @@ export function CryptoWalletForm({
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Are you sure?</DialogTitle>
-            <DialogDescription>
-              This action will permanently delete the bank account. Do you want to proceed?
-            </DialogDescription>
+            <DialogTitle>{t('are_you_sure')}</DialogTitle>
+            <DialogDescription>{t('delete_account_warning')}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button onClick={handleCancel} color="gray" size="sm">
-              Cancel
+              {t('cancel')}
             </Button>
             <Button onClick={() => handleDelete(cryptoWalletId)} color="red" size="sm">
-              Delete
+              {t('delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

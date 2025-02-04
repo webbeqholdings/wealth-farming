@@ -53,6 +53,7 @@ const Telegram: CollectionConfig = {
   ],
   admin: {
     useAsTitle: 'last_name',
+    listSearchableFields:['first_name', 'last_name'],
   },
 }
 

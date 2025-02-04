@@ -14,15 +14,18 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts'
 import { DollarSign } from 'lucide-react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { TabMenu } from '@/components/w88/TabMenu'
 import { accountConfig } from '@/config/accounts'
-import { formatDateTime } from '@/utilities/formatDateTime'
-import UserStatus from '@/lib/userStatus'
-import { getTransactions, getTransactionsWithDate } from '@/lib/transaction'
+
+import {
+  getTransactions,
+  getTransactionsWithDate,
+  getSumAmountBalanceByAccount,
+} from '@/lib/transaction'
+import { getAccountsByUser } from '@/lib/account'
 import {
   Pagination,
   PaginationContent,
@@ -34,16 +37,13 @@ import {
 import Spinner from '@/components/Spinner'
 import { printPdf } from '@/components/printPdf'
 import { useTheme } from 'next-themes'
-import { format } from "date-fns"
-import { CalendarIcon, ArrowDownToLine } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Calendar } from "@/components/ui/calendar"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns'
+import { CalendarIcon, ArrowDownToLine } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Calendar } from '@/components/ui/calendar'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { useTranslation } from 'react-i18next'
+import { me } from '@/lib/me'
 
 // Mock data for chart
 const chartData = [
@@ -55,50 +55,50 @@ const chartData = [
   { name: 'Jun', deposits: 3490, withdrawals: 1500 },
 ]
 
-export default function HistoryPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>
-}) {
+export default function HistoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const router = useRouter()
 
   const slug = use(params).slug
-  const tab = slug === "withdraw" || slug === "transfer" || slug === "bonus" || slug === "investment"
-    ? slug
-    : 'deposit' // Deposit tab as default
-  const { t } = useTranslation();
-  const { isLoggedIn, loading, user } = UserStatus()
+  const tab =
+    slug === 'withdraw' || slug === 'transfer' || slug === 'bonus' || slug === 'investment'
+      ? slug
+      : 'deposit' // Deposit tab as default
+  const { t } = useTranslation()
+  const [user, setUser] = useState(null)
   const [activeTab, setActiveTab] = useState(tab)
   const [transactions, setTransactions] = useState([])
   const [accounts, setAccounts] = useState([])
   const [totalPages, setTotalPages] = useState(1)
   const [currentPage, setCurrentPage] = useState(1)
   const { theme, setTheme } = useTheme()
+  const [loading, setLoading] = useState(true)
   const [startDate, setStartDate] = useState<Date>()
   const [endDate, setEndDate] = useState<Date>()
+  // const [user, setUser] = useState(null)
+  const [accountData, setAccountData] = useState(null)
 
   useEffect(() => {
     const fetchAccounts = async () => {
-      try {
-        const response = await fetch(`/api/accounts?where[user][equals]=${user.id}`) // Replace with dynamic user ID if necessary
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`)
-        }
-        const data = await response.json()
+      const _user = await me()
 
-        // Transform API response into desired format
-        const transformedAccounts = data.docs.map(
-          (account: { account_name: string; amount: number }) => ({
-            name: account.account_name,
-            balance: account.amount, // Assuming you want to divide the amount to convert to another unit
-            currency: 'USD', // Hardcoded as 'USD', replace with dynamic value if available in the API
-          }),
-        )
+      setUser(_user)
 
-        setAccounts(transformedAccounts) // Store the transformed accounts in state
-      } catch (error) {
-        console.error('Failed to fetch accounts:', error)
+      let _accounts = await getAccountsByUser(_user.id)
+      let _accountData = []
+
+      for (const _acc of _accounts) {
+        _accountData.push({
+          type: _acc.type,
+          balance: await getSumAmountBalanceByAccount(_acc.id),
+          account_number: _acc.account_number,
+        })
       }
+
+      setAccountData(_accountData)
+      // Update Code
+
+      setAccounts(_accounts) // Store the transformed accounts in state
+      setLoading(false)
     }
 
     fetchAccounts()
@@ -133,13 +133,13 @@ export default function HistoryPage({
 
   const handleEndDateSelect = (date: Date) => {
     if (date) {
-      const updatedEndDate = new Date(date);
-      updatedEndDate.setHours(23, 59, 59, 999);
-      setEndDate(updatedEndDate);
+      const updatedEndDate = new Date(date)
+      updatedEndDate.setHours(23, 59, 59, 999)
+      setEndDate(updatedEndDate)
     } else {
-      setEndDate(date);
+      setEndDate(date)
     }
-  };
+  }
 
   useEffect(() => {
     if (startDate && endDate) {
@@ -161,14 +161,21 @@ export default function HistoryPage({
   function filterDate() {
     const fetchTransactions = async () => {
       try {
-        const { docs, totalPages } = await getTransactionsWithDate(currentPage, 10, activeTab, startDate.toISOString(), endDate.toISOString());
-        setTransactions(docs); // Store the transactions in state
-        setTotalPages(totalPages);
+        const { docs, totalPages } = await getTransactionsWithDate(
+          currentPage,
+          10,
+          activeTab,
+          startDate.toISOString(),
+          endDate.toISOString(),
+        )
+        setTransactions(docs) // Store the transactions in state
+
+        setTotalPages(totalPages)
       } catch (error) {
-        console.error('Failed to fetch transactions:', error);
+        console.error('Failed to fetch transactions:', error)
       }
-    };
-    fetchTransactions(); // Invoke the asynchronous function
+    }
+    fetchTransactions() // Invoke the asynchronous function
   }
   // If still loading, show a loading indicator (or spinner)
   if (loading) {
@@ -176,7 +183,7 @@ export default function HistoryPage({
   }
 
   // If the user is not logged in, redirect to the join page
-  if (!isLoggedIn) {
+  if (!user) {
     router.push('/join')
     return <Spinner /> // Optional: Show a redirect message
   }
@@ -199,15 +206,15 @@ export default function HistoryPage({
         <TabMenu items={accountConfig.tabList} defaultValue="history" />
         {/* Wallet Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 mt-6">
-          {accounts.map((account) => (
-            <Card key={account.name}>
+          {accountData.map((data: any) => (
+            <Card key={data.type}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{account.name}</CardTitle>
+                <CardTitle className="text-sm font-medium">{data.type.toString()}</CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {account.balance.toLocaleString('en-US', {
+                  {data.balance.toLocaleString('en-US', {
                     style: 'currency',
                     currency: 'USD',
                   })}
@@ -226,14 +233,14 @@ export default function HistoryPage({
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
-                      variant={"outline"}
+                      variant={'outline'}
                       className={cn(
-                        "w-[240px] justify-start text-left font-normal",
-                        !Date && "text-muted-foreground"
+                        'w-[240px] justify-start text-left font-normal',
+                        !Date && 'text-muted-foreground',
                       )}
                     >
                       <CalendarIcon />
-                      {startDate ? format(startDate, "PPP") : <span>Start Date</span>}
+                      {startDate ? format(startDate, 'PPP') : <span>Start Date</span>}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -248,14 +255,14 @@ export default function HistoryPage({
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
-                      variant={"outline"}
+                      variant={'outline'}
                       className={cn(
-                        "w-[240px] justify-start text-left font-normal",
-                        !Date && "text-muted-foreground"
+                        'w-[240px] justify-start text-left font-normal',
+                        !Date && 'text-muted-foreground',
                       )}
                     >
                       <CalendarIcon />
-                      {endDate ? format(endDate, "PPP") : <span>End Date</span>}
+                      {endDate ? format(endDate, 'PPP') : <span>End Date</span>}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -273,8 +280,8 @@ export default function HistoryPage({
                 <Button
                   variant={activeTab === 'deposit' ? 'default' : 'outline'}
                   onClick={() => {
-                    setActiveTab('deposit');
-                    setCurrentPage(1);
+                    setActiveTab('deposit')
+                    setCurrentPage(1)
                   }}
                 >
                   {t('tranfer_history_table_button_1')}
@@ -282,8 +289,8 @@ export default function HistoryPage({
                 <Button
                   variant={activeTab === 'withdraw' ? 'default' : 'outline'}
                   onClick={() => {
-                    setActiveTab('withdraw');
-                    setCurrentPage(1);
+                    setActiveTab('withdraw')
+                    setCurrentPage(1)
                   }}
                 >
                   {t('tranfer_history_table_button_2')}
@@ -291,8 +298,8 @@ export default function HistoryPage({
                 <Button
                   variant={activeTab === 'transfer' ? 'default' : 'outline'}
                   onClick={() => {
-                    setActiveTab('transfer');
-                    setCurrentPage(1);
+                    setActiveTab('transfer')
+                    setCurrentPage(1)
                   }}
                 >
                   {t('tranfer_history_table_button_3')}
@@ -300,8 +307,8 @@ export default function HistoryPage({
                 <Button
                   variant={activeTab === 'investment' ? 'default' : 'outline'}
                   onClick={() => {
-                    setActiveTab('investment');
-                    setCurrentPage(1);
+                    setActiveTab('investment')
+                    setCurrentPage(1)
                   }}
                 >
                   {t('tranfer_history_table_button_4')}
@@ -309,8 +316,8 @@ export default function HistoryPage({
                 <Button
                   variant={activeTab === 'bonus' ? 'default' : 'outline'}
                   onClick={() => {
-                    setActiveTab('bonus');
-                    setCurrentPage(1);
+                    setActiveTab('bonus')
+                    setCurrentPage(1)
                   }}
                 >
                   {t('tranfer_history_table_button_5')}
@@ -330,20 +337,16 @@ export default function HistoryPage({
                 <TableRow>
                   <TableHead>{t('date')}</TableHead>
                   <TableHead>{t('type')}</TableHead>
-                  {activeTab === 'investment' ? (
+                  {activeTab === 'all' || activeTab === 'investment' ? (
                     <TableHead>{t('product')}</TableHead>
                   ) : (
                     ''
                   )}
                   <TableHead>{t('money_amount')}</TableHead>
-                  {activeTab === 'investment' ? (
-                    <TableHead>{t('portfolio_profit')}</TableHead>
-                  ) : (
-                    ''
-                  )}
+                  {activeTab === 'investment' ? <TableHead>{t('portfolio_profit')}</TableHead> : ''}
                   {activeTab !== 'transfer' ? <TableHead>{t('account')}</TableHead> : ''}
-                  {activeTab === 'transfer' ? <TableHead> {t('tranfer_from')}</TableHead> : ''}
-                  {activeTab === 'transfer' ? <TableHead> {t('tranfer_to')}</TableHead> : ''}
+                  {activeTab === 'transfer' ? <TableHead>{t('tranfer_from')}</TableHead> : ''}
+                  {activeTab === 'transfer' ? <TableHead>{t('tranfer_to')}</TableHead> : ''}
                   {activeTab === 'deposit' || activeTab === 'withdraw' || activeTab === 'bonus' ? (
                     <TableHead>{t('status')}</TableHead>
                   ) : (
@@ -373,7 +376,7 @@ export default function HistoryPage({
                         {transaction.type.charAt(0).toUpperCase() +
                           transaction.type.slice(1).toLowerCase()}
                       </TableCell>
-                      {activeTab === 'investment' ? (
+                      {activeTab === 'all' || activeTab === 'investment' ? (
                         <TableHead>{transaction.product_name}</TableHead>
                       ) : (
                         ''
@@ -386,8 +389,10 @@ export default function HistoryPage({
                           //     : 'text-red-600'
                           // }
                           className={clsx({
-                            'text-green-600': transaction.amount >= 0 && transaction.profit_or_loss >= 0,
-                            'text-red-600': transaction.status === 'failed' || transaction.amount < 0,
+                            'text-green-600':
+                              transaction.amount >= 0 && transaction.profit_or_loss >= 0,
+                            'text-red-600':
+                              transaction.status === 'failed' || transaction.amount < 0,
                           })}
                         >
                           {transaction.amount.toLocaleString('en-US', {
@@ -412,15 +417,20 @@ export default function HistoryPage({
                       ) : (
                         ''
                       )}
-                      <TableCell>{transaction.account}</TableCell>
+                      {activeTab === 'deposit' || activeTab === 'bonus' ? (
+                        <TableCell>{transaction.to_account}</TableCell>
+                      ) : (
+                        <TableCell>{transaction.account}</TableCell>
+                      )}
+                      {/* <TableCell>{transaction.account}</TableCell> */}
                       {activeTab === 'transfer' ? (
                         <TableCell>{transaction.to_account}</TableCell>
                       ) : (
                         ''
                       )}
                       {activeTab === 'deposit' ||
-                        activeTab === 'withdraw' ||
-                        activeTab === 'bonus' ? (
+                      activeTab === 'withdraw' ||
+                      activeTab === 'bonus' ? (
                         <TableCell
                           className={clsx({
                             'text-yellow-500': transaction.status === 'pending', // Yellow font
@@ -433,11 +443,7 @@ export default function HistoryPage({
                       ) : (
                         ''
                       )}
-                      {activeTab === 'bonus' ? (
-                        <TableHead>{transaction.message}</TableHead>
-                      ) : (
-                        ''
-                      )}
+                      {activeTab === 'bonus' ? <TableHead>{t(`${transaction.message}`)}</TableHead> : ''}
                     </TableRow>
                   ))}
               </TableBody>
@@ -449,7 +455,7 @@ export default function HistoryPage({
                     onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                     className="text-sm font-medium rounded-lg hover:bg-gray-100"
                   >
-                    {t("previous")}
+                    {t('previous')}
                   </PaginationPrevious>
                   <PaginationContent>
                     {[...Array(totalPages)].map((_, index) => (
@@ -457,8 +463,9 @@ export default function HistoryPage({
                         <PaginationLink
                           onClick={() => setCurrentPage(index + 1)}
                           isActive={currentPage === index + 1}
-                          className={`text-sm font-medium rounded-lg ${currentPage === index + 1 ? 'border-gray-400' : ''
-                            }`}
+                          className={`text-sm font-medium rounded-lg ${
+                            currentPage === index + 1 ? 'border-gray-400' : ''
+                          }`}
                         >
                           {index + 1}
                         </PaginationLink>
@@ -469,7 +476,7 @@ export default function HistoryPage({
                     onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                     className="px-3 py-1.5 text-sm font-medium rounded-lg hover:bg-gray-100"
                   >
-                    {t("next")}
+                    {t('next')}
                   </PaginationNext>
                 </Pagination>
               </div>

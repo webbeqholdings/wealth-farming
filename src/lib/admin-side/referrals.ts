@@ -8,11 +8,11 @@ export const getParentIdByUser = async (
   const response = await payload.find({
     collection: 'user-referrals',
     where: {
-      parent: { equals: user_id },
+      child: { equals: user_id },
     },
   })
 
-  if (!response.docs.length) {
+  if (!response.totalDocs) {
     return false
   }
 

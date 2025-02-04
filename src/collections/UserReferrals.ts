@@ -5,6 +5,7 @@ const UserReferrals: CollectionConfig = {
   admin: {
     useAsTitle: 'id',
     defaultColumns: ['parent', 'child', 'referral_at'],
+    listSearchableFields: ['parent.email', 'child.email'],
   },
   access: {
     create: () => true,

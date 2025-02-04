@@ -8,6 +8,7 @@ const InvestmentProducts: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'product_name',
+    listSearchableFields: ['product_name', 'rate_of_return'],
   },
   fields: [
     {

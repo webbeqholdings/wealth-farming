@@ -9,54 +9,49 @@ import {
   IconRouteAltLeft,
   IconTerminal2,
 } from '@tabler/icons-react'
+import { useTranslation } from 'react-i18next';
 
 export default function FeaturesSection() {
+  const { t } = useTranslation();
   const features = [
     {
-      title: 'Personal Investment Dashboard',
-      description:
-        'Displays asset status, interest rates, current investments, and portfolio performance.',
+      title: t('dashboard'),
+      description: t('dashboard_info'),
       icon: <IconTerminal2 />,
     },
     {
-      title: 'Estimated Profit Calculator',
-      description:
-        'A tool that helps users estimate projected profits based on their investment amount and duration.',
+      title: t('profit_calculator'),
+      description: t('calculator_info'),
       icon: <IconEaseInOut />,
     },
     {
-      title: 'Fund Information and Historical Performance',
-      description:
-        'Provides detailed information on each fund, past performance, and risk assessments.',
+      title: t('fund_info'),
+      description: t('fund_details'),
       icon: <IconCurrencyDollar />,
     },
     {
-      title: 'Accumulation and Asset Comparison Charts',
-      description:
-        'Shows comparison charts of investments over time for easy tracking and evaluation.',
+      title: t('comparison_charts'),
+      description: t('charts_info'),
       icon: <IconCloud />,
     },
     {
-      title: 'Transaction History',
-      description:
-        'Provides a detailed history of deposit/withdrawal transactions, profits, and accumulated interest.',
+      title: t('transaction_history'),
+      description: t('history_info'),
       icon: <IconRouteAltLeft />,
     },
     {
-      title: 'Portfolio Diversification Tool',
-      description:
-        'Offers suggestions for diversifying portfolios to minimize risk and optimize returns.',
+      title: t('diversification_tool'),
+      description:t('diversification_info'),
       icon: <IconHelp />,
     },
     {
-      title: 'Financial Market Updates',
-      description:
-        'Provides news and market analysis to help investors keep up with trends and opportunities.',
+      title: t('market_updates'),
+      description: t('updates_info'),
       icon: <IconAdjustmentsBolt />,
     },
     {
-      title: 'Investment Promotions and Rewards Programs',
-      description: 'Integrates promotions, discounts, or reward points for customers.',
+      title: t('promotions_rewards'),
+      description: t('promotions_info'),
       icon: <IconHeart />,
     },
   ]
@@ -80,6 +75,7 @@ const Feature = ({
   icon: React.ReactNode
   index: number
 }) => {
+  const { t } = useTranslation();
   return (
     <div
       className={cn(
@@ -98,11 +94,11 @@ const Feature = ({
       <div className="text-lg font-bold mb-2 relative z-10 px-10">
         <div className="absolute left-0 inset-y-0 h-6 group-hover/feature:h-8 w-1 rounded-tr-full rounded-br-full bg-neutral-300 dark:bg-neutral-700 group-hover/feature:bg-blue-500 transition-all duration-200 origin-center" />
         <span className="group-hover/feature:translate-x-2 transition duration-200 inline-block text-neutral-800 dark:text-neutral-100">
-          {title}
+          {t(title)}
         </span>
       </div>
       <p className="text-sm text-neutral-600 dark:text-neutral-300 max-w-xs relative z-10 px-10">
-        {description}
+        {t(description)}
       </p>
     </div>
   )

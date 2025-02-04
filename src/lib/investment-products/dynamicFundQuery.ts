@@ -8,15 +8,6 @@ const payload = await getPayload({
 })
 
 export const gcDynamicFund = async () => {
-  // const req = await fetch('/api/globals/gc-beq-dynamic-fund', {
-  //   method: 'GET',
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //   },
-  // })
-  // const data = await req.json()
-  // console.log('....data', data)
-
   const response = await payload.findGlobal({
     slug: 'gc-beq-dynamic-fund',
   })
@@ -33,7 +24,6 @@ export const getPublicProducts = async () => {
 export const getPublicProductsIDs = async () => {
   const data = await getPublicProducts()
   return data.map((prod: any) => {
-    console.log('product id', (prod as { id: number }).id)
     return (prod as { id: number }).id
   })
 }
