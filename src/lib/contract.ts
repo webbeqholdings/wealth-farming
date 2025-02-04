@@ -393,3 +393,47 @@ export async function checkContractLarger90Days() {
     console.error(erorr)
   }
 }
+
+export async function canTerminateContractAt(contract_id: Number) {
+  const payload = await getPayload({
+    config,
+  })
+
+  const response = await payload.find({
+    collection: 'contracts',
+    where: {
+      id: { equals: contract_id },
+    },
+  })
+
+  return response.docs[0].end_date
+}
+
+export async function comfortableCash(dayCount: number) {
+  const payload = await getPayload({ config, })
+
+  const response = await payload.find({
+    collection: 'contracts',
+    where: {
+      status: { equals: 'active' },
+    },
+    limit: 1000000,
+  })
+
+  const contracts = response.docs
+  const today = new Date()
+  const targetDate = new Date(today)
+  targetDate.setDate(today.getDate() + dayCount)
+
+  let sumAmount = 0
+  const filteredContracts = contracts.filter(contract => {
+    const endDate = new Date(contract.end_date)
+    return endDate >= targetDate
+  })
+
+  sumAmount = filteredContracts.reduce((total, contract) => {
+    return total + contract.amount
+  }, 0)
+
+  return sumAmount
+}

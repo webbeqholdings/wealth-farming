@@ -135,7 +135,6 @@ export const buildProfitRecordsAnnualy = (
     .map((item: any) => {
       return item.year
     })
-  console.log('check invalidYears: ', invalidYears)
 
   const dataYearLoop = dataAnnualy.filter((y: any) => {
     return y.isValid == false
