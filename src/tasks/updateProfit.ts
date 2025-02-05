@@ -125,7 +125,7 @@ export const updateProfitHandler: TaskHandler<{
         let profitToday = 0;
         let balanceToday = 0;
         // Ensure product_log is an object and has rate_of_return
-        if (typeof product_log !== 'object' || product_log === null || !('rate_of_return' in product_log) || typeof product_log.rate_of_return !== 'number' || amount === undefined) {
+        if (typeof product_log !== 'object' || product_log === null || !('data' in product_log) || typeof product_log.data !== 'object' || !('rate_of_return' in product_log.data) || typeof product_log.data.rate_of_return !== 'number' || amount === undefined) {
             console.warn(`Skipping contract ID: ${contract.id} due to missing or invalid product_log`);
             continue;
         }
@@ -146,6 +146,13 @@ export const updateProfitHandler: TaskHandler<{
             },
         });
 
+        console.log(
+            `Updated contract ID: ${contract.id} | Total Profit: ${profitToday.toFixed(
+                2
+            )}`
+        );
+
+        // Auto withdraw
         if (
             typeof config_log === 'object' && config_log !== null &&
             'extend_contract' in config_log && config_log.extend_contract == true &&
@@ -161,16 +168,20 @@ export const updateProfitHandler: TaskHandler<{
                         contractId: contract.id,
                         userId: user.id
                     }
-                    await withdrawInvestment(formData);
+                    const mesg = await withdrawInvestment(formData);
+                    console.log(
+                        `Auto withdraw for: ${contract.id} | Withdraw amount: ${amount} | Message : ${mesg.message}`
+                    );
+                }
+                else{
+                    console.log(
+                        `Auto withdraw for: ${contract.id} | Withdraw failed - amount < minWithdrawal`
+                    );
                 }
             }
         }
 
-        console.log(
-            `Updated contract ID: ${contract.id} | Total Profit: ${profitToday.toFixed(
-                2
-            )}`
-        );
+        
     }
 
     await payload.jobs.queue({
