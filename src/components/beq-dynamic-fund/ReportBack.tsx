@@ -3,23 +3,19 @@ import { format } from 'date-fns'
 import { Bird } from 'lucide-react'
 import { Separator } from '../ui/separator'
 import { useTranslation } from 'react-i18next'
+import { useDynamicFundData } from './DataProvider'
 
-const ReportBack = ({
-  amount,
-  term,
-  startDate,
-  endDate,
-  periods,
-  dataExtra,
-}: {
-  amount: number
-  term: Term
-  startDate: Date
-  endDate: Date
-  periods: number
-  dataExtra?: object
-}) => {
+const ReportBack = () => {
+  const { data } = useDynamicFundData()
   const { t } = useTranslation()
+  const {
+    amount,
+    term,
+    startDate,
+    endDate,
+    periods,
+    dataExtra
+  } = data
   let termDescriptionConfig = [
     {
       termKey: 'monthly',
@@ -78,7 +74,7 @@ const ReportBack = ({
       <div></div>
       <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
         <li>
-          {t('willing_to_invest')} <span className="text-primary mx-1 font-semibold">{amount}</span> 
+          {t('willing_to_invest')} <span className="text-primary mx-1 font-semibold">{amount}</span>
           {t('usd_investment_program')}
           <span className="text-primary mx-1 font-semibold">{t(termDescription.termName)}</span>
         </li>
@@ -113,7 +109,7 @@ const ReportBack = ({
           <span className="text-primary mx-1 font-semibold">
             {format(endDate, 'd/MM/yyyy')}
           </span>{' '}
-          {t('with')} <span className="text-primary mx-1 font-bold">{periods}</span> 
+          {t('with')} <span className="text-primary mx-1 font-bold">{periods}</span>
           {t('investment_period')}
           <span className="text-primary mx-1 font-bold">{years} {t('year')}</span>
         </li>
@@ -124,7 +120,7 @@ const ReportBack = ({
         <li>
           {t('interest_rate_on_date')}
           <span className="text-primary mx-1 font-semibold">
-            ({t('day_num', {num: standardApplyProgramDays + 1})})
+            ({t('day_num', { num: standardApplyProgramDays + 1 })})
           </span>
           <span className="text-primary mx-1 font-semibold">
             {format(canCancelContractAt, 'd/MM/yyyy')}
