@@ -264,7 +264,7 @@ export const en = {
     webinar: "Webinar: Sustainable Investing Strategies - Register Now",
     q2_report: "Q2 Performance Report Now Available",
     join_discord: "Join our Discord community for daily market insights",
-    breaking_news: "Breaking News",
+    posts: "Posts",
     mission_statement: "Your wealth, our mission",
     embark_journey: "Embark on Your Wealth Journey Today!",
     embark_journey_description:'Join BeQ Wealth Farming Fund and start growing your investments with sustainable, innovative agricultural projects.',
