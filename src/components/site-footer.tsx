@@ -8,7 +8,7 @@ export function SiteFooter() {
   return (
     <footer className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t">
       <div className="container md:py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8"> {/* Changed grid-cols-4 to grid-cols-3 */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Wealth Farming</h3>
             <p className="text-sm text-muted-foreground">Grow your wealth with sustainable investment strategies.</p>
@@ -33,48 +33,23 @@ export function SiteFooter() {
             <h4 className="text-sm font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/about" className="hover:underline">
-                  About Us
+                <Link href="/explore-tools/economic-calendar" className="hover:underline">
+                Economic Calendar
                 </Link>
               </li>
               <li>
-                <Link href="/services" className="hover:underline">
-                  Our Services
+                <Link href="/investment-products/incoming/investment-process" className="hover:underline">
+                  Dynamic Profit Calculator
                 </Link>
               </li>
               <li>
-                <Link href="/investment-contracts" className="hover:underline">
-                  Investment Contracts
+                <Link href="/explore-tools/compound-interest-rate" className="hover:underline">
+                  Investment Simulator
                 </Link>
               </li>
               <li>
                 <Link href="/account/referral" className="hover:underline">
                   Referral Program
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-sm font-semibold mb-4">Support</h4>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/faq" className="hover:underline">
-                  FAQ
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:underline">
-                  Contact Us
-                </Link>
-              </li>
-              <li>
-                <Link href="/terms" className="hover:underline">
-                  Terms of Service
-                </Link>
-              </li>
-              <li>
-                <Link href="/privacy" className="hover:underline">
-                  Privacy Policy
                 </Link>
               </li>
             </ul>
