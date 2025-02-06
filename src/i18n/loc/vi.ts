@@ -267,7 +267,7 @@ export const vi = {
     webinar: "Hội thảo trực tuyến: Chiến lược Đầu tư Bền vững - Đăng ký ngay",
     q2_report: "Báo cáo Hiệu suất Quý 2 đã sẵn sàng",
     join_discord: "Tham gia cộng đồng Discord của chúng tôi để cập nhật thông tin thị trường hàng ngày",
-    breaking_news: "Tin tức nóng",
+    posts: "Bài đăng",
     mission_statement: "Sự giàu có của bạn là sứ mệnh của chúng tôi",
     embark_journey: "Bắt đầu hành trình đầu tư của bạn ngay hôm nay!",
     embark_journey_description: 'Tham gia BeQ Wealth Farming Fund và bắt đầu phát triển khoản đầu tư của bạn với các dự án nông nghiệp bền vững và sáng tạo.',
@@ -330,6 +330,15 @@ export const vi = {
     rate: 'Tỷ Lệ',
     partialMonthNote:'({{days}} / {{months}} ngày) Tháng Không Trọn Vẹn',
     message: 'ghi chú',
+    profit_chart: 'Biểu Đồ Lợi Nhuận',
+    profit_by_time: 'Biểu diễn số dư theo thời gian',
+    profit_table: 'Bảng Lãi',
+    balance_chart: 'Số Dư ($)',
+    partial_monthly: 'Partial Monthly',
+    full_monthly: 'Đủ một tháng',
+    full_quarterly: 'Đủ một quý',
+    full_semester: 'Đủ nữa năm',
+    full_annually: 'Đủ một năm',
 
     // referral
     grow_wealth: 'Cùng Nhau Đầu Tư',
@@ -397,6 +406,17 @@ export const vi = {
     //blog
     read_more: "Đọc Thêm",
     lastest_news: "Tin Tức Gần Đây",
-    about_author: 'Về tác giả',
+    about_author: 'Về Tác Giả',
     related_article: "Các Bài Viết Liên Quan",
+
+    //footer
+    quick_link: 'Liên Kết Nhanh',
+    dynamic_cal: 'Máy Tính Lợi Nhuận',
+    invest_sim: 'Mô Phỏng Đầu Tư',
+    referral_program: 'Chương Trình Giới Thiệu',
+    subcribe: 'Đăng Ký',
+    newsletter: 'Bản Tin',
+    stay_updated: 'Cập nhật những tin tức và ưu đãi mới nhất từ chúng tôi.',
+    enter_email: 'Nhập email của bạn',
+    grow_your_wealth: 'Tăng trưởng tài sản của bạn với các chiến lược đầu tư bền vững.'
 }

@@ -99,7 +99,7 @@ export function BreakingNewsCarousel() {
   return (
     <section className="py-16 bg-secondary/10">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold mb-8">{t('breaking_news')}</h2>
+        <h2 className="text-3xl font-bold mb-8">{t('posts')}</h2>
         <Carousel
           opts={{
             align: 'start',

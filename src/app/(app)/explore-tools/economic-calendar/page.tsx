@@ -30,6 +30,13 @@ export default function EconomicCalendar() {
   const [events, setEvents] = useState<Event[]>([])
   const [date, setDate] = useState<Date | undefined>(new Date())
   const { t } = useTranslation()
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search); 
+    const lang = queryParams.get('locale') || 'en'; 
+    i18n.changeLanguage(lang);  
+  }, []);
 
   useEffect(() => {
     // Fetch data from the API based on the selected date
