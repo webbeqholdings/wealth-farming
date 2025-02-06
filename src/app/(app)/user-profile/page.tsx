@@ -302,7 +302,7 @@ export default function UserProfile() {
       toast({
         title: 'Open sharing dialog !',
       })
-      
+
     } catch (error) {
       navigator.clipboard.writeText(referralLink)
       toast({
@@ -310,7 +310,7 @@ export default function UserProfile() {
         description: 'Sharing dialog unavailable Your referral link will be copied to clipboard!'
       })
     }
-    
+
 
 
 
@@ -518,7 +518,7 @@ export default function UserProfile() {
             </CardContent>
             <CardFooter>
               <Button
-                onClick={() => router.push('/account/history')}
+                onClick={() => router.push('/account/history/deposit')}
                 variant="outline"
                 className="w-full"
               >

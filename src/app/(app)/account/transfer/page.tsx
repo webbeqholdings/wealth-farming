@@ -156,8 +156,8 @@ export default function TransferPage() {
       //     user_id: user.id,
       //     amount: amount,
       //     status: 'completed',
-      //     from_account: fromAccount,
-      //     to_account: toAccount,
+      //     account_to: fromAccount,
+      //     account_from: toAccount,
       //     type: 'transfer',
       //   }), // Convert the request body to JSON
       // })
@@ -191,7 +191,6 @@ export default function TransferPage() {
     router.push('/account/history/transfer')
     form.reset()
   }
-  console.log(process.env.NEXT_PUBLIC_GOOGLE_RECAPTCHA_V2_KEY)
   return (
     <>
       <SiteHeader />

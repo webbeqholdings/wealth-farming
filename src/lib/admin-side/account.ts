@@ -15,7 +15,6 @@ export const getAccountsByUserId = async (
   }) // response.docs = array[n ket qua]
 
   if (!response.docs.length) return false // acc nap rut, referral, invesment
-  console.log(response.docs.length)
 
   let array = response.docs.filter((item: any) => {
     return account_types.includes(item.type)

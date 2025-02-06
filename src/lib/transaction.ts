@@ -8,6 +8,7 @@ import {
   getEmployeePlusProducts,
   inArrayEmployeePlusUsersIDs,
 } from './investment-products/dynamicFundQuery'
+import { getCurrentLevelRate } from './referrals'
 
 const payload = await getPayload({
   config,
@@ -45,7 +46,7 @@ export const getTransactions = async (
         amount: transaction.amount,
         date: formatDateTime(transaction.createdAt),
         account: transaction.account_from?.account_name,
-        to_account: transaction.account_to?.account_name,
+        account_from: transaction.account_to?.account_name,
         profit_or_loss: transaction?.profit_or_loss,
         unit_code: transaction?.unit?.unit_code,
         product_name: transaction?.investment_product?.product_name,
@@ -106,8 +107,8 @@ export const getTransactionsWithDate = async (
         type: transaction.type,
         amount: transaction.amount,
         date: formatDateTime(transaction.createdAt),
-        account: transaction.from_account?.account_name,
-        to_account: transaction.to_account?.account_name,
+        account: transaction.account_to?.account_name,
+        account_from: transaction.account_from?.account_name,
         profit_or_loss: transaction?.profit_or_loss,
         unit_code: transaction?.unit?.unit_code,
         product_name: transaction?.investment_product?.product_name,
@@ -131,7 +132,7 @@ export const IsInvest = async (user_id: number): Promise<Boolean> => {
     where: {
       type: { equals: 'investment' },
       status: { equals: 'completed' },
-      from_account: { equals: account_id },
+      account_to: { equals: account_id },
     },
   })
 
@@ -139,13 +140,8 @@ export const IsInvest = async (user_id: number): Promise<Boolean> => {
 }
 
 export const createInvestment = async (formData: any) => {
-  const headers = await nextHeaders()
-  const auth = await payload.auth({ headers })
-  if (!auth.user) {
-    return
-  }
-  const { amount, startDate, endDate, productName, periods, term } = formData
-  const account_invesment = await getAccountsByUser(auth.user.id)
+  const { amount, startDate, endDate, productId, periods, term, userId } = formData
+  const account_invesment = await getAccountsByUser(userId)
   const amountAvailable = await getSumAmountBalanceByAccount(Number(account_invesment[0].id))
 
   if (amount <= 0) {
@@ -158,8 +154,8 @@ export const createInvestment = async (formData: any) => {
   const product = await payload.find({
     collection: 'investment-products',
     where: {
-      product_name: {
-        equals: productName,
+      id: {
+        equals: productId,
       },
     },
   })
@@ -175,7 +171,7 @@ export const createInvestment = async (formData: any) => {
 
   const min_investment = product.docs[0].min_investment
 
-  if (amountAvailable < min_investment) {
+  if (amount < min_investment) {
     return {
       isSuccess: false,
       msg: `Minimum amount investment is ${min_investment}`,
@@ -189,12 +185,12 @@ export const createInvestment = async (formData: any) => {
     }
   }
 
-  const account_id = await getAccountIdInvestmentByUser(auth.user.id)
+  const account_id = await getAccountIdInvestmentByUser(userId)
 
   const transaction_doc = await payload.create({
     collection: 'transactions',
     data: {
-      user: auth.user.id,
+      user: userId,
       amount: Number(amount),
       investment_product: product_doc.id,
       status: 'completed',
@@ -207,7 +203,7 @@ export const createInvestment = async (formData: any) => {
   const userReferral = await payload.find({
     collection: 'user-referrals',
     where: {
-      child: { equals: auth.user.id },
+      child: { equals: userId },
     },
   })
 
@@ -216,12 +212,13 @@ export const createInvestment = async (formData: any) => {
     typeof userReferral.docs[0]?.parent === 'object' &&
     userReferral.docs[0]?.parent !== null
   ) {
+    const configRate = await getCurrentLevelRate(userId)
     await payload.create({
       collection: 'contracts',
       data: {
         user: userReferral.docs[0].parent.id,
-        amount: Number(amount * 0.03),
-        balance: Number(amount * 0.03),
+        amount: Number(amount * configRate),
+        balance: Number(amount * configRate),
         status: 'active',
         profit: 0,
         term: term,
@@ -239,7 +236,7 @@ export const createInvestment = async (formData: any) => {
   const contract_doc = await payload.create({
     collection: 'contracts',
     data: {
-      user: Number(auth.user.id),
+      user: Number(userId),
       amount: Number(amount),
       balance: Number(amount),
       expected_return: expectedReturnValue,
@@ -279,7 +276,7 @@ export const getTotalBonusByProduct = async (
       investment_product: { equals: product_id },
       status: { equals: 'completed' },
       type: { equals: 'bonus' },
-      from_account: { equals: account_id },
+      account_to: { equals: account_id },
     },
   })
 
@@ -306,7 +303,7 @@ export const getTransactionsBonusByProduct = async (
       investment_product: { equals: product_id },
       status: { equals: 'completed' },
       type: { equals: 'bonus' },
-      from_account: { equals: account_id },
+      account_to: { equals: account_id },
     },
   })
 

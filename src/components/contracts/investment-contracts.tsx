@@ -132,7 +132,7 @@ export function InvestmentContracts() {
             setWithdrawals(docs);
             setTotalPagesWithdrawl(totalPages);
         }
-    }, [activeTab, currentPage]);
+    }, [activeTab, currentPage, loading]);
 
   // Call fetchData in useEffect
   useEffect(() => {

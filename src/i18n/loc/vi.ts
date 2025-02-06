@@ -314,7 +314,7 @@ export const vi = {
     interest_withdrawal_period: "Kì Hạn Rút Lãi",
     join_date: "Ngày tham gia",
     contract_end_date: "Ngày kết thúc hợp đồng",
-    investment_cycles: "Số chu kì tham gia",
+    investment_periods: "Số chu kì tham gia",
     calculate_result: "Tính Kết Quả",
     submit_investment: "Đầu Tư",
     month: "Tháng",
@@ -330,6 +330,15 @@ export const vi = {
     rate: 'Tỷ Lệ',
     partialMonthNote:'({{days}} / {{months}} ngày) Tháng Không Trọn Vẹn',
     message: 'ghi chú',
+    profit_chart: 'Biểu Đồ Lợi Nhuận',
+    profit_by_time: 'Biểu diễn số dư theo thời gian',
+    profit_table: 'Bảng Lãi',
+    balance_chart: 'Số Dư ($)',
+    partial_monthly: 'Partial Monthly',
+    full_monthly: 'Tháng Không Đủ',
+    full_quarterly: 'Quý Đủ',
+    full_semester: 'Nửa Năm Đủ',
+    full_annually: 'Một Năm Đủ',
 
     // referral
     grow_wealth: 'Cùng Nhau Đầu Tư',
@@ -394,4 +403,9 @@ export const vi = {
     x_times: 'X Lần:',
     amount_usd: 'Số tiền ($)',
 
+    //blog
+    read_more: "Đọc Thêm",
+    lastest_news: "Tin Tức Gần Đây",
+    about_author: 'Về tác giả',
+    related_article: "Các Bài Viết Liên Quan",
 }

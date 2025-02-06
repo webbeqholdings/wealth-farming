@@ -17,7 +17,7 @@ export const getBalanceToAccount = async (
   const response = await payload.find({
     collection: 'transactions',
     where: {
-      to_account: { equals: to_account_id },
+      account_from: { equals: to_account_id },
       type: { equals: accountType },
       status: { equals: status },
     },
@@ -44,7 +44,7 @@ export const getBalanceFromAccount = async (
   const response = await payload.find({
     collection: 'transactions',
     where: {
-      from_account: { equals: from_account_id },
+      account_to: { equals: from_account_id },
       type: { equals: accountType },
       status: { equals: status },
     },
