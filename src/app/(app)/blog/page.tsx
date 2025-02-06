@@ -101,7 +101,7 @@ export default function NewsPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/posts?locale=${locale}`);
+        const response = await fetch(`/api/posts?locale=${locale}&limit=1000`);
         const data = await response.json();
 
         // Assuming the response has a `docs` array with the products
