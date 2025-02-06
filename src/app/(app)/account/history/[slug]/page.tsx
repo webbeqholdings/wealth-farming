@@ -445,7 +445,7 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
                       ) : (
                         ''
                       )}
-                      {activeTab === 'bonus' ? <TableHead>{transaction.message}</TableHead> : ''}
+                      {activeTab === 'bonus' ? <TableHead>{t(`${transaction.message}`)}</TableHead> : ''}
                     </TableRow>
                   ))}
               </TableBody>
