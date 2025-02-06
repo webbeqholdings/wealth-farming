@@ -841,7 +841,7 @@ export const buildProfitLogsSemester = async (
         profit: _profit,
         days: _dayCount,
         term: 'semester',
-        message: 'full semester',
+        message: 'full_semester',
       })
       _fromDate = addDays(_fromDate, unitMonthly)
     }
@@ -880,7 +880,7 @@ export const buildProfitLogsSemester = async (
         profit: _profit,
         days: _dayCount,
         term: 'quarterly',
-        message: 'full quarterly',
+        message: 'full_quarterly',
       })
       _fromDate = addDays(_fromDate, unitMonthly)
     }
@@ -905,7 +905,7 @@ export const buildProfitLogsSemester = async (
         profit: _profit,
         days: _dayCount,
         term: 'monthly',
-        message: 'full monthly',
+        message: 'full_monthly',
       })
       _fromDate = addDays(_fromDate, unitMonthly)
     }
@@ -927,7 +927,7 @@ export const buildProfitLogsSemester = async (
       profit: _profit,
       days: _dayCount,
       term: 'monthly',
-      message: 'partial monthly',
+      message: 'partial_monthly',
     })
   }
 
@@ -978,7 +978,7 @@ export const buildProfitLogsQuarterly = async (
         profit: _profit,
         days: unitMonthly * mm,
         term: 'quarterly',
-        message: 'full quarterly',
+        message: 'full_quarterly',
       })
       _fromDate = addDays(_fromDate, unitMonthly)
     }
@@ -1016,7 +1016,7 @@ export const buildProfitLogsQuarterly = async (
         profit: _profit,
         days: unitMonthly * mm,
         term: 'monthly',
-        message: 'full monthly',
+        message: 'full_monthly',
       })
 
       _fromDate = addDays(_fromDate, unitMonthly)
@@ -1038,7 +1038,7 @@ export const buildProfitLogsQuarterly = async (
       profit: _profit,
       days: periodsModDays,
       term: 'monthly',
-      message: 'partial monthly',
+      message: 'partial_monthly',
     })
   }
 
@@ -1088,7 +1088,7 @@ export const buildProfitLogsMonthly = async (principal: number, startDate: Date,
         profit: _profit,
         days: _dayCount,
         term: 'monthly',
-        message: 'full monthly',
+        message: 'full_monthly',
       })
 
       _fromDate = addDays(_fromDate, unitMonthly)
@@ -1123,7 +1123,7 @@ export const buildProfitLogsMonthly = async (principal: number, startDate: Date,
       profit: _profit,
       days: _dayCount,
       term: 'monthly',
-      message: 'partial monthly',
+      message: 'partial_monthly',
     })
   }
 

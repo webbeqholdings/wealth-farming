@@ -406,6 +406,17 @@ export const vi = {
     //blog
     read_more: "Đọc Thêm",
     lastest_news: "Tin Tức Gần Đây",
-    about_author: 'Về tác giả',
+    about_author: 'Về Tác Giả',
     related_article: "Các Bài Viết Liên Quan",
+
+    //footer
+    quick_link: 'Liên Kết Nhanh',
+    dynamic_cal: 'Máy Tính Lợi Nhuận',
+    invest_sim: 'Mô Phỏng Đầu Tư',
+    referral_program: 'Chương Trình Giới Thiệu',
+    subcribe: 'Đăng Ký',
+    newsletter: 'Bản Tin',
+    stay_updated: 'Cập nhật những tin tức và ưu đãi mới nhất từ chúng tôi.',
+    enter_email: 'Nhập email của bạn',
+    grow_your_wealth: 'Tăng trưởng tài sản của bạn với các chiến lược đầu tư bền vững.',
 }

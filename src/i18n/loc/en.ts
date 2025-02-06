@@ -408,4 +408,15 @@ export const en = {
     lastest_news: "Latest News",
     about_author: "About The Author",
     related_article: 'Related Articles',
+
+    //footer
+    quick_link: 'Quick Links',
+    dynamic_cal: 'Dynamic Profit Calculator',
+    invest_sim: 'Investment Simulator',
+    referral_program: 'Referral Program',
+    subcribe: 'Subcribe',
+    newsletter: 'Newsletter',
+    stay_updated:'Stay updated with our latest news and offers.',
+    enter_email: 'Enter your email',
+    grow_your_wealth: 'Grow your wealth with sustainable investment strategies.',
 }
