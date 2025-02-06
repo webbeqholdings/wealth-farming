@@ -102,9 +102,7 @@ export default function NewsPage() {
     const fetchData = async () => {
       try {
         const response = await fetch(`/api/posts?locale=${locale}`);
-        console.log("response ", response)
         const data = await response.json();
-        console.log("locale ", locale)
 
         // Assuming the response has a `docs` array with the products
         const articles = data.docs.map((item: Blog) => ({
