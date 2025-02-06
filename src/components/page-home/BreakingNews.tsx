@@ -70,12 +70,14 @@ type Blog = {
 
 export function BreakingNewsCarousel() {
   const [newsItems, setNewsItems] = useState([]);
+  const { i18n } = useTranslation();
+  const locale = i18n.language;
   const { t } = useTranslation();
   useEffect(() => {
     // Fetch data from API
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/posts'); // Replace with your actual API endpoint
+        const response = await fetch(`/api/posts?locale=${locale}`); // Replace with your actual API endpoint
         const data = await response.json();
 
         // Transform API response to the desired format
@@ -93,11 +95,11 @@ export function BreakingNewsCarousel() {
     };
 
     fetchData();
-  }, []); // Empty dependency array to run only once
+  }, [locale]); // Empty dependency array to run only once
   return (
     <section className="py-16 bg-secondary/10">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold mb-8">{t('breaking_news')}</h2>
+        <h2 className="text-3xl font-bold mb-8">{t('posts')}</h2>
         <Carousel
           opts={{
             align: 'start',

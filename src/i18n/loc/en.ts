@@ -264,7 +264,7 @@ export const en = {
     webinar: "Webinar: Sustainable Investing Strategies - Register Now",
     q2_report: "Q2 Performance Report Now Available",
     join_discord: "Join our Discord community for daily market insights",
-    breaking_news: "Breaking News",
+    posts: "Posts",
     mission_statement: "Your wealth, our mission",
     embark_journey: "Embark on Your Wealth Journey Today!",
     embark_journey_description:'Join BeQ Wealth Farming Fund and start growing your investments with sustainable, innovative agricultural projects.',
@@ -331,6 +331,15 @@ export const en = {
     partialMonthNote: "({{days}} / {{months}} days) {{gender}}",
     from_date: "From Date",
     message: 'message',
+    profit_chart: 'Profit Chart',
+    profit_by_time: 'Balance Over Time Chart',
+    profit_table: 'Profit Table',
+    balance_chart: 'Balance ($)',
+    partial_monthly: 'Partial Monthly',
+    full_monthly: 'Full Monthly',
+    full_quarterly: 'Full Quarterly',
+    full_semester: 'Full Semester',
+    full_annually: 'Full Annually',
 
     // referral
     grow_wealth: 'Grow Your Wealth Together',
@@ -393,4 +402,10 @@ export const en = {
     total_interest: 'Total Interest Earned: ${{total}}',
     x_times: 'X times:',
     amount_usd: 'Amount ($)',
+
+    //blog
+    read_more: "Read More",
+    lastest_news: "Latest News",
+    about_author: "About The Author",
+    related_article: 'Related Articles',
 }

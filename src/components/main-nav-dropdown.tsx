@@ -17,15 +17,18 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu'
+import { useTranslation } from 'react-i18next'
 
 export function MainNavDropdown() {
   const pathname = usePathname()
   const [menuItems, setMenuItems] = useState([])
+  const { i18n } = useTranslation();
+  const locale = i18n.language;
   useEffect(() => {
     const getMenuItems = async () => {
       try {
         // Fetch the data from the API
-        const response = await fetch('/api/globals/main-menu')
+        const response = await fetch(`/api/globals/main-menu?locale=${locale}`)
         if (!response.ok) {
           throw new Error(`Failed to fetch menu items: ${response.statusText}`)
         }
@@ -47,7 +50,7 @@ export function MainNavDropdown() {
     }
 
     getMenuItems() // Call the async function inside useEffect
-  }, [])
+  }, [locale])
 
   return (
     <div className="mr-4 hidden md:flex">
@@ -70,7 +73,7 @@ export function MainNavDropdown() {
                   <NavigationMenuContent>
                     <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-1 lg:w-[600px] ">
                       {item.children.map((child: any) => (
-                        <ListItem key={child.title} title={child.title} href={child.url}>
+                        <ListItem key={child.title} title={child.title} href={`${child.url}?locale=${locale}`}>
                           {child.description}
                         </ListItem>
                       ))}
