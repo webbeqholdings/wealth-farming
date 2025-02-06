@@ -40,7 +40,7 @@ export function ProfitTable() {
   const profitData = data?.profitData; // Assuming profitData is an array
   // Check if profitData is defined and has at least one entry
   if (!profitData || profitData.length === 0) {
-    return <>No data</>;
+    return <></>;
   }
   // Access the first entry's profitLogs
   const profitLogs = profitData[0].profitLogs;
@@ -69,8 +69,8 @@ export function ProfitTable() {
     <>
       <Tabs defaultValue="table" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="table">Bảng Lãi</TabsTrigger>
-          <TabsTrigger value="chart">Biểu Đồ</TabsTrigger>
+          <TabsTrigger value="table">{t('profit_table')}</TabsTrigger>
+          <TabsTrigger value="chart">{t('chart')}</TabsTrigger>
         </TabsList>
         <TabsContent value="table" className="space-y-4">
           <Table>
@@ -98,7 +98,7 @@ export function ProfitTable() {
                   <TableCell>{row.profit.toFixed(2)}</TableCell>
                   <TableCell>{(row.rate * 100).toFixed(2) + ' %'}</TableCell>
                   <TableCell>{getMessage(row.term)}</TableCell>
-                  <TableCell>{row.message}</TableCell>
+                  <TableCell>{t(row.message)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -107,8 +107,8 @@ export function ProfitTable() {
         <TabsContent value="chart" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Biểu Đồ Lợi Nhuận</CardTitle>
-              <CardDescription>Biểu diễn số dư theo thời gian</CardDescription>
+              <CardTitle>{t('profit_chart')}</CardTitle>
+              <CardDescription>{t('profit_by_time')}</CardDescription>
             </CardHeader>
             <CardContent className="pt-2">
               <ProfitChart profitData={profitDataChart} />

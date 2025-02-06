@@ -331,6 +331,15 @@ export const en = {
     partialMonthNote: "({{days}} / {{months}} days) {{gender}}",
     from_date: "From Date",
     message: 'message',
+    profit_chart: 'Profit Chart',
+    profit_by_time: 'Balance Over Time Chart',
+    profit_table: 'Profit Table',
+    balance_chart: 'Balance ($)',
+    partial_monthly: 'Partial Monthly',
+    full_monthly: 'Full Monthly',
+    full_quarterly: 'Full Quarterly',
+    full_semester: 'Full Semester',
+    full_annually: 'Full Annually',
 
     // referral
     grow_wealth: 'Grow Your Wealth Together',
