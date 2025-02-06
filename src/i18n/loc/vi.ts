@@ -330,6 +330,15 @@ export const vi = {
     rate: 'Tỷ Lệ',
     partialMonthNote:'({{days}} / {{months}} ngày) Tháng Không Trọn Vẹn',
     message: 'ghi chú',
+    profit_chart: 'Biểu Đồ Lợi Nhuận',
+    profit_by_time: 'Biểu diễn số dư theo thời gian',
+    profit_table: 'Bảng Lãi',
+    balance_chart: 'Số Dư ($)',
+    partial_monthly: 'Partial Monthly',
+    full_monthly: 'Tháng Không Đủ',
+    full_quarterly: 'Quý Đủ',
+    full_semester: 'Nửa Năm Đủ',
+    full_annually: 'Một Năm Đủ',
 
     // referral
     grow_wealth: 'Cùng Nhau Đầu Tư',
