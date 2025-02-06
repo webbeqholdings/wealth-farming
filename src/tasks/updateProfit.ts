@@ -5,6 +5,7 @@ import calculateProfit from '@/lib/calculateProfit';
 import { endOfMonth, addMonths, differenceInDays, endOfYear, endOfQuarter } from 'date-fns';
 import { withdrawInvestment } from '@/lib/contract';
 import { getPaymentTransfer } from '@/lib/paymentTransfer';
+import { contractEndAt } from '@/lib/investment-products/dynamicFund'
 
 export const updateProfitHandler: TaskHandler<{
     input: {};
@@ -13,73 +14,6 @@ export const updateProfitHandler: TaskHandler<{
     const payload = await getPayload({
         config,
     });
-
-    // Calculate expected end dates for each term
-    const getExpectedEndDate = (term: string, start: Date) => {
-        const currentMonth = start.getMonth();
-        const currentDate = start.getDate();
-        switch (term) {
-            case 'monthly': {
-                if (currentMonth === 1 && currentDate === 1) {
-                    return endOfMonth(start); // End of the current month
-                }
-                if ((currentMonth === 1 && currentDate > 1) || (currentMonth > 1 && currentMonth < 12)) {
-                    const nextMonthStart = new Date(Date.UTC(start.getUTCFullYear(), currentMonth, 1));
-                    return new Date(Date.UTC(nextMonthStart.getUTCFullYear(), nextMonthStart.getUTCMonth() + 1, 0)); // Last day of the next month
-                }
-                if (currentMonth === 12 && currentDate > 1) {
-                    const nextYear = start.getUTCFullYear() + 1;
-                    return new Date(Date.UTC(nextYear, 0, 31)); // Last day of January next year
-                }
-                break;
-            }
-            case 'quarterly': {
-                if (currentMonth === 1 && currentDate === 1) {
-                    return new Date(Date.UTC(start.getUTCFullYear(), 2, 31)); // End of March
-                }
-                if ((currentMonth === 4 && currentDate === 1) || (currentMonth === 1 && currentDate > 1) || (currentMonth >= 2 && currentMonth <= 3)) {
-                    return new Date(Date.UTC(start.getUTCFullYear(), 5, 30)); // End of June
-                }
-                if ((currentMonth === 7 && currentDate === 1) || (currentMonth === 4 && currentDate > 1) || (currentMonth >= 5 && currentMonth <= 6)) {
-                    return new Date(Date.UTC(start.getUTCFullYear(), 8, 30)); // End of September
-                }
-                if ((currentMonth === 10 && currentDate === 1) || (currentMonth === 7 && currentDate > 1) || (currentMonth >= 8 && currentMonth <= 9)) {
-                    return new Date(Date.UTC(start.getUTCFullYear(), 11, 31)); // End of December
-                }
-                if ((currentMonth === 10 && currentDate > 1) || currentMonth > 10) {
-                    const nextYear = start.getUTCFullYear() + 1;
-                    return new Date(Date.UTC(nextYear, 2, 31)); // End of March next year
-                }
-                break;
-            }
-            case 'semester': {
-                if (currentMonth === 1 && currentDate === 1) {
-                    return new Date(Date.UTC(start.getUTCFullYear(), 5, 30)); // End of June
-                }
-                if ((currentMonth === 7 && currentDate === 1) || (currentMonth === 1 && currentDate > 1) || (currentMonth >= 2 && currentMonth <= 6)) {
-                    return new Date(Date.UTC(start.getUTCFullYear(), 11, 31)); // End of December
-                }
-                if ((currentMonth === 7 && currentDate > 1) || currentMonth > 7) {
-                    const nextYear = start.getUTCFullYear() + 1;
-                    return new Date(Date.UTC(nextYear, 5, 30)); // End of June next year
-                }
-                break;
-            }
-            case 'annually': {
-                if (currentMonth === 1 && currentDate === 1) {
-                    return endOfYear(start); // End of the current year
-                }
-                if ((currentMonth === 1 && currentDate > 1) || currentMonth > 1) {
-                    const nextYear = start.getUTCFullYear() + 1;
-                    return new Date(Date.UTC(nextYear, 11, 31)); // End of December next year
-                }
-                break;
-            }
-            default:
-                throw new Error('Unsupported term. Valid terms: monthly, quarterly, semester, annually.');
-        }
-
-    };
 
     const getBeginningOfNextMonth = (startDate: any) => {
         const start = new Date(startDate);
@@ -98,8 +32,11 @@ export const updateProfitHandler: TaskHandler<{
     const checkTermFullness = (startDate: any, term: any) => {
         const start = getBeginningOfNextMonth(startDate);
         const today = new Date();
+        if (today < start) {
+            return false;
+        }
         // Calculate total days in the expected term
-        const expectedEndDate = getExpectedEndDate(term, start);
+        const expectedEndDate = contractEndAt(start, term);
         const totalTermDays = differenceInDays(expectedEndDate, start) + 1;
         // Calculate actual duration of the contract
         const actualDurationDays = differenceInDays(today, start) + 1;
@@ -156,32 +93,29 @@ export const updateProfitHandler: TaskHandler<{
         if (
             typeof config_log === 'object' && config_log !== null &&
             'extend_contract' in config_log && config_log.extend_contract == true &&
-            checkTermFullness(start_date, term)
+            checkTermFullness(start_date, term) && 'auto_profit' in config_log && Number(config_log.auto_profit) >= 0 &&
+            typeof user === 'object' && user !== null
         ) {
-            if (typeof user === 'object' && user !== null && typeof config_log === 'object' && config_log !== null && 'auto_profit' in config_log) {
-                const paymentTransfer = await getPaymentTransfer();
-                const minWithdrawal = paymentTransfer.minWithdrawal;
-                const amount = (config_log.auto_profit.toString()) ?? 0
-                if (amount >= minWithdrawal) {
-                    const formData = {
-                        amount: amount,
-                        contractId: contract.id,
-                        userId: user.id
-                    }
-                    const mesg = await withdrawInvestment(formData);
-                    console.log(
-                        `Auto withdraw for: ${contract.id} | Withdraw amount: ${amount} | Message : ${mesg.message}`
-                    );
+            const paymentTransfer = await getPaymentTransfer();
+            const minWithdrawal = paymentTransfer.minWithdrawal;
+            const amount = config_log.auto_profit != null ? Number(config_log.auto_profit) : 0
+            if (amount >= minWithdrawal) {
+                const formData = {
+                    amount: amount,
+                    contractId: contract.id,
+                    userId: user.id
                 }
-                else{
-                    console.log(
-                        `Auto withdraw for: ${contract.id} | Withdraw failed - amount < minWithdrawal`
-                    );
-                }
+                const mesg = await withdrawInvestment(formData);
+                console.log(
+                    `Auto withdraw for: ${contract.id} | Withdraw amount: ${amount} | Message : ${mesg.message}`
+                );
+            }
+            else{
+                console.log(
+                    `Auto withdraw for: ${contract.id} | Withdraw failed - amount < minWithdrawal`
+                );
             }
         }
-
-        
     }
 
     await payload.jobs.queue({
