@@ -7,8 +7,6 @@ import { useTranslation } from "react-i18next"
 
 export function SiteFooter() {
   const { t } = useTranslation()
-  const { i18n } = useTranslation();
-  const locale = i18n.language;
   return (
     <footer className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t">
       <div className="container md:py-12">
@@ -37,7 +35,7 @@ export function SiteFooter() {
             <h4 className="text-sm font-semibold mb-4">{t('quick_link')}</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href={`/explore-tools/economic-calendar?locale=${locale}`} className="hover:underline">
+                <Link href={`/explore-tools/economic-calendar`} className="hover:underline">
                 {t('econ_calendar')}
                 </Link>
               </li>
@@ -47,7 +45,7 @@ export function SiteFooter() {
                 </Link>
               </li>
               <li>
-                <Link href={`/explore-tools/compound-interest-rate?locale=${locale}`} className="hover:underline">
+                <Link href={`/explore-tools/compound-interest-rate`} className="hover:underline">
                   {t('invest_sim')}
                 </Link>
               </li>
