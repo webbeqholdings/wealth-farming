@@ -46,7 +46,7 @@ export const getTransactions = async (
         amount: transaction.amount,
         date: formatDateTime(transaction.createdAt),
         account: transaction.account_from?.account_name,
-        to_account: transaction.account_to?.account_name,
+        account_from: transaction.account_to?.account_name,
         profit_or_loss: transaction?.profit_or_loss,
         unit_code: transaction?.unit?.unit_code,
         product_name: transaction?.investment_product?.product_name,
@@ -107,8 +107,8 @@ export const getTransactionsWithDate = async (
         type: transaction.type,
         amount: transaction.amount,
         date: formatDateTime(transaction.createdAt),
-        account: transaction.from_account?.account_name,
-        to_account: transaction.to_account?.account_name,
+        account: transaction.account_to?.account_name,
+        account_from: transaction.account_from?.account_name,
         profit_or_loss: transaction?.profit_or_loss,
         unit_code: transaction?.unit?.unit_code,
         product_name: transaction?.investment_product?.product_name,
@@ -132,7 +132,7 @@ export const IsInvest = async (user_id: number): Promise<Boolean> => {
     where: {
       type: { equals: 'investment' },
       status: { equals: 'completed' },
-      from_account: { equals: account_id },
+      account_to: { equals: account_id },
     },
   })
 
@@ -276,7 +276,7 @@ export const getTotalBonusByProduct = async (
       investment_product: { equals: product_id },
       status: { equals: 'completed' },
       type: { equals: 'bonus' },
-      from_account: { equals: account_id },
+      account_to: { equals: account_id },
     },
   })
 
@@ -303,7 +303,7 @@ export const getTransactionsBonusByProduct = async (
       investment_product: { equals: product_id },
       status: { equals: 'completed' },
       type: { equals: 'bonus' },
-      from_account: { equals: account_id },
+      account_to: { equals: account_id },
     },
   })
 
