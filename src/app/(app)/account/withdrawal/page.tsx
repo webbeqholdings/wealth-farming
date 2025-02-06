@@ -181,7 +181,7 @@ export default function WithdrawPage() {
       //     bank_id: selectBank,
       //     amount: -amount,
       //     status: 'pending',
-      //     from_account: Number(accounts[0].id),
+      //     account_to: Number(accounts[0].id),
       //     type: 'withdraw',
       //     currency: currency,
       //   }), // Convert the request body to JSON
