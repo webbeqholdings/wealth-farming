@@ -335,10 +335,10 @@ export const vi = {
     profit_table: 'Bảng Lãi',
     balance_chart: 'Số Dư ($)',
     partial_monthly: 'Partial Monthly',
-    full_monthly: 'Tháng Không Đủ',
-    full_quarterly: 'Quý Đủ',
-    full_semester: 'Nửa Năm Đủ',
-    full_annually: 'Một Năm Đủ',
+    full_monthly: 'Đủ một tháng',
+    full_quarterly: 'Đủ một quý',
+    full_semester: 'Đủ nữa năm',
+    full_annually: 'Đủ một năm',
 
     // referral
     grow_wealth: 'Cùng Nhau Đầu Tư',
