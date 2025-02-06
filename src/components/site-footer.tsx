@@ -3,17 +3,15 @@ import { Facebook, Twitter, Instagram, Mail } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useTranslation } from "react-i18next"
 
 export function SiteFooter() {
-  const { t } = useTranslation()
   return (
     <footer className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t">
       <div className="container md:py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8"> {/* Changed grid-cols-4 to grid-cols-3 */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Wealth Farming</h3>
-            <p className="text-sm text-muted-foreground">{t('grow_your_wealth')}</p>
+            <p className="text-sm text-muted-foreground">Grow your wealth with sustainable investment strategies.</p>
             <div className="flex space-x-4">
               <Link href="https://www.facebook.com/p/BeQ-Holdings-61555802044845/" target="_blank" rel="noreferrer">
                 <Button variant="ghost" size="icon">
@@ -32,37 +30,37 @@ export function SiteFooter() {
             </div>
           </div>
           <div>
-            <h4 className="text-sm font-semibold mb-4">{t('quick_link')}</h4>
+            <h4 className="text-sm font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href={`/explore-tools/economic-calendar`} className="hover:underline">
-                {t('econ_calendar')}
+                Economic Calendar
                 </Link>
               </li>
               <li>
                 <Link href="/investment-products/incoming/investment-process" className="hover:underline">
-                  {t('dynamic_cal')}
+                  Dynamic Profit Calculator
                 </Link>
               </li>
               <li>
                 <Link href={`/explore-tools/compound-interest-rate`} className="hover:underline">
-                  {t('invest_sim')}
+                  Investment Simulator
                 </Link>
               </li>
               <li>
                 <Link href="/referral" className="hover:underline">
-                  {t('referral_program')}
+                  Referral Program
                 </Link>
               </li>
             </ul>
           </div>
           <div>
-            <h4 className="text-sm font-semibold mb-4">{t('newsletter')}</h4>
-            <p className="text-sm text-muted-foreground mb-4">{t('stay_updated')}</p>
+            <h4 className="text-sm font-semibold mb-4">Newsletter</h4>
+            <p className="text-sm text-muted-foreground mb-4">Stay updated with our latest news and offers.</p>
             <form className="flex space-x-2">
-              <Input type="email" placeholder={t("enter_email")} className="max-w-[180px]" />
+              <Input type="email" placeholder='Enter your email' className="max-w-[180px]" />
               <Button type="submit" variant="default">
-                {t('subcribe')}
+                Subcribe
               </Button>
             </form>
           </div>
