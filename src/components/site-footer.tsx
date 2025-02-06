@@ -48,7 +48,7 @@ export function SiteFooter() {
                 </Link>
               </li>
               <li>
-                <Link href="/account/referral" className="hover:underline">
+                <Link href="referral" className="hover:underline">
                   Referral Program
                 </Link>
               </li>
