@@ -73,7 +73,7 @@ export function MainNavDropdown() {
                   <NavigationMenuContent>
                     <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-1 lg:w-[600px] ">
                       {item.children.map((child: any) => (
-                        <ListItem key={child.title} title={child.title} href={`${child.url}?locale=vi`}>
+                        <ListItem key={child.title} title={child.title} href={`${child.url}?locale=${locale}`}>
                           {child.description}
                         </ListItem>
                       ))}
