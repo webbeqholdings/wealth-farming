@@ -34,16 +34,23 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab}: Withd
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const { t } = useTranslation();
-  const [withdrawAvaibility, setWithdrawAvaibility] = useState(false)
+  const [withdrawAvailability, setWithdrawAvailability] = useState(false)
+  const [nextWithdrawDay, setNextWithdrawDay] = useState<Date>(new Date(contract.endDate))
 
   useEffect(() => {
-    if (new Date(contract.endDate) < new Date()){
-      setWithdrawAvaibility(true)
-    }
-    else {
-      setWithdrawAvaibility(false)
-    }
-  },[contract])
+    const today = new Date();
+    const initialEndDate = new Date(contract.endDate);
+
+    setNextWithdrawDay(initialEndDate);
+    setNextWithdrawDay((prevWithdrawDay) => {
+      let updatedWithdrawDay = prevWithdrawDay;
+      while (updatedWithdrawDay.getTime() < today.getTime()) {
+        updatedWithdrawDay = getExpectedEndDate(contract.term, updatedWithdrawDay);
+      }
+      setWithdrawAvailability(updatedWithdrawDay.toDateString() === today.toDateString());
+      return updatedWithdrawDay;
+    });
+  }, [contract]);
 
   // Calculate expected end dates for each term
   const getExpectedEndDate = (term: string, start: Date) => {
@@ -227,16 +234,16 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab}: Withd
     <Dialog open={isOpen} onOpenChange={handleDialogClose}>
       <DialogContent className="sm:max-w-[425px] bg-white border-gray-300 shadow-md">
 
-      <>{!withdrawAvaibility && <> 
+      <>{!withdrawAvailability && <> 
         <DialogHeader>
           <DialogTitle className="text-gray-900">{t('withdraw_funds')}</DialogTitle>
           <DialogDescription className="text-gray-600">
-            {t('withdrawal_condition')} {format(contract.endDate, 'dd/MM/yyyy')}.
+            {t('withdrawal_condition')} {format(nextWithdrawDay, 'MM/dd/yyyy')}.
           </DialogDescription>
           </DialogHeader>
       </>}</>
 
-      <>{withdrawAvaibility && <>
+      <>{withdrawAvailability && <>
         <DialogHeader>
           <DialogTitle className="text-gray-900">{t('withdraw_funds')}</DialogTitle>
           <DialogDescription className="text-gray-600">
