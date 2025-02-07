@@ -3,6 +3,18 @@
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
+
+interface InvestmentProduct {
+  id: number;
+  product_name: string;
+  description: string;
+  min_investment: number;
+  term: string;
+  rate_of_return: number;
+  updatedAt: string;
+  createdAt: string;
+}
+
 const payload = await getPayload({
   config,
 })
@@ -32,6 +44,16 @@ export const inArrayPublicProductsIDs = async (pid: number) => {
   const arrIds = await getPublicProductsIDs()
   return arrIds.includes(pid)
 }
+
+export const getProductNameByID = async (id: number): Promise<string | undefined> => { 
+  const data = await payload.findGlobal({
+    slug: 'gc-beq-dynamic-fund',
+  })
+
+  const publicProducts = data.public_products as InvestmentProduct[]
+  const product = publicProducts.find((prod) => prod.id === id)
+  return product?.product_name
+};
 
 // ::: EMPLOYEE PRODUCTS :::
 export const getEmployeePlusProducts = async () => {

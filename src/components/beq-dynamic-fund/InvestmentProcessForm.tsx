@@ -40,6 +40,7 @@ import userStatus from '@/lib/userStatus'
 import { checkContractLarger90Days } from '@/lib/contract'
 import { useTranslation } from 'react-i18next'
 import { useDynamicFundData } from './DataProvider'
+import exp from 'constants'
 
 const minRangeDays = 5
 const now = new Date()
@@ -55,6 +56,7 @@ export function InvestmentProcessForm() {
   const [endDate, setEndDate] = useState<Date | undefined>(addDays(startDate, minRangeDays))
   const [term, setTerm] = useState<any>('annually')
   const [productId, setProductId] = useState(null)
+  const [profitData, setProfitData] = useState<any>(null);
   const [depositAmount, setDepositAmount] = useState<number>(10000)
   const [periods, setPeriods] = useState<number>(1)
   const [dayCount, setDayCount] = useState<number>(0)
@@ -135,10 +137,14 @@ export function InvestmentProcessForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    let profitData = []
 
+    setContextData()
+  }
+
+  const setContextData = async () => {
     if (startDate && endDate && depositAmount) {
       const daysDifference = differenceInDays(endDate, startDate)
+      let profitData = []
       if (daysDifference < minRangeDays) {
         return toast({
           title: 'Error',
@@ -166,6 +172,8 @@ export function InvestmentProcessForm() {
         profitData.push(data)
       }
 
+      setProfitData(profitData)
+
       setData({
         profitData: profitData,
         amount: depositAmount,
@@ -173,6 +181,7 @@ export function InvestmentProcessForm() {
         startDate: startDate,
         endDate: endDate,
         periods: periods,
+        expected_return: await calculateBalance(term),
         dataExtra: {
           rateConfig: rateConfig,
           standardApplyProgramDays: standardApplyProgramDays,
@@ -221,45 +230,46 @@ export function InvestmentProcessForm() {
     return build?.balance
   }
 
-  const handleInvestment = async () => {
+  const handleConfirmInvestment = async () => {
     // If the user is not logged in, redirect to the join page
     if (!isLoggedIn) {
       router.push('../../join')
       return // Optional: Show a redirect message
     }
 
-
-
     if (startDate && endDate && depositAmount > 0) {
       const formData = {
         userId: user.id,
         productId: productId,
-        expected_return: calculateBalance(term),
+        expected_return: await calculateBalance(term),
         amount: depositAmount,
         term: term,
         startDate: startDate,
         endDate: endDate,
         periods: periods,
       }
-      const response: any = await createInvestment(formData)
-      if (!response?.isSuccess) {
-        toast({
-          title: 'Error',
-          description: response.msg,
-        })
-        return
-      }
-      notifyInvestment(response.data.contract)
-      toast({
-        title: 'Success',
-        description: 'Investment request has been submitted.',
-      })
-      router.push('../../investment-contracts')
-    } else {
-      toast({
-        title: 'Error',
-        description: 'Please ensure all fields are filled out correctly.',
-      })
+      sessionStorage.setItem('investmentData', JSON.stringify(formData))
+      setContextData()
+      router.push('../confirm-page')
+      //   const response: any = await createInvestment(formData)
+      //   if (!response?.isSuccess) {
+      //     toast({
+      //       title: 'Error',
+      //       description: response.msg,
+      //     })
+      //     return
+      //   }
+      //   notifyInvestment(response.data.contract)
+      //   toast({
+      //     title: 'Success',
+      //     description: 'Investment request has been submitted.',
+      //   })
+      //   router.push('../../investment-contracts')
+      // } else {
+      //   toast({
+      //     title: 'Error',
+      //     description: 'Please ensure all fields are filled out correctly.',
+      //   })
     }
   }
 
@@ -386,12 +396,14 @@ export function InvestmentProcessForm() {
         </form>
         <Button
           type="button"
-          onClick={() => handleInvestment()}
+          onClick={() => handleConfirmInvestment()}
           className="w-full mt-2 bg-green-600 text-white hover:bg-green-500"
         >
-          {t('submit_investment')}
+          {t('Confirm Investment')}
         </Button>
       </CardContent>
+
     </Card>
+
   )
 }
