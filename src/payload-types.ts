@@ -153,6 +153,7 @@ export interface User {
   otp?: string | null;
   otp_expires_at?: string | null;
   referral_code?: string | null;
+  subscription?: boolean | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -1046,6 +1047,7 @@ export interface UsersSelect<T extends boolean = true> {
   otp?: T;
   otp_expires_at?: T;
   referral_code?: T;
+  subscription?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
