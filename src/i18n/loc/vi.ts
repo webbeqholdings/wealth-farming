@@ -418,5 +418,5 @@ export const vi = {
     newsletter: 'Bản Tin',
     stay_updated: 'Cập nhật những tin tức và ưu đãi mới nhất từ chúng tôi.',
     enter_email: 'Nhập email của bạn',
-    grow_your_wealth: 'Tăng trưởng tài sản của bạn với các chiến lược đầu tư bền vững.',
+    grow_your_wealth: 'Tăng trưởng tài sản của bạn với các chiến lược đầu tư bền vững.'
 }

@@ -37,8 +37,8 @@ export function SiteFooter() {
             <h4 className="text-sm font-semibold mb-4">{t('quick_link')}</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href={`/explore-tools/economic-calendar?locale=${locale}`} className="hover:underline">
-                {t('econ_calendar')}
+                <Link href={`/explore-tools/economic-calendar`} className="hover:underline">
+                Economic Calendar
                 </Link>
               </li>
               <li>
@@ -47,13 +47,13 @@ export function SiteFooter() {
                 </Link>
               </li>
               <li>
-                <Link href={`/explore-tools/compound-interest-rate?locale=${locale}`} className="hover:underline">
-                  {t('invest_sim')}
+                <Link href={`/explore-tools/compound-interest-rate`} className="hover:underline">
+                  Investment Simulator
                 </Link>
               </li>
               <li>
                 <Link href="/referral" className="hover:underline">
-                  {t('referral_program')}
+                  Referral Program
                 </Link>
               </li>
             </ul>
@@ -62,9 +62,9 @@ export function SiteFooter() {
             <h4 className="text-sm font-semibold mb-4">{t('newsletter')}</h4>
             <p className="text-sm text-muted-foreground mb-4">{t('stay_updated')}</p>
             <form className="flex space-x-2">
-              <Input type="email" placeholder={t("enter_email")} className="max-w-[180px]" />
+              <Input type="email" placeholder='Enter your email' className="max-w-[180px]" />
               <Button type="submit" variant="default">
-                {t('subcribe')}
+                Subcribe
               </Button>
             </form>
           </div>
