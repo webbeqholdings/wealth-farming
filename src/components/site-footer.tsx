@@ -6,13 +6,11 @@ import { Input } from "@/components/ui/input"
 import { useTranslation } from "react-i18next"
 import userStatus from '@/lib/userStatus'
 import { useRouter } from 'next/navigation'
-import { updateUserSubscription } from "@/lib/mail"
+import { updateUserSubscription } from "@/lib/users"
 import { useToast } from '@/hooks/use-toast'
 
 export function SiteFooter() {
   const { t } = useTranslation()
-  const { i18n } = useTranslation();
-  const locale = i18n.language;
   const { isLoggedIn, user } = userStatus()
   const router = useRouter()
   const { toast } = useToast()
