@@ -83,7 +83,7 @@ export interface Config {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
   };
-  locale: null;
+  locale: 'en' | 'vi';
   user: User & {
     collection: 'users';
   };
@@ -153,6 +153,7 @@ export interface User {
   otp?: string | null;
   otp_expires_at?: string | null;
   referral_code?: string | null;
+  subscription?: boolean | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -368,8 +369,6 @@ export interface Transaction {
   bank?: (number | null) | Bank;
   amount: number;
   status: 'pending' | 'completed' | 'failed';
-  from_account?: (number | null) | Account;
-  to_account?: (number | null) | Account;
   account_from?: (number | null) | Account;
   account_to?: (number | null) | Account;
   deposit_screenshot?: (number | null) | Media;
@@ -924,8 +923,6 @@ export interface TransactionsSelect<T extends boolean = true> {
   bank?: T;
   amount?: T;
   status?: T;
-  from_account?: T;
-  to_account?: T;
   account_from?: T;
   account_to?: T;
   deposit_screenshot?: T;
@@ -1050,6 +1047,7 @@ export interface UsersSelect<T extends boolean = true> {
   otp?: T;
   otp_expires_at?: T;
   referral_code?: T;
+  subscription?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;

@@ -156,8 +156,8 @@ export default function TransferPage() {
       //     user_id: user.id,
       //     amount: amount,
       //     status: 'completed',
-      //     from_account: fromAccount,
-      //     to_account: toAccount,
+      //     account_to: fromAccount,
+      //     account_from: toAccount,
       //     type: 'transfer',
       //   }), // Convert the request body to JSON
       // })

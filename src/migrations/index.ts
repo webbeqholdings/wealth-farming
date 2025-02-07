@@ -21,6 +21,8 @@ import * as migration_20250114_122714_add_field_message_to_transaction from './2
 import * as migration_20250117_111708_add_columns_not_and_image_to_withdrawls from './20250117_111708_add_columns_not_and_image_to_withdrawls';
 import * as migration_20250123_025853_add_account_to_and_account_from_to_transaction from './20250123_025853_add_account_to_and_account_from_to_transaction';
 import * as migration_20250126_082116_delete_from_account_and_to_account_in_transactions from './20250126_082116_delete_from_account_and_to_account_in_transactions';
+import * as migration_20250205_100334_add_locale from './20250205_100334_add_locale';
+import * as migration_20250207_073006_add_subcription from './20250207_073006_add_subcription';
 
 export const migrations = [
   {
@@ -136,6 +138,16 @@ export const migrations = [
   {
     up: migration_20250126_082116_delete_from_account_and_to_account_in_transactions.up,
     down: migration_20250126_082116_delete_from_account_and_to_account_in_transactions.down,
-    name: '20250126_082116_delete_from_account_and_to_account_in_transactions'
+    name: '20250126_082116_delete_from_account_and_to_account_in_transactions',
+  },
+  {
+    up: migration_20250205_100334_add_locale.up,
+    down: migration_20250205_100334_add_locale.down,
+    name: '20250205_100334_add_locale',
+  },
+  {
+    up: migration_20250207_073006_add_subcription.up,
+    down: migration_20250207_073006_add_subcription.down,
+    name: '20250207_073006_add_subcription'
   },
 ];

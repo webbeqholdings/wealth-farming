@@ -176,7 +176,7 @@ const Withdrawals: CollectionConfig = {
                           amount: data.amount,
                           user: Number(data.user),
                           status: 'failed',
-                          from_account: account.id,
+                          account_to: account.id,
                           type: 'bonus',
                           message: data.message
                         },

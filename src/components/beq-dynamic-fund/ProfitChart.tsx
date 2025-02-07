@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { CustomTooltip } from './CustomTooltip'
+import { useTranslation } from 'react-i18next'
 
 interface ProfitData {
   time: Date
@@ -20,6 +21,7 @@ interface ProfitChartProps {
 }
 
 export function ProfitChart({ profitData }: ProfitChartProps) {
+  const { t } = useTranslation();
   const formatDate = (date: Date) => {
     const month = String(date.getMonth() + 1).padStart(2, '0')
     const year = date.getFullYear()
@@ -37,10 +39,10 @@ export function ProfitChart({ profitData }: ProfitChartProps) {
     <ResponsiveContainer width="100%" height={350}>
       <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="time" label={{ value: 'Time', position: 'insideBottom', offset: -5 }} />
+        <XAxis dataKey="time" label={{ value: t('time'), position: 'insideBottom', offset: -5 }} />
         <YAxis
           label={{
-            value: 'Balance ($)',
+            value: t('balance_chart'),
             angle: -90,
             position: 'insideLeft',
             dx: -8, // Shift the label to the left by 5px
