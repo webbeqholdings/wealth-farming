@@ -141,8 +141,14 @@ export const IsInvest = async (user_id: number): Promise<Boolean> => {
 
 export const createInvestment = async (formData: any) => {
   const { amount, startDate, endDate, productId, periods, term, userId } = formData
-  const account_invesment = await getAccountsByUser(userId)
-  const amountAvailable = await getSumAmountBalanceByAccount(Number(account_invesment[0].id))
+  const accountInvesment = await payload.find({
+    collection: 'accounts',
+    where: {
+      user: { equals: Number(userId) },
+      type: { equals: 'investment'}
+    },
+  })
+  const amountAvailable = await getSumAmountBalanceByAccount(Number(accountInvesment.docs[0].id))
 
   if (amount <= 0) {
     return {
