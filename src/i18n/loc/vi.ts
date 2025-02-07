@@ -143,11 +143,14 @@ export const vi = {
     balance_available: 'Số dư khả dụng: ',
     confirm_termination: 'Xác nhận chấm dứt',
     first_year: 'năm đầu tiên',
+    first_semester: 'nửa năm đầu tiên',
+    first_quarter: 'quý đầu tiên',
+    first_month: 'tháng đầu tiên',
     upload_photo: 'Tải ảnh',
     processing: 'Đang xử lý...',
     photo_requirement: 'Vui lòng tải lên ảnh chụp màn hình có hiển thị ảnh. Các định dạng được chấp nhận: JPG, PNG, với kích thước tối đa 5MB.',
     withdrawal_amount_input: 'Nhập số tiền muốn rút',
-    withdrawal_condition: 'Tài khoản của bạn không đáp ứng yêu cầu để rút tiền.',
+    withdrawal_condition: 'Hợp đồng của bạn sẽ được rút vào ngày ',
     terminated_note: 'Ghi chú',
 
     // user-profile

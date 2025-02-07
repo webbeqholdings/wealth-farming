@@ -141,11 +141,14 @@ export const en = {
     balance_available: 'Balance Available: ',
     confirm_termination: 'Confirm Termination',
     first_year: 'first year',
+    first_semester: 'first semester',
+    first_quarter: 'first quarter',
+    first_month: 'first month',
     upload_photo: 'Upload Photo',
     processing: 'Processing...',
     photo_requirement:'Please upload a screenshot showing the photo. Accepted formats: JPG, PNG, with a maximum size of 5MB.',
     withdrawal_amount_input: 'Enter amount to withdraw',
-    withdrawal_condition:'Your account does not meet the requirements for withdrawal.',
+    withdrawal_condition:'Your contract will be withdrawn on ',
     terminated_note: 'Note',
 
     // user-profile

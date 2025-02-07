@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,7 @@ import { notifyWithdrawlContracts } from '@/lib/telegram';
 import { getPaymentTransfer } from '@/lib/paymentTransfer'
 import { endOfMonth, addMonths, endOfYear, differenceInDays } from 'date-fns';
 import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
 
 interface WithdrawDialogProps {
   isOpen: boolean;
@@ -26,14 +27,23 @@ interface WithdrawDialogProps {
     profit: number
   };
   setActiveTab: (tab: string) => void;
-  terminated_avail: boolean;
 }
 
-export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab, terminated_avail }: WithdrawDialogProps) {
+export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab}: WithdrawDialogProps) {
   const [amount, setAmount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const { t } = useTranslation();
+  const [withdrawAvaibility, setWithdrawAvaibility] = useState(false)
+
+  useEffect(() => {
+    if (new Date(contract.endDate) < new Date()){
+      setWithdrawAvaibility(true)
+    }
+    else {
+      setWithdrawAvaibility(false)
+    }
+  },[contract])
 
   // Calculate expected end dates for each term
   const getExpectedEndDate = (term: string, start: Date) => {
@@ -130,16 +140,16 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab, termin
 
     switch (term) {
       case 'monthly':
-        termDescription = 'first month';
+        termDescription = 'first_month';
         break;
       case 'quarterly':
-        termDescription = 'first quarter';
+        termDescription = 'first_quarter';
         break;
       case 'semester':
-        termDescription = 'first semester';
+        termDescription = 'first_semester';
         break;
       case 'annually':
-        termDescription = 'first year';
+        termDescription = 'first_year';
         break;
       default:
         throw new Error('Unsupported term.');
@@ -217,16 +227,16 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab, termin
     <Dialog open={isOpen} onOpenChange={handleDialogClose}>
       <DialogContent className="sm:max-w-[425px] bg-white border-gray-300 shadow-md">
 
-      <>{!terminated_avail && <> 
+      <>{!withdrawAvaibility && <> 
         <DialogHeader>
           <DialogTitle className="text-gray-900">{t('withdraw_funds')}</DialogTitle>
           <DialogDescription className="text-gray-600">
-            {t('withdrawal_condition')}
+            {t('withdrawal_condition')} {format(contract.endDate, 'dd/MM/yyyy')}.
           </DialogDescription>
           </DialogHeader>
       </>}</>
 
-      <>{terminated_avail && <>
+      <>{withdrawAvaibility && <>
         <DialogHeader>
           <DialogTitle className="text-gray-900">{t('withdraw_funds')}</DialogTitle>
           <DialogDescription className="text-gray-600">
@@ -236,7 +246,7 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab, termin
         <form onSubmit={handleWithdraw}>
           <div className="grid gap-4">
             <div className="bg-yellow-100 text-yellow-800 text-sm rounded-md p-3">
-              <strong>{t('note')}</strong>
+              <strong>{t('note')} </strong>
               {t('withdrawal_profit_condition', { condition: t(message) })}
             </div>
             <div className="grid gap-2">
