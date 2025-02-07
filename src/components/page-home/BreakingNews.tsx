@@ -39,6 +39,7 @@ type Blog = {
   date: string;  // Added missing 'date'
   readTime: string;  // Added missing 'readTime'
   image: string;  // Added missing 'image' for the featured article
+  createdAt: string
 };
 
 export function BreakingNewsCarousel() {
@@ -52,12 +53,11 @@ export function BreakingNewsCarousel() {
       try {
         const response = await fetch(`/api/posts?locale=${locale}&limit=1000`); // Replace with your actual API endpoint
         const data = await response.json();
-
         // Transform API response to the desired format
         const formattedNews = data.docs.map((post: Blog) => ({
           title: post.title,
           content: post.content.root.children[0].children[0].text,
-          date: new Date(post.published_date).toISOString().split('T')[0], // Format date as YYYY-MM-DD
+          date: new Date(post.createdAt).toISOString().split('T')[0], // Format date as YYYY-MM-DD
           slug: post.slug,
         }));
 
