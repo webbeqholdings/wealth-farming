@@ -11,6 +11,8 @@ import { useToast } from '@/hooks/use-toast'
 
 export function SiteFooter() {
   const { t } = useTranslation()
+  const { i18n } = useTranslation();
+  const locale = i18n.language;
   const { isLoggedIn, user } = userStatus()
   const router = useRouter()
   const { toast } = useToast()
@@ -66,8 +68,8 @@ export function SiteFooter() {
             <h4 className="text-sm font-semibold mb-4">{t('quick_link')}</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href={`/explore-tools/economic-calendar`} className="hover:underline">
-                Economic Calendar
+                <Link href={`/explore-tools/economic-calendar?locale=${locale}`} className="hover:underline">
+                  {t('econ_calendar')}
                 </Link>
               </li>
               <li>
@@ -76,13 +78,13 @@ export function SiteFooter() {
                 </Link>
               </li>
               <li>
-                <Link href={`/explore-tools/compound-interest-rate`} className="hover:underline">
-                  Investment Simulator
+                <Link href={`/explore-tools/compound-interest-rate?locale=${locale}`} className="hover:underline">
+                  {t('invest_sim')}
                 </Link>
               </li>
               <li>
                 <Link href="/referral" className="hover:underline">
-                  Referral Program
+                  {t('referral_program')}
                 </Link>
               </li>
             </ul>
@@ -93,7 +95,7 @@ export function SiteFooter() {
             <form className="flex space-x-2" onSubmit={updateSubscription}>
               <Input type="email" name='user_email' placeholder='Enter your email' className="max-w-[180px]" />
               <Button type="submit" variant="default">
-                Subcribe
+                {t('subcribe')}
               </Button>
             </form>
           </div>
