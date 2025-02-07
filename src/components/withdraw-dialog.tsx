@@ -58,57 +58,42 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab}: Withd
     const currentDate = start.getDate();
     switch (term) {
       case 'monthly':
-        if (currentMonth == 0 && currentDate == 1) {
-          return endOfMonth(start); // End of the current month
+        if (currentDate == 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 1, 1)
+          return new Date(returnDate - 1);
         }
-        if ((currentMonth == 0 && currentDate > 1) || (currentMonth > 0 && currentMonth < 11)) {
-          const nextMonthStart: any = new Date(start.getFullYear(), currentMonth + 1, 1); // First day of the month after next
-          return new Date(nextMonthStart - 1); // Subtract 1 millisecond to get the last day of the next month
-        }
-        if (currentMonth == 11 && currentDate > 1) {
-          const nextYear = start.getFullYear() + 1;
-          return new Date(nextYear, 0, 31);
+        if (currentDate > 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 2, 1)
+          return new Date(returnDate - 1);
         }
       case 'quarterly': {
-        // End of the current quarter
-        if (currentMonth == 0 && currentDate == 1) {
-          return new Date(start.getFullYear(), 2, 31);
+        if (currentDate == 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 3, 1)
+          return new Date(returnDate - 1);
         }
-        if ((currentMonth == 3 && currentDate == 1) || (currentMonth == 0 && currentDate > 1) || (currentMonth >= 1 && currentMonth <= 2)) {
-          return new Date(start.getFullYear(), 5, 30);
-        }
-        if ((currentMonth == 6 && currentDate == 1) || (currentMonth == 3 && currentDate > 1) || (currentMonth >= 4 && currentMonth <= 5)) {
-          return new Date(start.getFullYear(), 8, 30);
-        }
-        if ((currentMonth == 9 && currentDate == 1) || (currentMonth == 6 && currentDate > 1) || (currentMonth >= 7 && currentMonth <= 8)) {
-          return new Date(start.getFullYear(), 11, 31);
-        }
-        if ((currentMonth == 9 && currentDate > 1) || (currentMonth > 9)) {
-          const nextYear = start.getFullYear() + 1;
-          return new Date(nextYear, 2, 31);
+        if (currentDate > 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 4, 1)
+          return new Date(returnDate - 1);
         }
       }
       case 'semester': {
-        // Determine the semester and return its last date
-        if (currentMonth == 0 && currentDate == 1) {
-          return new Date(start.getFullYear(), 5, 30);
+        if (currentDate == 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 6, 1)
+          return new Date(returnDate - 1);
         }
-        if ((currentMonth == 6 || currentDate == 1) || (currentMonth == 0 && currentDate > 1) || (currentMonth >= 1 && currentMonth <= 5)) {
-          return new Date(start.getFullYear(), 11, 31);
-        }
-        if ((currentMonth == 6 && currentDate > 1) || (currentMonth > 6)) {
-          const nextYear = start.getFullYear() + 1;
-          return new Date(nextYear, 5, 30);
+        if (currentDate > 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 7, 1)
+          return new Date(returnDate - 1);
         }
       }
       case 'annually': {
-        // End of the year
-        if (currentMonth == 0 && currentDate == 1) {
-          return endOfYear(start);
+        if (currentDate == 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 12, 1)
+          return new Date(returnDate - 1);
         }
-        if ((currentMonth == 0 && currentDate > 1) || currentMonth > 0) {
-          const nextYear = start.getFullYear() + 1;
-          return new Date(nextYear, 11, 31);
+        if (currentDate > 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 13, 1)
+          return new Date(returnDate - 1);
         }
       }
       default:
