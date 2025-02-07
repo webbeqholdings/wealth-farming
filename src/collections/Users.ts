@@ -149,6 +149,10 @@ export const Users: CollectionConfig = {
         ],
       },
     },
+    {
+      name: 'subscription',
+      type: 'checkbox',
+    }
   ],
   hooks: {
     beforeLogin: [

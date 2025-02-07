@@ -4,11 +4,40 @@ import { Facebook, Twitter, Instagram, Mail } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useTranslation } from "react-i18next"
+import userStatus from '@/lib/userStatus'
+import { useRouter } from 'next/navigation'
+import { updateUserSubscription } from "@/lib/users"
+import { useToast } from '@/hooks/use-toast'
 
 export function SiteFooter() {
   const { t } = useTranslation()
-  const { i18n } = useTranslation();
-  const locale = i18n.language;
+  const { isLoggedIn, user } = userStatus()
+  const router = useRouter()
+  const { toast } = useToast()
+
+  async function updateSubscription(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!isLoggedIn) {
+      router.push('/join')
+      return
+    }
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("user_email");
+
+    if (email == user.email) {
+      updateUserSubscription(user.id);
+      toast({
+        title: 'Success',
+        description: 'You have successfully updated your subscription preferences.',
+      });
+    } else {
+      toast({
+        title: 'Error',
+        description: 'Email does not match the user email.',
+      });
+    }
+  }
+
   return (
     <footer className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t">
       <div className="container md:py-12">
@@ -61,8 +90,8 @@ export function SiteFooter() {
           <div>
             <h4 className="text-sm font-semibold mb-4">{t('newsletter')}</h4>
             <p className="text-sm text-muted-foreground mb-4">{t('stay_updated')}</p>
-            <form className="flex space-x-2">
-              <Input type="email" placeholder='Enter your email' className="max-w-[180px]" />
+            <form className="flex space-x-2" onSubmit={updateSubscription}>
+              <Input type="email" name='user_email' placeholder='Enter your email' className="max-w-[180px]" />
               <Button type="submit" variant="default">
                 Subcribe
               </Button>
