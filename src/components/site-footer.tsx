@@ -1,16 +1,14 @@
 import Link from "next/link"
-import { Facebook, Twitter, Instagram, Mail } from "lucide-react"
+import { Facebook, Twitter, Instagram } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useTranslation } from "react-i18next"
 import userStatus from '@/lib/userStatus'
 import { useRouter } from 'next/navigation'
 import { updateUserSubscription } from "@/lib/users"
 import { useToast } from '@/hooks/use-toast'
 
 export function SiteFooter() {
-  const { t } = useTranslation()
   const { isLoggedIn, user } = userStatus()
   const router = useRouter()
   const { toast } = useToast()
@@ -44,7 +42,7 @@ export function SiteFooter() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8"> {/* Changed grid-cols-4 to grid-cols-3 */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Wealth Farming</h3>
-            <p className="text-sm text-muted-foreground">{t('grow_your_wealth')}</p>
+            <p className="text-sm text-muted-foreground">Grow your wealth with sustainable investment strategies.</p>
             <div className="flex space-x-4">
               <Link href="https://www.facebook.com/p/BeQ-Holdings-61555802044845/" target="_blank" rel="noreferrer">
                 <Button variant="ghost" size="icon">
@@ -63,7 +61,7 @@ export function SiteFooter() {
             </div>
           </div>
           <div>
-            <h4 className="text-sm font-semibold mb-4">{t('quick_link')}</h4>
+            <h4 className="text-sm font-semibold mb-4">Quick Link</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href={`/explore-tools/economic-calendar`} className="hover:underline">
@@ -72,7 +70,7 @@ export function SiteFooter() {
               </li>
               <li>
                 <Link href="/investment-products/incoming/investment-process" className="hover:underline">
-                  {t('dynamic_cal')}
+                  Dynamic Profit Calculator
                 </Link>
               </li>
               <li>
@@ -88,8 +86,8 @@ export function SiteFooter() {
             </ul>
           </div>
           <div>
-            <h4 className="text-sm font-semibold mb-4">{t('newsletter')}</h4>
-            <p className="text-sm text-muted-foreground mb-4">{t('stay_updated')}</p>
+            <h4 className="text-sm font-semibold mb-4">NewsLetter</h4>
+            <p className="text-sm text-muted-foreground mb-4">Stay updated with our latest news and offers.</p>
             <form className="flex space-x-2" onSubmit={updateSubscription}>
               <Input type="email" name='user_email' placeholder='Enter your email' className="max-w-[180px]" />
               <Button type="submit" variant="default">
