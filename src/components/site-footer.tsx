@@ -15,7 +15,7 @@ export function SiteFooter() {
   const router = useRouter()
   const { toast } = useToast()
 
-  async function userSubcription(e: React.FormEvent<HTMLFormElement>) {
+  async function updateSubscription(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!isLoggedIn) {
       router.push('/join')
@@ -24,12 +24,17 @@ export function SiteFooter() {
     const formData = new FormData(e.currentTarget);
     const email = formData.get("user_email");
 
-    if (email == user.email){
-      updateUserSubscription(user.id)
+    if (email == user.email) {
+      updateUserSubscription(user.id);
       toast({
         title: 'Success',
-        description: 'Subscription updated successfully!',
-      })
+        description: 'You have successfully updated your subscription preferences.',
+      });
+    } else {
+      toast({
+        title: 'Error',
+        description: 'Email does not match the user email.',
+      });
     }
   }
 
@@ -85,7 +90,7 @@ export function SiteFooter() {
           <div>
             <h4 className="text-sm font-semibold mb-4">{t('newsletter')}</h4>
             <p className="text-sm text-muted-foreground mb-4">{t('stay_updated')}</p>
-            <form className="flex space-x-2" onSubmit={userSubcription}>
+            <form className="flex space-x-2" onSubmit={updateSubscription}>
               <Input type="email" name='user_email' placeholder='Enter your email' className="max-w-[180px]" />
               <Button type="submit" variant="default">
                 Subcribe
