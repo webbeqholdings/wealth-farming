@@ -22,6 +22,7 @@ import * as migration_20250117_111708_add_columns_not_and_image_to_withdrawls fr
 import * as migration_20250123_025853_add_account_to_and_account_from_to_transaction from './20250123_025853_add_account_to_and_account_from_to_transaction';
 import * as migration_20250126_082116_delete_from_account_and_to_account_in_transactions from './20250126_082116_delete_from_account_and_to_account_in_transactions';
 import * as migration_20250205_100334_add_locale from './20250205_100334_add_locale';
+import * as migration_20250207_073006_add_subcription from './20250207_073006_add_subcription';
 
 export const migrations = [
   {
@@ -142,6 +143,11 @@ export const migrations = [
   {
     up: migration_20250205_100334_add_locale.up,
     down: migration_20250205_100334_add_locale.down,
-    name: '20250205_100334_add_locale'
+    name: '20250205_100334_add_locale',
+  },
+  {
+    up: migration_20250207_073006_add_subcription.up,
+    down: migration_20250207_073006_add_subcription.down,
+    name: '20250207_073006_add_subcription'
   },
 ];
