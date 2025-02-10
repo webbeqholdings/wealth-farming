@@ -674,19 +674,19 @@ export const buildProfitLogsAnnualy = async (principal: number, startDate: Date,
 
   while (true) {
     if (loopMonths.length >= defineAnnualy) {
-      mapMonths.Annualy = [...loopMonths.slice(0, defineAnnualy)]
+      mapMonths.Annualy = [...mapMonths.Annualy, ...loopMonths.slice(0, defineAnnualy)]
       loopMonths = loopMonths.slice(defineAnnualy, loopMonths.length)
       continue
     }
 
     if (loopMonths.length >= defineSemester) {
-      mapMonths.Semester = [...loopMonths.slice(0, defineSemester)]
+      mapMonths.Semester = [...mapMonths.Semester, ...loopMonths.slice(0, defineSemester)]
       loopMonths = loopMonths.slice(defineSemester, loopMonths.length)
       continue
     }
 
     if (loopMonths.length >= defineQuarterly) {
-      mapMonths.Quarterly = [...loopMonths.slice(0, defineQuarterly)]
+      mapMonths.Quarterly = [...mapMonths.Quarterly, ...loopMonths.slice(0, defineQuarterly)]
       loopMonths = loopMonths.slice(defineQuarterly, loopMonths.length)
       continue
     }
@@ -730,11 +730,12 @@ export const buildProfitLogsAnnualy = async (principal: number, startDate: Date,
   if (!isStartOfMonth(startDate)) {
     let __days = differenceInDays(lastDayOfMonth(startDate), startDate) + 1
     let _profit = (principal * _bestTermRate * __days) / getDaysInMonth(startDate)
+    _balance = _balance + _profit
     profitLogs.unshift({
       fromDate: startDate,
       toDate: lastDayOfMonth(startDate),
       rate: _bestTermRate,
-      balance: _balance,
+      balance: principal + _profit,
       profit: _profit,
       days: __days,
       term: _bestTerm,
@@ -744,14 +745,16 @@ export const buildProfitLogsAnnualy = async (principal: number, startDate: Date,
 
   if (!isEndOfMonth(endDate)) {
     let __days = differenceInDays(endDate, new Date(getYear(endDate), getMonth(endDate), 1))
+    _dayCount += __days
     let _profit = (principal * _bestTermRate * __days) / getDaysInMonth(endDate)
+    _balance = _balance + _profit
     profitLogs.push({
       fromDate: new Date(getYear(endDate), getMonth(endDate), 1),
-      toDate: lastDayOfMonth(endDate),
+      toDate: endDate,
       rate: _bestTermRate,
       balance: _balance,
       profit: _profit,
-      days: __days,
+      days: _dayCount,
       term: _bestTerm,
       message: _bestTerm + ' Partial',
     })
@@ -813,13 +816,13 @@ export const buildProfitLogsSemester = async (
 
   while (true) {
     if (loopMonths.length >= defineSemester) {
-      mapMonths.Semester = [...loopMonths.slice(0, defineSemester)]
+      mapMonths.Semester = [...mapMonths.Semester, ...loopMonths.slice(0, defineSemester)]
       loopMonths = loopMonths.slice(defineSemester, loopMonths.length)
       continue
     }
 
     if (loopMonths.length >= defineQuarterly) {
-      mapMonths.Quarterly = [...loopMonths.slice(0, defineQuarterly)]
+      mapMonths.Quarterly = [...mapMonths.Quarterly, ...loopMonths.slice(0, defineQuarterly)]
       loopMonths = loopMonths.slice(defineQuarterly, loopMonths.length)
       continue
     }
@@ -862,11 +865,12 @@ export const buildProfitLogsSemester = async (
   if (!isStartOfMonth(startDate)) {
     let __days = differenceInDays(lastDayOfMonth(startDate), startDate) + 1
     let _profit = (principal * _bestTermRate * __days) / getDaysInMonth(startDate)
+    _balance = _balance + _profit
     profitLogs.unshift({
       fromDate: startDate,
       toDate: lastDayOfMonth(startDate),
       rate: _bestTermRate,
-      balance: _balance,
+      balance: principal + _profit,
       profit: _profit,
       days: __days,
       term: _bestTerm,
@@ -876,14 +880,16 @@ export const buildProfitLogsSemester = async (
 
   if (!isEndOfMonth(endDate)) {
     let __days = differenceInDays(endDate, new Date(getYear(endDate), getMonth(endDate), 1))
+    _dayCount += __days
     let _profit = (principal * _bestTermRate * __days) / getDaysInMonth(endDate)
+    _balance = _balance + _profit
     profitLogs.push({
       fromDate: new Date(getYear(endDate), getMonth(endDate), 1),
-      toDate: lastDayOfMonth(endDate),
+      toDate: endDate,
       rate: _bestTermRate,
       balance: _balance,
       profit: _profit,
-      days: __days,
+      days: _dayCount,
       term: _bestTerm,
       message: _bestTerm + ' Partial',
     })
@@ -938,10 +944,9 @@ export const buildProfitLogsQuarterly = async (
   }
 
   let loopMonths = flatMapMonths
-
   while (true) {
     if (loopMonths.length >= defineQuarterly) {
-      mapMonths.Quarterly = [...loopMonths.slice(0, defineQuarterly)]
+      mapMonths.Quarterly = [...mapMonths.Quarterly, ...loopMonths.slice(0, defineQuarterly)]
       loopMonths = loopMonths.slice(defineQuarterly, loopMonths.length)
       continue
     }
@@ -984,11 +989,12 @@ export const buildProfitLogsQuarterly = async (
   if (!isStartOfMonth(startDate)) {
     let __days = differenceInDays(lastDayOfMonth(startDate), startDate) + 1
     let _profit = (principal * _bestTermRate * __days) / getDaysInMonth(startDate)
+    _balance = _balance + _profit
     profitLogs.unshift({
       fromDate: startDate,
       toDate: lastDayOfMonth(startDate),
       rate: _bestTermRate,
-      balance: _balance,
+      balance: principal + _profit,
       profit: _profit,
       days: __days,
       term: _bestTerm,
@@ -998,10 +1004,12 @@ export const buildProfitLogsQuarterly = async (
 
   if (!isEndOfMonth(endDate)) {
     let __days = differenceInDays(endDate, new Date(getYear(endDate), getMonth(endDate), 1))
+    _dayCount += __days
     let _profit = (principal * _bestTermRate * __days) / getDaysInMonth(endDate)
+    _balance = _balance + _profit
     profitLogs.push({
       fromDate: new Date(getYear(endDate), getMonth(endDate), 1),
-      toDate: lastDayOfMonth(endDate),
+      toDate: endDate,
       rate: _bestTermRate,
       balance: _balance,
       profit: _profit,
@@ -1092,11 +1100,12 @@ export const buildProfitLogsMonthly = async (principal: number, startDate: Date,
   if (!isStartOfMonth(startDate)) {
     let __days = differenceInDays(lastDayOfMonth(startDate), startDate) + 1
     let _profit = (principal * _bestTermRate * __days) / getDaysInMonth(startDate)
+    _balance = _balance + _profit
     profitLogs.unshift({
       fromDate: startDate,
       toDate: lastDayOfMonth(startDate),
       rate: _bestTermRate,
-      balance: _balance,
+      balance: principal + _profit,
       profit: _profit,
       days: __days,
       term: _bestTerm,
@@ -1106,14 +1115,16 @@ export const buildProfitLogsMonthly = async (principal: number, startDate: Date,
 
   if (!isEndOfMonth(endDate)) {
     let __days = differenceInDays(endDate, new Date(getYear(endDate), getMonth(endDate), 1))
+    _dayCount += __days
     let _profit = (principal * _bestTermRate * __days) / getDaysInMonth(endDate)
+    _balance = _balance + _profit
     profitLogs.push({
       fromDate: new Date(getYear(endDate), getMonth(endDate), 1),
-      toDate: lastDayOfMonth(endDate),
+      toDate: endDate,
       rate: _bestTermRate,
       balance: _balance,
       profit: _profit,
-      days: __days,
+      days: _dayCount,
       term: _bestTerm,
       message: _bestTerm + ' Partial',
     })
