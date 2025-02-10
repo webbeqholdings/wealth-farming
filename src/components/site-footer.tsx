@@ -41,8 +41,8 @@ export function SiteFooter() {
   }
 
   return (
-    <footer className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t">
-      <div className="container md:py-12">
+    <footer className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container md:py-12 bg-secondary/10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8"> {/* Changed grid-cols-4 to grid-cols-3 */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Wealth Farming</h3>
@@ -101,7 +101,7 @@ export function SiteFooter() {
           </div>
         </div>
       </div>
-      <div className="py-4 text-center">
+      <div className="py-4 text-center bg-secondary/10 border-t">
         <p className="text-sm text-muted-foreground">
           © {new Date().getFullYear()} Wealth Farming. All rights reserved.
         </p>
