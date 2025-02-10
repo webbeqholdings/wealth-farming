@@ -12,12 +12,11 @@ const calculateProfit = (term: string, availableBalance: any, startDate: Date, t
     let profitToday = 0;
     let balanceToday = availableBalance;
 
-    if (daysSinceStart <= 30 && daysSinceStart >= 0) {
-        profitToday = (daysSinceStart * availableBalance * 20) / (255 * 100);
-        balanceToday = availableBalance + profitToday;
-        return type === 'profit' ? profitToday : balanceToday;
-    }
-
+    // if (daysSinceStart <= 30 && daysSinceStart >= 0) {
+    //     profitToday = (daysSinceStart * availableBalance * 20) / (255 * 100);
+    //     balanceToday = availableBalance + profitToday;
+    //     return type === 'profit' ? profitToday : balanceToday;
+    // }
     if(daysSinceStart < 0){
         profitToday = 0;
         balanceToday = availableBalance;
