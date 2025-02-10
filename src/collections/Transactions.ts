@@ -74,6 +74,7 @@ const Transactions: CollectionConfig = {
     {
       name: 'payment_method',
       type: 'text',
+      label: 'Payment Method',
     },
     {
       name: 'amount',

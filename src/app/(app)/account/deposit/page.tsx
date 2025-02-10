@@ -458,18 +458,18 @@ export default function DepositPage() {
               {step === 2 && (
                 <div className="space-y-4">
                   <RadioGroup value={method} onValueChange={setMethod}>
-                    <div className={`flex items-center space-x-2 ${paymentMethod === 'bank_transfer' ? 'opacity-100' : 'opacity-50'}`} onClick={() => setPaymentMethod('bank_transfer')}>
+                    <div className={`flex items-center space-x-2 cursor-pointer ${paymentMethod === 'bank_transfer' ? 'opacity-100' : 'opacity-50'}`} onClick={() => setPaymentMethod('bank_transfer')}>
                       <RadioGroupItem value="bank" id="bank" />
                       <Label htmlFor="bank" className="flex items-center space-x-2">
                         <Banknote className="h-4 w-4" />
-                        <span>Bank Transfer</span>
+                        <span className='cursor-pointer'>Bank Transfer</span>
                       </Label>
                     </div>
-                    <div className={`flex items-center space-x-2 ${paymentMethod === 'crypto_wallet' ? 'opacity-100' : 'opacity-50'}`}  onClick={() => setPaymentMethod('crypto_wallet')}>
+                    <div className={`flex items-center space-x-2 cursor-pointer ${paymentMethod === 'crypto_wallet' ? 'opacity-100' : 'opacity-50'}`}  onClick={() => setPaymentMethod('crypto_wallet')}>
                       <RadioGroupItem value="crypto" id="crypto" />
                       <Label htmlFor="crypto" className="flex items-center space-x-2">
                         <CreditCard className="h-4 w-4" />
-                        <span>Crypto Wallet</span>
+                        <span className='cursor-pointer'>Crypto Wallet</span>
                       </Label>
                     </div>
                     {/* <div className="flex items-center space-x-2 opacity-50">
