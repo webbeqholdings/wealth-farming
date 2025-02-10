@@ -29,19 +29,51 @@ export const updateProfitHandler: TaskHandler<{
         return nextMonth;
     }
 
-    const checkTermFullness = (startDate: any, term: any) => {
-        const start = getBeginningOfNextMonth(startDate);
-        const today = new Date();
-        if (today < start) {
-            return false;
+    function checkEndOfCurrentMonth(): boolean {
+        const date = new Date()
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const lastDay = new Date(year, month + 1, 0).getDate();
+        return date.getDate() === lastDay;
+    }
+
+    function getAppearingMonths(inputDate: Date | string, step: number) {
+        if (step < 1 || step > 12) {
+            throw new Error("Step must be between 1 and 12");
         }
-        // Calculate total days in the expected term
-        const expectedEndDate = contractEndAt(start, term);
-        const totalTermDays = differenceInDays(expectedEndDate, start) + 1;
-        // Calculate actual duration of the contract
-        const actualDurationDays = differenceInDays(today, start) + 1;
-        return (actualDurationDays >= totalTermDays) && (today.getDate() == 1)
-    };
+        const date = typeof inputDate === "string" ? new Date(inputDate) : new Date(inputDate);
+        const monthsSet = new Set<number>();
+        for (let i = 0; i < 12; i++) {
+            monthsSet.add((date.getMonth() + step) - 1);
+            date.setMonth((date.getMonth() + step));
+        }
+        // return a normalize month list 0-11 
+        return Array.from(monthsSet).map(month => month % 12);
+    }
+    function checkEndOfPeriodTerm(inputDate: Date | string, term: "monthly" | "quarterly" | "semester" | "yearly" | string): boolean {
+        const date = typeof inputDate === "string" ? new Date(inputDate) : inputDate;
+        const currentDate = new Date();
+    
+        // Xác định ngày bắt đầu hợp đồng
+        const scheduleContract = date.getDate() !== 1;
+        const contractStart = scheduleContract ? new Date(date.getFullYear(), date.getMonth() + 1, 1) : date;
+    
+        // Nếu không phải cuối tháng, trả về false ngay
+        if (!checkEndOfCurrentMonth()) return false;
+    
+        // Kiểm tra điều kiện theo từng kỳ hạn
+        if (term === "monthly") {
+            return !scheduleContract || !(currentDate.getMonth() === date.getMonth() && currentDate.getFullYear() === date.getFullYear());
+        }
+    
+        if (term === "quarterly" || term === "semester") {
+            const period = term === "quarterly" ? 3 : 6;
+            const withdrawableMonths = getAppearingMonths(contractStart, period);
+            return withdrawableMonths.includes(currentDate.getMonth()) && (!scheduleContract || !(currentDate.getMonth() === date.getMonth() && currentDate.getFullYear() === date.getFullYear()));
+        }
+    
+        return (contractStart.getMonth() - 1 === currentDate.getMonth()) && (currentDate.getFullYear() > contractStart.getFullYear());
+    }
 
     // Fetch all active contracts
     const contractsResponse = await payload.find({
@@ -93,7 +125,7 @@ export const updateProfitHandler: TaskHandler<{
         if (
             typeof config_log === 'object' && config_log !== null &&
             'extend_contract' in config_log && config_log.extend_contract == true &&
-            checkTermFullness(start_date, term) && 'auto_profit' in config_log && Number(config_log.auto_profit) >= 0 &&
+            checkEndOfPeriodTerm(start_date, term) && 'auto_profit' in config_log && Number(config_log.auto_profit) >= 0 &&
             typeof user === 'object' && user !== null
         ) {
             const paymentTransfer = await getPaymentTransfer();
@@ -110,7 +142,7 @@ export const updateProfitHandler: TaskHandler<{
                     `Auto withdraw for: ${contract.id} | Withdraw amount: ${amount} | Message : ${mesg.message}`
                 );
             }
-            else{
+            else {
                 console.log(
                     `Auto withdraw for: ${contract.id} | Withdraw failed - amount < minWithdrawal`
                 );
