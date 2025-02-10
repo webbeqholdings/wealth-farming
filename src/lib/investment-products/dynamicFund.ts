@@ -674,7 +674,7 @@ export const buildProfitLogsAnnualy = async (principal: number, startDate: Date,
 
   while (true) {
     if (loopMonths.length >= defineAnnualy) {
-      mapMonths.Annualy = [...mapMonths.Annualy, ...loopMonths.slice(0, defineAnnualy)]
+      mapMonths.Annually = [...mapMonths.Annually, ...loopMonths.slice(0, defineAnnualy)]
       loopMonths = loopMonths.slice(defineAnnualy, loopMonths.length)
       continue
     }
