@@ -72,6 +72,10 @@ const Transactions: CollectionConfig = {
       },
     },
     {
+      name: 'payment_method',
+      type: 'text',
+    },
+    {
       name: 'amount',
       type: 'number',
       label: 'Transaction Amount',
