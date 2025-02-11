@@ -2,9 +2,7 @@
 
 import React, { useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
-import dynamic from 'next/dynamic'
-import createGlobe from 'cobe'
-import { GlobeGithub } from '@/components/GlobeGithub'
+// import { GlobeGithub } from '@/components/GlobeGithub'
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -36,7 +34,7 @@ export function MinimalHero() {
             </PageHeader>
           </div>
           <div className="mx-auto lg:mx-0 aspect-video overflow-hidden rounded-xl order-1 lg:order-2">
-            <GlobeGithub />
+            {/* <GlobeGithub /> */}
           </div>
         </div>
       </div>
