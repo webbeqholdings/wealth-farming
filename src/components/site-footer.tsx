@@ -41,7 +41,7 @@ export function SiteFooter() {
   }
 
   return (
-    <footer className="w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <footer className="w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t">
       {/* Full-width background section */}
       <div className="w-full md:py-12 bg-secondary/10">
         {/* Centered inner content */}
