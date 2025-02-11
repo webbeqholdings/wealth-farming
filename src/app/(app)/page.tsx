@@ -6,7 +6,7 @@ import FeaturesSection from '@/components/page-home/FeaturesSection'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 
-import { MinimalHero } from '@/components/page-home/MinimalHero'
+// import { MinimalHero } from '@/components/page-home/MinimalHero'
 import { Metadata } from 'next'
 import { MarqueeAnnouncements } from '@/components/page-home/MarqueeAnnouncements'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
@@ -93,7 +93,7 @@ export default function IndexPage() {
   return (
     <>
       <SiteHeader />
-      <MinimalHero />
+      {/* <MinimalHero /> */}
       <div className="container relative">
         <MarqueeAnnouncements
           items={announcements}
