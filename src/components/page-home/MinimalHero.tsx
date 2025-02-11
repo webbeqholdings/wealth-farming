@@ -1,11 +1,10 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react'
+import React from 'react'
 import { Button } from '@/components/ui/button'
 // import { GlobeGithub } from '@/components/GlobeGithub'
 import { useTranslation } from 'react-i18next';
 import WorldMap from "@/components/ui/world-map";
-import { motion } from "motion/react";
 
 import {
   PageHeaderHeading,
