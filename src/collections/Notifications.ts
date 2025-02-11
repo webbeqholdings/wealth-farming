@@ -1,5 +1,6 @@
 import { CollectionConfig } from 'payload'
 import { isAdmin } from '@/access/isAdmin';
+import { sendEventNotification, sendOtherNotification } from '@/lib/users';
 const Notifications: CollectionConfig = {
   slug: 'notifications',
   access: {
@@ -14,6 +15,11 @@ const Notifications: CollectionConfig = {
     plural: 'Notifications',
   },
   fields: [
+    {
+      name: 'user',
+      type: 'relationship',
+      relationTo: 'users',
+    },
     {
       name: 'title',
       type: 'text',
@@ -38,6 +44,7 @@ const Notifications: CollectionConfig = {
         { label: 'Alert', value: 'alert' },
         { label: 'Transaction', value: 'transaction' },
         { label: 'Security', value: 'security' },
+        { label: 'Event', value: 'event'}
       ],
       required: true,
     },
@@ -46,6 +53,22 @@ const Notifications: CollectionConfig = {
       type: 'richText',
     },
   ],
+  hooks: {
+    beforeChange: [
+      async ({ data }) => {
+        if (data.user && data.type != 'event') {
+        sendOtherNotification(
+              data.user, 
+              data.title, 
+              data.content.root.children
+          );
+        }
+        if(data.type == 'event'){
+          sendEventNotification(data.title, data.content.root.children)
+        }
+      }
+    ]
+  },
 };
 
 export default Notifications;

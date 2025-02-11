@@ -514,10 +514,11 @@ export interface UserReferral {
  */
 export interface Notification {
   id: number;
+  user?: (number | null) | User;
   title: string;
   description: string;
   date: string;
-  type: 'opportunity' | 'account' | 'alert' | 'transaction' | 'security';
+  type: 'opportunity' | 'account' | 'alert' | 'transaction' | 'security' | 'event';
   content?: {
     root: {
       type: string;
@@ -1073,6 +1074,7 @@ export interface UnitsSelect<T extends boolean = true> {
  * via the `definition` "notifications_select".
  */
 export interface NotificationsSelect<T extends boolean = true> {
+  user?: T;
   title?: T;
   description?: T;
   date?: T;
