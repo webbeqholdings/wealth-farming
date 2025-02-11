@@ -554,49 +554,68 @@ export const buildProfitRecordsMonthly = (
 }
 
 export const contractEndAt = (startDate: Date, term: Term): Date => {
-  let endDate = addDays(startDate, 360)
+  const adjustedStartDate = isStartOfMonth(startDate) ? startDate : new Date(startDate.getFullYear(), startDate.getMonth() + 1, 1);
+
+  let endDate: Date;
 
   if (term === 'monthly') {
-    endDate = addDays(startDate, 30)
+    endDate = new Date(adjustedStartDate.getFullYear(), adjustedStartDate.getMonth() + 1, 0); 
   }
 
   if (term === 'semester') {
-    endDate = addDays(startDate, 180)
+    endDate = new Date(adjustedStartDate.getFullYear(), adjustedStartDate.getMonth() + 6, 0); 
   }
 
   if (term === 'quarterly') {
-    endDate = addDays(startDate, 90)
+    endDate = new Date(adjustedStartDate.getFullYear(), adjustedStartDate.getMonth() + 3, 0); 
   }
 
-  return endDate
+  if (term === 'annually') { 
+    endDate = new Date(adjustedStartDate.getFullYear() + 1, adjustedStartDate.getMonth(), 0);
+  }
+
+  return endDate;
 }
 
 export const contractMultiPeriodEndAt = (startDate: Date, term: Term, periods: number): Date => {
-  const endByTerm = contractEndAt(startDate, term)
-  let periodsEndAt: Date
+  const endByTerm = contractEndAt(startDate, term);
+  let periodsEndAt: Date;
+  
   if (periods <= 1) {
-    return endByTerm
+    return endByTerm;
+  }
+  const listOfMonths = getMonthsBetweenYears(startDate, addMonths(startDate, 50));
+  
+  if (!isStartOfMonth(startDate)) {
+    listOfMonths[0].months.shift(); 
   }
 
-  const _periods = periods - 1
+  const firstMonth = listOfMonths[0].months[0];
+  
+  const monthNumber = typeof firstMonth === 'string' ? parseInt(firstMonth, 10) : firstMonth;
+  const yearNumber = listOfMonths[0].year; 
 
-  if (term == 'monthly') {
-    periodsEndAt = addMonths(endByTerm, _periods)
+  const startDateFullMonth = new Date(yearNumber, monthNumber - 1, 1); 
+
+  if (term === 'monthly') {
+    periodsEndAt = addMonths(startDateFullMonth, periods);
   }
 
-  if (term == 'annually') {
-    periodsEndAt = addMonths(endByTerm, _periods * 12)
+  if (term === 'annually') {
+    periodsEndAt = addMonths(startDateFullMonth, periods * 12);
   }
 
-  if (term == 'semester') {
-    periodsEndAt = addMonths(endByTerm, _periods * 6)
+  if (term === 'semester') {
+    periodsEndAt = addMonths(startDateFullMonth, periods * 6);
   }
 
-  if (term == 'quarterly') {
-    periodsEndAt = addMonths(endByTerm, _periods * 4)
+  if (term === 'quarterly') {
+    periodsEndAt = addMonths(startDateFullMonth, periods * 3);
   }
 
-  return periodsEndAt
+  const endDate = new Date(periodsEndAt.getFullYear(), periodsEndAt.getMonth(), 0);
+
+  return endDate;
 }
 
 export const isValidForStandardApplyCancelContract = (startDate: Date): Boolean => {
