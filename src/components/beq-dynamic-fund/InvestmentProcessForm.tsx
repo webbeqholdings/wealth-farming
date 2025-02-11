@@ -361,7 +361,9 @@ export function InvestmentProcessForm() {
                   onSelect={handleEndDateSelect}
                   initialFocus
                   disabled={(date) =>
-                    startDate ? isBefore(date, addDays(startDate, minRangeDays)) : false
+                    // startDate ? isBefore(date, addDays(startDate, minRangeDays)) : false
+                    startDate ? isBefore(date, endDate)  : false
+
                   }
                   defaultMonth={endDate || (startDate ? addDays(startDate, 14) : new Date())}
                 />
