@@ -343,7 +343,7 @@ export const getTotalDeposit = async (user_id: number): Promise<number> => {
 // -- -- Pending Transaction -- --
 export const createDeposit = async (inputData: any) => {
   // validate: is approve pending deposit ?
-  const { amount, user_id, account_to, deposit_screenshot } = inputData
+  const { amount, user_id, account_to, deposit_screenshot, payment_method } = inputData
 
   // Validate
   if (!amount) {
@@ -363,6 +363,7 @@ export const createDeposit = async (inputData: any) => {
       account_to: account_to,
       type: 'deposit',
       deposit_screenshot: deposit_screenshot,
+      payment_method: payment_method,
     },
   })
 
