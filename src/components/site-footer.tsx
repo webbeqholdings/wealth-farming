@@ -41,7 +41,7 @@ export function SiteFooter() {
   }
 
   return (
-    <footer className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t">
+    <footer className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t ">
       <div className="container md:py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8"> {/* Changed grid-cols-4 to grid-cols-3 */}
           <div className="space-y-4">
