@@ -28,12 +28,10 @@ const Notifications: CollectionConfig = {
     {
       name: 'description',
       type: 'textarea',
-      required: true,
     },
     {
       name: 'date',
       type: 'date',
-      required: true,
     },
     {
       name: 'type',

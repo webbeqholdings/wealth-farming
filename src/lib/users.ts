@@ -48,7 +48,6 @@ export const sendEventNotification: any = async (title: string, text: RichTextBl
         });
       })
     )
-    console.log('Email sent successfully');
   } catch (error) {
     console.error('Error sending email:', error);
   }
@@ -69,7 +68,6 @@ export const sendOtherNotification: any = async (to: string, title: string, text
     const email = await payload.email.sendEmail({
       to: user.docs[0].email, subject: title, html: convertRichTextToHTML(text),
     });
-    console.log('Email sent successfully');
   } catch (error) {
     console.error('Error sending email:', error);
   }
