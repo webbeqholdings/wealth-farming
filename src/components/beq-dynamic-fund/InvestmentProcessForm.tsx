@@ -37,7 +37,6 @@ import { useToast } from '@/hooks/use-toast'
 import { notifyInvestment } from '@/lib/telegram'
 import { useRouter } from 'next/navigation'
 import userStatus from '@/lib/userStatus'
-import { checkContractLarger90Days } from '@/lib/contract'
 import { useTranslation } from 'react-i18next'
 import { useDynamicFundData } from './DataProvider'
 
@@ -67,36 +66,23 @@ export function InvestmentProcessForm() {
     if (startDate === undefined) {
       setStartDate(tomorrow)
     }
-
     if (isSiteLoading) {
       const fetchRates = async () => {
         try {
           setIsSiteLoading(true)
-          const MonthlyAvalable = await checkContractLarger90Days()
           const response: any = await getPublicProducts()
-          if (MonthlyAvalable) {
-            setRateConfig(response)
-          } else {
-            const no90Term = response.slice(1, 4)
-            setRateConfig(no90Term)
-
-          }
-
+          setRateConfig(response)
         } finally {
           setIsSiteLoading(false)
-
         }
       }
-
       fetchRates()
     }
-
     if (startDate && endDate) {
       const daysDifference = differenceInDays(endDate, startDate)
       if (daysDifference < minRangeDays) {
         setEndDate(addDays(startDate, minRangeDays))
       }
-
       setDayCount(daysDifference)
     }
     setEndDate(contractMultiPeriodEndAt(startDate, term, periods))
@@ -113,7 +99,6 @@ export function InvestmentProcessForm() {
     if (date === undefined) {
       date = tomorrow
     }
-
     setStartDate(date)
     if (endDate && date) {
       const daysDifference = differenceInDays(endDate, date)
@@ -361,7 +346,9 @@ export function InvestmentProcessForm() {
                   onSelect={handleEndDateSelect}
                   initialFocus
                   disabled={(date) =>
-                    startDate ? isBefore(date, addDays(startDate, minRangeDays)) : false
+                    // startDate ? isBefore(date, addDays(startDate, minRangeDays)) : false
+                    startDate ? isBefore(date, endDate)  : false
+
                   }
                   defaultMonth={endDate || (startDate ? addDays(startDate, 14) : new Date())}
                 />
