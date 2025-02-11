@@ -367,6 +367,7 @@ export interface Transaction {
   profit_or_loss?: number | null;
   unit?: (number | null) | Unit;
   bank?: (number | null) | Bank;
+  payment_method?: string | null;
   amount: number;
   status: 'pending' | 'completed' | 'failed';
   account_from?: (number | null) | Account;
@@ -921,6 +922,7 @@ export interface TransactionsSelect<T extends boolean = true> {
   profit_or_loss?: T;
   unit?: T;
   bank?: T;
+  payment_method?: T;
   amount?: T;
   status?: T;
   account_from?: T;
