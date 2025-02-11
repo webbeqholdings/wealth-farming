@@ -209,7 +209,7 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
           {accountData.map((data: any) => (
             <Card key={data.type}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{data.type.toString()}</CardTitle>
+                <CardTitle className="text-sm font-medium">{t(data.type.toString())}</CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -240,7 +240,7 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
                       )}
                     >
                       <CalendarIcon />
-                      {startDate ? format(startDate, 'PPP') : <span>Start Date</span>}
+                      {startDate ? format(startDate, 'PPP') : <span>{t('start_date')}</span>}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -262,7 +262,7 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
                       )}
                     >
                       <CalendarIcon />
-                      {endDate ? format(endDate, 'PPP') : <span>End Date</span>}
+                      {endDate ? format(endDate, 'PPP') : <span>{t('end_date')}</span>}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -373,8 +373,8 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
                     <TableRow key={transaction.id}>
                       <TableCell>{transaction.date}</TableCell>
                       <TableCell>
-                        {transaction.type.charAt(0).toUpperCase() +
-                          transaction.type.slice(1).toLowerCase()}
+                        {t(transaction.type).charAt(0).toUpperCase() +
+                          t(transaction.type).slice(1).toLowerCase()}
                       </TableCell>
                       {activeTab === 'all' || activeTab === 'investment' ? (
                         <TableHead>{transaction.product_name}</TableHead>
@@ -418,13 +418,13 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
                         ''
                       )}
                       {activeTab === 'deposit' || activeTab === 'bonus' ? (
-                        <TableCell>{transaction.account_from}</TableCell>
+                        <TableCell>{t(transaction.account_from)}</TableCell>
                       ) : (
-                        <TableCell>{transaction.account}</TableCell>
+                        <TableCell>{t(transaction.account)}</TableCell>
                       )}
                       {/* <TableCell>{transaction.account}</TableCell> */}
                       {activeTab === 'transfer' ? (
-                        <TableCell>{transaction.account_from}</TableCell>
+                        <TableCell>{t(transaction.account_from)}</TableCell>
                       ) : (
                         ''
                       )}
@@ -438,7 +438,7 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
                             'text-red-500': transaction.status === 'failed', // Red font
                           })}
                         >
-                          {transaction.status}
+                          {t(transaction.status)}
                         </TableCell>
                       ) : (
                         ''
@@ -489,20 +489,19 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
         {/* Tips and Tricks */}
         <Card className="mt-8">
           <CardHeader>
-            <CardTitle>Tips & Tricks</CardTitle>
+            <CardTitle>{t('tips')}</CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="list-disc pl-5 space-y-2">
               <li>
-                Set up automatic transfers to your savings account to build your wealth
-                consistently.
+                {t('setup')}
               </li>
-              <li>Review your transaction history regularly to track your spending habits.</li>
+              <li>{t('review')}</li>
               <li>
-                Consider setting up alerts for large transactions to monitor your account activity.
+                {t('consider')}
               </li>
               <li>
-                Take advantage of our investment account to potentially grow your wealth faster.
+                {t('take_advantage')}
               </li>
             </ul>
           </CardContent>

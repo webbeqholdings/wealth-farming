@@ -214,7 +214,7 @@ export default function TransferPage() {
                     <SelectContent>
                       {listAccounts.map((account) => (
                         <SelectItem key={account.id} value={account.id.toString()}>
-                          {account.account_name}
+                          {t(account.account_name)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -241,7 +241,7 @@ export default function TransferPage() {
                     <SelectContent>
                       {listAccounts.map((account) => (
                         <SelectItem key={account.id} value={account.id.toString()}>
-                          {account.account_name}
+                          {t(account.account_name)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -259,7 +259,7 @@ export default function TransferPage() {
                   <Label htmlFor="amount">{t('money_amount')}</Label>
                   <Input
                     id="amount"
-                    placeholder="Enter amount"
+                    placeholder={t("enter_amount")}
                     type="number"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}

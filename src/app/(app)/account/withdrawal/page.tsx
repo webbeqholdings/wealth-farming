@@ -67,12 +67,13 @@ interface StepsProps {
 }
 
 function Steps({ currentStep, className, children }: StepsProps) {
+  const { t } = useTranslation()
   return (
     <div className={cn('flex justify-between', className)}>
       {children.map((child, index) => (
         <Step
           key={index}
-          title={child.props.title}
+          title={t(child.props.title)}
           isCompleted={index < currentStep - 1}
           isActive={index === currentStep - 1}
         />
@@ -292,7 +293,7 @@ export default function WithdrawPage() {
                   <RadioGroup value={method} onValueChange={setMethod}>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="bank" id="bank" />
-                      <Label htmlFor="bank">Bank Transfer</Label>
+                      <Label htmlFor="bank">{t('bank_transfer')}</Label>
                     </div>
                     {/* <div className="flex items-center space-x-2">
                       <RadioGroupItem value="card" id="card" />
@@ -358,15 +359,15 @@ export default function WithdrawPage() {
                   </Alert>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span>Amount:</span>
+                      <span>{t('amount')}: </span>
                       <span className="font-semibold">
                         {currency} {amount}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Method:</span>
+                      <span>{t('method')}: </span>
                       <span className="font-semibold">
-                        {method === 'card' ? 'Credit/Debit Card' : 'Bank Transfer'}
+                        {method === 'card' ? t('cre_deb_card') : t('bank_transfer')}
                       </span>
                     </div>
                     {method === 'card' && (
@@ -394,7 +395,7 @@ export default function WithdrawPage() {
               </Button>
             )}
             {step < 3 ? (
-              <Button onClick={handleNextStep}>Next</Button>
+              <Button onClick={handleNextStep}>{t('Next')}</Button>
             ) : (
               <Button onClick={handleSubmit} className="bg-primary hover:bg-primary/90">
                 <ArrowDownCircle className="mr-2 h-4 w-4" />
