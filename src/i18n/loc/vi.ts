@@ -73,7 +73,7 @@ export const vi = {
     withdraw_confirm_title: "Xác nhận việc rút tiền của bạn",
     withdraw_confirm_decs: "Vui lòng xem lại các chi tiết bên dưới trước khi xác nhận yêu cầu rút tiền của bạn.",
     withdraw_important_title: "Quan trọng",
-    withdraw_important_decs: "Bằng cách xác nhận, bạn đồng ý với các điều khoản và điều kiện rút tiền của chúng tôi. Hành động này không thể đã hoàn tác.",
+    withdraw_important_decs: "Bằng cách xác nhận, bạn đồng ý với các điều khoản và điều kiện rút tiền của chúng tôi. Hành động này không thể hoàn tác.",
 
     // /history
     tranfer_history_Header_title: "Lịch sử giao dịch",

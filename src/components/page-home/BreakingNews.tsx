@@ -11,33 +11,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { useTranslation } from 'react-i18next';
 
-const newsItems = [
-  {
-    title: 'BeQ Expands Green Energy Portfolio',
-    content:
-      'BeQ Wealth Farming Fund announces a significant investment in solar-powered agricultural technologies, marking a major step towards sustainable farming practices.',
-    date: '2024-03-15',
-  },
-  {
-    title: 'Record Returns for Q1 2024',
-    content:
-      'Investors celebrate as BeQ reports record-breaking returns for the first quarter, attributed to strategic investments in high-yield crops and innovative farming techniques.',
-    date: '2024-04-01',
-  },
-  {
-    title: 'New Partnership with AgriTech Startup',
-    content:
-      'BeQ forms strategic partnership with leading AgriTech startup to integrate AI-driven crop management systems across its farming portfolio.',
-    date: '2024-04-10',
-  },
-  {
-    title: 'Sustainable Water Management Initiative Launched',
-    content:
-      'BeQ introduces cutting-edge water management systems across its farms, significantly reducing water usage while increasing crop yields.',
-    date: '2024-04-15',
-  },
-]
-
 type Content = {
   root: {
     type: string;
@@ -66,6 +39,7 @@ type Blog = {
   date: string;  // Added missing 'date'
   readTime: string;  // Added missing 'readTime'
   image: string;  // Added missing 'image' for the featured article
+  createdAt: string
 };
 
 export function BreakingNewsCarousel() {
@@ -77,14 +51,13 @@ export function BreakingNewsCarousel() {
     // Fetch data from API
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/posts?locale=${locale}`); // Replace with your actual API endpoint
+        const response = await fetch(`/api/posts?locale=${locale}&limit=1000`); // Replace with your actual API endpoint
         const data = await response.json();
-
         // Transform API response to the desired format
         const formattedNews = data.docs.map((post: Blog) => ({
           title: post.title,
           content: post.content.root.children[0].children[0].text,
-          date: new Date(post.published_date).toISOString().split('T')[0], // Format date as YYYY-MM-DD
+          date: new Date(post.createdAt).toISOString().split('T')[0], // Format date as YYYY-MM-DD
           slug: post.slug,
         }));
 
@@ -97,7 +70,7 @@ export function BreakingNewsCarousel() {
     fetchData();
   }, [locale]); // Empty dependency array to run only once
   return (
-    <section className="py-16 bg-secondary/10">
+    <section className="py-16">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-bold mb-8">{t('posts')}</h2>
         <Carousel

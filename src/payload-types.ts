@@ -153,6 +153,7 @@ export interface User {
   otp?: string | null;
   otp_expires_at?: string | null;
   referral_code?: string | null;
+  subscription?: boolean | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -366,6 +367,7 @@ export interface Transaction {
   profit_or_loss?: number | null;
   unit?: (number | null) | Unit;
   bank?: (number | null) | Bank;
+  payment_method?: string | null;
   amount: number;
   status: 'pending' | 'completed' | 'failed';
   account_from?: (number | null) | Account;
@@ -513,10 +515,11 @@ export interface UserReferral {
  */
 export interface Notification {
   id: number;
+  user?: (number | null) | User;
   title: string;
   description: string;
   date: string;
-  type: 'opportunity' | 'account' | 'alert' | 'transaction' | 'security';
+  type: 'opportunity' | 'account' | 'alert' | 'transaction' | 'security' | 'event';
   content?: {
     root: {
       type: string;
@@ -920,6 +923,7 @@ export interface TransactionsSelect<T extends boolean = true> {
   profit_or_loss?: T;
   unit?: T;
   bank?: T;
+  payment_method?: T;
   amount?: T;
   status?: T;
   account_from?: T;
@@ -1046,6 +1050,7 @@ export interface UsersSelect<T extends boolean = true> {
   otp?: T;
   otp_expires_at?: T;
   referral_code?: T;
+  subscription?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -1071,6 +1076,7 @@ export interface UnitsSelect<T extends boolean = true> {
  * via the `definition` "notifications_select".
  */
 export interface NotificationsSelect<T extends boolean = true> {
+  user?: T;
   title?: T;
   description?: T;
   date?: T;
