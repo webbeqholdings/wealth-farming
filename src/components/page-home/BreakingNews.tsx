@@ -70,7 +70,7 @@ export function BreakingNewsCarousel() {
     fetchData();
   }, [locale]); // Empty dependency array to run only once
   return (
-    <section className="py-16 bg-secondary/10">
+    <section className="py-16">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-bold mb-8">{t('posts')}</h2>
         <Carousel
