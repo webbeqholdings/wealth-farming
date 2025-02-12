@@ -79,8 +79,9 @@ export default function TransferPage() {
     if (toAccount === accountId) {
       const availableToAccounts = listAccounts.filter((account) => account.id !== Number(accountId))
       if (availableToAccounts.length > 0) {
+        const nextAccountBalance = await getSumAmountBalanceByAccount(availableToAccounts[0].id)
         setToAccount(availableToAccounts[0].id.toString())
-        setToBalance(availableToAccounts[0].amount || 0)
+        setToBalance(nextAccountBalance || 0)
       } else {
         setToAccount(null)
         setToBalance(0)
@@ -99,8 +100,9 @@ export default function TransferPage() {
         (account) => account.id !== Number(accountId),
       )
       if (availableFromAccounts.length > 0) {
+        const nextAccountBalance = await getSumAmountBalanceByAccount(availableFromAccounts[0].id)
         setFromAccount(availableFromAccounts[0].id.toString())
-        setFromBalance(availableFromAccounts[0].amount || 0)
+        setFromBalance(nextAccountBalance || 0)
       } else {
         setFromAccount(null)
         setFromBalance(0)
@@ -137,6 +139,14 @@ export default function TransferPage() {
 
   const handleTransfer = async (e: React.FormEvent) => {
     e.preventDefault()
+    const fromAmount = await getSumAmountBalanceByAccount(fromAccount)
+    if (fromAmount < Number(amount)){
+      toast({
+        title: 'Error',
+        description: `Insufficient funds in your account to complete the transfer.`,
+      })
+      return
+    }
 
     // if (!recaptchaToken) {
     //   toast({
@@ -195,7 +205,7 @@ export default function TransferPage() {
     <>
       <SiteHeader />
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">My Transfer</h1>
+        <h1 className="text-3xl font-bold mb-6">{t('my_transfer')}</h1>
         <TabMenu items={accountConfig.tabList} defaultValue="transfer" />
         <Card className="mt-6">
           <CardHeader>
