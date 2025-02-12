@@ -5,6 +5,7 @@ import calculateProfit from '@/lib/calculateProfit';
 import { endOfMonth, addMonths, differenceInDays, endOfYear, endOfQuarter } from 'date-fns';
 import { withdrawInvestment } from '@/lib/contract';
 import { getPaymentTransfer } from '@/lib/paymentTransfer';
+import { object } from 'zod';
 
 export const updateProfitHandler: TaskHandler<{
     input: {};
@@ -121,11 +122,12 @@ export const updateProfitHandler: TaskHandler<{
 
     // Iterate through each contract to update profit and balance
     for (const contract of contracts) {
-        const { product_log, amount, term, start_date, user, config_log } = contract;
+        const { product_log, amount, start_date, user, config_log } = contract;
         let profitToday = 0;
         let balanceToday = 0;
         // Ensure product_log is an object and has rate_of_return
-        if (typeof product_log !== 'object' || product_log === null || !('rate_of_return' in product_log) || typeof product_log.rate_of_return !== 'number' || amount === undefined) {
+        if (typeof product_log !== 'object' || product_log === null || !('data' in product_log)  || product_log.data !== object || !('rate_of_return' in product_log.data) ||
+         typeof product_log.data.rate_of_return !== 'number' || amount === undefined || !('term' in product_log.data) || product_log.data.term !== 'string' ){
             console.warn(`Skipping contract ID: ${contract.id} due to missing or invalid product_log`);
             continue;
         }
@@ -134,8 +136,8 @@ export const updateProfitHandler: TaskHandler<{
         if (isNaN(parsedStartDate.getTime())) {
             throw new Error('Invalid start_date provided');
         }
-        profitToday = calculateProfit(term, amount, new Date(start_date), 'profit');
-        balanceToday = calculateProfit(term, amount, new Date(start_date), 'balance');
+        profitToday = calculateProfit(product_log.data.term, amount, new Date(start_date), 'profit');
+        balanceToday = calculateProfit(product_log.data.term, amount, new Date(start_date), 'balance');
 
         await payload.update({
             collection: 'contracts',
@@ -149,7 +151,7 @@ export const updateProfitHandler: TaskHandler<{
         if (
             typeof config_log === 'object' && config_log !== null &&
             'extend_contract' in config_log && config_log.extend_contract == true &&
-            checkTermFullness(start_date, term)
+            checkTermFullness(start_date, product_log.data.term)
         ) {
             if (typeof user === 'object' && user !== null && typeof config_log === 'object' && config_log !== null && 'auto_profit' in config_log) {
                 const paymentTransfer = await getPaymentTransfer();
