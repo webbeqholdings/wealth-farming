@@ -28,6 +28,7 @@ export const en = {
     // site-header
     profile: "Profile",
     referral_reward: "Referral Reward",
+    transfer: 'Transfer',
     login: "Login",
     log_out: "Log out",
     //investment process
@@ -162,6 +163,7 @@ export const en = {
     recent_transactions: "Recent Transactions",
     main: "Main",
     investment: "Investment",
+    withdraw: 'Withdraw',
     view_full_statement: "View Full Statement",
     crypto_wallet: "Crypto Wallet",
     add_bank_account: "Add Bank Account",
@@ -214,6 +216,16 @@ export const en = {
     action: "Action",
     crypto_details:'Enter your bank account details for deposits and withdrawals.',
     Network: 'Network',
+    failed_to_fetch: 'Failed to fetch accounts:',
+    Active: 'Active',
+    chat_tele: 'Chat with us on Telegram:',
+    error_update: 'Error during avatar update process:',
+    referral_copy: 'Referral code copied to clipboard!',
+    open_dialog: 'Opening share dialog...',
+    error_avatar: 'Error during avatar update process:',
+    error_avatar2: 'Error uploading avatar:',
+    failed_profile: 'Failed to update profile',
+    failed_date: 'Error fetching user data:',
 
     // Homepage
     get_started: "Get Started in 30 Seconds!",
@@ -402,6 +414,8 @@ export const en = {
     total_interest: 'Total Interest Earned: ${{total}}',
     x_times: 'X times:',
     amount_usd: 'Amount ($)',
+    amount_graph: 'Amount: ${{amount}}',
+    month_graph: 'Month: {{label}}',
 
     //blog
     read_more: "Read More",
