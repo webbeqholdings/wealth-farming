@@ -577,6 +577,20 @@ export const contractEndAt = (startDate: Date, term: Term): Date => {
   return endDate;
 }
 
+const getLastDateOfMonth = (date: any) => {
+  const _date = new Date(date);
+
+  // Check if the start date is the beginning of the month
+  if (_date.getDate() === 1) {
+      // If it's already the first day, return it
+      return _date;
+  }
+  // Move to the first day of the next month: 1
+  // Move to the last day of the this month: 0
+  const lastDate = new Date(_date.getFullYear(), _date.getMonth() + 1, 0);
+  return lastDate;
+}
+
 export const contractMultiPeriodEndAt = (startDate: Date, term: Term, periods: number): Date => {
   const endByTerm = contractEndAt(startDate, term);
   let periodsEndAt: Date;
@@ -713,7 +727,8 @@ export const buildProfitLogsAnnualy = async (principal: number, startDate: Date,
     mapMonths.Monthly = loopMonths
     break
   }
-  let _dayCount = 0
+  let _firstDayCount = differenceInDays(lastDayOfMonth(startDate), startDate) + 1
+  let _dayCount = _firstDayCount
   let _bestTerm = null
   let _bestTermRate = null
   for (const key of ['Annually', 'Semester', 'Quarterly', 'Monthly']) {
@@ -748,7 +763,7 @@ export const buildProfitLogsAnnualy = async (principal: number, startDate: Date,
   }
 
   if (!isStartOfMonth(startDate)) {
-    let __days = differenceInDays(lastDayOfMonth(startDate), startDate) + 1
+    let __days = _firstDayCount
     let _profit = (principal * _bestTermRate * __days) / getDaysInMonth(startDate)
     _balance = _balance + _profit
     profitLogs.unshift({
@@ -849,7 +864,8 @@ export const buildProfitLogsSemester = async (
     mapMonths.Monthly = loopMonths
     break
   }
-  let _dayCount = 0
+  let _firstDayCount = differenceInDays(lastDayOfMonth(startDate), startDate) + 1
+  let _dayCount = _firstDayCount
   let _bestTerm = null
   let _bestTermRate = null
   for (const key of ['Annually', 'Semester', 'Quarterly', 'Monthly']) {
@@ -883,7 +899,7 @@ export const buildProfitLogsSemester = async (
   }
 
   if (!isStartOfMonth(startDate)) {
-    let __days = differenceInDays(lastDayOfMonth(startDate), startDate) + 1
+    let __days = _firstDayCount
     let _profit = (principal * _bestTermRate * __days) / getDaysInMonth(startDate)
     _balance = _balance + _profit
     profitLogs.unshift({
@@ -973,7 +989,8 @@ export const buildProfitLogsQuarterly = async (
     mapMonths.Monthly = loopMonths
     break
   }
-  let _dayCount = 0
+  let _firstDayCount = differenceInDays(lastDayOfMonth(startDate), startDate) + 1
+  let _dayCount = _firstDayCount
   let _bestTerm = null
   let _bestTermRate = null
   for (const key of ['Annually', 'Semester', 'Quarterly', 'Monthly']) {
@@ -1007,7 +1024,7 @@ export const buildProfitLogsQuarterly = async (
   }
 
   if (!isStartOfMonth(startDate)) {
-    let __days = differenceInDays(lastDayOfMonth(startDate), startDate) + 1
+    let __days = _firstDayCount
     let _profit = (principal * _bestTermRate * __days) / getDaysInMonth(startDate)
     _balance = _balance + _profit
     profitLogs.unshift({
@@ -1033,7 +1050,7 @@ export const buildProfitLogsQuarterly = async (
       rate: _bestTermRate,
       balance: _balance,
       profit: _profit,
-      days: __days,
+      days: _dayCount,
       term: _bestTerm,
       message: _bestTerm + ' Partial',
     })
@@ -1084,7 +1101,8 @@ export const buildProfitLogsMonthly = async (principal: number, startDate: Date,
   }
 
   mapMonths.Monthly = flatMapMonths
-  let _dayCount = 0
+  let _firstDayCount = differenceInDays(lastDayOfMonth(startDate), startDate) + 1
+  let _dayCount = _firstDayCount
   let _bestTerm = null
   let _bestTermRate = null
   for (const key of ['Monthly']) {
@@ -1118,7 +1136,7 @@ export const buildProfitLogsMonthly = async (principal: number, startDate: Date,
   }
 
   if (!isStartOfMonth(startDate)) {
-    let __days = differenceInDays(lastDayOfMonth(startDate), startDate) + 1
+    let __days = _firstDayCount
     let _profit = (principal * _bestTermRate * __days) / getDaysInMonth(startDate)
     _balance = _balance + _profit
     profitLogs.unshift({
