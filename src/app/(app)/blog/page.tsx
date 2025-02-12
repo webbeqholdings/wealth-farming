@@ -16,13 +16,12 @@ import { Badge } from '@/components/ui/badge'
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination'
-import { CalendarIcon, ClockIcon } from 'lucide-react'
+import { CalendarIcon } from 'lucide-react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { useTranslation } from 'react-i18next'
@@ -83,6 +82,7 @@ type Blog = {
   date: string;  // Added missing 'date'
   readTime: string;  // Added missing 'readTime'
   image: string;  // Added missing 'image' for the featured article
+  createdAt: string;
 };
 
 type NewsArticles = Blog[]; // Assuming `newsArticles` is an array of products
@@ -117,9 +117,10 @@ export default function NewsPage() {
           status: item.status,
           featured_image: item.featured_image,
           excerpt: item.excerpt,  // Ensure your API returns this
-          date: item.published_date,  // Assuming 'published_date' is your date
+          date: item.createdAt,  // Assuming 'published_date' is your date
           readTime: item.readTime,  // Ensure your API returns this
           image: item.image,  // Ensure your API returns this image URL
+          createdAt: item.createdAt
         }));
 
         // Set the fetched articles to state

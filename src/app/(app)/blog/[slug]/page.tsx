@@ -6,7 +6,6 @@ import Link from 'next/link'
 import { format } from 'date-fns'
 import { CalendarIcon } from 'lucide-react'
 import { useParams } from "next/navigation";
-
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -31,7 +30,7 @@ export default function NewsDetailPage() {
       avatar: '/avatars/jane-smith.jpg',
       bio: 'AI researcher and professor at Tech University',
     },
-    publishDate: new Date('2024-03-15'),
+    publishDate: new Date(),
     category: 'Technology',
     image: '/images/ai-future.jpg',
     content: '',
@@ -59,7 +58,7 @@ export default function NewsDetailPage() {
             avatar: apiData.author.avatar || '/default-avatar.jpg',
             bio: apiData.author.phone_contact, // Adjust as needed
           },
-          publishDate: new Date(apiData.published_date),
+          publishDate: new Date(apiData.createdAt),
           category: apiData.category.name,
           content: apiData.content.root.children.map((child: any) => renderContent(child)).join(' '),
           tags: apiData.tags,

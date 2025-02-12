@@ -71,12 +71,13 @@ interface StepsProps {
 }
 
 function Steps({ currentStep, className, children }: StepsProps) {
+  const { t } = useTranslation()
   return (
     <div className={cn('flex justify-between', className)}>
       {children.map((child, index) => (
         <Step
           key={index}
-          title={child.props.title}
+          title={t(child.props.title)}
           isCompleted={index < currentStep - 1}
           isActive={index === currentStep - 1}
         />
@@ -112,6 +113,7 @@ export default function DepositPage() {
   const [cryptoWalletAddress, setCryptoWalletAddress] = useState();
   const [cryptoWalletNetwork, setCryptoWalletNetwork] = useState();
   const [minDeposit, setMinDeposit] = useState(0);
+  const [paymentMethod, setPaymentMethod] = useState('bank_transfer')
   const quickAmounts = [
     { label: '500K', value: 500000 },
     { label: '1M', value: 1000000 },
@@ -345,6 +347,7 @@ export default function DepositPage() {
         account_to: Number(toAccount),
         currency: 'USD',
         deposit_screenshot: depositScreenshotId, // Include the screenshot ID
+        payment_method: paymentMethod,
       })
 
       notifyDeposit(responseDeposit.data) // Call notifyDeposit and get its response
@@ -374,7 +377,7 @@ export default function DepositPage() {
       {/* Render Steps and Errors */}
       <SiteHeader />
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">My Deposit</h1>
+        <h1 className="text-3xl font-bold mb-6">{t('my_deposit')}</h1>
         <TabMenu items={accountConfig.tabList} defaultValue="deposit" />
         <Card className="mt-6">
           <CardHeader>
@@ -399,7 +402,7 @@ export default function DepositPage() {
                       <SelectContent>
                         {accounts.map((acc) => (
                           <SelectItem key={acc.id} value={acc.id.toString()}>
-                            {acc.account_name}
+                            {t(acc.account_name)}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -456,18 +459,18 @@ export default function DepositPage() {
               {step === 2 && (
                 <div className="space-y-4">
                   <RadioGroup value={method} onValueChange={setMethod}>
-                    <div className="flex items-center space-x-2">
+                    <div className={`flex items-center space-x-2 cursor-pointer ${paymentMethod === 'bank_transfer' ? 'opacity-100' : 'opacity-50'}`} onClick={() => setPaymentMethod('bank_transfer')}>
                       <RadioGroupItem value="bank" id="bank" />
                       <Label htmlFor="bank" className="flex items-center space-x-2">
                         <Banknote className="h-4 w-4" />
-                        <span>Bank Transfer</span>
+                        <span className='cursor-pointer'>{t('bank_transfer')}</span>
                       </Label>
                     </div>
-                    <div className="flex items-center space-x-2 opacity-50">
+                    <div className={`flex items-center space-x-2 cursor-pointer ${paymentMethod === 'crypto_wallet' ? 'opacity-100' : 'opacity-50'}`}  onClick={() => setPaymentMethod('crypto_wallet')}>
                       <RadioGroupItem value="crypto" id="crypto" />
                       <Label htmlFor="crypto" className="flex items-center space-x-2">
                         <CreditCard className="h-4 w-4" />
-                        <span>Crypto Wallet</span>
+                        <span className='cursor-pointer'>{t('crypto_wallet')}</span>
                       </Label>
                     </div>
                     {/* <div className="flex items-center space-x-2 opacity-50">
@@ -495,7 +498,7 @@ export default function DepositPage() {
                   {method === 'bank' && (
                     <div className="space-y-6">
                       <div className="space-y-4">
-                        <Label className="flex justify-center">SCAN THIS QR CODE</Label>
+                        <Label className="flex justify-center">{t('scan_qr')}</Label>
                         <div className="flex justify-center">
                           <img
                             //src={bankQRCode || "https://via.placeholder.com/300"  }
@@ -517,7 +520,7 @@ export default function DepositPage() {
                           htmlFor="deposit_screenshot"
                           className="text-sm font-medium text-gray-700"
                         >
-                          Upload Your Deposit
+                          {t('upload_deposit')}
                         </Label>
                         <Input
                           id="deposit_screenshot"
@@ -539,7 +542,7 @@ export default function DepositPage() {
                   {method === 'crypto' && (
                     <div className="space-y-6">
                       <div className="space-y-4">
-                        <Label className="flex justify-center">SCAN THIS QR CODE</Label>
+                        <Label className="flex justify-center">{t('scan_qr')}</Label>
                         <div className="flex justify-center">
                           <Image
                             src={cryptoWalletQrCodeUrl || 'https://via.placeholder.com/300'}
@@ -595,7 +598,7 @@ export default function DepositPage() {
                     </div>
                     <div className="flex justify-between">
                       <span>{t('method')}:</span>
-                      <span className="font-semibold">{method == 'bank' ? 'Bank Transfer' : 'Crypto Wallet'}</span>
+                      <span className="font-semibold">{method == 'bank' ? t('bank_transfer') : t('crypto_wallet')}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>{t("card_number")}:</span>

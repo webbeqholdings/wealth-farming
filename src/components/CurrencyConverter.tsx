@@ -8,6 +8,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 import { useState, useEffect, useCallback } from 'react';
 import { getPaymentTransfer } from '@/lib/paymentTransfer';
+import { useTranslation } from 'react-i18next';
 
 type Currency = 'USD' | 'USDT' | 'VND';
 
@@ -117,16 +118,16 @@ interface CurrencyConverterProps {
 
 export default function CurrencyConverter({ setUSDCurrency }: CurrencyConverterProps) {
   const { exchangeRates, values, formatCurrency, handleChange } = useCurrencyConverter(setUSDCurrency);
-
+  const { t } = useTranslation()
   return (
     <Card className="w-full mx-auto">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold text-center">Currency Converter</CardTitle>
+        <CardTitle className="text-2xl font-bold text-center">{t('currency_convert')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <Alert>
-          <AlertTitle className="text-red-500">Heads up!</AlertTitle>
-          <AlertDescription>System only uses USD currency.</AlertDescription>
+          <AlertTitle className="text-red-500">{t('heads_up')}</AlertTitle>
+          <AlertDescription>{t('system_only')}</AlertDescription>
         </Alert>
         {(Object.keys(exchangeRates) as Currency[]).map((currency) => (
           <div key={currency} className="space-y-2">
@@ -140,7 +141,7 @@ export default function CurrencyConverter({ setUSDCurrency }: CurrencyConverterP
               id={currency}
               type="text"
               inputMode="decimal"
-              placeholder={`Enter amount in ${currency}`}
+              placeholder={t(`enter_${currency}`)}
               value={values[currency]}
               onChange={handleChange(currency)}
             />

@@ -67,7 +67,7 @@ export const getAccountsByUser: any = async (user_id: number): Promise<any> => {
   const response = await payload.find({
     collection: 'accounts',
     where: {
-      user: { equals: user_id },
+      user: { equals: user_id }
     },
   })
 
