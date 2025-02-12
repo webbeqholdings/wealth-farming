@@ -682,10 +682,8 @@ export const buildProfitLogsAnnualy = async (principal: number, startDate: Date,
   if (!isStartOfMonth(startDate)) {
     listOfMonths[0].months.shift()
   }
-  console.log(isEndOfMonth(endDate))
   if (!isEndOfMonth(endDate)) {
     listOfMonths[listOfMonths.length - 1].months.pop()
-    console.log(listOfMonths)
   }
 
   const flatMapMonths = listOfMonths.flatMap(
@@ -728,7 +726,10 @@ export const buildProfitLogsAnnualy = async (principal: number, startDate: Date,
     break
   }
   let _firstDayCount = differenceInDays(lastDayOfMonth(startDate), startDate) + 1
-  let _dayCount = _firstDayCount
+  let _dayCount = 0
+  if (!isStartOfMonth(startDate)) {
+    _dayCount = _firstDayCount
+  }
   let _bestTerm = null
   let _bestTermRate = null
   for (const key of ['Annually', 'Semester', 'Quarterly', 'Monthly']) {
@@ -744,7 +745,6 @@ export const buildProfitLogsAnnualy = async (principal: number, startDate: Date,
       _bestTerm = key
       _bestTermRate = rate
     }
-    console.log(mapMonths[key])
     for (const mm of mapMonths[key]) {
       let _profit = _balance * rate
       _balance = _balance + _profit
@@ -865,7 +865,10 @@ export const buildProfitLogsSemester = async (
     break
   }
   let _firstDayCount = differenceInDays(lastDayOfMonth(startDate), startDate) + 1
-  let _dayCount = _firstDayCount
+  let _dayCount = 0
+  if (!isStartOfMonth(startDate)) {
+    _dayCount = _firstDayCount
+  }
   let _bestTerm = null
   let _bestTermRate = null
   for (const key of ['Annually', 'Semester', 'Quarterly', 'Monthly']) {
@@ -990,7 +993,10 @@ export const buildProfitLogsQuarterly = async (
     break
   }
   let _firstDayCount = differenceInDays(lastDayOfMonth(startDate), startDate) + 1
-  let _dayCount = _firstDayCount
+  let _dayCount = 0
+  if (!isStartOfMonth(startDate)) {
+    _dayCount = _firstDayCount
+  }
   let _bestTerm = null
   let _bestTermRate = null
   for (const key of ['Annually', 'Semester', 'Quarterly', 'Monthly']) {
@@ -1102,7 +1108,11 @@ export const buildProfitLogsMonthly = async (principal: number, startDate: Date,
 
   mapMonths.Monthly = flatMapMonths
   let _firstDayCount = differenceInDays(lastDayOfMonth(startDate), startDate) + 1
-  let _dayCount = _firstDayCount
+  let _dayCount = 0
+  if (!isStartOfMonth(startDate)) {
+    _dayCount = _firstDayCount
+  }
+
   let _bestTerm = null
   let _bestTermRate = null
   for (const key of ['Monthly']) {
@@ -1124,7 +1134,7 @@ export const buildProfitLogsMonthly = async (principal: number, startDate: Date,
       _dayCount += getDaysInMonth(mm)
       profitLogs.push({
         fromDate: mm,
-        toDate: addDays(mm, getDaysInMonth(mm)),
+        toDate: addDays(mm, getDaysInMonth(mm) - 1),
         rate: rate,
         balance: _balance,
         profit: _profit,
