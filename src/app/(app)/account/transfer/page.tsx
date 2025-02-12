@@ -178,7 +178,7 @@ export default function TransferPage() {
 
       if (response.isSuccess) {
         toast({
-          title: 'Transfer Successful',
+          title:t('transfer_sucess'),
         })
       }
     } catch (error) {

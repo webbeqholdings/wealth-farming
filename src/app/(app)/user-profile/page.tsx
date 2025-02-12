@@ -197,7 +197,7 @@ export default function UserProfile() {
       })
 
       toast({
-        title: 'Update profile successfully',
+        title: t('update_success'),
       })
     } catch (error) {
       console.error('Error updating profile:', error)
@@ -284,8 +284,8 @@ export default function UserProfile() {
   const copyReferralCode = () => {
     navigator.clipboard.writeText(user.referral_code)
     toast({
-      title: 'Copied !',
-      description: 'Your referral code copied to clipboard!'
+      title: t('copied'),
+      description: t('refer_code_copied')
     })
   }
 
@@ -299,14 +299,14 @@ export default function UserProfile() {
     try {
       navigator.share(shared_data)
       toast({
-        title: 'Open sharing dialog !',
+        title: t('share_dial'),
       })
 
     } catch (error) {
       navigator.clipboard.writeText(referralLink)
       toast({
-        title: 'Copied !',
-        description: 'Sharing dialog unavailable Your referral link will be copied to clipboard!'
+        title: t('copied'),
+        description: t('share_dial_fail')
       })
     }
     alert('Opening share dialog...')
