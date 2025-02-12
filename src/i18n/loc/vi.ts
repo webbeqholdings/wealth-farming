@@ -452,8 +452,6 @@ export const vi = {
    enter_VND: 'Nhập số tiền bằng VND',
    Transfer: 'Chuyển Tiền',
    Withdraw: 'Rút Tiền',
-   transfer: 'chuyển tiền',
-   withdraw: 'rút tiền',
    enter_amount: 'Nhập số tiền',
    my_transfer: 'Chuyển Tiền',
    my_withdraw: 'Rút Tiền',

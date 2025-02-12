@@ -457,8 +457,6 @@ export const en = {
     enter_VND: 'Enter amount in VND',
     Transfer: 'Transfer',
     Withdraw: 'Withdraw',
-    transfer: 'transfer',
-    withdraw: 'withdraw',
     enter_amount: 'Enter amount',
     my_transfer: 'My Transfer',
     my_withdraw: 'My Withdrawal',
