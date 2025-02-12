@@ -76,7 +76,7 @@ export const vi = {
     withdraw_important_decs: "Bằng cách xác nhận, bạn đồng ý với các điều khoản và điều kiện rút tiền của chúng tôi. Hành động này không thể đã hoàn tác.",
 
     // /history
-    tranfer_history_Header_title: "Lịch sử giao dịch",
+    tranfer_history_Header_title: "Lịch Sử Giao Dịch",
     tranfer_history_card_1: "Ví đầu tư",
     tranfer_history_card_2: "Ví thưởng",
     tranfer_history_card_3: "Ví chính",
@@ -446,4 +446,6 @@ export const vi = {
    transfer: 'chuyển tiền',
    withdraw: 'rút tiền',
    enter_amount: 'Nhập số tiền',
+   my_transfer: 'Chuyển Tiền',
+   my_withdraw: 'Rút Tiền',
 }

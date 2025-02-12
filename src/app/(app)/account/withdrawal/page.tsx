@@ -240,7 +240,7 @@ export default function WithdrawPage() {
     <>
       <SiteHeader />
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">My Withdrawal</h1>
+        <h1 className="text-3xl font-bold mb-6">{t('my_withdraw')}</h1>
         <TabMenu items={accountConfig.tabList} defaultValue="withdrawal" />
         <Card className="mt-6">
           <CardHeader>

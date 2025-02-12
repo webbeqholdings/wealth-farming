@@ -446,4 +446,6 @@ export const en = {
     transfer: 'transfer',
     withdraw: 'withdraw',
     enter_amount: 'Enter amount',
+    my_transfer: 'My Transfer',
+    my_withdraw: 'My Withdrawal',
 }
