@@ -38,6 +38,7 @@ import TelegramButton from '@/components/TelegramButton'
 import Spinner from '@/components/Spinner'
 import { getAccountsByUser } from '@/lib/account'
 import { useTranslation } from 'react-i18next';
+import { getSumAmountBalanceByAccount } from '@/lib/transaction'
 
 interface Referral {
   id: string
@@ -331,11 +332,13 @@ export default function UserProfile() {
       try {
         const response = await getAccountsByUser(user.id)
         // Transform API response into desired format
-        const transformedAccounts = response.map((account: { type: string, amount: number }) => ({
-          name: account.type,
-          balance: account.amount, // Assuming you want to divide the amount to convert to another unit
-          currency: 'USD', // Hardcoded as 'USD', replace with dynamic value if available in the API
-        }));
+        const transformedAccounts = await Promise.all(
+          response.map(async (account: { account_name: string, id: number }) => ({
+            name: account.account_name,
+            balance: await getSumAmountBalanceByAccount(account.id),
+            currency: 'USD', // Hardcoded as 'USD', replace with dynamic value if available in the API
+          }))
+        );
 
         setAccounts(transformedAccounts); // Store the transformed accounts in state
       } catch (error) {
