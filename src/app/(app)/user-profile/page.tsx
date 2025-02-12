@@ -342,7 +342,7 @@ export default function UserProfile() {
 
         setAccounts(transformedAccounts); // Store the transformed accounts in state
       } catch (error) {
-        console.error('Failed to fetch accounts:', error);
+        console.error(t('failed_to_fetch'), error);
       }
     };
     fetchAccounts()
@@ -378,7 +378,7 @@ export default function UserProfile() {
         },
       })
     } catch (error) {
-      console.error('Error during avatar update process:', error)
+      console.error(t('error_update'), error)
     }
   }
 
@@ -497,8 +497,7 @@ export default function UserProfile() {
                       transactions.map((transaction) => (
                         <li key={transaction.id} className="flex justify-between items-center">
                           <span>
-                            {t(transaction.type.charAt(0).toUpperCase() +
-                              transaction.type.slice(1).toLowerCase())}
+                            {t(transaction.type)}
                           </span>
                           <span
                             className={transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'}
@@ -590,7 +589,7 @@ export default function UserProfile() {
 
                 {/* Add the link to the Telegram bot */}
                 <div className="mt-4 flex justify-between items-center">
-                  <span className="text-sm text-gray-500">Chat with us on Telegram:</span>
+                  <span className="text-sm text-gray-500">{t('chat_tele')}</span>
                   <a
                     href="https://t.me/wealth_farming_bot"
                     target="_blank"
@@ -603,7 +602,7 @@ export default function UserProfile() {
 
                 <div className="space-y-4 mt-4">
                   <div className="flex items-center justify-between spaddce-x-2">
-                    <Label htmlFor="transactions">{t('Transaction Notifications')}</Label>
+                    <Label htmlFor="transactions">{t('transaction_notifications')}</Label>
                     <Switch
                       id="transactions"
                       checked={telegramNotifications.settings.transactions}
@@ -624,7 +623,7 @@ export default function UserProfile() {
               </>
             ) : (
               <div className="text-center space-y-4">
-                <p className="mb-4">{t('connect_telegram:')}</p>
+                <p className="mb-4">{t('connect_telegram')}</p>
                 <TelegramButton userId={user.id} />
               </div>
             )}
