@@ -83,7 +83,7 @@ export interface Config {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
   };
-  locale: null;
+  locale: 'en' | 'vi';
   user: User & {
     collection: 'users';
   };
@@ -153,6 +153,7 @@ export interface User {
   otp?: string | null;
   otp_expires_at?: string | null;
   referral_code?: string | null;
+  subscription?: boolean | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -366,10 +367,11 @@ export interface Transaction {
   profit_or_loss?: number | null;
   unit?: (number | null) | Unit;
   bank?: (number | null) | Bank;
+  payment_method?: string | null;
   amount: number;
   status: 'pending' | 'completed' | 'failed';
-  from_account?: (number | null) | Account;
-  to_account?: (number | null) | Account;
+  account_from?: (number | null) | Account;
+  account_to?: (number | null) | Account;
   deposit_screenshot?: (number | null) | Media;
   type: 'deposit' | 'withdraw' | 'bonus' | 'transfer' | 'investment' | 'referral_reward';
   message?: string | null;
@@ -513,10 +515,11 @@ export interface UserReferral {
  */
 export interface Notification {
   id: number;
+  user?: (number | null) | User;
   title: string;
   description: string;
   date: string;
-  type: 'opportunity' | 'account' | 'alert' | 'transaction' | 'security';
+  type: 'opportunity' | 'account' | 'alert' | 'transaction' | 'security' | 'event';
   content?: {
     root: {
       type: string;
@@ -920,10 +923,11 @@ export interface TransactionsSelect<T extends boolean = true> {
   profit_or_loss?: T;
   unit?: T;
   bank?: T;
+  payment_method?: T;
   amount?: T;
   status?: T;
-  from_account?: T;
-  to_account?: T;
+  account_from?: T;
+  account_to?: T;
   deposit_screenshot?: T;
   type?: T;
   message?: T;
@@ -1046,6 +1050,7 @@ export interface UsersSelect<T extends boolean = true> {
   otp?: T;
   otp_expires_at?: T;
   referral_code?: T;
+  subscription?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -1071,6 +1076,7 @@ export interface UnitsSelect<T extends boolean = true> {
  * via the `definition` "notifications_select".
  */
 export interface NotificationsSelect<T extends boolean = true> {
+  user?: T;
   title?: T;
   description?: T;
   date?: T;

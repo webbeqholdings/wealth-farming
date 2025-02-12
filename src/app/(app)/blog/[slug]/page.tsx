@@ -6,7 +6,6 @@ import Link from 'next/link'
 import { format } from 'date-fns'
 import { CalendarIcon } from 'lucide-react'
 import { useParams } from "next/navigation";
-
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -17,9 +16,13 @@ import {
 } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { SiteHeader } from '@/components/site-header';
+import { useTranslation } from 'react-i18next';
 
 export default function NewsDetailPage() {
   const params = useParams();
+  const { i18n } = useTranslation();
+  const locale = i18n.language;
+  const { t } = useTranslation();
   const [article, setArticle] = useState({
     title: 'The Future of Artificial Intelligence: Promises and Perils',
     author: {
@@ -27,7 +30,7 @@ export default function NewsDetailPage() {
       avatar: '/avatars/jane-smith.jpg',
       bio: 'AI researcher and professor at Tech University',
     },
-    publishDate: new Date('2024-03-15'),
+    publishDate: new Date(),
     category: 'Technology',
     image: '/images/ai-future.jpg',
     content: '',
@@ -39,7 +42,7 @@ export default function NewsDetailPage() {
     const loadArticleData = async () => {
       // Fetch the article data from API
       try {
-        const response = await fetch(`/api/posts?where[slug][equals]=${params.slug}`); // API call
+        const response = await fetch(`/api/posts?where[slug][equals]=${params.slug}&locale=${locale}`); // API call
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -55,7 +58,7 @@ export default function NewsDetailPage() {
             avatar: apiData.author.avatar || '/default-avatar.jpg',
             bio: apiData.author.phone_contact, // Adjust as needed
           },
-          publishDate: new Date(apiData.published_date),
+          publishDate: new Date(apiData.createdAt),
           category: apiData.category.name,
           content: apiData.content.root.children.map((child: any) => renderContent(child)).join(' '),
           tags: apiData.tags,
@@ -72,7 +75,7 @@ export default function NewsDetailPage() {
     };
 
     loadArticleData();
-  }, []);
+  }, [locale]);
 
   return (
     <div>
@@ -84,7 +87,7 @@ export default function NewsDetailPage() {
             <div className="flex items-center space-x-4 text-muted-foreground">
               <span className="flex items-center">
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {format(article.publishDate, 'MMMM d, yyyy')}
+                {format(article.publishDate, 'dd/MM/yyyy')}
               </span>
               <Badge variant="secondary">{article.category}</Badge>
             </div>
@@ -117,7 +120,7 @@ export default function NewsDetailPage() {
 
           <Separator className="my-8" />
           <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-4">About the Author</h2>
+            <h2 className="text-2xl font-semibold mb-4">{t('about_author')}</h2>
             <div className="flex items-center space-x-4">
               <Avatar className="h-16 w-16">
                 <AvatarImage src={article.author.avatar} alt={article.author.name} />
@@ -134,7 +137,7 @@ export default function NewsDetailPage() {
 
           {article.relatedArticles.length > 0 && article.relatedArticles[0].relatedPost !== null && (
             <section className="mb-12">
-              <h2 className="text-2xl font-semibold mb-4">Related Articles</h2>
+              <h2 className="text-2xl font-semibold mb-4">{t('related_article')}</h2>
               <div className="grid gap-4 md:grid-cols-3">
                 {article.relatedArticles.map((related, index) => (
                   <Card key={index}>
@@ -143,7 +146,7 @@ export default function NewsDetailPage() {
                     </CardHeader>
                     <CardFooter>
                       <Link href={`/blog/${related.slug}`} className="text-primary hover:underline">
-                        Read more
+                        {t("read_more")}
                       </Link>
                     </CardFooter>
                   </Card>

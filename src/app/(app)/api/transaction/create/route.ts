@@ -9,7 +9,7 @@ export async function POST(req: Request) {
       config,
     })
 
-    let { to_account, from_account, bank_id, product_id, type, amount, user_id, currency, deposit_screenshot } = request
+    let { account_from, account_to, bank_id, product_id, type, amount, user_id, currency, deposit_screenshot } = request
     let response = null
     // Handle deposit type
     if (type === 'deposit') {
@@ -27,8 +27,8 @@ export async function POST(req: Request) {
           investment_product: product_id ? Number(product_id) : undefined,
           amount: currency == 'VND' ? Number(amount / unit.docs[0].amount) : Number(amount),
           status: 'pending',
-          from_account: from_account ? Number(from_account) : undefined,
-          to_account: to_account ? Number(to_account) : undefined,
+          account_to: account_to ? Number(account_to) : undefined,
+          account_from: account_from ? Number(account_from) : undefined,
           type,
           deposit_screenshot: Number(deposit_screenshot)
         },
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
         currency == 'VND' ? Number(amount / unit.docs[0].amount) : Number(amount)
       const fromAccount = await payload.findByID({
         collection: 'accounts',
-        id: from_account,
+        id: account_to,
       })
 
       if (fromAccount.amount < -Number(amountWithdraw)) {
@@ -66,7 +66,7 @@ export async function POST(req: Request) {
       const updatedAmount = fromAccount.amount + Number(amountWithdraw)
       await payload.update({
         collection: 'accounts',
-        id: from_account,
+        id: account_to,
         data: { amount: updatedAmount },
       })
 
@@ -78,8 +78,8 @@ export async function POST(req: Request) {
           investment_product: product_id ? Number(product_id) : undefined,
           amount: amountWithdraw,
           status: 'pending',
-          from_account: from_account ? Number(from_account) : undefined,
-          to_account: to_account ? Number(to_account) : undefined,
+          account_to: account_to ? Number(account_to) : undefined,
+          account_from: account_from ? Number(account_from) : undefined,
           type,
         },
       })
@@ -90,11 +90,11 @@ export async function POST(req: Request) {
       const transactionAmount = Number(amount)
       const fromAccount = await payload.findByID({
         collection: 'accounts',
-        id: from_account,
+        id: account_to,
       })
       const toAccount = await payload.findByID({
         collection: 'accounts',
-        id: to_account,
+        id: account_from,
       })
       if (fromAccount.amount < transactionAmount) {
         const errorBody = { error: 'Amount not enough' }
@@ -114,13 +114,13 @@ export async function POST(req: Request) {
 
       await payload.update({
         collection: 'accounts',
-        id: from_account,
+        id: account_to,
         data: { amount: AmountFromAccount },
       })
 
       await payload.update({
         collection: 'accounts',
-        id: to_account,
+        id: account_from,
         data: { amount: AmountToAccount },
       })
 
@@ -132,8 +132,8 @@ export async function POST(req: Request) {
           investment_product: product_id ? Number(product_id) : undefined,
           amount: Number(amount),
           status: 'completed',
-          from_account: from_account ? Number(from_account) : undefined,
-          to_account: to_account ? Number(to_account) : undefined,
+          account_to: account_to ? Number(account_to) : undefined,
+          account_from: account_from ? Number(account_from) : undefined,
           type,
         },
       })
@@ -193,7 +193,7 @@ export async function POST(req: Request) {
           amount: transactionAmount,
           investment_product: product_id ? Number(product_id) : undefined,
           status: 'completed',
-          from_account: investmentAccount.docs[0].id,
+          account_to: investmentAccount.docs[0].id,
           type,
         },
       })

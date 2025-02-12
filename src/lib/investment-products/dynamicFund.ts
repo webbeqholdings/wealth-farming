@@ -11,6 +11,8 @@ import {
   getYear,
   addYears,
   addDays,
+  getDaysInMonth,
+  lastDayOfMonth,
 } from 'date-fns'
 import {
   getMonthsBetweenYears,
@@ -26,6 +28,7 @@ import {
 } from '@/utilities/formatDateTime'
 
 import { getTotalBonusByProduct, getTransactionsBonusByProduct } from '../transaction'
+import { getPublicProducts } from './dynamicFundQuery'
 
 export type Term =
   | 'partialMonth'
@@ -40,6 +43,42 @@ interface Rate {
   rate: number
   text: string
   isShowForm: Boolean
+}
+
+interface TradingDay {
+  month: string
+  days: number
+  rate: number
+  valid: boolean
+  gender: string
+}
+
+interface YearData {
+  year: {
+    year: number
+    tradingDaysLayer: TradingDay[]
+  }
+  date: string
+  balance: number
+  profit: number
+  interestEarned: number
+  rate: number
+  termType: string
+  days: number
+}
+
+interface ProfitData {
+  [year: string]: YearData[]
+}
+interface ProfitLogItem {
+  fromDate: Date
+  toDate: Date
+  rate: number
+  balance: number
+  profit: number
+  days: number
+  term: string
+  message: string
 }
 
 export const rateConfig: Rate[] = [
@@ -98,7 +137,6 @@ export const buildProfitRecordsAnnualy = (
     .map((item: any) => {
       return item.year
     })
-  console.log('check invalidYears: ', invalidYears)
 
   const dataYearLoop = dataAnnualy.filter((y: any) => {
     return y.isValid == false
@@ -176,8 +214,12 @@ export const buildProfitRecordsAnnualy = (
       if (monthItem.gender == 'Partial Month') {
         note = JSON.stringify({
           key: 'partialMonthNote',
-          params: { days: monthItem.days, months: findMarketTradingDays(monthItem.month, yearData.year), gender: monthItem.gender },
-        });
+          params: {
+            days: monthItem.days,
+            months: findMarketTradingDays(monthItem.month, yearData.year),
+            gender: monthItem.gender,
+          },
+        })
         // note = `(${monthItem.days} / ${findMarketTradingDays(monthItem.month, yearData.year)} days) ${monthItem.gender}`
         periodInterest =
           (balance * monthItem.rate * monthItem.days) /
@@ -522,177 +564,45 @@ export const buildProfitRecordsMonthly = (
 }
 
 export const contractEndAt = (startDate: Date, term: Term): Date => {
-  let endDate
-  if (term == 'monthly') {
-    if (isStartOfMonth(startDate)) {
-      endDate = endOfMonth(startDate)
-    }
+  let endDate = addDays(startDate, 360)
 
-    if (!isStartOfMonth(startDate)) {
-      let nextMonth = addMonths(startDate, 1)
-      let year = getYear(nextMonth)
-      let month = format(nextMonth, 'MM')
-      let endMonthdd = format(endOfMonth(nextMonth), 'dd')
-      endDate = new Date(`${year}-${month}-${endMonthdd}`)
-    }
+  if (term === 'monthly') {
+    endDate = addDays(startDate, 30)
   }
 
-  if (term == 'semester') {
-    const defineSemester = [
-      ['01', '02', '03', '04', '05', '06'],
-      ['07', '08', '09', '10', '11', '12'],
-    ]
-
-    const defineStartSemester = ['01', '07']
-    const month = format(startDate, 'MM')
-
-    if (isStartOfMonth(startDate)) {
-      // Start Semester
-      if (defineStartSemester.includes(month)) {
-        let endMonth = defineSemester.filter((item) => {
-          return item.includes(month)
-        })[0][5]
-
-        let year = getYear(startDate)
-        let endMonthdd = format(endOfMonth(new Date(`${year}-${endMonth}-01`)), 'dd')
-        endDate = new Date(`${year}-${endMonth}-${endMonthdd}`)
-      }
-
-      // not Start Semester
-
-      if (!defineStartSemester.includes(month)) {
-        if (['01', '02', '03', '04', '05', '06'].includes(month)) {
-          let year = getYear(startDate)
-          endDate = new Date(`${year}-12-31`)
-        }
-
-        if (['07', '08', '09', '10', '11', '12'].includes(month)) {
-          let year = getYear(startDate) + 1
-          endDate = new Date(`${year}-06-30`)
-        }
-      }
-    }
-
-    if (!isStartOfMonth(startDate)) {
-      console.log('!isStartOfMonth(startDate)')
-      if (['01', '02', '03', '04', '05', '06'].includes(month)) {
-        let year = getYear(startDate)
-        endDate = new Date(`${year}-12-31`)
-      }
-
-      if (['07', '08', '09', '10', '11', '12'].includes(month)) {
-        let year = getYear(startDate) + 1
-        endDate = new Date(`${year}-06-30`)
-      }
-    }
+  if (term === 'semester') {
+    endDate = addDays(startDate, 180)
   }
 
-  if (term == 'quarterly') {
-    const defineQuarterly = [
-      ['01', '02', '03'],
-      ['04', '05', '06'],
-      ['07', '08', '09'],
-      ['10', '11', '12'],
-    ]
-
-    const defineStartQuarterly = ['01', '04', '07', '10']
-    const month = format(startDate, 'MM')
-
-    if (isStartOfMonth(startDate)) {
-      // Start Quarterly
-      if (defineStartQuarterly.includes(month)) {
-        let endMonth = defineQuarterly.filter((item) => {
-          return item.includes(month)
-        })[0][2]
-
-        let year = getYear(startDate)
-        let endMonthdd = format(endOfMonth(new Date(`${year}-${endMonth}-01`)), 'dd')
-        endDate = new Date(`${year}-${endMonth}-${endMonthdd}`)
-      }
-
-      // not Start Quarterly
-      if (!defineStartQuarterly.includes(month)) {
-        let nextQuarterLastMonth
-        let year = getYear(startDate)
-
-        for (let index = 0; index < 3; index++) {
-          let qq = defineQuarterly[index]
-
-          if (qq.includes(month)) {
-            if (index < 3) {
-              nextQuarterLastMonth = defineQuarterly[index + 1][2]
-              break
-            }
-
-            if (index == 3) {
-              nextQuarterLastMonth = defineQuarterly[0][2]
-              year = year + 1
-              break
-            }
-          }
-        }
-
-        let endMonthdd = format(endOfMonth(new Date(`${year}-${nextQuarterLastMonth}-01`)), 'dd')
-        endDate = new Date(`${year}-${nextQuarterLastMonth}-${endMonthdd}`)
-      }
-    }
-
-    if (!isStartOfMonth(startDate)) {
-      // not Start Quarterly
-      if (defineStartQuarterly.includes(month)) {
-        let nextQuarterLastMonth
-        let year = getYear(startDate)
-
-        for (let index = 0; index <= 3; index++) {
-          let qq = defineQuarterly[index]
-
-          if (qq.includes(month)) {
-            if (index < 3) {
-              nextQuarterLastMonth = defineQuarterly[index + 1][2]
-              break
-            }
-
-            if (index == 3) {
-              nextQuarterLastMonth = defineQuarterly[0][2]
-              year = year + 1
-              break
-            }
-          }
-        }
-
-        let endMonthdd = format(endOfMonth(new Date(`${year}-${nextQuarterLastMonth}-01`)), 'dd')
-        endDate = new Date(`${year}-${nextQuarterLastMonth}-${endMonthdd}`)
-      }
-    }
-  }
-
-  if (term == 'annually') {
-    const dd = format(startDate, 'dd')
-
-    console.log('dd', dd)
-    const MM = format(startDate, 'MM')
-    const year = getYear(startDate)
-    const isStartYear = MM == '01' && dd == '01'
-
-    if (isStartYear) {
-      endDate = new Date(`${year}-12-31`)
-    }
-
-    if (!isStartYear) {
-      endDate = new Date(`${year + 1}-12-31`)
-    }
+  if (term === 'quarterly') {
+    endDate = addDays(startDate, 90)
   }
 
   return endDate
 }
 
+const getLastDateOfMonth = (date: any) => {
+  const _date = new Date(date);
+
+  // Check if the start date is the beginning of the month
+  if (_date.getDate() === 1) {
+      // If it's already the first day, return it
+      return _date;
+  }
+  // Move to the first day of the next month: 1
+  // Move to the last day of the this month: 0
+  const lastDate = new Date(_date.getFullYear(), _date.getMonth() + 1, 0);
+  return lastDate;
+}
+
 export const contractMultiPeriodEndAt = (startDate: Date, term: Term, periods: number): Date => {
-  const endByTerm = contractEndAt(startDate, term)
+  const endDateByTerm = contractEndAt(startDate, term) 
+  const endByTerm = getLastDateOfMonth(endDateByTerm)
+ 
   let periodsEndAt: Date
   if (periods <= 1) {
     return endByTerm
   }
-
   const _periods = periods - 1
 
   if (term == 'monthly') {
@@ -740,4 +650,527 @@ export const calculatePenaltyContractRecords = async (
   if (!months) return false
 
   return root_amount - total_bonus + 0.0167 * 12
+}
+
+export const getlastBalance = async (data: ProfitData): Promise<number> => {
+  const years = Object.keys(data)
+  const lastYear = years[years.length - 1]
+  const lastEntry = data[lastYear][data[lastYear].length - 1]
+
+  return lastEntry.balance
+}
+export const buildProfitLogsAnnualy = async (principal: number, startDate: Date, endDate: Date) => {
+  const countDays: number = differenceInDays(endDate, startDate) + 1
+  let isPartialContract = countDays < 90
+  const products = await getPublicProducts()
+  const defineAnnualy = 12
+  const defineSemester = 6
+  const defineQuarterly = 3
+
+  let profitLogs: ProfitLogItem[] = []
+
+  // Map List Months From (start to end)
+  const listOfMonths = getMonthsBetweenYears(startDate, endDate)
+  if (!isStartOfMonth(startDate)) {
+    listOfMonths[0].months.shift()
+  }
+
+  if (!isEndOfMonth(endDate)) {
+    listOfMonths[listOfMonths.length - 1].months.pop()
+  }
+
+  const flatMapMonths = listOfMonths.flatMap(
+    (item) => item.months.map((month) => new Date(`${item.year}-${month}-01 00:00:00`)),
+    // item.months.map((month) => month),
+  )
+
+  let _balance = principal
+
+  let mapMonths: any = {
+    Annually: [],
+    Semester: [],
+    Quarterly: [],
+    Monthly: [],
+  }
+
+  // IF < 90 days
+
+  let loopMonths = flatMapMonths
+
+  while (true) {
+    if (loopMonths.length >= defineAnnualy) {
+      mapMonths.Annually = [...mapMonths.Annually, ...loopMonths.slice(0, defineAnnualy)]
+      loopMonths = loopMonths.slice(defineAnnualy, loopMonths.length)
+      continue
+    }
+
+    if (loopMonths.length >= defineSemester) {
+      mapMonths.Semester = [...mapMonths.Semester, ...loopMonths.slice(0, defineSemester)]
+      loopMonths = loopMonths.slice(defineSemester, loopMonths.length)
+      continue
+    }
+
+    if (loopMonths.length >= defineQuarterly) {
+      mapMonths.Quarterly = [...mapMonths.Quarterly, ...loopMonths.slice(0, defineQuarterly)]
+      loopMonths = loopMonths.slice(defineQuarterly, loopMonths.length)
+      continue
+    }
+    mapMonths.Monthly = loopMonths
+    break
+  }
+  let _firstDayCount = differenceInDays(lastDayOfMonth(startDate), startDate) + 1
+  let _dayCount = _firstDayCount
+  let _bestTerm = null
+  let _bestTermRate = null
+  for (const key of ['Annually', 'Semester', 'Quarterly', 'Monthly']) {
+    if (mapMonths[key].length == 0) continue
+
+    let prod = products.find((prod: any) => {
+      return prod.term == key.toLowerCase()
+    })
+
+    let rate = (prod as { rate_of_return: number }).rate_of_return
+
+    if (_bestTerm == null) {
+      _bestTerm = key
+      _bestTermRate = rate
+    }
+
+    for (const mm of mapMonths[key]) {
+      let _profit = _balance * rate
+      _balance = _balance + _profit
+      _dayCount += getDaysInMonth(mm)
+      profitLogs.push({
+        fromDate: mm,
+        toDate: addDays(mm, getDaysInMonth(mm)),
+        rate: rate,
+        balance: _balance,
+        profit: _profit,
+        days: _dayCount,
+        term: key,
+        message: key,
+      })
+    }
+  }
+
+  if (!isStartOfMonth(startDate)) {
+    let __days = _firstDayCount
+    let _profit = (principal * _bestTermRate * __days) / getDaysInMonth(startDate)
+    _balance = _balance + _profit
+    profitLogs.unshift({
+      fromDate: startDate,
+      toDate: lastDayOfMonth(startDate),
+      rate: _bestTermRate,
+      balance: principal + _profit,
+      profit: _profit,
+      days: __days,
+      term: _bestTerm,
+      message: _bestTerm + ' Partial',
+    })
+  }
+
+  if (!isEndOfMonth(endDate)) {
+    let __days = differenceInDays(endDate, new Date(getYear(endDate), getMonth(endDate), 1))
+    _dayCount += __days
+    let _profit = (principal * _bestTermRate * __days) / getDaysInMonth(endDate)
+    _balance = _balance + _profit
+    profitLogs.push({
+      fromDate: new Date(getYear(endDate), getMonth(endDate), 1),
+      toDate: endDate,
+      rate: _bestTermRate,
+      balance: _balance,
+      profit: _profit,
+      days: _dayCount,
+      term: _bestTerm,
+      message: _bestTerm + ' Partial',
+    })
+  }
+
+  return {
+    balance: _balance,
+    profit: _balance - principal,
+    roi: (_balance - principal) / principal,
+    profitLogs: profitLogs,
+    isPartialContract: isPartialContract,
+    terminate: isPartialContract
+      ? terminatePartialContract(_balance, _balance - principal, countDays)
+      : _balance,
+  }
+}
+
+export const buildProfitLogsSemester = async (
+  principal: number,
+  startDate: Date,
+  endDate: Date,
+) => {
+  const countDays: number = differenceInDays(endDate, startDate) + 1
+  let isPartialContract = countDays < 90
+  const products = await getPublicProducts()
+
+  const defineSemester = 6
+  const defineQuarterly = 3
+
+  let profitLogs: ProfitLogItem[] = []
+
+  // Map List Months From (start to end)
+  const listOfMonths = getMonthsBetweenYears(startDate, endDate)
+  if (!isStartOfMonth(startDate)) {
+    listOfMonths[0].months.shift()
+  }
+
+  if (!isEndOfMonth(endDate)) {
+    listOfMonths[listOfMonths.length - 1].months.pop()
+  }
+
+  const flatMapMonths = listOfMonths.flatMap(
+    (item) => item.months.map((month) => new Date(`${item.year}-${month}-01 00:00:00`)),
+    // item.months.map((month) => month),
+  )
+
+  let _balance = principal
+
+  let mapMonths: any = {
+    Annually: [],
+    Semester: [],
+    Quarterly: [],
+    Monthly: [],
+  }
+
+  // IF < 90 days
+
+  let loopMonths = flatMapMonths
+
+  while (true) {
+    if (loopMonths.length >= defineSemester) {
+      mapMonths.Semester = [...mapMonths.Semester, ...loopMonths.slice(0, defineSemester)]
+      loopMonths = loopMonths.slice(defineSemester, loopMonths.length)
+      continue
+    }
+
+    if (loopMonths.length >= defineQuarterly) {
+      mapMonths.Quarterly = [...mapMonths.Quarterly, ...loopMonths.slice(0, defineQuarterly)]
+      loopMonths = loopMonths.slice(defineQuarterly, loopMonths.length)
+      continue
+    }
+    mapMonths.Monthly = loopMonths
+    break
+  }
+  let _firstDayCount = differenceInDays(lastDayOfMonth(startDate), startDate) + 1
+  let _dayCount = _firstDayCount
+  let _bestTerm = null
+  let _bestTermRate = null
+  for (const key of ['Annually', 'Semester', 'Quarterly', 'Monthly']) {
+    if (mapMonths[key].length == 0) continue
+
+    let prod = products.find((prod: any) => {
+      return prod.term == key.toLowerCase()
+    })
+    let rate = (prod as { rate_of_return: number }).rate_of_return
+
+    if (_bestTerm == null) {
+      _bestTerm = key
+      _bestTermRate = rate
+    }
+
+    for (const mm of mapMonths[key]) {
+      let _profit = _balance * rate
+      _balance = _balance + _profit
+      _dayCount += getDaysInMonth(mm)
+      profitLogs.push({
+        fromDate: mm,
+        toDate: addDays(mm, getDaysInMonth(mm)),
+        rate: rate,
+        balance: _balance,
+        profit: _profit,
+        days: _dayCount,
+        term: key,
+        message: key,
+      })
+    }
+  }
+
+  if (!isStartOfMonth(startDate)) {
+    let __days = _firstDayCount
+    let _profit = (principal * _bestTermRate * __days) / getDaysInMonth(startDate)
+    _balance = _balance + _profit
+    profitLogs.unshift({
+      fromDate: startDate,
+      toDate: lastDayOfMonth(startDate),
+      rate: _bestTermRate,
+      balance: principal + _profit,
+      profit: _profit,
+      days: __days,
+      term: _bestTerm,
+      message: _bestTerm + ' Partial',
+    })
+  }
+
+  if (!isEndOfMonth(endDate)) {
+    let __days = differenceInDays(endDate, new Date(getYear(endDate), getMonth(endDate), 1))
+    _dayCount += __days
+    let _profit = (principal * _bestTermRate * __days) / getDaysInMonth(endDate)
+    _balance = _balance + _profit
+    profitLogs.push({
+      fromDate: new Date(getYear(endDate), getMonth(endDate), 1),
+      toDate: endDate,
+      rate: _bestTermRate,
+      balance: _balance,
+      profit: _profit,
+      days: _dayCount,
+      term: _bestTerm,
+      message: _bestTerm + ' Partial',
+    })
+  }
+
+  return {
+    balance: _balance,
+    profit: _balance - principal,
+    roi: (_balance - principal) / principal,
+    profitLogs: profitLogs,
+    isPartialContract: isPartialContract,
+    terminate: isPartialContract
+      ? terminatePartialContract(_balance, _balance - principal, countDays)
+      : _balance,
+  }
+}
+
+export const buildProfitLogsQuarterly = async (
+  principal: number,
+  startDate: Date,
+  endDate: Date,
+) => {
+  const countDays: number = differenceInDays(endDate, startDate) + 1
+  let isPartialContract = countDays < 90
+  const products = await getPublicProducts()
+  const defineQuarterly = 3
+
+  let profitLogs: ProfitLogItem[] = []
+
+  // Map List Months From (start to end)
+  const listOfMonths = getMonthsBetweenYears(startDate, endDate)
+  if (!isStartOfMonth(startDate)) {
+    listOfMonths[0].months.shift()
+  }
+
+  if (!isEndOfMonth(endDate)) {
+    listOfMonths[listOfMonths.length - 1].months.pop()
+  }
+
+  const flatMapMonths = listOfMonths.flatMap(
+    (item) => item.months.map((month) => new Date(`${item.year}-${month}-01 00:00:00`)),
+    // item.months.map((month) => month),
+  )
+
+  let _balance = principal
+
+  let mapMonths: any = {
+    Annually: [],
+    Semester: [],
+    Quarterly: [],
+    Monthly: [],
+  }
+
+  let loopMonths = flatMapMonths
+  while (true) {
+    if (loopMonths.length >= defineQuarterly) {
+      mapMonths.Quarterly = [...mapMonths.Quarterly, ...loopMonths.slice(0, defineQuarterly)]
+      loopMonths = loopMonths.slice(defineQuarterly, loopMonths.length)
+      continue
+    }
+    mapMonths.Monthly = loopMonths
+    break
+  }
+  let _firstDayCount = differenceInDays(lastDayOfMonth(startDate), startDate) + 1
+  let _dayCount = _firstDayCount
+  let _bestTerm = null
+  let _bestTermRate = null
+  for (const key of ['Annually', 'Semester', 'Quarterly', 'Monthly']) {
+    if (mapMonths[key].length == 0) continue
+
+    let prod = products.find((prod: any) => {
+      return prod.term == key.toLowerCase()
+    })
+    let rate = (prod as { rate_of_return: number }).rate_of_return
+
+    if (_bestTerm == null) {
+      _bestTerm = key
+      _bestTermRate = rate
+    }
+
+    for (const mm of mapMonths[key]) {
+      let _profit = _balance * rate
+      _balance = _balance + _profit
+      _dayCount += getDaysInMonth(mm)
+      profitLogs.push({
+        fromDate: mm,
+        toDate: addDays(mm, getDaysInMonth(mm)),
+        rate: rate,
+        balance: _balance,
+        profit: _profit,
+        days: _dayCount,
+        term: key,
+        message: key,
+      })
+    }
+  }
+
+  if (!isStartOfMonth(startDate)) {
+    let __days = _firstDayCount
+    let _profit = (principal * _bestTermRate * __days) / getDaysInMonth(startDate)
+    _balance = _balance + _profit
+    profitLogs.unshift({
+      fromDate: startDate,
+      toDate: lastDayOfMonth(startDate),
+      rate: _bestTermRate,
+      balance: principal + _profit,
+      profit: _profit,
+      days: __days,
+      term: _bestTerm,
+      message: _bestTerm + ' Partial',
+    })
+  }
+
+  if (!isEndOfMonth(endDate)) {
+    let __days = differenceInDays(endDate, new Date(getYear(endDate), getMonth(endDate), 1))
+    _dayCount += __days
+    let _profit = (principal * _bestTermRate * __days) / getDaysInMonth(endDate)
+    _balance = _balance + _profit
+    profitLogs.push({
+      fromDate: new Date(getYear(endDate), getMonth(endDate), 1),
+      toDate: endDate,
+      rate: _bestTermRate,
+      balance: _balance,
+      profit: _profit,
+      days: _dayCount,
+      term: _bestTerm,
+      message: _bestTerm + ' Partial',
+    })
+  }
+
+  return {
+    balance: _balance,
+    profit: _balance - principal,
+    roi: (_balance - principal) / principal,
+    profitLogs: profitLogs,
+    isPartialContract: isPartialContract,
+    terminate: isPartialContract
+      ? terminatePartialContract(_balance, _balance - principal, countDays)
+      : _balance,
+  }
+}
+
+export const buildProfitLogsMonthly = async (principal: number, startDate: Date, endDate: Date) => {
+  const countDays: number = differenceInDays(endDate, startDate) + 1
+  let isPartialContract = countDays < 90
+  const products = await getPublicProducts()
+  const defineQuarterly = 3
+
+  let profitLogs: ProfitLogItem[] = []
+
+  // Map List Months From (start to end)
+  const listOfMonths = getMonthsBetweenYears(startDate, endDate)
+  if (!isStartOfMonth(startDate)) {
+    listOfMonths[0].months.shift()
+  }
+
+  if (!isEndOfMonth(endDate)) {
+    listOfMonths[listOfMonths.length - 1].months.pop()
+  }
+
+  const flatMapMonths = listOfMonths.flatMap(
+    (item) => item.months.map((month) => new Date(`${item.year}-${month}-01 00:00:00`)),
+    // item.months.map((month) => month),
+  )
+
+  let _balance = principal
+
+  let mapMonths: any = {
+    Annually: [],
+    Semester: [],
+    Quarterly: [],
+    Monthly: [],
+  }
+
+  mapMonths.Monthly = flatMapMonths
+  let _firstDayCount = differenceInDays(lastDayOfMonth(startDate), startDate) + 1
+  let _dayCount = _firstDayCount
+  let _bestTerm = null
+  let _bestTermRate = null
+  for (const key of ['Monthly']) {
+    if (mapMonths[key].length == 0) continue
+
+    let prod = products.find((prod: any) => {
+      return prod.term == key.toLowerCase()
+    })
+    let rate = (prod as { rate_of_return: number }).rate_of_return
+
+    if (_bestTerm == null) {
+      _bestTerm = key
+      _bestTermRate = rate
+    }
+
+    for (const mm of mapMonths[key]) {
+      let _profit = _balance * rate
+      _balance = _balance + _profit
+      _dayCount += getDaysInMonth(mm)
+      profitLogs.push({
+        fromDate: mm,
+        toDate: addDays(mm, getDaysInMonth(mm)),
+        rate: rate,
+        balance: _balance,
+        profit: _profit,
+        days: _dayCount,
+        term: key,
+        message: key,
+      })
+    }
+  }
+
+  if (!isStartOfMonth(startDate)) {
+    let __days = _firstDayCount
+    let _profit = (principal * _bestTermRate * __days) / getDaysInMonth(startDate)
+    _balance = _balance + _profit
+    profitLogs.unshift({
+      fromDate: startDate,
+      toDate: lastDayOfMonth(startDate),
+      rate: _bestTermRate,
+      balance: principal + _profit,
+      profit: _profit,
+      days: __days,
+      term: _bestTerm,
+      message: _bestTerm + ' Partial',
+    })
+  }
+
+  if (!isEndOfMonth(endDate)) {
+    let __days = differenceInDays(endDate, new Date(getYear(endDate), getMonth(endDate), 1))
+    _dayCount += __days
+    let _profit = (principal * _bestTermRate * __days) / getDaysInMonth(endDate)
+    _balance = _balance + _profit
+    profitLogs.push({
+      fromDate: new Date(getYear(endDate), getMonth(endDate), 1),
+      toDate: endDate,
+      rate: _bestTermRate,
+      balance: _balance,
+      profit: _profit,
+      days: _dayCount,
+      term: _bestTerm,
+      message: _bestTerm + ' Partial',
+    })
+  }
+
+  return {
+    balance: _balance,
+    profit: _balance - principal,
+    roi: (_balance - principal) / principal,
+    profitLogs: profitLogs,
+    isPartialContract: isPartialContract,
+    terminate: isPartialContract
+      ? terminatePartialContract(_balance, _balance - principal, countDays)
+      : _balance,
+  }
+}
+
+const terminatePartialContract = (_balance: number, profit: number, days: number) => {
+  return _balance - profit + (days * 0.0167) / 30
 }

@@ -1,6 +1,7 @@
 'use server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { getSumAmountBalanceByAccount } from './transaction'
 // import { headers as nextHeaders } from 'next/headers'
 
 // Pass Account Enum Type vô đây: deposit | withdraw | bonus | investment | transfer
@@ -16,7 +17,7 @@ export const getBalanceToAccount = async (
   const response = await payload.find({
     collection: 'transactions',
     where: {
-      to_account: { equals: to_account_id },
+      account_from: { equals: to_account_id },
       type: { equals: accountType },
       status: { equals: status },
     },
@@ -43,7 +44,7 @@ export const getBalanceFromAccount = async (
   const response = await payload.find({
     collection: 'transactions',
     where: {
-      from_account: { equals: from_account_id },
+      account_to: { equals: from_account_id },
       type: { equals: accountType },
       status: { equals: status },
     },
@@ -66,7 +67,7 @@ export const getAccountsByUser: any = async (user_id: number): Promise<any> => {
   const response = await payload.find({
     collection: 'accounts',
     where: {
-      user: { equals: user_id },
+      user: { equals: user_id }
     },
   })
 
@@ -90,12 +91,12 @@ export const getAccountIdInvestmentByUser = async (user_id: number): Promise<any
   return response.docs[0].id
 }
 
-export const getBalanceByUser = async (user_id: number, status: string): Promise<number> => {
+export const getBalanceAmountByUser = async (user_id: number): Promise<number> => {
   const accounts = await getAccountsByUser(user_id)
   let total = 0
 
   for (let acc of accounts) {
-    total += await getBalanceToAccount(acc.name, acc.id, status)
+    total += await getSumAmountBalanceByAccount(acc.id)
   }
 
   return total
@@ -125,3 +126,5 @@ export const getAccountsByUserId = async (
     return account_types.includes(item.type)
   })
 }
+
+// getAccountsByUserId(1, ["main", ""])

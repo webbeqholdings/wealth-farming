@@ -37,7 +37,7 @@ export const vi = {
     //investment process
     investment_process_title: "Giả lập kế hoạch tài chính",
     investment_process_table: "Bảng Lãi",
-    investment_process_chart_decs: "Biểu diễn sự cân bằng theo thời gian",
+    investment_process_chart_decs: "Biểu đồ số dư theo thời gian",
     
     // /transaction
     // /menu-label
@@ -74,7 +74,7 @@ export const vi = {
     withdraw_confirm_title: "Xác nhận việc rút tiền của bạn",
     withdraw_confirm_decs: "Vui lòng xem lại các chi tiết bên dưới trước khi xác nhận yêu cầu rút tiền của bạn.",
     withdraw_important_title: "Quan trọng",
-    withdraw_important_decs: "Bằng cách xác nhận, bạn đồng ý với các điều khoản và điều kiện rút tiền của chúng tôi. Hành động này không thể đã hoàn tác.",
+    withdraw_important_decs: "Bằng cách xác nhận, bạn đồng ý với các điều khoản và điều kiện rút tiền của chúng tôi. Hành động này không thể hoàn tác.",
 
     // /history
     tranfer_history_Header_title: "Lịch sử giao dịch",
@@ -258,7 +258,7 @@ export const vi = {
     promotions_info: "Tích hợp các chương trình khuyến mãi, giảm giá hoặc điểm thưởng cho khách hàng",
     faq: "Câu Hỏi Thường Gặp",
     beq_fund: "BeQ Wealth Farming Fund là gì?",
-    beq_fund_info: "BeQ Wealth Farming Fund là một nền tảng đầu tư sáng tạo tập trung vào các dự án nông nghiệp và nông nghiệp bền vững. Chúng tôi kết hợp trí tuệ nông nghiệp truyền thống với công nghệ tiên tiến để cung cấp cơ hội đầu tư độc đáo.",
+    beq_fund_info: "BeQ Wealth Farming Fund là một nền tảng đầu tư sáng tạo tập trung vào các dự án công nghệ và nông nghiệp bền vững. Chúng tôi kết hợp trí tuệ nông nghiệp truyền thống với công nghệ tiên tiến để cung cấp cơ hội đầu tư độc đáo.",
     start_investing_question: "Làm thế nào để bắt đầu đầu tư với BeQ?",
     start_investing_info: "Để bắt đầu đầu tư với BeQ, bạn cần tạo tài khoản, xác minh danh tính và thực hiện một khoản nạp ban đầu. Sau khi tài khoản của bạn có đủ tiền, bạn có thể duyệt qua các cơ hội đầu tư có sẵn và phân bổ tiền của mình theo sở thích.",
     investment_types: "BeQ cung cấp loại hình đầu tư nào?",
@@ -274,8 +274,8 @@ export const vi = {
     webinar: "Hội thảo trực tuyến: Chiến lược Đầu tư Bền vững - Đăng ký ngay",
     q2_report: "Báo cáo Hiệu suất Quý 2 đã sẵn sàng",
     join_discord: "Tham gia cộng đồng Discord của chúng tôi để cập nhật thông tin thị trường hàng ngày",
-    breaking_news: "Tin tức nóng",
-    mission_statement: "Tài sản của bạn, mục tiêu của chúng tôi",
+    posts: "Bài đăng",
+    mission_statement: "Sự giàu có của bạn là sứ mệnh của chúng tôi",
     embark_journey: "Bắt đầu hành trình đầu tư của bạn ngay hôm nay!",
     embark_journey_description: 'Tham gia BeQ Wealth Farming Fund và bắt đầu phát triển khoản đầu tư của bạn với các dự án nông nghiệp bền vững và sáng tạo.',
 
@@ -321,7 +321,7 @@ export const vi = {
     interest_withdrawal_period: "Kì Hạn Rút Lãi",
     join_date: "Ngày tham gia",
     contract_end_date: "Ngày kết thúc hợp đồng",
-    investment_cycles: "Số chu kì tham gia",
+    investment_periods: "Số chu kì tham gia",
     calculate_result: "Tính Kết Quả",
     submit_investment: "Đầu Tư",
     month: "Tháng",
@@ -336,6 +336,16 @@ export const vi = {
     day_num: 'thứ {{num}}',
     rate: 'Tỷ Lệ',
     partialMonthNote:'({{days}} / {{months}} ngày) Tháng Không Trọn Vẹn',
+    message: 'ghi chú',
+    profit_chart: 'Biểu Đồ Lợi Nhuận',
+    profit_by_time: 'Biểu diễn số dư theo thời gian',
+    profit_table: 'Bảng Lãi',
+    balance_chart: 'Số Dư ($)',
+    partial_monthly: 'Partial Monthly',
+    full_monthly: 'Đủ một tháng',
+    full_quarterly: 'Đủ một quý',
+    full_semester: 'Đủ nữa năm',
+    full_annually: 'Đủ một năm',
 
     // referral
     grow_wealth: 'Cùng Nhau Đầu Tư',
@@ -401,4 +411,21 @@ export const vi = {
     amount_usd: 'Số tiền ($)',
     amount_graph: 'Số tiền: ${{amount}}',
     month_graph: 'Tháng: {{label}}',
+
+    //blog
+    read_more: "Đọc Thêm",
+    lastest_news: "Tin Tức Gần Đây",
+    about_author: 'Về Tác Giả',
+    related_article: "Các Bài Viết Liên Quan",
+
+    //footer
+    quick_link: 'Liên Kết Nhanh',
+    dynamic_cal: 'Máy Tính Lợi Nhuận',
+    invest_sim: 'Mô Phỏng Đầu Tư',
+    referral_program: 'Chương Trình Giới Thiệu',
+    subcribe: 'Đăng Ký',
+    newsletter: 'Bản Tin',
+    stay_updated: 'Cập nhật những tin tức và ưu đãi mới nhất từ chúng tôi.',
+    enter_email: 'Nhập email của bạn',
+    grow_your_wealth: 'Tăng trưởng tài sản của bạn với các chiến lược đầu tư bền vững.'
 }

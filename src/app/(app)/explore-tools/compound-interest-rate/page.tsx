@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { CompoundInterestCalculator } from '@/components/interest-rate/CompoundInterestCalculator'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -21,6 +21,13 @@ export default function InvestmentSimulatorPage() {
   const [principal, setPrincipal] = useState<number>(10000)
   const [months, setMonths] = useState<number>(12)
   const { t } = useTranslation()
+  const { i18n } = useTranslation()
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search); 
+    const lang = queryParams.get('locale') || 'en'; 
+    i18n.changeLanguage(lang);  
+  }, []);
 
   return (
     <div>

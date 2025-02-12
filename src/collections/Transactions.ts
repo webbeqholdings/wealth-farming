@@ -1,5 +1,5 @@
 // transactions.collection.js
-import type { CollectionConfig } from 'payload'
+import type { BasePayload, CollectionConfig } from 'payload'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { isAdmin } from '../access/isAdmin'
@@ -9,20 +9,23 @@ import {
   getParentIdByUser,
   getReferralProducts,
 } from '@/lib/admin-side/referrals'
+import { getTotalDeposit } from '@/lib/admin-side/transaction'
+import { getAccountsByUserId } from '@/lib/admin-side/account'
 import { sendEmailDeposit } from '@/utilities/emailDeposit'
 import { sendEmailWithdraw } from '@/utilities/emailWithdraw'
 
-
 const Transactions: CollectionConfig = {
   slug: 'transactions',
+  admin: {
+    defaultColumns: ['type', 'id', 'user', 'amount', 'investment_product', 'status'],
+    listSearchableFields: ['user.email', 'investment_product.product_name'],
+    group: 'BeQ Dynamic Fund',
+  },
   access: {
     read: () => true,
     create: isIndividualOrAdmin,
     update: isAdmin,
     delete: isAdmin,
-  },
-  admin: {
-    listSearchableFields: ['user.email', 'investment_product.product_name'],
   },
   fields: [
     {
@@ -51,12 +54,27 @@ const Transactions: CollectionConfig = {
       type: 'relationship',
       relationTo: 'units',
       label: 'Unit',
+      defaultValue: 1, // USD
     },
     {
       name: 'bank',
       type: 'relationship',
       relationTo: 'banks', // Tài khoản đích
-      label: 'Banks',
+      label: 'User Bank Account',
+      filterOptions: ({ data }) => {
+        if (data.user) {
+          return {
+            user: {
+              equals: data.user,
+            },
+          }
+        }
+      },
+    },
+    {
+      name: 'payment_method',
+      type: 'text',
+      label: 'Payment Method',
     },
     {
       name: 'amount',
@@ -76,16 +94,34 @@ const Transactions: CollectionConfig = {
       required: true,
     },
     {
-      name: 'from_account',
+      name: 'account_from',
       type: 'relationship',
-      relationTo: 'accounts', // Tài khoản nguồn
-      label: 'From Account',
+      relationTo: 'accounts',
+      label: 'Account From (Out)',
+      filterOptions: ({ data }) => {
+        if (data.user) {
+          return {
+            user: {
+              equals: data.user,
+            },
+          }
+        }
+      },
     },
     {
-      name: 'to_account',
+      name: 'account_to',
       type: 'relationship',
-      relationTo: 'accounts', // Tài khoản đích
-      label: 'To Account',
+      relationTo: 'accounts',
+      label: 'Account To (In)',
+      filterOptions: ({ data }) => {
+        if (data.user) {
+          return {
+            user: {
+              equals: data.user,
+            },
+          }
+        }
+      },
     },
     {
       name: 'deposit_screenshot',
@@ -119,15 +155,29 @@ const Transactions: CollectionConfig = {
         const payload = await getPayload({
           config,
         })
-        const { amount, from_account, type, status } = doc
+
+        const { amount, account_to, type, status } = doc
 
         const handleSendEmail = async (user: any, amount: any, status: any, type: any) => {
           try {
             if (type === 'deposit') {
-              await sendEmailDeposit(user.email, `Deposit ${status}`, user.first_name, user.last_name, amount, status)
-            }
-            else if (type === 'withdraw') {
-              await sendEmailWithdraw(user.email, `Withdrawal ${status}`, user.first_name, user.last_name, amount, status)
+              await sendEmailDeposit(
+                user.email,
+                `Deposit ${status}`,
+                user.first_name,
+                user.last_name,
+                amount,
+                status,
+              )
+            } else if (type === 'withdraw') {
+              await sendEmailWithdraw(
+                user.email,
+                `Withdrawal ${status}`,
+                user.first_name,
+                user.last_name,
+                amount,
+                status,
+              )
             }
           } catch (error) {
             console.error(`Error sending ${type} ${status} email:`, error)
@@ -135,112 +185,10 @@ const Transactions: CollectionConfig = {
         }
 
         if (operation === 'update' && type === 'deposit' && status === 'completed') {
-          // Fetch the existing account details
-          const fromAccount = await payload.findByID({
-            collection: 'accounts',
-            id: from_account,
-          })
-
-          if (fromAccount) {
-            // Update the account amount
-            const updatedAmount = fromAccount.amount + amount
-
-            // Save the updated account data
-            await payload.update({
-              collection: 'accounts',
-              id: from_account,
-              data: {
-                amount: updatedAmount,
-              },
-            })
-            // ... Update Referral Process
-            const parentUser = await getParentIdByUser(payload, doc.user)
-            const referralRate = await getCurrentLevelRate(payload, amount)
-            const parentId = (parentUser as { id: number }).id
-            const referralAmount = amount * referralRate
-            const referralProducts = await getReferralProducts(payload)
-            if(referralProducts){
-              const referralProduct = referralProducts.filter((prod) => {
-                return prod.term == 'annually'
-              })[0]
-              if (!referralProduct) return
-
-              if (parentId) {
-                await payload.create({
-                  collection: 'transactions',
-                  data: {
-                    amount: Number(referralAmount),
-                    user: Number(parentId),
-                    investment_product: referralProduct.id,
-                    status: 'completed',
-                    from_account: from_account,
-                    type: 'investment',
-                  },
-                })
-                await payload.create({
-                  collection: 'contracts',
-                  data: {
-                    user: Number(parentId),
-                    amount: Number(referralAmount),
-                    balance: Number(referralAmount),
-                    expected_return: referralProduct.rate_of_return,
-                    status: 'active',
-                    term: referralProduct.term,
-                    profit: 0,
-                    periods: 1,
-                    start_date: new Date().toISOString(),
-                    end_date: null,
-                    product_log: {
-                      data: referralProduct,
-                    },
-                    note_log: ['Contract by Referral'],
-                  },
-                })
-              }
-            }
-            handleSendEmail(fromAccount.user, amount, status, type)
-          } 
-        }
-
-        if (operation === 'update' && type === 'deposit' && status === 'failed') {
-          // Fetch the existing account details
-          const fromAccount = await payload.findByID({
-            collection: 'accounts',
-            id: from_account,
-          })
-          
-          if (fromAccount) {
-            handleSendEmail(fromAccount.user, amount, status, type)
-          }    
-        }
-
-        if (operation === 'update' && doc.type === 'withdraw' && doc.status === 'completed') {
-          // Fetch the existing account details
-          const fromAccount = await payload.findByID({
-            collection: 'accounts',
-            id: from_account,
-          })
-
-          if (fromAccount) {
-            // Update the account amount
-            const updatedAmount = fromAccount.amount - amount
-
-            // Save the updated account data
-            await payload.update({
-              collection: 'accounts',
-              id: from_account,
-              data: {
-                amount: updatedAmount,
-              },
-            })
-            
-            handleSendEmail(fromAccount.user, amount, doc.status, doc.type)
-          }
-
         }
 
         if (operation === 'update' && doc.type === 'withdraw' && doc.status === 'failed') {
-          const fromAccountId = doc.from_account
+          const fromAccountId = doc.account_from
           const transactionAmount = doc.amount
           // Fetch the existing account details
           const fromAccount = await payload.findByID({

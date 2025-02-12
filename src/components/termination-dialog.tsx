@@ -87,6 +87,9 @@ export function TerminationDialog({ isOpen, onClose, contract, setActiveTab, ter
     if (dayNum <= standardApplyProgramDays) {
       return parseFloat(((under90DayRate * dayNum)).toFixed(2))
     }
+    else{
+      return parseFloat('0.00')
+    }
   }
   function caculatedTerminationTotal(): number {
     return contract.investedAmount + (contract.investedAmount * caculatedTerminationRate())

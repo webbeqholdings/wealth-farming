@@ -1,19 +1,13 @@
 'use client'
-import { CoverText } from '@/components/page-home/CoverText'
-import { MarqueeClients } from '@/components/page-home/MarqueeClients'
-import Link from 'next/link'
 import FeaturesSection from '@/components/page-home/FeaturesSection'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
-
 import { MinimalHero } from '@/components/page-home/MinimalHero'
-import { Metadata } from 'next'
 import { MarqueeAnnouncements } from '@/components/page-home/MarqueeAnnouncements'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Mail, Wallet, BarChart3 } from 'lucide-react'
 import { useTranslation } from 'react-i18next';
-
 import {
   Accordion,
   AccordionContent,
@@ -22,13 +16,6 @@ import {
 } from '@/components/ui/accordion'
 import { CTASection } from '@/components/page-home/CTASection'
 import { BreakingNewsCarousel } from '@/components/page-home/BreakingNews'
-import CryptoDashboard from '@/components/crypto/CryptoDashboard'
-import WorldIndicesDashboard from '@/components/crypto/WorldIndicesDashboard'
-
-const metadata: Metadata = {
-  title: 'Wealth Farming | Cultivate wealth, harvest results',
-  description: 'Example music app using the components.',
-}
 
 export default function IndexPage() {
   const { t } = useTranslation();

@@ -39,7 +39,7 @@ import {
 import { useToast } from '@/hooks/use-toast'
 import { Trash2 } from 'lucide-react'
 import UserStatus from '@/lib/userStatus'
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next'
 
 const formSchema = z.object({
   accountName: z.string().min(2, {
@@ -57,13 +57,13 @@ const formSchema = z.object({
 })
 
 export function BankAccountForm({
-  accounts,
-  setAccounts,
+  bankAccounts,
+  setBankAccounts,
 }: {
-  accounts: any[]
-  setAccounts: React.Dispatch<React.SetStateAction<any[]>>
+  bankAccounts: any[]
+  setBankAccounts: React.Dispatch<React.SetStateAction<any[]>>
 }) {
-  const { t } = useTranslation();
+  const { t } = useTranslation()
   const [bankId, setBankId] = useState('')
   const [isDialogOpen, setIsDialogOpen] = useState(false) // Manage dialog visibility
   const { toast } = useToast()
@@ -94,7 +94,9 @@ export function BankAccountForm({
         setIsDialogOpen(false)
 
         // Remove the deleted account from local state
-        setAccounts((prevAccounts) => prevAccounts.filter((account) => account.id !== accountId))
+        setBankAccounts((prevAccounts) =>
+          prevAccounts.filter((account) => account.id !== accountId),
+        )
 
         // Show success toast message
         toast({
@@ -137,7 +139,7 @@ export function BankAccountForm({
         const data = await response.json() // Parse the response data if needed
 
         // Update local state with the new account if necessary
-        setAccounts((prevAccounts) => [...prevAccounts, newAccount])
+        setBankAccounts((prevAccounts) => [...prevAccounts, data.doc])
 
         // Reset the form and show success message
         form.reset()
@@ -173,9 +175,7 @@ export function BankAccountForm({
       <Card className="mb-8">
         <CardHeader>
           <CardTitle>{t('add_bank_account')}</CardTitle>
-          <CardDescription>
-            {t('bank_account_details')}
-          </CardDescription>
+          <CardDescription>{t('bank_account_details')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -201,7 +201,7 @@ export function BankAccountForm({
                   <FormItem>
                     <FormLabel>{t('account_number')}</FormLabel>
                     <FormControl>
-                      <Input placeholder={t("enter_account_number")} {...field} />
+                      <Input placeholder={t('enter_account_number')} {...field} />
                     </FormControl>
                     <FormDescription>{t('bank_account_number_note')}</FormDescription>
                     <FormMessage />
@@ -232,7 +232,7 @@ export function BankAccountForm({
                     <FormItem className="flex-1">
                       <FormLabel>{t('branch')}</FormLabel>
                       <FormControl>
-                        <Input placeholder={t("enter_branch_name")} {...field} />
+                        <Input placeholder={t('enter_branch_name')} {...field} />
                       </FormControl>
                       <FormDescription>{t('branch_note')}</FormDescription>
                       <FormMessage />
@@ -263,7 +263,7 @@ export function BankAccountForm({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {accounts.map((account) => (
+              {bankAccounts.map((account) => (
                 <TableRow key={account.id}>
                   <TableCell>{account.name}</TableCell>
                   <TableCell>{account.account_number}</TableCell>
@@ -287,9 +287,7 @@ export function BankAccountForm({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t('are_you_sure')}</DialogTitle>
-            <DialogDescription>
-              {t('delete_account_warning')}
-            </DialogDescription>
+            <DialogDescription>{t('delete_account_warning')}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button onClick={handleCancel} color="gray" size="sm">
