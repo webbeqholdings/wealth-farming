@@ -287,7 +287,6 @@ export default function UserProfile() {
       title: 'Copied !',
       description: 'Your referral code copied to clipboard!'
     })
-
   }
 
   const shareReferralCode = () => {
@@ -310,10 +309,6 @@ export default function UserProfile() {
         description: 'Sharing dialog unavailable Your referral link will be copied to clipboard!'
       })
     }
-
-
-
-
     alert('Opening share dialog...')
   }
 
