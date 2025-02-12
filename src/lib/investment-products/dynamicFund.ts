@@ -668,9 +668,10 @@ export const buildProfitLogsAnnualy = async (principal: number, startDate: Date,
   if (!isStartOfMonth(startDate)) {
     listOfMonths[0].months.shift()
   }
-
+  console.log(isEndOfMonth(endDate))
   if (!isEndOfMonth(endDate)) {
     listOfMonths[listOfMonths.length - 1].months.pop()
+    console.log(listOfMonths)
   }
 
   const flatMapMonths = listOfMonths.flatMap(
@@ -728,14 +729,14 @@ export const buildProfitLogsAnnualy = async (principal: number, startDate: Date,
       _bestTerm = key
       _bestTermRate = rate
     }
-
+    console.log(mapMonths[key])
     for (const mm of mapMonths[key]) {
       let _profit = _balance * rate
       _balance = _balance + _profit
       _dayCount += getDaysInMonth(mm)
       profitLogs.push({
         fromDate: mm,
-        toDate: addDays(mm, getDaysInMonth(mm)),
+        toDate: addDays(mm, getDaysInMonth(mm) - 1),
         rate: rate,
         balance: _balance,
         profit: _profit,
@@ -870,7 +871,7 @@ export const buildProfitLogsSemester = async (
       _dayCount += getDaysInMonth(mm)
       profitLogs.push({
         fromDate: mm,
-        toDate: addDays(mm, getDaysInMonth(mm)),
+        toDate: addDays(mm, getDaysInMonth(mm) - 1),
         rate: rate,
         balance: _balance,
         profit: _profit,
@@ -994,7 +995,7 @@ export const buildProfitLogsQuarterly = async (
       _dayCount += getDaysInMonth(mm)
       profitLogs.push({
         fromDate: mm,
-        toDate: addDays(mm, getDaysInMonth(mm)),
+        toDate: addDays(mm, getDaysInMonth(mm) - 1),
         rate: rate,
         balance: _balance,
         profit: _profit,
