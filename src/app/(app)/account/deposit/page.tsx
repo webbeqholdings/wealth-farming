@@ -410,9 +410,9 @@ export default function DepositPage() {
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="accountTo">{t('account')}</Label>
-                    <Select value={toAccount} onValueChange={handleToAccountOnChange}>
+                    <Select onValueChange={handleToAccountOnChange}>
                       <SelectTrigger id="accountTo">
-                        <SelectValue placeholder="Select account" />
+                        <SelectValue placeholder={t("select_account")} />
                       </SelectTrigger>
                       <SelectContent>
                         {accounts.map((acc) => (
@@ -438,9 +438,9 @@ export default function DepositPage() {
                   )}
                   <div className="space-y-2">
                     <Label htmlFor="bank">{t('bank_account')}</Label>
-                    <Select value={selectBank} onValueChange={handleBankChange}>
+                    <Select onValueChange={handleBankChange}>
                       <SelectTrigger id="bank">
-                        <SelectValue placeholder="Select bank" />
+                        <SelectValue placeholder={t("select_bank")} />
                       </SelectTrigger>
                       <SelectContent>
                         {banks.map((bank) => (
