@@ -741,6 +741,7 @@ export const buildProfitLogsAnnualy = async (principal: number, startDate: Date,
   let _bestTermRate = null 
   let _firstProfit = 0
   let _firstBalance = 0
+  let isSetFirstMonth = 1
   for (const key of ['Annually', 'Semester', 'Quarterly', 'Monthly']) {
     if (mapMonths[key].length == 0) continue
 
@@ -755,11 +756,12 @@ export const buildProfitLogsAnnualy = async (principal: number, startDate: Date,
       _bestTermRate = rate
     }
 
-    if (!isStartOfMonth(startDate)) {
+    if (!isStartOfMonth(startDate) && isSetFirstMonth) {
       _dayCount = _firstDayCount
       _firstProfit = (principal * _bestTermRate * _firstDayCount) / getDaysInMonth(startDate)
       _firstBalance = _firstProfit + principal
       _balance = _firstBalance
+      isSetFirstMonth = 0
     }
     
     for (const mm of mapMonths[key]) {
@@ -885,6 +887,7 @@ export const buildProfitLogsSemester = async (
   let _bestTermRate = null
   let _firstProfit = 0
   let _firstBalance = 0
+  let isSetFirstMonth = 1
   for (const key of ['Annually', 'Semester', 'Quarterly', 'Monthly']) {
     if (mapMonths[key].length == 0) continue
 
@@ -898,11 +901,12 @@ export const buildProfitLogsSemester = async (
       _bestTermRate = rate
     }
 
-    if (!isStartOfMonth(startDate)) {
+    if (!isStartOfMonth(startDate) && isSetFirstMonth) {
       _dayCount = _firstDayCount
       _firstProfit = (principal * _bestTermRate * _firstDayCount) / getDaysInMonth(startDate)
       _firstBalance = _firstProfit + principal
       _balance = _firstBalance
+      isSetFirstMonth = 0
     }
 
     for (const mm of mapMonths[key]) {
@@ -1017,6 +1021,8 @@ export const buildProfitLogsQuarterly = async (
   let _bestTermRate = null
   let _firstProfit = 0
   let _firstBalance = 0
+  let isSetFirstMonth = 1
+
   for (const key of ['Annually', 'Semester', 'Quarterly', 'Monthly']) {
     if (mapMonths[key].length == 0) continue
 
@@ -1030,11 +1036,12 @@ export const buildProfitLogsQuarterly = async (
       _bestTermRate = rate
     }
 
-    if (!isStartOfMonth(startDate)) {
+    if (!isStartOfMonth(startDate) && isSetFirstMonth) {
       _dayCount = _firstDayCount
       _firstProfit = (principal * _bestTermRate * _firstDayCount) / getDaysInMonth(startDate)
       _firstBalance = _firstProfit + principal
       _balance = _firstBalance
+      isSetFirstMonth = 0
     }
 
     for (const mm of mapMonths[key]) {
