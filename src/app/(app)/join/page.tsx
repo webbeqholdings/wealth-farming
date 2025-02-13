@@ -21,6 +21,7 @@ import { SiteFooter } from '@/components/site-footer'
 import { z } from 'zod'
 import { useToast } from '@/hooks/use-toast'
 import { useParams } from 'next/navigation'
+import { useTranslation } from 'react-i18next'
 
 // Define Zod schemas
 const loginSchema = z.object({
@@ -45,6 +46,7 @@ export default function Page() {
 
   const params = useParams()
   const urlReferralCode = params.ref
+  const { t } = useTranslation()
 
   // Click Submit
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>, type: '/login' | '') => {
@@ -98,8 +100,8 @@ export default function Page() {
         }
 
         return toast({
-          title: 'Error',
-          description: 'The email or password is incorrect. Please try again.'
+          title: t('error'),
+          description: t('try_again')
         })
       }
 
@@ -138,7 +140,7 @@ export default function Page() {
 
           return toast({
             title: 'Error',
-            description: errorMessage,
+            description: t(errorMessage),
           })
         } catch (error) {
           console.error('Registration error:', error)
@@ -146,7 +148,7 @@ export default function Page() {
           return toast({
             title: 'Error',
             description:
-              (error as any).data.errors[0].message || 'An error occurred during registration.',
+              t(((error as any).data.errors[0].message) || 'join_error'),
           })
         }
       }
@@ -173,14 +175,14 @@ export default function Page() {
       <div className="container flex items-center justify-center min-h-screen">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-[400px]">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="login">Login</TabsTrigger>
-            <TabsTrigger value="register">Register</TabsTrigger>
+            <TabsTrigger value="login">{t('login')}</TabsTrigger>
+            <TabsTrigger value="register">{t('register')}</TabsTrigger>
           </TabsList>
           <TabsContent value="login">
             <Card>
               <CardHeader>
-                <CardTitle>Login</CardTitle>
-                <CardDescription>Enter your credentials to access your account.</CardDescription>
+                <CardTitle>{t('login')}</CardTitle>
+                <CardDescription>{t('enter_credential')}</CardDescription>
               </CardHeader>
               <form onSubmit={(e) => handleSubmit(e, '/login')}>
                 <CardContent className="space-y-2">
@@ -194,13 +196,13 @@ export default function Page() {
                         type="email"
                         className="pl-10"
                         required
-                        placeholder="Enter your email"
+                        placeholder={t("enter_email")}
                       />
                     </div>
                   </div>
 
                   <div className="space-y-1 my-1">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password">{t('password')}</Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
                       <input
@@ -208,7 +210,7 @@ export default function Page() {
                         id="password"
                         name="password"
                         required
-                        placeholder="Enter your password"
+                        placeholder= {t("enter_password")}
                         className="flex h-9 w-full rounded-md border border-input bg-transparent pl-10 pr-10 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                       />
                       <button
@@ -233,7 +235,7 @@ export default function Page() {
                       }}
                       className="text-sm text-blue-600 hover:underline"
                     >
-                      Forgot password?
+                      {t('forgot_password')}
                     </a>
                   </div>
                 </CardContent>
@@ -243,7 +245,7 @@ export default function Page() {
                     disabled={isLoading}
                     className="w-full rounded-lg py-3 shadow-lg"
                   >
-                    {isLoading ? 'Loading...' : 'Login'}
+                    {isLoading ? t('loading') : t('login')}
                   </Button>
                 </CardFooter>
               </form>
@@ -252,32 +254,32 @@ export default function Page() {
           <TabsContent value="register">
             <Card>
               <CardHeader>
-                <CardTitle>Register</CardTitle>
-                <CardDescription>Create a new account to get started.</CardDescription>
+                <CardTitle>{t('register')}</CardTitle>
+                <CardDescription>{t('create_new_acc')}</CardDescription>
               </CardHeader>
               <form onSubmit={(e) => handleSubmit(e, '')}>
                 <CardContent className="space-y-2">
                   <div className="flex space-x-4">
                     <div className="flex-1 space-y-1">
-                      <Label htmlFor="first_name">First Name</Label>
+                      <Label htmlFor="first_name">{t('first_name')}</Label>
                       <Input id="first_name" name="first_name" required />
                       {errors.first_name && <p className="text-red-500">{errors.first_name}</p>}
                     </div>
                     <div className="flex-1 space-y-1">
-                      <Label htmlFor="last_name">Last Name</Label>
+                      <Label htmlFor="last_name">{t('last_name')}</Label>
                       <Input id="last_name" name="last_name" required />
                       {errors.last_name && <p className="text-red-500">{errors.last_name}</p>}
                     </div>
                   </div>
 
                   <div className="space-y-1 py-1">
-                    <Label htmlFor="phone_number">Phone Number</Label>
+                    <Label htmlFor="phone_number">{t('phone_num')}</Label>
                     <div className="relative">
                       <PhoneCall className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
                       <Input
                         id="phone_number"
                         name="phone_number"
-                        placeholder="Enter your phone"
+                        placeholder={t("enter_phone")}
                         type="text"
                         className="pl-10"
                         required
@@ -292,7 +294,7 @@ export default function Page() {
                       <Input
                         id="email"
                         name="email"
-                        placeholder="Enter your email"
+                        placeholder={t("enter_email")}
                         type="email"
                         className="pl-10"
                         required
@@ -300,7 +302,7 @@ export default function Page() {
                     </div>
                   </div>
                   <div className="space-y-1 py-1">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password">{t('password')}</Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
                       <input
@@ -329,7 +331,7 @@ export default function Page() {
                   </div>
 
                   <div className="space-y-1">
-                    <Label htmlFor="email">Referral Code</Label>
+                    <Label htmlFor="email">{t('refer_code')}</Label>
                     <Input
                       id="referral_code"
                       name="referral_code"
@@ -340,7 +342,7 @@ export default function Page() {
                 </CardContent>
                 <CardFooter className="flex justify-center">
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? 'Loading...' : 'Register'}
+                    {isLoading ? t('loading') : t('register')}
                   </Button>
                 </CardFooter>
               </form>

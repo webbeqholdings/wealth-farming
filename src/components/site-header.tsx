@@ -114,7 +114,7 @@ export function SiteHeader() {
                 </DropdownMenu>
               </>
             ) : (
-              <Button onClick={() => router.push('/join')}>Login</Button>
+              <Button onClick={() => router.push('/join')}>{t('login')}</Button>
             )}
             <Link href="https://www.facebook.com/p/BeQ-Holdings-61555802044845/" target="_blank" rel="noreferrer">
               <div
