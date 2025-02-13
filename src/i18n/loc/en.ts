@@ -148,7 +148,8 @@ export const en = {
     processing: 'Processing...',
     photo_requirement:'Please upload a screenshot showing the photo. Accepted formats: JPG, PNG, with a maximum size of 5MB.',
     withdrawal_amount_input: 'Enter amount to withdraw',
-    withdrawal_condition:'Your contract will be withdrawn on ',
+    withdrawal_condition1:'Your contract can be withdrawn from ',
+    withdrawal_condition2:'Your contract will be withdrawn on ',
     terminated_note: 'Note',
 
     // user-profile
