@@ -6,7 +6,7 @@ import { endOfMonth, addMonths, differenceInDays, endOfYear, endOfQuarter } from
 import { withdrawInvestment } from '@/lib/contract';
 import { getPaymentTransfer } from '@/lib/paymentTransfer';
 import { object } from 'zod';
-import { contractEndAt } from '@/lib/investment-products/dynamicFund'
+import { contractMultiPeriodEndAt } from '@/lib/investment-products/dynamicFund'
 
 export const updateProfitHandler: TaskHandler<{
     input: {};
@@ -97,32 +97,43 @@ export const updateProfitHandler: TaskHandler<{
         return nextMonth;
     }
 
-    const checkTermFullness = (startDate: any, term: any) => {
-        const start = getBeginningOfNextMonth(startDate);
-        const today = new Date();
-        // Calculate total days in the expected term
-        const expectedEndDate = contractEndAt(start, term); 
-        const totalTermDays = differenceInDays(expectedEndDate, start) + 1;
-        // Calculate actual duration of the contract
-        const actualDurationDays = differenceInDays(today, start) + 1;
-        return (actualDurationDays >= totalTermDays) && (today.getDate() == 1)
-    };
-
-    // const checkTermFullness = (startDate: any, term: any) => {
-    //     // const start = getBeginningOfNextMonth(startDate);
-    //     const today = new Date(2023, 2, 1);
-
-    //     let expectedEndDate = startDate
-    //     let withdrawDate
-    //     while ( expectedEndDate < today ) 
-    //     {
-    //         expectedEndDate = contractEndAt(expectedEndDate, term)
-    //     }
-
-    //     withdrawDate = new Date(expectedEndDate.getFullYear, expectedEndDate.getMonth, 1)
+    const differenceInMonths = (date1: Date, date2: Date): number => {
+        const yearDiff = date1.getFullYear() - date2.getFullYear()
+        const monthDiff = date1.getMonth() - date2.getMonth()
         
-    //     return ( today == withdrawDate ) && (today.getDate() == 1)
-    // };
+        return yearDiff * 12 + monthDiff
+    };
+    
+    const checkTermFullness = (startDate: any, term: any) => {
+        const start = getBeginningOfNextMonth(startDate)
+    
+        const today = new Date(); 
+    
+        let termMonths = 0;
+        if (term === 'monthly') termMonths = 1;
+        if (term === 'quarterly') termMonths = 3;
+        if (term === 'semester') termMonths = 6;
+        if (term === 'annually') termMonths = 12;
+    
+        if (termMonths === 0) return false; 
+
+        const monthsElapsed = differenceInMonths(today, start);
+    
+        // Tính số kỳ hạn đã trôi qua
+        const periodsElapsed = Math.floor(monthsElapsed / termMonths);
+    
+        if (periodsElapsed < 1) return false; 
+
+        const lastTermEndDate = contractMultiPeriodEndAt(start, term, periodsElapsed);
+    
+        // Ngày rút tiền là ngày 1 của tháng sau ngày kết thúc
+        const nextWithdrawalDate = new Date(
+            lastTermEndDate.getFullYear(),
+            lastTermEndDate.getMonth() + 1, 
+            1 
+        );
+        return today.getTime() === nextWithdrawalDate.getTime();
+    };  
 
     // Fetch all active contracts
     const contractsResponse = await payload.find({
