@@ -12,6 +12,90 @@ const payload = await getPayload({
 })
 // export const PRODUCT_ID_REFERRAL = 5
 
+export const getReferralRewardBalance = async (user_id: number): Promise<number> => {
+  try {
+    const response = await payload.find({
+      collection: 'contracts',
+      where: {
+        'user': { equals: user_id },
+        'config_log': { not_equals: null },
+        'config_log.referral': { not_equals: null }
+      },
+      sort: '-balance',
+      select: {
+        balance: true
+      },
+    })
+
+    const totalBalance = response.docs.reduce((total, item) => total + item.balance, 0);
+
+    return totalBalance
+  } catch (error) {
+    console.error('Error getReferralRewardBalance:', error)
+    return 0
+  }
+}
+
+export const getTotalNumberReferral = async (): Promise<{
+  parent: {
+    id: number;
+    first_name: string;
+    last_name: string;
+  }, count: number, balance: number
+}[]> => {
+  try {
+    const response = await payload.find({
+      collection: 'user-referrals',
+      select: {
+        parent: true,
+        child: true
+      }
+      , limit: 1000
+      , depth: 1
+    })
+    const data = response.docs
+
+    function isUser(parent: number | User): parent is User {
+      return (parent as User).id !== undefined;
+    }
+
+    const parentCounts = data.reduce<{ [key: number]: { count: number, first_name: string, last_name: string } }>((acc, { parent }) => {
+      let parentId: User;
+
+      if (isUser(parent)) {
+        parentId = parent;
+      } else {
+        return acc;
+      }
+      if (acc[parentId.id]) {
+        acc[parentId.id].count++;
+      } else {
+        acc[parentId.id] = { count: 1, first_name: parentId.first_name, last_name: parentId.last_name };
+      }
+      return acc;
+    }, {});
+    const parentWithBalance = await Promise.all(
+      Object.entries(parentCounts).map(async ([parent, { count, first_name, last_name }]) => {
+        const parentId = Number(parent);
+        const balance = await getReferralRewardBalance(parentId);
+
+        return {
+          parent: { id: parentId, first_name, last_name },
+          count,
+          balance
+        };
+      })
+    );
+    const sortedParentCounts = parentWithBalance.sort((a, b) => b.count - a.count).slice(0,10);
+    return sortedParentCounts;
+  }
+  catch (error) {
+    return []
+  }
+}
+
+
+
 export const getReferralsByParentId = async (
   parentId: number,
   page: number,
@@ -59,30 +143,33 @@ export const getReferralsByParentIdWithFilter = async (
 ): Promise<{ docs: any; referral_code: string; totalPages: number; totalDocs: number }> => {
   try {
     var query
-    if(nameFilter != '' && startDate!='' && endDate!=''){
+    if (nameFilter != '' && startDate != '' && endDate != '') {
       query = {
         parent: { equals: parentId },
         referral_at: {
           greater_than_equal: startDate,
           less_than_equal: endDate,
         },
-        or:[ {'child.first_name': {like: nameFilter}}, {'child.last_name': {like: nameFilter}}, {'child.email': {like: nameFilter}}]}
-    } else if (nameFilter !=''){
+        or: [{ 'child.first_name': { like: nameFilter } }, { 'child.last_name': { like: nameFilter } }, { 'child.email': { like: nameFilter } }]
+      }
+    } else if (nameFilter != '') {
       query = {
         parent: { equals: parentId },
-        or:[ {'child.first_name': {like: nameFilter}}, {'child.last_name': {like: nameFilter}}, {'child.email': {like: nameFilter}}]} 
+        or: [{ 'child.first_name': { like: nameFilter } }, { 'child.last_name': { like: nameFilter } }, { 'child.email': { like: nameFilter } }]
+      }
     } else if (startDate != '' && endDate != '') {
       query = {
         parent: { equals: parentId },
         referral_at: {
           greater_than_equal: startDate,
           less_than_equal: endDate,
-        }}
-      }else{
-        query = {
-          parent: { equals: parentId },
         }
       }
+    } else {
+      query = {
+        parent: { equals: parentId },
+      }
+    }
 
     const response = await payload.find({
       collection: 'user-referrals',
