@@ -36,6 +36,7 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab}: Withd
   const { t } = useTranslation();
   const [withdrawAvailability, setWithdrawAvailability] = useState(false)
   const [nextWithdrawDay, setNextWithdrawDay] = useState<Date>(new Date(contract.endDate))
+  const [FiveDaysAgo, setFiveDaysAgo] = useState<Date|null>(null)
 
   useEffect(() => {
     const today = new Date();
@@ -44,6 +45,16 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab}: Withd
     if (initialEndDate.getTime() >= today.getTime() || initialEndDate.toDateString() == today.toDateString()){
       setNextWithdrawDay(getExpectedEndDate(contract.term, initialEndDate));
       setWithdrawAvailability(false);
+      setFiveDaysAgo(null)
+      return
+    }
+
+    // first withdraw day
+    let updatedWithdrawDay = getExpectedEndDate(contract.term, initialEndDate);
+    if ( updatedWithdrawDay.getTime() >= today.getTime()){
+      setNextWithdrawDay(updatedWithdrawDay)
+      setWithdrawAvailability(nextWithdrawDay.toDateString() === today.toDateString());
+      setFiveDaysAgo(null)
       return
     }
 
@@ -53,7 +64,11 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab}: Withd
       while (updatedWithdrawDay.getTime() < today.getTime()) {
         updatedWithdrawDay = getExpectedEndDate(contract.term, updatedWithdrawDay);
       }
-      setWithdrawAvailability(updatedWithdrawDay.toDateString() === today.toDateString());
+      const fiveDaysAgo = new Date(updatedWithdrawDay.setHours(0,0,0,0));
+      fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+      
+      setFiveDaysAgo(fiveDaysAgo)
+      setWithdrawAvailability(today.getTime() <= updatedWithdrawDay.getTime() && today.getTime() >= fiveDaysAgo.getTime());
       return updatedWithdrawDay;
     });
   }, [contract]);
@@ -229,7 +244,9 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab}: Withd
         <DialogHeader>
           <DialogTitle className="text-gray-900">{t('withdraw_funds')}</DialogTitle>
           <DialogDescription className="text-gray-600">
-            {t('withdrawal_condition')} {format(nextWithdrawDay, 'MM/dd/yyyy')}.
+          {FiveDaysAgo 
+          ? `${t('withdrawal_condition1')} ${format(FiveDaysAgo, 'MM/dd/yyyy')} ${t('to')} ${format(nextWithdrawDay, 'MM/dd/yyyy')}`
+          : `${t('withdrawal_condition2')} ${format(nextWithdrawDay, 'MM/dd/yyyy')}`}
           </DialogDescription>
           </DialogHeader>
       </>}</>

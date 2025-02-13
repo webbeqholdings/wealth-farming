@@ -155,7 +155,8 @@ export const vi = {
     processing: 'Đang xử lý...',
     photo_requirement: 'Vui lòng tải lên ảnh chụp màn hình có hiển thị ảnh. Các định dạng được chấp nhận: JPG, PNG, với kích thước tối đa 5MB.',
     withdrawal_amount_input: 'Nhập số tiền muốn rút',
-    withdrawal_condition: 'Hợp đồng của bạn sẽ được rút vào ngày ',
+    withdrawal_condition1: 'Hợp đồng của bạn có thể rút từ ngày ',
+    withdrawal_condition2: 'Hợp đồng của bạn có thể rút vào ngày ',
     terminated_note: 'Ghi chú',
 
     // user-profile
