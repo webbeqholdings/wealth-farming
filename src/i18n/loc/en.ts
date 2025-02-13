@@ -28,6 +28,7 @@ export const en = {
     // site-header
     profile: "Profile",
     referral_reward: "Referral Reward",
+    transfer: 'Transfer',
     login: "Login",
     log_out: "Log out",
     //investment process
@@ -162,6 +163,7 @@ export const en = {
     recent_transactions: "Recent Transactions",
     main: "Main",
     investment: "Investment",
+    withdraw: 'Withdraw',
     view_full_statement: "View Full Statement",
     crypto_wallet: "Crypto Wallet",
     add_bank_account: "Add Bank Account",
@@ -214,6 +216,16 @@ export const en = {
     action: "Action",
     crypto_details:'Enter your bank account details for deposits and withdrawals.',
     Network: 'Network',
+    failed_to_fetch: 'Failed to fetch accounts:',
+    Active: 'Active',
+    chat_tele: 'Chat with us on Telegram:',
+    error_update: 'Error during avatar update process:',
+    referral_copy: 'Referral code copied to clipboard!',
+    open_dialog: 'Opening share dialog...',
+    error_avatar: 'Error during avatar update process:',
+    error_avatar2: 'Error uploading avatar:',
+    failed_profile: 'Failed to update profile',
+    failed_date: 'Error fetching user data:',
 
     // Homepage
     get_started: "Get Started in 30 Seconds!",
@@ -402,6 +414,8 @@ export const en = {
     total_interest: 'Total Interest Earned: ${{total}}',
     x_times: 'X times:',
     amount_usd: 'Amount ($)',
+    amount_graph: 'Amount: ${{amount}}',
+    month_graph: 'Month: {{label}}',
 
     //blog
     read_more: "Read More",
@@ -419,4 +433,31 @@ export const en = {
      stay_updated:'Stay updated with our latest news and offers.',
      enter_email: 'Enter your email',
      grow_your_wealth: 'Grow your wealth with sustainable investment strategies.',
+     
+    // account/history/deposit
+    tips: 'Tips & Tricks',
+    setup: 'Set up automatic transfers to your savings account to build your wealth consistently.',
+    review: 'Review your transaction history regularly to track your spending habits.',
+    consider: 'Consider setting up alerts for large transactions to monitor your account activity.',
+    take_advantage: 'Take advantage of our investment account to potentially grow your wealth faster.',
+    pending:"Pending",
+    Amount: 'Amount',
+    Method: 'Method',
+    Confirm: 'Confirm',
+    my_deposit: 'My Deposit',
+    heads_up: 'Heads up!',
+    system_only: 'System only uses USD currency.',
+    currency_convert: 'Currency Converter',
+    bank_transfer: 'Bank Transfer',
+    scan_qr: 'SCAN THIS QR CODE',
+    upload_deposit: 'Upload Your Deposit',
+    cre_deb_card: 'Credit/Debit Card',
+    enter_USD: 'Enter amount in USD',
+    enter_USDT: 'Enter amount in USDT',
+    enter_VND: 'Enter amount in VND',
+    Transfer: 'Transfer',
+    Withdraw: 'Withdraw',
+    enter_amount: 'Enter amount',
+    my_transfer: 'My Transfer',
+    my_withdraw: 'My Withdrawal',
 }
