@@ -118,6 +118,18 @@ export function InvestmentProcessForm() {
     setEndDate(date)
   }
 
+  const getMessage = (messageField: string | object): string => {
+    if (typeof messageField === 'string') {
+      try {
+        const messageData = JSON.parse(messageField);
+        return t(messageData.key, messageData.params || {}) as string;
+      } catch (e) {
+        return t(messageField);
+      }
+    }
+    return '';
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     let profitData = []
@@ -125,9 +137,13 @@ export function InvestmentProcessForm() {
     if (startDate && endDate && depositAmount) {
       const daysDifference = differenceInDays(endDate, startDate)
       if (daysDifference < minRangeDays) {
+        const mess =  getMessage(JSON.stringify({
+          key: 'invest_period',
+          params: { minRangeDays: minRangeDays },
+        }))
         return toast({
-          title: 'Error',
-          description: `The investment period must be at least ${minRangeDays} days.`,
+          title: t('error'),
+          description: t(mess),
         })
       }
 
@@ -229,21 +245,21 @@ export function InvestmentProcessForm() {
       const response: any = await createInvestment(formData)
       if (!response?.isSuccess) {
         toast({
-          title: 'Error',
-          description: response.msg,
+          title: t('error'),
+          description: getMessage(response.msg),
         })
         return
       }
       notifyInvestment(response.data.contract)
       toast({
-        title: 'Success',
-        description: 'Investment request has been submitted.',
+        title: t('success'),
+        description: t('invest_submit'),
       })
       router.push('../../investment-contracts')
     } else {
       toast({
-        title: 'Error',
-        description: 'Please ensure all fields are filled out correctly.',
+        title: t('error'),
+        description: t('ensure_filled'),
       })
     }
   }

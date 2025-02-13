@@ -16,19 +16,12 @@ import { SiteFooter } from '@/components/site-footer'
 import { getReferralConfigRates } from '@/lib/investment-products/dynamicFundQuery'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-
-// Mock data for the ranking table
-const topReferrers = [
-  { rank: 1, username: 'J***n', referrals: 25, rewards: '$2,500' },
-  { rank: 2, username: 'S***h', referrals: 22, rewards: '$2,200' },
-  { rank: 3, username: 'M***e', referrals: 20, rewards: '$2,000' },
-  { rank: 4, username: 'A***x', referrals: 18, rewards: '$1,800' },
-  { rank: 5, username: 'L***a', referrals: 15, rewards: '$1,500' },
-]
+import { getTotalNumberReferral } from '@/lib/referrals'
 
 export default function ReferralsIntroductionPage() {
 
   const [configs, setConfigs] = useState([])
+  const [top_referral, setTopReferral] = useState([])
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -36,13 +29,41 @@ export default function ReferralsIntroductionPage() {
       const config = await getReferralConfigRates()
       setConfigs(config)
     }
+    const fetchTopReferral = async () => {
+      const data = await getTotalNumberReferral()
+      setTopReferral(data)
+    }
+    fetchTopReferral()
     fetchConfig()
   }, [])
 
-  
+  //Load top referral
+  //** */
+  useEffect(() => {
+    const fetchTopReferral = async () => {
+      const top_referral = (await getTotalNumberReferral());
+      const reformat_top_referral = await Promise.all(
+        top_referral.map(async (data: {
+          parent: {
+            id: number;
+            first_name: string;
+            last_name: string;
+          }, count: number, balance: number
+        }, index: number) => ({
+          rank: index + 1,
+          username: `${data.parent.first_name} ${data.parent.last_name}`,
+          referrals: data.count,
+          rewards: `$${data.balance.toLocaleString()}`
+        }))
+      );
+      setTopReferral(reformat_top_referral)
+    }
+    fetchTopReferral()
+  }, [])
+
   return (
     <div>
-      <SiteHeader/>
+      <SiteHeader />
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold mb-6 text-center">{t('grow_wealth')}</h1>
         <p className="text-xl text-muted-foreground mb-8 text-center">
@@ -128,7 +149,7 @@ export default function ReferralsIntroductionPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {topReferrers.map((referrer) => (
+                {top_referral && top_referral.map((referrer: any) => (
                   <TableRow key={referrer.rank}>
                     <TableCell className="font-medium">{referrer.rank}</TableCell>
                     <TableCell>{referrer.username}</TableCell>
@@ -190,7 +211,7 @@ export default function ReferralsIntroductionPage() {
           </CardContent>
         </Card>
       </div>
-      <SiteFooter/>
+      <SiteFooter />
     </div>
   )
 }

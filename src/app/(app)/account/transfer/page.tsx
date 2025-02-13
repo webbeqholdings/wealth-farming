@@ -188,7 +188,7 @@ export default function TransferPage() {
 
       if (response.isSuccess) {
         toast({
-          title: 'Transfer Successful',
+          title:t('transfer_sucess'),
         })
       }
     } catch (error) {
@@ -217,9 +217,9 @@ export default function TransferPage() {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="fromAccount">{t('tranfer_from')}</Label>
-                  <Select value={fromAccount} onValueChange={handleFromAccountChange}>
+                  <Select onValueChange={handleFromAccountChange}>
                     <SelectTrigger id="fromAccount">
-                      <SelectValue placeholder="Select account" />
+                      <SelectValue placeholder={t("select_account")} />
                     </SelectTrigger>
                     <SelectContent>
                       {listAccounts.map((account) => (
@@ -244,9 +244,9 @@ export default function TransferPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="toAccount">{t('tranfer_to')}</Label>
-                  <Select value={toAccount} onValueChange={handleToAccountChange}>
+                  <Select onValueChange={handleToAccountChange}>
                     <SelectTrigger id="toAccount">
-                      <SelectValue placeholder="Select account" />
+                      <SelectValue placeholder={t("select_account")} />
                     </SelectTrigger>
                     <SelectContent>
                       {listAccounts.map((account) => (
