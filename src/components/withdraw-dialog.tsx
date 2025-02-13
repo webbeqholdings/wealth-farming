@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,7 @@ import { notifyWithdrawlContracts } from '@/lib/telegram';
 import { getPaymentTransfer } from '@/lib/paymentTransfer'
 import { endOfMonth, addMonths, endOfYear, differenceInDays } from 'date-fns';
 import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
 
 interface WithdrawDialogProps {
   isOpen: boolean;
@@ -26,14 +27,36 @@ interface WithdrawDialogProps {
     profit: number
   };
   setActiveTab: (tab: string) => void;
-  terminated_avail: boolean;
 }
 
-export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab, terminated_avail }: WithdrawDialogProps) {
+export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab}: WithdrawDialogProps) {
   const [amount, setAmount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const { t } = useTranslation();
+  const [withdrawAvailability, setWithdrawAvailability] = useState(false)
+  const [nextWithdrawDay, setNextWithdrawDay] = useState<Date>(new Date(contract.endDate))
+
+  useEffect(() => {
+    const today = new Date();
+    const initialEndDate = new Date(contract.startDate);
+
+    if (initialEndDate.getTime() >= today.getTime() || initialEndDate.toDateString() == today.toDateString()){
+      setNextWithdrawDay(getExpectedEndDate(contract.term, initialEndDate));
+      setWithdrawAvailability(false);
+      return
+    }
+
+    setNextWithdrawDay(initialEndDate);
+    setNextWithdrawDay((prevWithdrawDay) => {
+      let updatedWithdrawDay = prevWithdrawDay;
+      while (updatedWithdrawDay.getTime() < today.getTime()) {
+        updatedWithdrawDay = getExpectedEndDate(contract.term, updatedWithdrawDay);
+      }
+      setWithdrawAvailability(updatedWithdrawDay.toDateString() === today.toDateString());
+      return updatedWithdrawDay;
+    });
+  }, [contract]);
 
   // Calculate expected end dates for each term
   const getExpectedEndDate = (term: string, start: Date) => {
@@ -41,57 +64,42 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab, termin
     const currentDate = start.getDate();
     switch (term) {
       case 'monthly':
-        if (currentMonth == 1 && currentDate == 1) {
-          return endOfMonth(start); // End of the current month
+        if (currentDate == 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 1, 1)
+          return new Date(returnDate - 1);
         }
-        if ((currentMonth == 1 && currentDate > 1) || (currentMonth > 1 && currentMonth < 12)) {
-          const nextMonthStart: any = new Date(start.getFullYear(), currentMonth + 1, 1); // First day of the month after next
-          return new Date(nextMonthStart - 1); // Subtract 1 millisecond to get the last day of the next month
-        }
-        if (currentMonth == 12 && currentDate > 1) {
-          const nextYear = start.getFullYear() + 1;
-          return new Date(nextYear, 1, 31);
+        if (currentDate > 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 2, 1)
+          return new Date(returnDate - 1);
         }
       case 'quarterly': {
-        // End of the current quarter
-        if (currentMonth == 1 && currentDate == 1) {
-          return new Date(start.getFullYear(), 3, 31);
+        if (currentDate == 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 3, 1)
+          return new Date(returnDate - 1);
         }
-        if ((currentMonth == 4 && currentDate == 1) || (currentMonth == 1 && currentDate > 1) || (currentMonth >= 2 && currentMonth <= 3)) {
-          return new Date(start.getFullYear(), 6, 30);
-        }
-        if ((currentMonth == 7 && currentDate == 1) || (currentMonth == 4 && currentDate > 1) || (currentMonth >= 5 && currentMonth <= 6)) {
-          return new Date(start.getFullYear(), 9, 30);
-        }
-        if ((currentMonth == 10 && currentDate == 1) || (currentMonth == 7 && currentDate > 1) || (currentMonth >= 8 && currentMonth <= 9)) {
-          return new Date(start.getFullYear(), 12, 31);
-        }
-        if ((currentMonth == 10 && currentDate > 1) || (currentMonth > 10)) {
-          const nextYear = start.getFullYear() + 1;
-          return new Date(nextYear, 3, 31);
+        if (currentDate > 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 4, 1)
+          return new Date(returnDate - 1);
         }
       }
       case 'semester': {
-        // Determine the semester and return its last date
-        if (currentMonth == 1 && currentDate == 1) {
-          return new Date(start.getFullYear(), 6, 30);
+        if (currentDate == 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 6, 1)
+          return new Date(returnDate - 1);
         }
-        if ((currentMonth == 7 || currentDate == 1) || (currentMonth == 1 && currentDate > 1) || (currentMonth >= 2 && currentMonth <= 6)) {
-          return new Date(start.getFullYear(), 12, 31);
-        }
-        if ((currentMonth == 7 && currentDate > 1) || (currentMonth > 7)) {
-          const nextYear = start.getFullYear() + 1;
-          return new Date(nextYear, 6, 30);
+        if (currentDate > 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 7, 1)
+          return new Date(returnDate - 1);
         }
       }
       case 'annually': {
-        // End of the year
-        if (currentMonth == 1 && currentDate == 1) {
-          return endOfYear(start);
+        if (currentDate == 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 12, 1)
+          return new Date(returnDate - 1);
         }
-        if ((currentMonth == 1 && currentDate > 1) || currentMonth > 1) {
-          const nextYear = start.getFullYear() + 1;
-          return new Date(nextYear, 12, 31);
+        if (currentDate > 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 13, 1)
+          return new Date(returnDate - 1);
         }
       }
       default:
@@ -130,16 +138,16 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab, termin
 
     switch (term) {
       case 'monthly':
-        termDescription = 'first month';
+        termDescription = 'first_month';
         break;
       case 'quarterly':
-        termDescription = 'first quarter';
+        termDescription = 'first_quarter';
         break;
       case 'semester':
-        termDescription = 'first semester';
+        termDescription = 'first_semester';
         break;
       case 'annually':
-        termDescription = 'first year';
+        termDescription = 'first_year';
         break;
       default:
         throw new Error('Unsupported term.');
@@ -217,16 +225,16 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab, termin
     <Dialog open={isOpen} onOpenChange={handleDialogClose}>
       <DialogContent className="sm:max-w-[425px] bg-white border-gray-300 shadow-md">
 
-      <>{!terminated_avail && <> 
+      <>{!withdrawAvailability && <> 
         <DialogHeader>
           <DialogTitle className="text-gray-900">{t('withdraw_funds')}</DialogTitle>
           <DialogDescription className="text-gray-600">
-            {t('withdrawal_condition')}
+            {t('withdrawal_condition')} {format(nextWithdrawDay, 'MM/dd/yyyy')}.
           </DialogDescription>
           </DialogHeader>
       </>}</>
 
-      <>{terminated_avail && <>
+      <>{withdrawAvailability && <>
         <DialogHeader>
           <DialogTitle className="text-gray-900">{t('withdraw_funds')}</DialogTitle>
           <DialogDescription className="text-gray-600">
@@ -236,7 +244,7 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab, termin
         <form onSubmit={handleWithdraw}>
           <div className="grid gap-4">
             <div className="bg-yellow-100 text-yellow-800 text-sm rounded-md p-3">
-              <strong>{t('note')}</strong>
+              <strong>{t('note')} </strong>
               {t('withdrawal_profit_condition', { condition: t(message) })}
             </div>
             <div className="grid gap-2">
