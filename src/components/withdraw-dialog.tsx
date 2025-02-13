@@ -41,7 +41,7 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab}: Withd
     const today = new Date();
     const initialEndDate = new Date(contract.startDate);
 
-    if (initialEndDate.getTime() > today.getTime()){
+    if (initialEndDate.getTime() >= today.getTime() || initialEndDate.toDateString() == today.toDateString()){
       setNextWithdrawDay(getExpectedEndDate(contract.term, initialEndDate));
       setWithdrawAvailability(false);
       return
@@ -53,8 +53,7 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab}: Withd
       while (updatedWithdrawDay.getTime() < today.getTime()) {
         updatedWithdrawDay = getExpectedEndDate(contract.term, updatedWithdrawDay);
       }
-      setWithdrawAvailability(updatedWithdrawDay.toDateString() === today.toDateString() 
-      && initialEndDate.toDateString() !== today.toDateString());
+      setWithdrawAvailability(updatedWithdrawDay.toDateString() === today.toDateString());
       return updatedWithdrawDay;
     });
   }, [contract]);
