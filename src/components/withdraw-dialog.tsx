@@ -47,7 +47,8 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab}: Withd
       while (updatedWithdrawDay.getTime() < today.getTime()) {
         updatedWithdrawDay = getExpectedEndDate(contract.term, updatedWithdrawDay);
       }
-      setWithdrawAvailability(updatedWithdrawDay.toDateString() === today.toDateString());
+      setWithdrawAvailability(updatedWithdrawDay.toDateString() === today.toDateString() 
+      && initialEndDate.toDateString() !== today.toDateString());
       return updatedWithdrawDay;
     });
   }, [contract]);
