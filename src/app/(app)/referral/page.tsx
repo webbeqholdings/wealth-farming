@@ -16,8 +16,7 @@ import { SiteFooter } from '@/components/site-footer'
 import { getReferralConfigRates } from '@/lib/investment-products/dynamicFundQuery'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { getCountChildren, getReferralRewardBalance, getTotalNumberReferral } from '@/lib/referrals'
-import { User } from 'payload'
+import { getTotalNumberReferral } from '@/lib/referrals'
 
 export default function ReferralsIntroductionPage() {
 
@@ -29,7 +28,6 @@ export default function ReferralsIntroductionPage() {
     const fetchConfig = async () => {
       const config = await getReferralConfigRates()
       setConfigs(config)
-      console.log(getTotalNumberReferral())
     }
     const fetchTopReferral = async () => {
       const data = await getTotalNumberReferral()
@@ -151,7 +149,7 @@ export default function ReferralsIntroductionPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {top_referral.map((referrer: any) => (
+                {top_referral && top_referral.map((referrer: any) => (
                   <TableRow key={referrer.rank}>
                     <TableCell className="font-medium">{referrer.rank}</TableCell>
                     <TableCell>{referrer.username}</TableCell>
