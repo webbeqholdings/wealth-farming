@@ -145,7 +145,7 @@ export const createInvestment = async (formData: any) => {
     collection: 'accounts',
     where: {
       user: { equals: Number(userId) },
-      type: { equals: 'investment'}
+      type: { equals: 'investment' }
     },
   })
   const amountAvailable = await getSumAmountBalanceByAccount(Number(accountInvesment.docs[0].id))
@@ -221,6 +221,8 @@ export const createInvestment = async (formData: any) => {
   if (
     userReferral &&
     typeof userReferral.docs[0]?.parent === 'object' &&
+    userReferral.docs[0]?.parent !== null &&
+    typeof userReferral.docs[0]?.child === 'object' &&
     userReferral.docs[0]?.parent !== null
   ) {
     const configRate = await getCurrentLevelRate(userId)
@@ -239,6 +241,17 @@ export const createInvestment = async (formData: any) => {
         product_log: {
           data: product_doc,
         },
+        config_log: {
+          referral: {
+            id: userReferral.docs[0].id,
+            user: {
+              id: userReferral.docs[0].child.id,
+              mail: userReferral.docs[0].child.email,
+              first_name: userReferral.docs[0].child.first_name,
+              last_name: userReferral.docs[0].child.last_name,
+            },
+          }
+        }
       },
     })
   }
