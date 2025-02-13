@@ -73,7 +73,8 @@ interface Withdrawal {
   amount: number
   date: string
   status: 'completed' | 'pending' | 'failed'
-  message: string
+  message: string,
+  note: string,
 }
 
 export function InvestmentContracts() {
@@ -657,7 +658,7 @@ export function InvestmentContracts() {
                                                     </span>
                                                 </TableCell>
                                                 <TableCell>
-                                                    {getMessage(withdrawal.message)}
+                                                    {(withdrawal.note != '') && (withdrawal.status == 'failed') ? withdrawal.note : getMessage(withdrawal.message)}
                                                 </TableCell>
                                             </TableRow>
                                         ))}

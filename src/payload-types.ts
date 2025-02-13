@@ -294,6 +294,7 @@ export interface Contract {
     | number
     | boolean
     | null;
+  note?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -854,6 +855,7 @@ export interface ContractsSelect<T extends boolean = true> {
   note_log?: T;
   product_log?: T;
   config_log?: T;
+  note?: T;
   updatedAt?: T;
   createdAt?: T;
 }
