@@ -56,7 +56,7 @@ export function BreakingNewsCarousel() {
         // Transform API response to the desired format
         const formattedNews = data.docs.map((post: Blog) => ({
           title: post.title,
-          content: post.content.root.children[0].children[0].text,
+          content: post.content?.root?.children[0].children[0].text,
           date: new Date(post.createdAt).toISOString().split('T')[0], // Format date as YYYY-MM-DD
           slug: post.slug,
         }));
@@ -95,7 +95,7 @@ export function BreakingNewsCarousel() {
                       </div>
                     </CardHeader>
                     <CardContent className="flex-grow">
-                      <p className="text-sm text-muted-foreground">{item.content}</p>
+                      <p className="text-sm text-muted-foreground"> <div dangerouslySetInnerHTML={{ __html: item.content }}/></p>
                     </CardContent>
                   </Card>
                 </div>
