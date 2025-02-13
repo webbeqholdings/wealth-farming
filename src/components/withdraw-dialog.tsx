@@ -41,6 +41,12 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab}: Withd
     const today = new Date();
     const initialEndDate = new Date(contract.startDate);
 
+    if (initialEndDate.getTime() >= today.getTime() || initialEndDate.toDateString() == today.toDateString()){
+      setNextWithdrawDay(getExpectedEndDate(contract.term, initialEndDate));
+      setWithdrawAvailability(false);
+      return
+    }
+
     setNextWithdrawDay(initialEndDate);
     setNextWithdrawDay((prevWithdrawDay) => {
       let updatedWithdrawDay = prevWithdrawDay;
