@@ -39,7 +39,7 @@ export function WithdrawDialog({ isOpen, onClose, contract, setActiveTab}: Withd
 
   useEffect(() => {
     const today = new Date();
-    const initialEndDate = new Date(contract.endDate);
+    const initialEndDate = new Date(contract.startDate);
 
     setNextWithdrawDay(initialEndDate);
     setNextWithdrawDay((prevWithdrawDay) => {
