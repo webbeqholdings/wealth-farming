@@ -153,7 +153,7 @@ export const createInvestment = async (formData: any) => {
   if (amount <= 0) {
     return {
       isSuccess: false,
-      msg: 'invalid amount',
+      msg: 'invalid_amount',
     }
   }
 
@@ -171,23 +171,28 @@ export const createInvestment = async (formData: any) => {
   if (!product_doc) {
     return {
       isSuccess: false,
-      msg: 'invalid product',
+      msg: 'invalid_product',
     }
   }
 
   const min_investment = product.docs[0].min_investment
 
   if (amount < min_investment) {
+    const mess =  JSON.stringify({
+      key: 'min_invest',
+      params: { amount: min_investment},
+    })
+    console.log('mess', mess)
     return {
       isSuccess: false,
-      msg: `Minimum amount investment is ${min_investment}`,
+      msg: mess,
     }
   }
 
   if (amount > amountAvailable) {
     return {
       isSuccess: false,
-      msg: 'Amount account investment not enough',
+      msg: 'account_not_enough',
     }
   }
 
@@ -272,7 +277,7 @@ export const createInvestment = async (formData: any) => {
 
   return {
     isSuccess: true,
-    msg: 'Deal Success',
+    msg: 'deal_success',
     data: {
       transaction: transaction_doc,
       contract: contract_doc,
@@ -362,7 +367,7 @@ export const createDeposit = async (inputData: any) => {
   if (!amount) {
     return {
       isSuccess: false,
-      msg: 'Amount Empty',
+      msg: 'amount_empty',
       data: {},
     }
   }
@@ -383,14 +388,14 @@ export const createDeposit = async (inputData: any) => {
   if (!response) {
     return {
       isSuccess: false,
-      msg: 'Deposit Failed',
+      msg: 'deposit_fail',
       data: {},
     }
   }
 
   return {
     isSuccess: true,
-    msg: 'Deposit Success',
+    msg: 'deposit_successs',
     data: response,
   }
 }
@@ -404,7 +409,7 @@ export const createWithdrawal = async (inputData: any) => {
   if (!amount) {
     return {
       isSuccess: false,
-      msg: 'Amount Empty',
+      msg: 'amount_empty',
       data: {},
     }
   }
@@ -426,20 +431,20 @@ export const createWithdrawal = async (inputData: any) => {
     if (!response) {
       return {
         isSuccess: false,
-        msg: 'Withdraw Failed',
+        msg: 'withdraw_fail',
         data: {},
       }
     }
 
     return {
       isSuccess: true,
-      msg: 'Withdraw Success',
+      msg: 'withdraw_success',
       data: response,
     }
   } else {
     return {
       isSuccess: false,
-      msg: 'Amount account main not enough',
+      msg: 'main_not_enough',
       data: {},
     }
   }
@@ -454,7 +459,7 @@ export const createTransfer = async (inputData: any) => {
   if (!amount) {
     return {
       isSuccess: false,
-      msg: 'Amount Empty',
+      msg: 'amount_empty',
       data: {},
     }
   }
@@ -474,14 +479,14 @@ export const createTransfer = async (inputData: any) => {
   if (!response) {
     return {
       isSuccess: false,
-      msg: 'Transfer Failed',
+      msg: 'transfer_failed',
       data: {},
     }
   }
 
   return {
     isSuccess: true,
-    msg: 'Transfer Success',
+    msg: 'transfer_success',
     data: response,
   }
 }
