@@ -18,17 +18,17 @@ const calculateProfit = async (term: string, availableBalance: any, startDate: D
     let balanceToday = availableBalance;
     const today = new Date();
 
+    if(daysSinceStart < 0){
+        profitToday = 0;
+        balanceToday = availableBalance;
+        return type === 'profit' ? profitToday : balanceToday;
+    }
+    
     //Calculate profit and balance for not have 1 round month:
     if ((differenceInMonths(today, parsedStartDate) === 0 && !(isStartOfMonth(parsedStartDate) && isEndOfMonth(today))) || 
         (differenceInMonths(today, parsedStartDate) === 1 && !isStartOfMonth(parsedStartDate) && !isEndOfMonth(today))) {
         profitToday = (daysSinceStart * availableBalance * 20) / (255 * 100);
         balanceToday = availableBalance + profitToday;       
-        return type === 'profit' ? profitToday : balanceToday;
-    }
-
-    if(daysSinceStart < 0){
-        profitToday = 0;
-        balanceToday = availableBalance;
         return type === 'profit' ? profitToday : balanceToday;
     }
 
