@@ -38,6 +38,8 @@ export const vi = {
     investment_process_title: "Giả lập kế hoạch tài chính",
     investment_process_table: "Bảng Lãi",
     investment_process_chart_decs: "Biểu đồ số dư theo thời gian",
+    Investment: 'Tài khoản đầu tư',
+    Main: 'Tài khoản chính',
     
     // /transaction
     // /menu-label

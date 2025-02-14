@@ -88,11 +88,6 @@ const Contracts: CollectionConfig = {
       type: 'json',
       label: 'Config Log',
     },
-    {
-      name: 'note',
-      label: 'Note',
-      type: 'text',
-    },
   ],
 }
 
