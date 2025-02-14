@@ -185,7 +185,6 @@ export const createInvestment = async (formData: any) => {
       key: 'min_invest',
       params: { amount: min_investment},
     })
-    console.log('mess', mess)
     return {
       isSuccess: false,
       msg: mess,
