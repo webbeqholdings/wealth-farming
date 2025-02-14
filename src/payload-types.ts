@@ -294,7 +294,6 @@ export interface Contract {
     | number
     | boolean
     | null;
-  note?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -376,6 +375,7 @@ export interface Transaction {
   deposit_screenshot?: (number | null) | Media;
   type: 'deposit' | 'withdraw' | 'bonus' | 'transfer' | 'investment' | 'referral_reward';
   message?: string | null;
+  note?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -518,8 +518,8 @@ export interface Notification {
   id: number;
   user?: (number | null) | User;
   title: string;
-  description: string;
-  date: string;
+  description?: string | null;
+  date?: string | null;
   type: 'opportunity' | 'account' | 'alert' | 'transaction' | 'security' | 'event';
   content?: {
     root: {
@@ -855,7 +855,6 @@ export interface ContractsSelect<T extends boolean = true> {
   note_log?: T;
   product_log?: T;
   config_log?: T;
-  note?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -933,6 +932,7 @@ export interface TransactionsSelect<T extends boolean = true> {
   deposit_screenshot?: T;
   type?: T;
   message?: T;
+  note?: T;
   updatedAt?: T;
   createdAt?: T;
 }
