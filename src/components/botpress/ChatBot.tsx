@@ -5,7 +5,7 @@ const ChatBot = () => {
   useEffect(() => {
     if (typeof window !== "undefined" && (window as any).botpress) {
       (window as any).botpress.init({
-        "botId": "ccf9936b-e976-4add-96de-6f8719acb9c4",
+        "botId": "bac514d4-4fbe-41c3-9d9e-c5efc5919e9b",
         "configuration": {
           "botName": "Wealth Farming",
           "website": {},
@@ -19,7 +19,7 @@ const ChatBot = () => {
           "fontFamily": "inter",
           "radius": 1
         },
-        "clientId": "8000cc50-3979-48aa-90f5-50a2ec7437bd",
+        "clientId": "6a8aebe0-1c97-45fd-addd-cb677c876a88",
         "user": {
           "data": {
             "uid": localStorage.getItem('user_id')
@@ -35,10 +35,6 @@ const ChatBot = () => {
        })
     }
   }, []);
-
-  const sendMessage = () => {
-    
-  };
 
   return (
     <>
