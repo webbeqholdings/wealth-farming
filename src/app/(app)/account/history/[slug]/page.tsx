@@ -44,6 +44,7 @@ import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { useTranslation } from 'react-i18next'
 import { me } from '@/lib/me'
+import { useGetMessage } from '@/utilities/getMessage'
 
 // Mock data for chart
 const chartData = [
@@ -76,6 +77,7 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
   const [endDate, setEndDate] = useState<Date>()
   // const [user, setUser] = useState(null)
   const [accountData, setAccountData] = useState(null)
+  const getMessage = useGetMessage()
 
   useEffect(() => {
     const fetchAccounts = async () => {
@@ -352,7 +354,7 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
                   ) : (
                     ''
                   )}
-                  {activeTab === 'bonus' ? (
+                  {(activeTab === 'bonus' || activeTab === 'withdraw' || activeTab === 'deposit') ? (
                     <TableHead>{t('portfolio_withdraw_message')}</TableHead>
                   ) : (
                     ''
@@ -443,7 +445,11 @@ export default function HistoryPage({ params }: { params: Promise<{ slug: string
                       ) : (
                         ''
                       )}
-                      {activeTab === 'bonus' ? <TableHead>{t(`${transaction.message}`)}</TableHead> : ''}
+                      {(activeTab === 'bonus' || activeTab == 'withdraw' || activeTab == 'deposit') ? 
+                      <TableHead>
+                        {(transaction.note != null && transaction.status == 'failed') ? 
+                        transaction.note : (transaction.message != null ? getMessage(transaction.message): '')}
+                      </TableHead> : ''}
                     </TableRow>
                   ))}
               </TableBody>
