@@ -737,11 +737,11 @@ export const buildProfitLogsAnnualy = async (principal: number, startDate: Date,
   }
   let _firstDayCount = differenceInDays(lastDayOfMonth(startDate), startDate) + 1
   let _dayCount = 0
-  if (!isStartOfMonth(startDate)) {
-    _dayCount = _firstDayCount
-  }
   let _bestTerm = null
-  let _bestTermRate = null
+  let _bestTermRate = null 
+  let _firstProfit = 0
+  let _firstBalance = 0
+  let isSetFirstMonth = 1
   for (const key of ['Annually', 'Semester', 'Quarterly', 'Monthly']) {
     if (mapMonths[key].length == 0) continue
 
@@ -755,6 +755,15 @@ export const buildProfitLogsAnnualy = async (principal: number, startDate: Date,
       _bestTerm = key
       _bestTermRate = rate
     }
+
+    if (!isStartOfMonth(startDate) && isSetFirstMonth) {
+      _dayCount = _firstDayCount
+      _firstProfit = (principal * _bestTermRate * _firstDayCount) / getDaysInMonth(startDate)
+      _firstBalance = _firstProfit + principal
+      _balance = _firstBalance
+      isSetFirstMonth = 0
+    }
+    
     for (const mm of mapMonths[key]) {
       let _profit = _balance * rate
       _balance = _balance + _profit
@@ -773,16 +782,14 @@ export const buildProfitLogsAnnualy = async (principal: number, startDate: Date,
   }
 
   if (!isStartOfMonth(startDate)) {
-    let __days = _firstDayCount
-    let _profit = (principal * _bestTermRate * __days) / getDaysInMonth(startDate)
-    _balance = _balance + _profit
+
     profitLogs.unshift({
       fromDate: startDate,
       toDate: lastDayOfMonth(startDate),
       rate: _bestTermRate,
-      balance: principal + _profit,
-      profit: _profit,
-      days: __days,
+      balance: _firstBalance,
+      profit: _firstProfit,
+      days: _firstDayCount,
       term: _bestTerm,
       message: _bestTerm + ' Partial',
     })
@@ -876,11 +883,11 @@ export const buildProfitLogsSemester = async (
   }
   let _firstDayCount = differenceInDays(lastDayOfMonth(startDate), startDate) + 1
   let _dayCount = 0
-  if (!isStartOfMonth(startDate)) {
-    _dayCount = _firstDayCount
-  }
   let _bestTerm = null
   let _bestTermRate = null
+  let _firstProfit = 0
+  let _firstBalance = 0
+  let isSetFirstMonth = 1
   for (const key of ['Annually', 'Semester', 'Quarterly', 'Monthly']) {
     if (mapMonths[key].length == 0) continue
 
@@ -892,6 +899,14 @@ export const buildProfitLogsSemester = async (
     if (_bestTerm == null) {
       _bestTerm = key
       _bestTermRate = rate
+    }
+
+    if (!isStartOfMonth(startDate) && isSetFirstMonth) {
+      _dayCount = _firstDayCount
+      _firstProfit = (principal * _bestTermRate * _firstDayCount) / getDaysInMonth(startDate)
+      _firstBalance = _firstProfit + principal
+      _balance = _firstBalance
+      isSetFirstMonth = 0
     }
 
     for (const mm of mapMonths[key]) {
@@ -912,16 +927,14 @@ export const buildProfitLogsSemester = async (
   }
 
   if (!isStartOfMonth(startDate)) {
-    let __days = _firstDayCount
-    let _profit = (principal * _bestTermRate * __days) / getDaysInMonth(startDate)
-    _balance = _balance + _profit
+
     profitLogs.unshift({
       fromDate: startDate,
       toDate: lastDayOfMonth(startDate),
       rate: _bestTermRate,
-      balance: principal + _profit,
-      profit: _profit,
-      days: __days,
+      balance: _firstBalance,
+      profit: _firstProfit,
+      days: _firstDayCount,
       term: _bestTerm,
       message: _bestTerm + ' Partial',
     })
@@ -1004,11 +1017,12 @@ export const buildProfitLogsQuarterly = async (
   }
   let _firstDayCount = differenceInDays(lastDayOfMonth(startDate), startDate) + 1
   let _dayCount = 0
-  if (!isStartOfMonth(startDate)) {
-    _dayCount = _firstDayCount
-  }
   let _bestTerm = null
   let _bestTermRate = null
+  let _firstProfit = 0
+  let _firstBalance = 0
+  let isSetFirstMonth = 1
+
   for (const key of ['Annually', 'Semester', 'Quarterly', 'Monthly']) {
     if (mapMonths[key].length == 0) continue
 
@@ -1020,6 +1034,14 @@ export const buildProfitLogsQuarterly = async (
     if (_bestTerm == null) {
       _bestTerm = key
       _bestTermRate = rate
+    }
+
+    if (!isStartOfMonth(startDate) && isSetFirstMonth) {
+      _dayCount = _firstDayCount
+      _firstProfit = (principal * _bestTermRate * _firstDayCount) / getDaysInMonth(startDate)
+      _firstBalance = _firstProfit + principal
+      _balance = _firstBalance
+      isSetFirstMonth = 0
     }
 
     for (const mm of mapMonths[key]) {
@@ -1040,16 +1062,13 @@ export const buildProfitLogsQuarterly = async (
   }
 
   if (!isStartOfMonth(startDate)) {
-    let __days = _firstDayCount
-    let _profit = (principal * _bestTermRate * __days) / getDaysInMonth(startDate)
-    _balance = _balance + _profit
     profitLogs.unshift({
       fromDate: startDate,
       toDate: lastDayOfMonth(startDate),
       rate: _bestTermRate,
-      balance: principal + _profit,
-      profit: _profit,
-      days: __days,
+      balance: _firstBalance,
+      profit: _firstProfit,
+      days: _firstDayCount,
       term: _bestTerm,
       message: _bestTerm + ' Partial',
     })
@@ -1119,12 +1138,10 @@ export const buildProfitLogsMonthly = async (principal: number, startDate: Date,
   mapMonths.Monthly = flatMapMonths
   let _firstDayCount = differenceInDays(lastDayOfMonth(startDate), startDate) + 1
   let _dayCount = 0
-  if (!isStartOfMonth(startDate)) {
-    _dayCount = _firstDayCount
-  }
-
   let _bestTerm = null
   let _bestTermRate = null
+  let _firstProfit = 0
+  let _firstBalance = 0
   for (const key of ['Monthly']) {
     if (mapMonths[key].length == 0) continue
 
@@ -1136,6 +1153,13 @@ export const buildProfitLogsMonthly = async (principal: number, startDate: Date,
     if (_bestTerm == null) {
       _bestTerm = key
       _bestTermRate = rate
+    }
+
+    if (!isStartOfMonth(startDate)) {
+      _dayCount = _firstDayCount
+      _firstProfit = (principal * _bestTermRate * _firstDayCount) / getDaysInMonth(startDate)
+      _firstBalance = _firstProfit + principal
+      _balance = _firstBalance
     }
 
     for (const mm of mapMonths[key]) {
@@ -1156,16 +1180,14 @@ export const buildProfitLogsMonthly = async (principal: number, startDate: Date,
   }
 
   if (!isStartOfMonth(startDate)) {
-    let __days = _firstDayCount
-    let _profit = (principal * _bestTermRate * __days) / getDaysInMonth(startDate)
-    _balance = _balance + _profit
+    
     profitLogs.unshift({
       fromDate: startDate,
       toDate: lastDayOfMonth(startDate),
       rate: _bestTermRate,
-      balance: principal + _profit,
-      profit: _profit,
-      days: __days,
+      balance: _firstBalance,
+      profit: _firstProfit,
+      days: _firstDayCount,
       term: _bestTerm,
       message: _bestTerm + ' Partial',
     })
