@@ -35,6 +35,8 @@ export const en = {
     investment_process_title: "Financial Planning Simulator",
     investment_process_table: "Profit Table",
     investment_process_chart_decs: "Representation of balance over time",
+    Investment: 'Investment',
+    Main: 'Main',
     
     // /transaction
     // /menu-label
