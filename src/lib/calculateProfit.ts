@@ -5,18 +5,26 @@ import {
     buildProfitLogsMonthly,
 } from '@/lib/investment-products/dynamicFund'
 import { format, getYear } from 'date-fns';
+import {
+    isStartOfMonth,
+    isEndOfMonth,
+    differenceInMonths
+  } from '@/utilities/formatDateTime'
 
 const calculateProfit = async (term: string, availableBalance: any, startDate: Date, type: string) => {
     const parsedStartDate = new Date(startDate);
     const daysSinceStart = Math.floor((new Date().getTime() - parsedStartDate.getTime()) / (1000 * 60 * 60 * 24))
     let profitToday = 0;
     let balanceToday = availableBalance;
+    const today = new Date();
 
-    // if (daysSinceStart <= 30 && daysSinceStart >= 0) {
-    //     profitToday = (daysSinceStart * availableBalance * 20) / (255 * 100);
-    //     balanceToday = availableBalance + profitToday;       
-    //     return type === 'profit' ? profitToday : balanceToday;
-    // }
+    //Calculate profit and balance for not have 1 round month:
+    if ((differenceInMonths(today, parsedStartDate) === 0 && !(isStartOfMonth(parsedStartDate) && isEndOfMonth(today))) || 
+        (differenceInMonths(today, parsedStartDate) === 1 && !isStartOfMonth(parsedStartDate) && !isEndOfMonth(today))) {
+        profitToday = (daysSinceStart * availableBalance * 20) / (255 * 100);
+        balanceToday = availableBalance + profitToday;       
+        return type === 'profit' ? profitToday : balanceToday;
+    }
 
     if(daysSinceStart < 0){
         profitToday = 0;
@@ -24,7 +32,6 @@ const calculateProfit = async (term: string, availableBalance: any, startDate: D
         return type === 'profit' ? profitToday : balanceToday;
     }
 
-    const today = new Date();
     let build;
 
     switch (term) {

@@ -7,6 +7,7 @@ import { withdrawInvestment } from '@/lib/contract';
 import { getPaymentTransfer } from '@/lib/paymentTransfer';
 import { object } from 'zod';
 import { contractMultiPeriodEndAt } from '@/lib/investment-products/dynamicFund'
+import { differenceInMonths } from '@/utilities/formatDateTime'
 
 export const updateProfitHandler: TaskHandler<{
     input: {};
@@ -96,13 +97,6 @@ export const updateProfitHandler: TaskHandler<{
         const nextMonth = new Date(start.getFullYear(), start.getMonth() + 1, 1);
         return nextMonth;
     }
-
-    const differenceInMonths = (date1: Date, date2: Date): number => {
-        const yearDiff = date1.getFullYear() - date2.getFullYear()
-        const monthDiff = date1.getMonth() - date2.getMonth()
-        
-        return yearDiff * 12 + monthDiff
-    };
     
     const checkTermFullness = (startDate: any, term: any) => {
         const start = getBeginningOfNextMonth(startDate)

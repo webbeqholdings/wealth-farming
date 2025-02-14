@@ -516,3 +516,10 @@ export function removeSubArray(mainArray: string[], subArray: string[]) {
 
   return mainArray.slice()
 }
+
+export function differenceInMonths(date1: Date, date2: Date) {
+  const yearDiff = date1.getFullYear() - date2.getFullYear()
+  const monthDiff = date1.getMonth() - date2.getMonth()
+  
+  return yearDiff * 12 + monthDiff
+};
