@@ -14,6 +14,7 @@ interface Withdrawal {
   date: string
   status: 'completed' | 'pending' | 'failed'
   message: string
+  note: string
 }
 
 interface ProductLog {
@@ -167,6 +168,7 @@ export const getWithdrawals = async (
         date: withdrawal.createdAt,
         status: withdrawal.status,
         message: withdrawal.message,
+        note: withdrawal.note,
       })),
       totalPages: response.totalPages,
       totalDocs: response.totalDocs,
@@ -218,6 +220,7 @@ export const getWithdrawalsWithDate = async (
         date: withdrawal.createdAt,
         status: withdrawal.status,
         message: withdrawal.message,
+        note: withdrawal.note,
       })),
       totalPages: response.totalPages,
       totalDocs: response.totalDocs,

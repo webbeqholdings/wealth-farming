@@ -30,13 +30,16 @@ export const vi = {
     confirm: "Xác nhận",
     // site-header
     profile: "Thông tin cá nhân",
-    referral_reward: "Phần thưởng giới thiệu",
+    referral_reward: "Phần Thưởng Giới Thiệu",
+    transfer: 'Chuyển tiền',
     login: "Đăng nhập",
     log_out: "Đăng xuất",
     //investment process
     investment_process_title: "Giả lập kế hoạch tài chính",
     investment_process_table: "Bảng Lãi",
     investment_process_chart_decs: "Biểu đồ số dư theo thời gian",
+    Investment: 'Tài khoản đầu tư',
+    Main: 'Tài khoản chính',
     
     // /transaction
     // /menu-label
@@ -116,8 +119,8 @@ export const vi = {
     portfolio_profit: "Lợi nhuận",
     portfolio_rate: "Lãi xuất",
     portfolio_term: "Kỳ hạn",
-    'Start Date': "Ngày bắt đầu",
-    'End Date': "Ngày kết thúc",
+    portfolio_startDate: "Ngày bắt đầu",
+    portfolio_endDate: "Ngày kết thúc",
     portfolio_status: "Trạng thái",
     portfolio_actions: "Thao tác",
     portfolio_setting_excontract: "Gia hạn hợp đồng",
@@ -147,11 +150,15 @@ export const vi = {
     balance_available: 'Số dư khả dụng: ',
     confirm_termination: 'Xác nhận chấm dứt',
     first_year: 'năm đầu tiên',
+    first_semester: 'nửa năm đầu tiên',
+    first_quarter: 'quý đầu tiên',
+    first_month: 'tháng đầu tiên',
     upload_photo: 'Tải ảnh',
     processing: 'Đang xử lý...',
     photo_requirement: 'Vui lòng tải lên ảnh chụp màn hình có hiển thị ảnh. Các định dạng được chấp nhận: JPG, PNG, với kích thước tối đa 5MB.',
     withdrawal_amount_input: 'Nhập số tiền muốn rút',
-    withdrawal_condition: 'Tài khoản của bạn không đáp ứng yêu cầu để rút tiền.',
+    withdrawal_condition1: 'Hợp đồng của bạn có thể rút từ ngày ',
+    withdrawal_condition2: 'Hợp đồng của bạn có thể rút vào ngày ',
     terminated_note: 'Ghi chú',
 
     // user-profile
@@ -167,9 +174,8 @@ export const vi = {
     account_details: "Thông Tin Chi Tiết",
     recent_transactions: "Các Giao Dịch Gần Đây",
     main: "Tài Khoản Chính",
-    Main: "Tài Khoản Chính",
     investment: "Tài Khoản Đầu Tư",
-    Investment: "Tài Khoản Đầu Tư",
+    withdraw: 'Rút tiền',
     view_full_statement: "Xem đầy đủ các giao dịch",
     crypto_wallet: "Ví Tiền Điện Tử",
     add_bank_account: "Thêm Tài Khoản Ngân Hàng",
@@ -220,7 +226,14 @@ export const vi = {
     select_network: "Chọn network...",
     select_bank: "Chọn ngân hàng...",
     action: "Thao tác",
-
+    crypto_details: 'Nhập chi tiết tài khoản ngân hàng của bạn để gửi tiền và rút tiền.',
+    Network: 'Mạng',
+    failed_to_fetch: 'Không thể lấy tài khoản:',
+    Active: 'Hoạt động',
+    chat_tele: 'Chat với chúng tôi trên Telegram:',
+    referral_copy: 'Mã giới thiệu đã được sao chép vào clipboard!',
+    open_dialog: 'Đang mở hộp thoại chia sẻ...',
+    
     // Homepage
     get_started: "Bắt Đầu Trong 30 Giây!",
     email_prompt: "Cung cấp địa chỉ email và kiểm tra hộp thư để nhận mã xác nhận 6 chữ số.",
@@ -430,6 +443,8 @@ export const vi = {
     total_interest: 'Tổng Lợi Nhuận Kiếm Được: ${{total}}',
     x_times: 'X Lần:',
     amount_usd: 'Số tiền ($)',
+    amount_graph: 'Số tiền: ${{amount}}',
+    month_graph: 'Tháng: {{label}}',
 
     //blog
     read_more: "Đọc Thêm",
@@ -473,8 +488,6 @@ export const vi = {
    enter_VND: 'Nhập số tiền bằng VND',
    Transfer: 'Chuyển Tiền',
    Withdraw: 'Rút Tiền',
-   transfer: 'chuyển tiền',
-   withdraw: 'rút tiền',
    enter_amount: 'Nhập số tiền',
    my_transfer: 'Chuyển Tiền',
    my_withdraw: 'Rút Tiền',

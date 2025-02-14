@@ -28,12 +28,15 @@ export const en = {
     // site-header
     profile: "Profile",
     referral_reward: "Referral Reward",
+    transfer: 'Transfer',
     login: "Login",
     log_out: "Log out",
     //investment process
     investment_process_title: "Financial Planning Simulator",
     investment_process_table: "Profit Table",
     investment_process_chart_decs: "Representation of balance over time",
+    Investment: 'Investment',
+    Main: 'Main',
     
     // /transaction
     // /menu-label
@@ -146,11 +149,15 @@ export const en = {
     balance_available: 'Balance Available: ',
     confirm_termination: 'Confirm Termination',
     first_year: 'first year',
+    first_semester: 'first semester',
+    first_quarter: 'first quarter',
+    first_month: 'first month',
     upload_photo: 'Upload Photo',
     processing: 'Processing...',
     photo_requirement:'Please upload a screenshot showing the photo. Accepted formats: JPG, PNG, with a maximum size of 5MB.',
     withdrawal_amount_input: 'Enter amount to withdraw',
-    withdrawal_condition:'Your account does not meet the requirements for withdrawal.',
+    withdrawal_condition1:'Your contract can be withdrawn from ',
+    withdrawal_condition2:'Your contract will be withdrawn on ',
     terminated_note: 'Note',
 
     // user-profile
@@ -167,6 +174,7 @@ export const en = {
     recent_transactions: "Recent Transactions",
     main: "Main",
     investment: "Investment",
+    withdraw: 'Withdraw',
     view_full_statement: "View Full Statement",
     crypto_wallet: "Crypto Wallet",
     add_bank_account: "Add Bank Account",
@@ -219,6 +227,16 @@ export const en = {
     action: "Action",
     crypto_details:'Enter your bank account details for deposits and withdrawals.',
     Network: 'Network',
+    failed_to_fetch: 'Failed to fetch accounts:',
+    Active: 'Active',
+    chat_tele: 'Chat with us on Telegram:',
+    error_update: 'Error during avatar update process:',
+    referral_copy: 'Referral code copied to clipboard!',
+    open_dialog: 'Opening share dialog...',
+    error_avatar: 'Error during avatar update process:',
+    error_avatar2: 'Error uploading avatar:',
+    failed_profile: 'Failed to update profile',
+    failed_date: 'Error fetching user data:',
 
     // Homepage
     get_started: "Get Started in 30 Seconds!",
@@ -430,6 +448,8 @@ export const en = {
     total_interest: 'Total Interest Earned: ${{total}}',
     x_times: 'X times:',
     amount_usd: 'Amount ($)',
+    amount_graph: 'Amount: ${{amount}}',
+    month_graph: 'Month: {{label}}',
 
     //blog
     read_more: "Read More",
@@ -473,8 +493,6 @@ export const en = {
     enter_VND: 'Enter amount in VND',
     Transfer: 'Transfer',
     Withdraw: 'Withdraw',
-    transfer: 'transfer',
-    withdraw: 'withdraw',
     enter_amount: 'Enter amount',
     my_transfer: 'My Transfer',
     my_withdraw: 'My Withdrawal',

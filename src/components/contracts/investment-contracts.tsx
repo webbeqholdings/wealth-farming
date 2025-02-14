@@ -44,6 +44,7 @@ import { CalendarIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Calendar } from '@/components/ui/calendar'
 import { useTranslation } from 'react-i18next'
+import { useGetMessage } from '@/utilities/getMessage'
 interface Investment {
   id: string
   userId: string
@@ -73,7 +74,8 @@ interface Withdrawal {
   amount: number
   date: string
   status: 'completed' | 'pending' | 'failed'
-  message: string
+  message: string,
+  note: string,
 }
 
 export function InvestmentContracts() {
@@ -95,17 +97,7 @@ export function InvestmentContracts() {
     const [terminatedAvaibility, setTerminatedAvaibility] = useState(false)
     const { t } = useTranslation();
 
-    const getMessage = (messageField: string | object): string => {
-        if (typeof messageField === 'string') {
-          try {
-            const messageData = JSON.parse(messageField);
-            return t(messageData.key, messageData.params || {}) as string;
-          } catch (e) {
-            return t(messageField);
-          }
-        }
-        return '';
-      };
+    const getMessage = useGetMessage()
 
     useEffect(() => {
         async function fetchTerminateAvaibility() {
@@ -465,8 +457,8 @@ export function InvestmentContracts() {
                                             <TableHead>{t('portfolio_profit')}</TableHead>
                                             <TableHead>{t('portfolio_rate')}</TableHead>
                                             <TableHead>{t('portfolio_term')}</TableHead>
-                                            <TableHead>{t('Start Date')}</TableHead>
-                                            <TableHead>{t('End Date')}</TableHead>
+                                            <TableHead>{t('portfolio_startDate')}</TableHead>
+                                            <TableHead>{t('portfolio_endDate')}</TableHead>
                                             <TableHead>{t('portfolio_status')}</TableHead>
                                             <TableHead className="text-center">{t('portfolio_actions')}</TableHead>
                                         </TableRow>
@@ -657,7 +649,7 @@ export function InvestmentContracts() {
                                                     </span>
                                                 </TableCell>
                                                 <TableCell>
-                                                    {getMessage(withdrawal.message)}
+                                                    {(withdrawal.note != null) && (withdrawal.status == 'failed') ? withdrawal.note : getMessage(withdrawal.message)}
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -710,7 +702,6 @@ export function InvestmentContracts() {
                     isOpen={withdrawDialogOpen}
                     onClose={() => setWithdrawDialogOpen(false)}
                     contract={selectedContract}
-                    terminated_avail={terminatedAvaibility}
                     setActiveTab={setActiveTab}
                 />
             )}
