@@ -23,8 +23,9 @@ import * as migration_20250123_025853_add_account_to_and_account_from_to_transac
 import * as migration_20250126_082116_delete_from_account_and_to_account_in_transactions from './20250126_082116_delete_from_account_and_to_account_in_transactions';
 import * as migration_20250205_100334_add_locale from './20250205_100334_add_locale';
 import * as migration_20250207_073006_add_subcription from './20250207_073006_add_subcription';
-import * as migration_20250211_092052_add_column_user from './20250211_092052_add_column_user';
 import * as migration_20250210_115628_add_column_payment_method from './20250210_115628_add_column_payment_method';
+import * as migration_20250211_092052_add_column_user from './20250211_092052_add_column_user';
+import * as migration_20250214_051404_add_note_in_transaction from './20250214_051404_add_note_in_transaction';
 
 export const migrations = [
   {
@@ -153,13 +154,18 @@ export const migrations = [
     name: '20250207_073006_add_subcription',
   },
   {
-    up: migration_20250211_092052_add_column_user.up,
-    down: migration_20250211_092052_add_column_user.down,
-    name: '20250211_092052_add_column_user'
-  },
-  {
     up: migration_20250210_115628_add_column_payment_method.up,
     down: migration_20250210_115628_add_column_payment_method.down,
-    name: '20250210_115628_add_column_payment_method'
+    name: '20250210_115628_add_column_payment_method',
+  },
+  {
+    up: migration_20250211_092052_add_column_user.up,
+    down: migration_20250211_092052_add_column_user.down,
+    name: '20250211_092052_add_column_user',
+  },
+  {
+    up: migration_20250214_051404_add_note_in_transaction.up,
+    down: migration_20250214_051404_add_note_in_transaction.down,
+    name: '20250214_051404_add_note_in_transaction'
   },
 ];
