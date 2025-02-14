@@ -62,6 +62,54 @@ export function InvestmentProcessForm() {
 
   const { toast } = useToast()
 
+  const getExpectedEndDate = (term: string, start: Date) => {
+    const currentMonth = start.getMonth();
+    const currentDate = start.getDate();
+    switch (term) {
+      case 'monthly':
+        if (currentDate == 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 1, 1)
+          return new Date(returnDate - 1);
+        }
+        if (currentDate > 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 2, 1)
+          return new Date(returnDate - 1);
+        }
+      case 'quarterly': {
+        if (currentDate == 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 3, 1)
+          return new Date(returnDate - 1);
+        }
+        if (currentDate > 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 4, 1)
+          return new Date(returnDate - 1);
+        }
+      }
+      case 'semester': {
+        if (currentDate == 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 6, 1)
+          return new Date(returnDate - 1);
+        }
+        if (currentDate > 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 7, 1)
+          return new Date(returnDate - 1);
+        }
+      }
+      case 'annually': {
+        if (currentDate == 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 12, 1)
+          return new Date(returnDate - 1);
+        }
+        if (currentDate > 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 13, 1)
+          return new Date(returnDate - 1);
+        }
+      }
+      default:
+        throw new Error('Unsupported term. Valid terms: monthly, quarterly, semester, yearly.');
+    }
+  };
+
   useEffect(() => {
     if (startDate === undefined) {
       setStartDate(tomorrow)
@@ -229,7 +277,12 @@ export function InvestmentProcessForm() {
       return // Optional: Show a redirect message
     }
 
-
+    if (isBefore(startDate, tomorrow)){
+      return toast({
+        title: t('error'),
+        description: t('join_date_cond'),
+      })
+    }
 
     if (startDate && endDate && depositAmount > 0) {
       const formData = {
@@ -332,9 +385,6 @@ export function InvestmentProcessForm() {
                   mode="single"
                   selected={startDate}
                   onSelect={handleStartDateSelect}
-                  disabled={(date) => {
-                    return isBefore(date, tomorrow)
-                  }}
                   defaultMonth={startDate || tomorrow}
                   initialFocus
                 />
@@ -361,11 +411,9 @@ export function InvestmentProcessForm() {
                   selected={endDate}
                   onSelect={handleEndDateSelect}
                   initialFocus
-                  disabled={(date) =>
-                    // startDate ? isBefore(date, addDays(startDate, minRangeDays)) : false
-                    startDate ? isBefore(date, endDate)  : false
-
-                  }
+                  disabled={(date) => {
+                    return isBefore(date, getExpectedEndDate(term, startDate).setHours(0,0,0,0))
+                  }}
                   defaultMonth={endDate || (startDate ? addDays(startDate, 14) : new Date())}
                 />
               </PopoverContent>
