@@ -380,6 +380,7 @@ export const vi = {
     main_not_enough: "Số dư tài khoản chính không đủ",
     transfer_failed: "Chuyển khoản thất bại",
     transfer_success: "Chuyển khoản thành công",
+    join_date_cond: 'Ngày tham gia phải từ ngày mai trở đi',
 
     // referral
     grow_wealth: 'Cùng Nhau Đầu Tư',
