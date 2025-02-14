@@ -649,7 +649,7 @@ export function InvestmentContracts() {
                                                     </span>
                                                 </TableCell>
                                                 <TableCell>
-                                                    {(withdrawal.note != '') && (withdrawal.status == 'failed') ? withdrawal.note : getMessage(withdrawal.message)}
+                                                    {(withdrawal.note != null) && (withdrawal.status == 'failed') ? withdrawal.note : getMessage(withdrawal.message)}
                                                 </TableCell>
                                             </TableRow>
                                         ))}
