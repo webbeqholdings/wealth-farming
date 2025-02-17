@@ -1,7 +1,36 @@
 export const renderContent = (child: any) => {
     switch (child.type) {
       case 'paragraph':
-        return `<p>${child.children[0]?.text ?? '</br>'}</p>`;
+        let style = ''
+        let text = child.children.map((child2: any) => {
+          if (child2.type == 'autolink' || child2.type == 'link'){
+            return `<a href=${child2.fields.url} style='color: #0000FF; text-decoration-line: underline;'>${child2.children[0].text}</a>`
+          }
+          else if (child2.format == 1){
+            style = 'font-weight: 700;'
+          } else if (child2.format == 2){
+            style = 'font-style: italic;'
+          } else if (child2.format == 3){
+            style = 'font-style: italic;'
+          } else if (child2.format == 8){
+            style = 'text-decoration-line: underline;'
+          } else if (child2.format == 9){
+            style = 'text-decoration-line: underline; font-weight: 700;'
+          } else if (child2.format == 11){
+            style = 'text-decoration-line: underline; font-weight: 700; font-style: italic'
+          }
+          return `<span style='${style}'>${child2?.text}</span>`
+        }).join(' ');
+        if (child.format == 'left'){
+          style = 'text-align: left;';
+        } else if (child.format == 'right'){
+          style = 'text-align: right;';
+        } else if (child.format == 'center'){
+          style = 'text-align: center;';
+        } else if (child.format == 'justify'){
+          style = 'text-align: justify;';
+        }
+        return `<p style='${style}'>${text}</p>`;
       case 'upload':
         return `<img src="${child.value.url}" width="${child.value.width}px" height="${child.value.height}px" alt="${child.value.filename}" class="rounded-lg mb-8" />`;
       case 'list': {
