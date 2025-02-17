@@ -58,11 +58,13 @@ const Notifications: CollectionConfig = {
         sendOtherNotification(
               data.user, 
               data.title, 
-              data.content.root.children
+              data.content.root.children,
+              data.description,
+              data.type,
           );
         }
         if(data.type == 'event'){
-          sendEventNotification(data.title, data.content.root.children)
+          sendEventNotification(data.title, data.content.root.children, data.description, data.date)
         }
       }
     ]
