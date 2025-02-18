@@ -11,7 +11,12 @@ const I18nContext = createContext<I18nContextProps | undefined>(undefined);
 export const I18nProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { i18n } = useTranslation();
 
-  const changeLanguage = (lng: string) => {
+  const changeLanguage = async (lng: string) => {
+    const current_lang = await localStorage.getItem('lang')
+    if (!current_lang){
+      localStorage.setItem('lang', 'en')
+    }
+    localStorage.setItem('lang', lng)
     i18n.changeLanguage(lng); // Thay đổi ngôn ngữ
   };
 
