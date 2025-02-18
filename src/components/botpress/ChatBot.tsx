@@ -1,7 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Script from "next/script";
-import { Button } from "../ui/button";
-import { LucideAArrowUp, LucideHeadset, LucideX } from "lucide-react";
 const ChatwootWidget = ():any => {
   useEffect(() => {
     // Thêm CSS để ẩn icon gốc của Chatwoot
@@ -112,36 +110,11 @@ const ChatBot = () => {
     }
   }, []);
 
-  const [isOpenSupport, setSupportOpen] = useState(false)
-  const [isChatwootOpen, setChatwootOpen] = useState(false)
-  const [isBotPressOpen, setBotPressOpen] = useState(false)
-  async function open_support() {
-    setSupportOpen
-  }
   return (
     <>
-      <Script src="https://cdn.botpress.cloud/webchat/v2.2/inject.js" strategy="beforeInteractive" className="" />
+      <Script src="https://cdn.botpress.cloud/webchat/v2.2/inject.js"/>
+      <Script src="https://files.bpcontent.cloud/2025/02/14/11/20250214113712-TNLG44T4.js"></Script>
       <ChatwootWidget />
-
-      <style jsx global>
-        {`
-              .bpWebchat {
-                right: 7.5rem !important;
-                bottom: 0.5rem !important;
-              }
-              .bpFab {
-                bottom: 2.5rem !important;
-              }
-              .woot-widget-bubble.woot-elements--right {
-                right: 1.5rem !important;
-                bottom: 7.5rem;
-              }
-              .woot-widget-holder.woot-elements--right {
-                right: 7.5rem !important;
-                bottom: 2.5rem !important;
-              }
-        `}
-      </style>
     </>
   );
 };

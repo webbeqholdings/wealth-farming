@@ -35,6 +35,8 @@ export const en = {
     investment_process_title: "Financial Planning Simulator",
     investment_process_table: "Profit Table",
     investment_process_chart_decs: "Representation of balance over time",
+    Investment: 'Investment',
+    Main: 'Main',
     
     // /transaction
     // /menu-label
@@ -384,6 +386,7 @@ export const en = {
     main_not_enough: 'Amount account main not enough',
     transfer_failed: 'Transfer Failed',
     transfer_success: 'Transfer Success',
+    join_date_cond: 'The join date must be set to a future date, starting from tomorrow.',
 
     // referral
     grow_wealth: 'Grow Your Wealth Together',
