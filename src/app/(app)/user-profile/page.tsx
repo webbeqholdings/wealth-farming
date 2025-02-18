@@ -38,6 +38,7 @@ import TelegramButton from '@/components/TelegramButton'
 import Spinner from '@/components/Spinner'
 import { getAccountsByUser } from '@/lib/account'
 import { useTranslation } from 'react-i18next';
+import { getSumAmountBalanceByAccount } from '@/lib/transaction'
 
 interface Referral {
   id: string
@@ -197,7 +198,7 @@ export default function UserProfile() {
       })
 
       toast({
-        title: 'Update profile successfully',
+        title: t('update_success'),
       })
     } catch (error) {
       console.error('Error updating profile:', error)
@@ -284,10 +285,9 @@ export default function UserProfile() {
   const copyReferralCode = () => {
     navigator.clipboard.writeText(user.referral_code)
     toast({
-      title: 'Copied !',
-      description: 'Your referral code copied to clipboard!'
+      title: t('copied'),
+      description: t('refer_code_copied')
     })
-
   }
 
   const shareReferralCode = () => {
@@ -300,20 +300,16 @@ export default function UserProfile() {
     try {
       navigator.share(shared_data)
       toast({
-        title: 'Open sharing dialog !',
+        title: t('share_dial'),
       })
 
     } catch (error) {
       navigator.clipboard.writeText(referralLink)
       toast({
-        title: 'Copied !',
-        description: 'Sharing dialog unavailable Your referral link will be copied to clipboard!'
+        title: t('copied'),
+        description: t('share_dial_fail')
       })
     }
-
-
-
-
     alert('Opening share dialog...')
   }
 
@@ -336,15 +332,17 @@ export default function UserProfile() {
       try {
         const response = await getAccountsByUser(user.id)
         // Transform API response into desired format
-        const transformedAccounts = response.map((account: { account_name: string, amount: number }) => ({
-          name: account.account_name,
-          balance: account.amount, // Assuming you want to divide the amount to convert to another unit
-          currency: 'USD', // Hardcoded as 'USD', replace with dynamic value if available in the API
-        }));
+        const transformedAccounts = await Promise.all(
+          response.map(async (account: { account_name: string, id: number }) => ({
+            name: account.account_name,
+            balance: await getSumAmountBalanceByAccount(account.id),
+            currency: 'USD', // Hardcoded as 'USD', replace with dynamic value if available in the API
+          }))
+        );
 
         setAccounts(transformedAccounts); // Store the transformed accounts in state
       } catch (error) {
-        console.error('Failed to fetch accounts:', error);
+        console.error(t('failed_to_fetch'), error);
       }
     };
     fetchAccounts()
@@ -380,7 +378,7 @@ export default function UserProfile() {
         },
       })
     } catch (error) {
-      console.error('Error during avatar update process:', error)
+      console.error(t('error_update'), error)
     }
   }
 
@@ -499,8 +497,7 @@ export default function UserProfile() {
                       transactions.map((transaction) => (
                         <li key={transaction.id} className="flex justify-between items-center">
                           <span>
-                            {t(transaction.type.charAt(0).toUpperCase() +
-                              transaction.type.slice(1).toLowerCase())}
+                            {t(transaction.type)}
                           </span>
                           <span
                             className={transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'}
@@ -592,7 +589,7 @@ export default function UserProfile() {
 
                 {/* Add the link to the Telegram bot */}
                 <div className="mt-4 flex justify-between items-center">
-                  <span className="text-sm text-gray-500">Chat with us on Telegram:</span>
+                  <span className="text-sm text-gray-500">{t('chat_tele')}</span>
                   <a
                     href="https://t.me/dev_wealth_farming_bot"
                     target="_blank"
@@ -605,7 +602,7 @@ export default function UserProfile() {
 
                 <div className="space-y-4 mt-4">
                   <div className="flex items-center justify-between spaddce-x-2">
-                    <Label htmlFor="transactions">{t('Transaction Notifications')}</Label>
+                    <Label htmlFor="transactions">{t('transaction_notifications')}</Label>
                     <Switch
                       id="transactions"
                       checked={telegramNotifications.settings.transactions}
@@ -626,7 +623,7 @@ export default function UserProfile() {
               </>
             ) : (
               <div className="text-center space-y-4">
-                <p className="mb-4">{t('connect_telegram:')}</p>
+                <p className="mb-4">{t('connect_telegram')}</p>
                 <TelegramButton userId={user.id} />
               </div>
             )}

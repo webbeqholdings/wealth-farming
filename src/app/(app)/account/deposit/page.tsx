@@ -71,12 +71,13 @@ interface StepsProps {
 }
 
 function Steps({ currentStep, className, children }: StepsProps) {
+  const { t } = useTranslation()
   return (
     <div className={cn('flex justify-between', className)}>
       {children.map((child, index) => (
         <Step
           key={index}
-          title={child.props.title}
+          title={t(child.props.title)}
           isCompleted={index < currentStep - 1}
           isActive={index === currentStep - 1}
         />
@@ -123,17 +124,32 @@ export default function DepositPage() {
 
   const [convertedQuickAmounts, setConvertedQuickAmounts] = useState(quickAmounts)
   const [USDCurrency, setUSDCurrency] = useState<number>(0)
+  const getMessage = (messageField: string | object): string => {
+    if (typeof messageField === 'string') {
+      try {
+        const messageData = JSON.parse(messageField);
+        return t(messageData.key, messageData.params || {}) as string;
+      } catch (e) {
+        return t(messageField);
+      }
+    }
+    return '';
+  };
   const handleNextStep = async () => {
     if (!validateStep()) {
       toast({
         title: 'Error',
-        description: 'Some fields are missing or invalid.',
+        description: t('missing_field'),
       })
     }
     if (USDCurrency < minDeposit && Number(USDCurrency) > 0) {
+      const mess =  getMessage(JSON.stringify({
+        key: 'amount_must_greater',
+        params: { amount: minDeposit },
+      }))
       toast({
         title: `Error`,
-        description: `The amount must be greater than or equal to the minimum withdrawal amount of ${minDeposit} USD.`,
+        description: mess,
       })
     } else if (validateStep()) {
       if (step < 3) setStep(step + 1)
@@ -160,15 +176,15 @@ export default function DepositPage() {
     const newErrors: { [key: string]: string } = {}
 
     if (step === 1) {
-      if (!toAccount) newErrors.toAccount = 'Please select an account.'
+      if (!toAccount) newErrors.toAccount = t('select_account')
       if (!USDCurrency || Number(USDCurrency) <= 0)
-        newErrors.USDCurrency = 'Please enter a valid deposit amount.'
-      if (!selectBank) newErrors.selectBank = 'Please select a bank.'
+        newErrors.USDCurrency = t('enter_deposit_amount')
+      if (!selectBank) newErrors.selectBank = t('withdraw_nobank_warning')
     }
 
     if (step === 2) {
       if (!depositScreenshot) {
-        newErrors.depositScreenshot = 'Please upload a valid deposit screenshot.'
+        newErrors.depositScreenshot = t('upload_screenshot')
       }
     }
 
@@ -287,7 +303,7 @@ export default function DepositPage() {
     } else {
       toast({
         title: 'Error',
-        description: 'Please select a file to upload.',
+        description: t('upload_file'),
       })
     }
   }
@@ -300,7 +316,7 @@ export default function DepositPage() {
       })
 
       if (!response.ok) {
-        throw new Error('Screenshot upload failed')
+        throw new Error(t('screenshot_fail'))
       }
 
       const data = await response.json()
@@ -326,7 +342,7 @@ export default function DepositPage() {
     if (!validateStep()) {
       toast({
         title: 'Error',
-        description: 'Please review the form and fix errors before submitting.',
+        description: t('review_form'),
       })
       return
     }
@@ -356,12 +372,12 @@ export default function DepositPage() {
       }
 
       toast({
-        title: 'Transaction created successfully',
+        title: t('transaction_sucess'),
       })
 
       router.push('/account/history/deposit') // Redirect to history page with tab = 'deposit'
     } catch (error) {
-      console.error('Error creating transaction:', error)
+      console.error('transaction_error', error)
       toast({
         title: 'Error',
         description: String(error),
@@ -376,7 +392,7 @@ export default function DepositPage() {
       {/* Render Steps and Errors */}
       <SiteHeader />
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">My Deposit</h1>
+        <h1 className="text-3xl font-bold mb-6">{t('my_deposit')}</h1>
         <TabMenu items={accountConfig.tabList} defaultValue="deposit" />
         <Card className="mt-6">
           <CardHeader>
@@ -394,14 +410,14 @@ export default function DepositPage() {
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="accountTo">{t('account')}</Label>
-                    <Select value={toAccount} onValueChange={handleToAccountOnChange}>
+                    <Select onValueChange={handleToAccountOnChange}>
                       <SelectTrigger id="accountTo">
-                        <SelectValue placeholder="Select account" />
+                        <SelectValue placeholder={t("select_account")} />
                       </SelectTrigger>
                       <SelectContent>
                         {accounts.map((acc) => (
                           <SelectItem key={acc.id} value={acc.id.toString()}>
-                            {acc.account_name}
+                            {t(acc.account_name)}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -422,9 +438,9 @@ export default function DepositPage() {
                   )}
                   <div className="space-y-2">
                     <Label htmlFor="bank">{t('bank_account')}</Label>
-                    <Select value={selectBank} onValueChange={handleBankChange}>
+                    <Select onValueChange={handleBankChange}>
                       <SelectTrigger id="bank">
-                        <SelectValue placeholder="Select bank" />
+                        <SelectValue placeholder={t("select_bank")} />
                       </SelectTrigger>
                       <SelectContent>
                         {banks.map((bank) => (
@@ -462,14 +478,14 @@ export default function DepositPage() {
                       <RadioGroupItem value="bank" id="bank" />
                       <Label htmlFor="bank" className="flex items-center space-x-2">
                         <Banknote className="h-4 w-4" />
-                        <span className='cursor-pointer'>Bank Transfer</span>
+                        <span className='cursor-pointer'>{t('bank_transfer')}</span>
                       </Label>
                     </div>
                     <div className={`flex items-center space-x-2 cursor-pointer ${paymentMethod === 'crypto_wallet' ? 'opacity-100' : 'opacity-50'}`}  onClick={() => setPaymentMethod('crypto_wallet')}>
                       <RadioGroupItem value="crypto" id="crypto" />
                       <Label htmlFor="crypto" className="flex items-center space-x-2">
                         <CreditCard className="h-4 w-4" />
-                        <span className='cursor-pointer'>Crypto Wallet</span>
+                        <span className='cursor-pointer'>{t('crypto_wallet')}</span>
                       </Label>
                     </div>
                     {/* <div className="flex items-center space-x-2 opacity-50">
@@ -497,7 +513,7 @@ export default function DepositPage() {
                   {method === 'bank' && (
                     <div className="space-y-6">
                       <div className="space-y-4">
-                        <Label className="flex justify-center">SCAN THIS QR CODE</Label>
+                        <Label className="flex justify-center">{t('scan_qr')}</Label>
                         <div className="flex justify-center">
                           <img
                             //src={bankQRCode || "https://via.placeholder.com/300"  }
@@ -519,7 +535,7 @@ export default function DepositPage() {
                           htmlFor="deposit_screenshot"
                           className="text-sm font-medium text-gray-700"
                         >
-                          Upload Your Deposit
+                          {t('upload_deposit')}
                         </Label>
                         <Input
                           id="deposit_screenshot"
@@ -541,7 +557,7 @@ export default function DepositPage() {
                   {method === 'crypto' && (
                     <div className="space-y-6">
                       <div className="space-y-4">
-                        <Label className="flex justify-center">SCAN THIS QR CODE</Label>
+                        <Label className="flex justify-center">{t('scan_qr')}</Label>
                         <div className="flex justify-center">
                           <Image
                             src={cryptoWalletQrCodeUrl || 'https://via.placeholder.com/300'}
@@ -597,7 +613,7 @@ export default function DepositPage() {
                     </div>
                     <div className="flex justify-between">
                       <span>{t('method')}:</span>
-                      <span className="font-semibold">{method == 'bank' ? 'Bank Transfer' : 'Crypto Wallet'}</span>
+                      <span className="font-semibold">{method == 'bank' ? t('bank_transfer') : t('crypto_wallet')}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>{t("card_number")}:</span>
@@ -625,7 +641,7 @@ export default function DepositPage() {
                 disabled={isSubmitting}
                 className={cn(isSubmitting && 'cursor-not-allowed opacity-50')}
               >
-                {isSubmitting ? 'Processing...' : 'Submit'}
+                {isSubmitting ? t('processing') : t('submit')}
               </Button>
             )}
           </CardFooter>

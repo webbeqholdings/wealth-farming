@@ -113,7 +113,7 @@ export function SiteFooter() {
               <Input
                 type="email"
                 name="user_email"
-                placeholder="Enter your email"
+                placeholder= {t(`enter_email`)}
                 className="max-w-[180px]"
               />
               <Button type="submit" variant="default">

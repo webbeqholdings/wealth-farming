@@ -67,12 +67,13 @@ interface StepsProps {
 }
 
 function Steps({ currentStep, className, children }: StepsProps) {
+  const { t } = useTranslation()
   return (
     <div className={cn('flex justify-between', className)}>
       {children.map((child, index) => (
         <Step
           key={index}
-          title={child.props.title}
+          title={t(child.props.title)}
           isCompleted={index < currentStep - 1}
           isActive={index === currentStep - 1}
         />
@@ -94,13 +95,29 @@ export default function WithdrawPage() {
   const [accounts, setAccounts] = useState([])
   const [selectBank, setSelectBank] = useState(null)
 
+  const getMessage = (messageField: string | object): string => {
+    if (typeof messageField === 'string') {
+      try {
+        const messageData = JSON.parse(messageField);
+        return t(messageData.key, messageData.params || {}) as string;
+      } catch (e) {
+        return t(messageField);
+      }
+    }
+    return '';
+  };
+
   const handleNextStep = async () => {
     if (step === 1) {
       const paymentTransfer = await getPaymentTransfer()
       if (Number(amount) < paymentTransfer.minWithdrawal) {
+        const mess =  getMessage(JSON.stringify({
+          key: 'withdraw_must_greater',
+          params: { amount: paymentTransfer.minWithdrawal },
+        }))
         toast({
-          title: `Error`,
-          description: `The amount must be greater than or equal to the minimum withdrawal amount of ${paymentTransfer.minWithdrawal} USD.`,
+          title: t(`error`),
+          description: mess,
         })
         return
       }
@@ -109,7 +126,7 @@ export default function WithdrawPage() {
     if (step === 2 && method === 'bank' && !selectBank) {
       toast({
         title: 'Error',
-        description: 'Please select a bank account to proceed.',
+        description: t('withdraw_bank'),
       })
       return
     }
@@ -205,20 +222,20 @@ export default function WithdrawPage() {
       if (!response?.isSuccess) {
         // Nếu không thành công, hiển thị thông báo lỗi
         toast({
-          title: 'Error',
-          description: response.msg,
+          title: t('error'),
+          description: t(response.msg),
         })
-        throw new Error(response.msg)
+        throw new Error(t(response.msg))
       }
       notifyWithdrawl(response.data)
       toast({
-        title: 'Transaction created successfully',
+        title: t('transaction_sucess'),
       })
       router.push('/account/history/withdraw') // Assuming there's a dashboard page to redirect to
     } catch (error) {
       console.log('Error creating transaction:', error)
       toast({
-        title: 'Error',
+        title: t('error'),
         description: `${error}`,
       })
     }
@@ -239,7 +256,7 @@ export default function WithdrawPage() {
     <>
       <SiteHeader />
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">My Withdrawal</h1>
+        <h1 className="text-3xl font-bold mb-6">{t('my_withdraw')}</h1>
         <TabMenu items={accountConfig.tabList} defaultValue="withdrawal" />
         <Card className="mt-6">
           <CardHeader>
@@ -292,7 +309,7 @@ export default function WithdrawPage() {
                   <RadioGroup value={method} onValueChange={setMethod}>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="bank" id="bank" />
-                      <Label htmlFor="bank">Bank Transfer</Label>
+                      <Label htmlFor="bank">{t('bank_transfer')}</Label>
                     </div>
                     {/* <div className="flex items-center space-x-2">
                       <RadioGroupItem value="card" id="card" />
@@ -358,15 +375,15 @@ export default function WithdrawPage() {
                   </Alert>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span>Amount:</span>
+                      <span>{t('amount')}: </span>
                       <span className="font-semibold">
                         {currency} {amount}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Method:</span>
+                      <span>{t('method')}: </span>
                       <span className="font-semibold">
-                        {method === 'card' ? 'Credit/Debit Card' : 'Bank Transfer'}
+                        {method === 'card' ? t('cre_deb_card') : t('bank_transfer')}
                       </span>
                     </div>
                     {method === 'card' && (
@@ -394,7 +411,7 @@ export default function WithdrawPage() {
               </Button>
             )}
             {step < 3 ? (
-              <Button onClick={handleNextStep}>Next</Button>
+              <Button onClick={handleNextStep}>{t('Next')}</Button>
             ) : (
               <Button onClick={handleSubmit} className="bg-primary hover:bg-primary/90">
                 <ArrowDownCircle className="mr-2 h-4 w-4" />

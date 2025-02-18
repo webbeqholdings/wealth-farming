@@ -37,7 +37,6 @@ import { useToast } from '@/hooks/use-toast'
 import { notifyInvestment } from '@/lib/telegram'
 import { useRouter } from 'next/navigation'
 import userStatus from '@/lib/userStatus'
-import { checkContractLarger90Days } from '@/lib/contract'
 import { useTranslation } from 'react-i18next'
 import { useDynamicFundData } from './DataProvider'
 
@@ -63,40 +62,75 @@ export function InvestmentProcessForm() {
 
   const { toast } = useToast()
 
+  const getExpectedEndDate = (term: string, start: Date) => {
+    const currentMonth = start.getMonth();
+    const currentDate = start.getDate();
+    switch (term) {
+      case 'monthly':
+        if (currentDate == 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 1, 1)
+          return new Date(returnDate - 1);
+        }
+        if (currentDate > 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 2, 1)
+          return new Date(returnDate - 1);
+        }
+      case 'quarterly': {
+        if (currentDate == 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 3, 1)
+          return new Date(returnDate - 1);
+        }
+        if (currentDate > 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 4, 1)
+          return new Date(returnDate - 1);
+        }
+      }
+      case 'semester': {
+        if (currentDate == 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 6, 1)
+          return new Date(returnDate - 1);
+        }
+        if (currentDate > 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 7, 1)
+          return new Date(returnDate - 1);
+        }
+      }
+      case 'annually': {
+        if (currentDate == 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 12, 1)
+          return new Date(returnDate - 1);
+        }
+        if (currentDate > 1){
+          const returnDate: any = new Date(start.getFullYear(), currentMonth + 13, 1)
+          return new Date(returnDate - 1);
+        }
+      }
+      default:
+        throw new Error('Unsupported term. Valid terms: monthly, quarterly, semester, yearly.');
+    }
+  };
+
   useEffect(() => {
     if (startDate === undefined) {
       setStartDate(tomorrow)
     }
-
     if (isSiteLoading) {
       const fetchRates = async () => {
         try {
           setIsSiteLoading(true)
-          const MonthlyAvalable = await checkContractLarger90Days()
           const response: any = await getPublicProducts()
-          if (MonthlyAvalable) {
-            setRateConfig(response)
-          } else {
-            const no90Term = response.slice(1, 4)
-            setRateConfig(no90Term)
-
-          }
-
+          setRateConfig(response)
         } finally {
           setIsSiteLoading(false)
-
         }
       }
-
       fetchRates()
     }
-
     if (startDate && endDate) {
       const daysDifference = differenceInDays(endDate, startDate)
       if (daysDifference < minRangeDays) {
         setEndDate(addDays(startDate, minRangeDays))
       }
-
       setDayCount(daysDifference)
     }
     setEndDate(contractMultiPeriodEndAt(startDate, term, periods))
@@ -113,7 +147,6 @@ export function InvestmentProcessForm() {
     if (date === undefined) {
       date = tomorrow
     }
-
     setStartDate(date)
     if (endDate && date) {
       const daysDifference = differenceInDays(endDate, date)
@@ -133,6 +166,18 @@ export function InvestmentProcessForm() {
     setEndDate(date)
   }
 
+  const getMessage = (messageField: string | object): string => {
+    if (typeof messageField === 'string') {
+      try {
+        const messageData = JSON.parse(messageField);
+        return t(messageData.key, messageData.params || {}) as string;
+      } catch (e) {
+        return t(messageField);
+      }
+    }
+    return '';
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     let profitData = []
@@ -140,9 +185,13 @@ export function InvestmentProcessForm() {
     if (startDate && endDate && depositAmount) {
       const daysDifference = differenceInDays(endDate, startDate)
       if (daysDifference < minRangeDays) {
+        const mess =  getMessage(JSON.stringify({
+          key: 'invest_period',
+          params: { minRangeDays: minRangeDays },
+        }))
         return toast({
-          title: 'Error',
-          description: `The investment period must be at least ${minRangeDays} days.`,
+          title: t('error'),
+          description: t(mess),
         })
       }
 
@@ -228,7 +277,12 @@ export function InvestmentProcessForm() {
       return // Optional: Show a redirect message
     }
 
-
+    if (isBefore(startDate, tomorrow)){
+      return toast({
+        title: t('error'),
+        description: t('join_date_cond'),
+      })
+    }
 
     if (startDate && endDate && depositAmount > 0) {
       const formData = {
@@ -244,21 +298,21 @@ export function InvestmentProcessForm() {
       const response: any = await createInvestment(formData)
       if (!response?.isSuccess) {
         toast({
-          title: 'Error',
-          description: response.msg,
+          title: t('error'),
+          description: getMessage(response.msg),
         })
         return
       }
       notifyInvestment(response.data.contract)
       toast({
-        title: 'Success',
-        description: 'Investment request has been submitted.',
+        title: t('success'),
+        description: t('invest_submit'),
       })
       router.push('../../investment-contracts')
     } else {
       toast({
-        title: 'Error',
-        description: 'Please ensure all fields are filled out correctly.',
+        title: t('error'),
+        description: t('ensure_filled'),
       })
     }
   }
@@ -331,9 +385,6 @@ export function InvestmentProcessForm() {
                   mode="single"
                   selected={startDate}
                   onSelect={handleStartDateSelect}
-                  disabled={(date) => {
-                    return isBefore(date, tomorrow)
-                  }}
                   defaultMonth={startDate || tomorrow}
                   initialFocus
                 />
@@ -360,9 +411,9 @@ export function InvestmentProcessForm() {
                   selected={endDate}
                   onSelect={handleEndDateSelect}
                   initialFocus
-                  disabled={(date) =>
-                    startDate ? isBefore(date, addDays(startDate, minRangeDays)) : false
-                  }
+                  disabled={(date) => {
+                    return isBefore(date, getExpectedEndDate(term, startDate).setHours(0,0,0,0))
+                  }}
                   defaultMonth={endDate || (startDate ? addDays(startDate, 14) : new Date())}
                 />
               </PopoverContent>
