@@ -38,7 +38,8 @@ const ChatBot = () => {
 
   return (
     <>
-      <Script src="https://cdn.botpress.cloud/webchat/v2.2/inject.js" strategy="beforeInteractive" />
+    <Script src="https://cdn.botpress.cloud/webchat/v2.2/inject.js"></Script>
+    <Script src="https://files.bpcontent.cloud/2025/02/14/11/20250214113712-TNLG44T4.js"></Script>
     </>
   );
 };
