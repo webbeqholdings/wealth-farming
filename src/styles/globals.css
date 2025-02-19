@@ -92,5 +92,9 @@
     left: auto !important;
     bottom: 20px !important;
   }
+  #woot-widget-bubble-icon { display: none; }
+  .woot-widget-bubble img:nth-child(n+3) {
+    display: none;
+  }
 }
 
