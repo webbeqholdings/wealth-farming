@@ -86,22 +86,31 @@
 }
 
 @layer base {
-  @keyframes move{
-    from {bottom: 110px;}
-    50% {bottom: 90px;}
-    to {bottom: 110px;}
-  }
-  body {
-    position: relative; 
-  }
-  body::after {
-    content: '';
-    position: fixed;
-    animation: move 1.5s infinite;
-    right: 45px; 
-    height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-top: 10px solid red; 
+
+  .woot-widget-bubble {
+    right: 100px !important; 
+    left: auto !important;
+    bottom: 20px !important;
   }
 }
+@keyframes move{
+  from {bottom: 110px;}
+  50% {bottom: 90px;}
+  to {bottom: 110px;}
+}
+
+body {
+  position: relative; 
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  animation: move 1.5s infinite;
+  right: 45px; 
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid red; 
+}
+

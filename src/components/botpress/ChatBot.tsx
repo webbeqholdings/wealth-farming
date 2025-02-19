@@ -28,8 +28,7 @@ const ChatwootWidget = ():any => {
                 bubbleElements.forEach((bubble) => {
                   const img = document.createElement("img");
                   img.style.width = "80%"
-                  img.style.marginLeft = "3.5px"
-                  img.style.marginRight = "3.5px"
+                  img.style.marginLeft = "6.5px"
                   img.src = "https://i.postimg.cc/rwbwmwsP/header-icon-support.png";
                   img.width = 36; // Điều chỉnh kích thước icon
                   bubble.appendChild(img);
