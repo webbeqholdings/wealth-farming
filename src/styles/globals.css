@@ -86,13 +86,28 @@
 }
 
 @layer base {
-
   .woot-widget-bubble {
-    right: 100px !important; 
+    right: 100px !important;
     left: auto !important;
     bottom: 20px !important;
+    animation: pulse 1.5s ease-in-out infinite; /* Apply pulse animation with infinite loop */
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+
+    50% {
+      transform: scale(1.2);
+    }
+
+    100% {
+      transform: scale(1);
+    }
   }
 }
+
 @keyframes move{
   from {bottom: 110px;}
   50% {bottom: 90px;}
