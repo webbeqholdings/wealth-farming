@@ -84,3 +84,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer base {
+
+  .woot-widget-bubble {
+    right: 100px !important; 
+    left: auto !important;
+    bottom: 20px !important;
+  }
+}
+
