@@ -125,5 +125,15 @@ body::after {
   100% { top: 45%; }
 }
 
-
+@layer base {
+  .woot-widget-bubble {
+    right: 100px !important; 
+    left: auto !important;
+    bottom: 20px !important;
+  }
+  #woot-widget-bubble-icon { display: none; }
+  .woot-widget-bubble img:nth-child(n+3) {
+    display: none;
+  }
+}
 
