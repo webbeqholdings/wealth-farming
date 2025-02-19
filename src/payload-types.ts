@@ -517,8 +517,8 @@ export interface Notification {
   id: number;
   user?: (number | null) | User;
   title: string;
-  description: string;
-  date: string;
+  description?: string | null;
+  date?: string | null;
   type: 'opportunity' | 'account' | 'alert' | 'transaction' | 'security' | 'event';
   content?: {
     root: {
