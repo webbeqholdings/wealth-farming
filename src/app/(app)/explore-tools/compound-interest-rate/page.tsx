@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { useTranslation } from 'react-i18next'
-import ChatBot from '@/components/botpress/ChatBot'
+import { ChatBot } from '@/components/botpress/ChatBot'
 
 const terms = [
   { name: 'Month', rate: 5.95, months: 24 },

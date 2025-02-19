@@ -17,7 +17,7 @@ import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
-import ChatBot from '@/components/botpress/ChatBot'
+import { ChatBot } from '@/components/botpress/ChatBot'
 
 type Event = {
   id: string
