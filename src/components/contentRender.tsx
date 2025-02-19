@@ -1,9 +1,14 @@
 export const renderContent = (child: any) => {
     switch (child.type) {
       case 'paragraph':
-        return `<p>${child.children[0]?.text ?? '</br>'}</p>`;
+        return `<p>${child.children[0]?.text ?? '</br>'}</p></br>`;
       case 'upload':
         return `<img src="${child.value.url}" width="${child.value.width}px" height="${child.value.height}px" alt="${child.value.filename}" class="rounded-lg mb-8" />`;
+      case 'image':
+        if (child.url) {
+          return `<img src="${child.url}" width="100%" alt="${child.alt}" class="rounded-sm mb-8" />`;
+        }
+      return '';
       case 'list': {
         const listItems = child.children
           .map((item: any, index: number) => {

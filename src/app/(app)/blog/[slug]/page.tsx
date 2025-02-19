@@ -80,43 +80,33 @@ export default function NewsDetailPage() {
   return (
     <div>
       <SiteHeader />
-      <div className="container mx-auto px-4 py-8">
-        <article className="max-w-4xl mx-auto">
+      <div className="container flex flex-row mx-auto px-4 py-8">
+        <article className="max-w-4xl mx-auto w-3/4 ">
           <header className="mb-8">
             <h1 className="text-4xl font-bold mb-4">{article.title}</h1>
             <div className="flex items-center space-x-4 text-muted-foreground">
               <span className="flex items-center">
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {format(article.publishDate, 'dd/MM/yyyy')}
+                {format(article?.publishDate, 'dd/MM/yyyy')}
               </span>
-              <Badge variant="secondary">{article.category}</Badge>
+              <Badge variant="secondary">{article?.category}</Badge>
             </div>
           </header>
 
-          <Image
-            src={article.image}
+          {article.image &&
+            <Image
+            src={article?.image}
             alt="Article Image"
             width={1200}
             height={630}
             className="rounded-lg mb-8"
           />
+          }
 
           <div
             className="prose prose-lg max-w-none mb-12"
             dangerouslySetInnerHTML={{ __html: article.content }}
           />
-
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex flex-wrap gap-2">
-              {article.tags.map((tag) => (
-                tag.postTags?.name && (
-                  <Badge key={tag.postTags.id} variant="outline">
-                    {tag.postTags.name}
-                  </Badge>
-                )
-              ))}
-            </div>
-          </div>
 
           <Separator className="my-8" />
           <section className="mb-12">
@@ -134,15 +124,29 @@ export default function NewsDetailPage() {
               </div>
             </div>
           </section>
-
-          {article.relatedArticles.length > 0 && article.relatedArticles[0].relatedPost !== null && (
+        </article>
+        <div className='w-1/4 mt-10'>
+          <div className='min-h-[200px]'>
+            <h1 className='border-b-2 py-2 text-xl font-semibold'>Tags</h1>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {article?.tags.map((tag) => (
+                tag.postTags?.name && (
+                  <Badge key={tag.postTags.id} variant="outline">
+                    {tag.postTags.name}
+                  </Badge>
+                )
+              ))}
+            </div>
+          </div>
+          <div className='min-h-[200px]'>
+            {article.relatedArticles.length > 0 && article.relatedArticles[0].relatedPost !== null && (
             <section className="mb-12">
-              <h2 className="text-2xl font-semibold mb-4">{t('related_article')}</h2>
-              <div className="grid gap-4 md:grid-cols-3">
+              <h2 className="border-b-2 text-xl font-semibold mb-4">{t('related_article')}</h2>
+              <div className="flex flex-col gap-6 my-6">
                 {article.relatedArticles.map((related, index) => (
-                  <Card key={index}>
+                  <Card className='rounded-sm' key={index}>
                     <CardHeader>
-                      <CardTitle className="text-lg">{related.title}</CardTitle>
+                      <CardTitle className="text-md">{related.title}</CardTitle>
                     </CardHeader>
                     <CardFooter>
                       <Link href={`/blog/${related.slug}`} className="text-primary hover:underline">
@@ -154,7 +158,8 @@ export default function NewsDetailPage() {
               </div>
             </section>
           )}
-        </article>
+          </div>
+        </div>
       </div>
     </div>
   );

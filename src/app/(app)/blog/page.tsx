@@ -156,7 +156,7 @@ export default function NewsPage() {
                   />
                 </div>
                 <div className="md:w-1/3 p-6">
-                  <Badge>{newsArticles[0].category.name}</Badge>
+                  <Badge>{newsArticles[0]?.category.name}</Badge>
                   <CardTitle className="mt-4 mb-2">{newsArticles[0].title}</CardTitle>
                   <CardDescription>{newsArticles[0].excerpt}</CardDescription>
                   <div className="flex items-center mt-4 text-sm text-gray-500">
