@@ -52,6 +52,7 @@ export const getTransactions = async (
         product_name: transaction?.investment_product?.product_name,
         status: transaction?.status,
         message: transaction?.message,
+        note: transaction?.note,
       })),
       totalPages: response.totalPages,
       totalDocs: response.totalDocs,
@@ -113,6 +114,8 @@ export const getTransactionsWithDate = async (
         unit_code: transaction?.unit?.unit_code,
         product_name: transaction?.investment_product?.product_name,
         status: transaction?.status,
+        message: transaction?.message,
+        note: transaction?.note,
       })),
       totalPages: response.totalPages,
       totalDocs: response.totalDocs,
@@ -182,7 +185,6 @@ export const createInvestment = async (formData: any) => {
       key: 'min_invest',
       params: { amount: min_investment},
     })
-    console.log('mess', mess)
     return {
       isSuccess: false,
       msg: mess,

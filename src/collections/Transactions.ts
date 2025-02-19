@@ -148,6 +148,11 @@ const Transactions: CollectionConfig = {
       label: 'Message',
       type: 'text',
     },
+    {
+      name: 'note',
+      label: 'Note',
+      type: 'text',
+    },
   ],
   hooks: {
     afterChange: [

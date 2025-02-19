@@ -178,7 +178,8 @@ const Withdrawals: CollectionConfig = {
                           status: 'failed',
                           account_to: account.id,
                           type: 'bonus',
-                          message: data.message
+                          message: data.message,
+                          note: data.note
                         },
                     })
 

@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/accordion'
 import { CTASection } from '@/components/page-home/CTASection'
 import { BreakingNewsCarousel } from '@/components/page-home/BreakingNews'
-
+import { ChatBot } from "@/components/botpress/ChatBot"
 export default function IndexPage() {
   const { t } = useTranslation();
   const announcements = [
@@ -131,6 +131,10 @@ export default function IndexPage() {
             {t('wealth_farming_risk')}
           </div>
           <FeaturesSection />
+        </div>
+        <div className=''>
+          <ChatBot></ChatBot>
+          
         </div>
 
         <div className="container mx-auto px-0 md:py-14">
