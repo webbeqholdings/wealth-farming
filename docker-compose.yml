@@ -22,11 +22,11 @@ services:
     labels:
       - 'traefik.enable=true'
       - 'traefik.docker.network=traefik'
-      - 'traefik.http.routers.wealthfarming.entrypoints=http'
-      - 'traefik.http.routers.wealthfarming.rule=Host(`web2.wealthfarming.org`)'
-      - 'traefik.http.routers.wealthfarming-secure.entrypoints=https'
-      - 'traefik.http.routers.wealthfarming-secure.rule=Host(`web2.wealthfarming.org`)'
-      - 'traefik.http.routers.wealthfarming-secure.tls.certresolver=letsencrypt'
+      - 'traefik.http.routers.nextjs.entrypoints=http'
+      - 'traefik.http.routers.nextjs.rule=Host(`localhost`)'
+      - 'traefik.http.routers.nextjs-secure.entrypoints=https'
+      - 'traefik.http.routers.nextjs-secure.rule=Host(`localhost`)'
+      - 'traefik.http.routers.nextjs-secure.tls.certresolver=letsencrypt'
 
     networks:
       - traefik  # Kết nối container Next.js với network traefik
