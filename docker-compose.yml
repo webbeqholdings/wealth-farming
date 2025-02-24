@@ -19,18 +19,3 @@ services:
       PGADMIN_DEFAULT_PASSWORD: 1234
     ports:
       - "5050:80"
-    labels:
-      - 'traefik.enable=true'
-      - 'traefik.docker.network=traefik'
-      - 'traefik.http.routers.nextjs.entrypoints=http'
-      - 'traefik.http.routers.nextjs.rule=Host(`localhost`)'
-      - 'traefik.http.routers.nextjs-secure.entrypoints=https'
-      - 'traefik.http.routers.nextjs-secure.rule=Host(`localhost`)'
-      - 'traefik.http.routers.nextjs-secure.tls.certresolver=letsencrypt'
-
-    networks:
-      - traefik  # Kết nối container Next.js với network traefik
-
-networks:
-  traefik:
-    external: true  # Đảm bảo Traefik và các dịch vụ container sử dụng cùng mạng này
