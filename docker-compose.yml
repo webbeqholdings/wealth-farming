@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: 1234
       POSTGRES_DB: database
     ports:
-      - "5432:5432"
+      - "5434:5432"
   pgadmin:
     container_name: pgadmin4_container
     image: dpage/pgadmin4
@@ -19,20 +19,20 @@ services:
       PGADMIN_DEFAULT_PASSWORD: 1234
     ports:
       - "5050:80"
-  nextjs:
+  wealthfarming:
     build:
       context: .  # Chỉ định thư mục chứa Dockerfile của bạn
-    container_name: dapp
+    container_name: wealthfarming
     ports:
       - "3000:3000"  # Mở cổng 3000 để có thể truy cập vào Next.js từ bên trong container
     labels:
       - 'traefik.enable=true'
       - 'traefik.docker.network=traefik'
-      - 'traefik.http.routers.nextjs.entrypoints=http'
-      - 'traefik.http.routers.nextjs.rule=Host(`wealthfarming.org`)'
-      - 'traefik.http.routers.nextjs-secure.entrypoints=https'
-      - 'traefik.http.routers.nextjs-secure.rule=Host(`wealthfarming.org`)'
-      - 'traefik.http.routers.nextjs-secure.tls.certresolver=letsencrypt'
+      - 'traefik.http.routers.wealthfarming.entrypoints=http'
+      - 'traefik.http.routers.wealthfarming.rule=Host(`wf.wealthfarming.org`)'
+      - 'traefik.http.routers.wealthfarming-secure.entrypoints=https'
+      - 'traefik.http.routers.wealthfarming-secure.rule=Host(`wf.wealthfarming.org`)'
+      - 'traefik.http.routers.wealthfarming-secure.tls.certresolver=letsencrypt'
 
     networks:
       - traefik  # Kết nối container Next.js với network traefik

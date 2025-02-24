@@ -17,10 +17,10 @@ RUN pnpm install
 COPY . .
 
 # Build the Next.js application
-RUN pnpm run build
+RUN npm run build
 
 # Expose the port Next.js will run on
 EXPOSE 3000
 
 # Start the application
-CMD ["pnpm", "start"]
+CMD ["npm", "start"]
