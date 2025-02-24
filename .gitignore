@@ -42,5 +42,3 @@ next-env.d.ts
 
 /media
 /.vscode
-pnpm-lock.yaml
-package-lock.json
