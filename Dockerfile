@@ -19,6 +19,9 @@ COPY . .
 # Build the Next.js application
 RUN npm run build
 
+# migrate
+RUN npm run payload migrate
+
 # Expose the port Next.js will run on
 EXPOSE 3000
 
