@@ -120,7 +120,7 @@ export default buildConfig({
   },
   db: postgresAdapter({
     pool: {
-      connectionString: process.env.DATABASE_URL || '',
+      connectionString: 'postgres://admin:1234@188.172.228.17:5432/production',
     },
   }),
   jobs: {
