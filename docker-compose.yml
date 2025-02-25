@@ -14,10 +14,8 @@ services:
       - 'traefik.http.routers.wealthfarming-secure.entrypoints=https'
       - 'traefik.http.routers.wealthfarming-secure.rule=Host(`wealthfarming.org`)'
       - 'traefik.http.routers.wealthfarming-secure.tls.certresolver=letsencrypt'
-
     networks:
       - traefik  
-
 networks:
   traefik:
     external: true 
