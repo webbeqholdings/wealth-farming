@@ -20,6 +20,7 @@
   "dependencies": {
     "@fileforge/react-print": "^0.1.150",
     "@hookform/resolvers": "^3.9.1",
+    "@payloadcms/email-nodemailer" : "3.0.0-beta.122",
     "@payloadcms/db-postgres": "3.0.0-beta.122",
     "@payloadcms/next": "3.0.0-beta.122",
     "@payloadcms/payload-cloud": "3.0.0-beta.122",
