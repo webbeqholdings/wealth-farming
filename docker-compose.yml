@@ -1,21 +1,21 @@
 version: "3.8"
 services:
-  db:
-    container_name: postgres_container
-    image: postgres
-    restart: always
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: 1234
-      POSTGRES_DB: database
+  dev_wealthfarming:
+    build:
+      context: . 
+    container_name: dev_wealthfarming
     ports:
-      - "5432:5432"
-  pgadmin:
-    container_name: pgadmin4_container
-    image: dpage/pgadmin4
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@gmail.com
-      PGADMIN_DEFAULT_PASSWORD: 1234
-    ports:
-      - "5050:80"
+      - "3001:3000"
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=traefik'
+      - 'traefik.http.routers.dev_wealthfarming.entrypoints=http'
+      - 'traefik.http.routers.dev_wealthfarming.rule=Host(`dev.wealthfarming.org`)'
+      - 'traefik.http.routers.dev_wealthfarming-secure.entrypoints=https'
+      - 'traefik.http.routers.dev_wealthfarming-secure.rule=Host(`dev.wealthfarming.org`)'
+      - 'traefik.http.routers.dev_wealthfarming-secure.tls.certresolver=letsencrypt'
+    networks:
+      - traefik
+networks:
+  traefik:
+    external: true 
