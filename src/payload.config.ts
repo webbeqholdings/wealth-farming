@@ -33,7 +33,6 @@ import EconomicCalendar from './collections/EconomicCalendar'
 import MainMenu from './global-configs/main-menu'
 import UserReferrals from './collections/UserReferrals'
 import Withdrawals from './collections/Withdrawls'
-import { s3Storage } from '@payloadcms/storage-s3'
 import GcBeQDynamicFund from './global-configs/beq-dynamic-fund'
 import GcPaymentTransfer from './global-configs/payment-transfer'
 
@@ -144,26 +143,7 @@ export default buildConfig({
       generateTitle: ({ doc }) => `Wealthfarming.org — ${doc.title}`,
       generateDescription: ({ doc }) => doc.title,
       generateURL: ({ doc, collectionSlug }) => process.env.BASE_URL + `/${doc.slug}`, // recommend env
-    }),
-    // store media to minio storage
-    s3Storage({
-      bucket: process.env.MINIO_BUCKET_NAME,
-      acl: 'public-read',
-      config: {
-        endpoint: process.env.MINIO_END_POINT,
-        region: process.env.MINIO_REGION,
-        credentials: {
-          accessKeyId: process.env.MINIO_ACCESS_KEY_ID,
-          secretAccessKey: process.env.MINIO_SECRET_ACCESS_KEY,
-        },
-        forcePathStyle: true,
-      },
-      collections: {
-        media: true,
-      },
-      disableLocalStorage: true,
-      enabled: true, // Enable the plugin
-    }),
+    })
   ],
   localization: {
     locales: ['en', 'vi'],
