@@ -132,7 +132,7 @@ const Withdrawals: CollectionConfig = {
                         },
                     })
 
-                    handleSendEmail(account, data)
+                    // handleSendEmail(account, data)
                       
                 } else if (data.status === 'failed') {
                     // Validate contract data
@@ -183,7 +183,7 @@ const Withdrawals: CollectionConfig = {
                         },
                     })
 
-                    handleSendEmail(account, data)
+                    // handleSendEmail(account, data)
                 }
             },
         ],
