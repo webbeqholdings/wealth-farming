@@ -405,7 +405,7 @@ export const createDeposit = async (inputData: any) => {
 // -- -- Pending Transaction -- --
 export const createWithdrawal = async (inputData: any) => {
   // validate: is approve pending deposit ?
-  const { amount, user_id, account_from, bank_id } = inputData
+  const { amount, user_id, account_from, bank_id, withdrawal_exchange_log } = inputData
 
   // Validate
   if (!amount) {
@@ -427,6 +427,7 @@ export const createWithdrawal = async (inputData: any) => {
         account_from: account_from,
         bank: Number(bank_id),
         type: 'withdraw',
+        withdrawal_exchange_log: withdrawal_exchange_log
       },
     })
 
