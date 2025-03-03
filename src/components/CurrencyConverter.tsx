@@ -17,7 +17,7 @@ export interface UseCurrencyConverterReturn {
   values: Record<Currency, string>;
   formatCurrency: (value: string, currency: string) => string;
   handleChange: (currency: Currency) => (e: React.ChangeEvent<HTMLInputElement>) => void;
-  convertUSDtoVND:  (usdAmount: number, decimal: number) => string;
+  convertUSDtoVND: (usdAmount: number, decimal: number) => string;
 }
 
 export function useCurrencyConverter(setUSDCurrency: React.Dispatch<React.SetStateAction<number>>): UseCurrencyConverterReturn {
@@ -132,7 +132,16 @@ export default function CurrencyConverter({ setUSDCurrency }: CurrencyConverterP
         {(Object.keys(exchangeRates) as Currency[]).map((currency) => (
           <div key={currency} className="space-y-2">
             <Label htmlFor={currency} className="flex justify-between items-center">
-              <span>{currency}</span>
+              <span>
+                {currency}
+                {currency !== 'USD' && (
+                  <> (1 USD ={' '}
+                    {currency === 'USDT'
+                      ? `${exchangeRates.USDT.toFixed(2)} USDT`
+                      : `${exchangeRates.VND.toLocaleString('en-US')} VND`})
+                  </>
+                )}
+              </span>
               <span className="text-sm">
                 {values[currency] ? formatCurrency(values[currency], currency) : '-'}
               </span>
