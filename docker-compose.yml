@@ -1,23 +1,5 @@
 version: "3.8"
 services:
-<<<<<<< HEAD
-  dev_wealthfarming:
-    build:
-      context: . 
-    container_name: dev_wealthfarming
-    ports:
-      - "3001:3000"
-    labels:
-      - 'traefik.enable=true'
-      - 'traefik.docker.network=traefik'
-      - 'traefik.http.routers.dev_wealthfarming.entrypoints=http'
-      - 'traefik.http.routers.dev_wealthfarming.rule=Host(`dev.wealthfarming.org`)'
-      - 'traefik.http.routers.dev_wealthfarming-secure.entrypoints=https'
-      - 'traefik.http.routers.dev_wealthfarming-secure.rule=Host(`dev.wealthfarming.org`)'
-      - 'traefik.http.routers.dev_wealthfarming-secure.tls.certresolver=letsencrypt'
-    networks:
-      - traefik
-=======
   wealthfarming:
     build:
       context: . 
@@ -34,7 +16,6 @@ services:
       - 'traefik.http.routers.wealthfarming-secure.tls.certresolver=letsencrypt'
     networks:
       - traefik  
->>>>>>> main
 networks:
   traefik:
     external: true 
