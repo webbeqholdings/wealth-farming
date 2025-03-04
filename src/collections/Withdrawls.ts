@@ -93,7 +93,7 @@ const Withdrawals: CollectionConfig = {
                 const handleSendEmail = async ( account: any, data: any ) => {
                     // Send email Withdrawal Contract: Completed or Failed
                     if (typeof account.user !== 'number') {
-                        const userDetail = account.user; 
+                        const userDetail = account.user;
                         try {
                             await sendEmailContractWithdraw(userDetail.email, `Contract Withdrawal ${data.status} `, userDetail.first_name, userDetail.last_name, data.amount, data.status)
                         } catch (error) {

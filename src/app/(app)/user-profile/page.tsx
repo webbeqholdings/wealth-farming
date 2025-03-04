@@ -591,12 +591,12 @@ export default function UserProfile() {
                 <div className="mt-4 flex justify-between items-center">
                   <span className="text-sm text-gray-500">{t('chat_tele')}</span>
                   <a
-                    href="https://t.me/dev_wealth_farming_bot"
+                    href="https://t.me/wealth_farming_bot"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:text-blue-700 text-sm font-semibold"
                   >
-                    @dev_wealth_farming_bot
+                    @wealth_farming_bot
                   </a>
                 </div>
 
