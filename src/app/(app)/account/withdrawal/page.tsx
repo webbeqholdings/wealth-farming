@@ -94,6 +94,7 @@ export default function WithdrawPage() {
   const [banks, setBanks] = useState([])
   const [accounts, setAccounts] = useState([])
   const [selectBank, setSelectBank] = useState(null)
+  const [withdrawalExchangeRate, setWithdrawalExchangeRate] = useState(1)
 
   const getMessage = (messageField: string | object): string => {
     if (typeof messageField === 'string') {
@@ -111,7 +112,7 @@ export default function WithdrawPage() {
     if (step === 1) {
       const paymentTransfer = await getPaymentTransfer()
       if (Number(amount) < paymentTransfer.minWithdrawal) {
-        const mess =  getMessage(JSON.stringify({
+        const mess = getMessage(JSON.stringify({
           key: 'withdraw_must_greater',
           params: { amount: paymentTransfer.minWithdrawal },
         }))
@@ -143,8 +144,21 @@ export default function WithdrawPage() {
   }
 
   useEffect(() => {
+    const fetchPaymentTransfer = async () => {
+      try {
+        const paymentTransfer = await getPaymentTransfer();
+        setWithdrawalExchangeRate(paymentTransfer.usdToVndWithdrawal);
+      } catch (error) {
+        console.error('Error fetching payment transfer:', error);
+      }
+    };
+
+    fetchPaymentTransfer();
+  }, []);
+
+  useEffect(() => {
     const fetchAccounts = async () => {
-      if(!user?.id){
+      if (!user?.id) {
         return
       }
       try {
@@ -166,7 +180,7 @@ export default function WithdrawPage() {
 
   useEffect(() => {
     const fetchBanks = async () => {
-      if(!user?.id){
+      if (!user?.id) {
         return
       }
       try {
@@ -218,6 +232,10 @@ export default function WithdrawPage() {
         bank_id: selectBank,
         amount: amount,
         account_from: Number(accounts[0].id),
+        withdrawal_exchange_log: {
+          currency_exchange_rate: withdrawalExchangeRate,
+          currency_code: 'vnd',
+        },
       })
       if (!response?.isSuccess) {
         // Nếu không thành công, hiển thị thông báo lỗi
@@ -275,6 +293,15 @@ export default function WithdrawPage() {
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="amount">{t('money_amount')}</Label>
+                    <Alert>
+                      <AlertTitle className="text-red-500">{t('heads_up')}</AlertTitle>
+                      <AlertDescription>
+                        Withdrawal Exchange Rate:
+                        {currency == 'USD' && (
+                          <> (1 USD = {`${withdrawalExchangeRate?.toLocaleString('en-US')} VND`}) </>
+                        )}</AlertDescription>
+                    </Alert>
+
                     <div className="flex space-x-2">
                       <Select value={currency} onValueChange={setCurrency}>
                         <SelectTrigger className="w-[100px]">
@@ -407,7 +434,7 @@ export default function WithdrawPage() {
           <CardFooter className="flex justify-between">
             {step > 1 && (
               <Button variant="outline" onClick={handlePreviousStep}>
-                 {t("back")}
+                {t("back")}
               </Button>
             )}
             {step < 3 ? (

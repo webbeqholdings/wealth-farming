@@ -153,6 +153,25 @@ const Transactions: CollectionConfig = {
       label: 'Note',
       type: 'text',
     },
+    {
+      name: 'withdrawal_exchange_log',
+      type: 'group',
+      label: 'Withdrawal Exchange Information',
+      fields: [
+        {
+          name: 'currency_exchange_rate',
+          type: 'number',
+          label: 'Currency Exchange Rate',
+          defaultValue: 1, 
+        },
+        {
+          name: 'currency_code',
+          type: 'text',
+          label: 'Currency Code',
+          defaultValue: 'vnd',
+        },
+      ],
+    },
   ],
   hooks: {
     afterChange: [

@@ -376,6 +376,10 @@ export interface Transaction {
   type: 'deposit' | 'withdraw' | 'bonus' | 'transfer' | 'investment' | 'referral_reward';
   message?: string | null;
   note?: string | null;
+  withdrawal_exchange_log?: {
+    currency_exchange_rate?: number | null;
+    currency_code?: string | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -933,6 +937,12 @@ export interface TransactionsSelect<T extends boolean = true> {
   type?: T;
   message?: T;
   note?: T;
+  withdrawal_exchange_log?:
+    | T
+    | {
+        currency_exchange_rate?: T;
+        currency_code?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1248,6 +1258,7 @@ export interface GcPaymentTransfer {
   usd_to_vnd?: number | null;
   usdt_to_vnd?: number | null;
   usd_to_usdt?: number | null;
+  usd_to_vnd_withdrawal?: number | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1384,6 +1395,7 @@ export interface GcPaymentTransferSelect<T extends boolean = true> {
   usd_to_vnd?: T;
   usdt_to_vnd?: T;
   usd_to_usdt?: T;
+  usd_to_vnd_withdrawal?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

@@ -77,6 +77,12 @@ const GcPaymentTransfer: GlobalConfig = {
       label: 'USD to USDT',
       defaultValue: 1,
     },
+    {
+      name: 'usd_to_vnd_withdrawal',
+      type: 'number',
+      label: 'USD to VND (Withdrawal)',
+      defaultValue: 24444,
+    },
   ],
 }
 

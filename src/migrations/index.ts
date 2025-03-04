@@ -26,6 +26,7 @@ import * as migration_20250207_073006_add_subcription from './20250207_073006_ad
 import * as migration_20250210_115628_add_column_payment_method from './20250210_115628_add_column_payment_method';
 import * as migration_20250211_092052_add_column_user from './20250211_092052_add_column_user';
 import * as migration_20250214_051404_add_note_in_transaction from './20250214_051404_add_note_in_transaction';
+import * as migration_20250304_084217_add_transfer_logs_withdrawl from './20250304_084217_add_transfer_logs_withdrawl';
 
 export const migrations = [
   {
@@ -166,6 +167,11 @@ export const migrations = [
   {
     up: migration_20250214_051404_add_note_in_transaction.up,
     down: migration_20250214_051404_add_note_in_transaction.down,
-    name: '20250214_051404_add_note_in_transaction'
+    name: '20250214_051404_add_note_in_transaction',
+  },
+  {
+    up: migration_20250304_084217_add_transfer_logs_withdrawl.up,
+    down: migration_20250304_084217_add_transfer_logs_withdrawl.down,
+    name: '20250304_084217_add_transfer_logs_withdrawl'
   },
 ];
