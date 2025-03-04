@@ -43,3 +43,6 @@ next-env.d.ts
 /media
 /.vscode
 package-lock.json
+pnpm-lock.yaml
+docker-compose.yml
+Dockerfile
