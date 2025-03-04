@@ -25,7 +25,7 @@ export const getPaymentTransfer = async () => {
             usdToVnd: Number(response.usd_to_vnd),
             usdtToVnd: response.usdt_to_vnd,
             usdToUsdt: response.usd_to_usdt,
-            usd_to_vnd_withdrawal: response.usd_to_vnd_withdrawal
+            usdToVndWithdrawal: response.usd_to_vnd_withdrawal
         };
     } catch (error) {
         console.error('Transaction error:', error);

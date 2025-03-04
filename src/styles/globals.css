@@ -114,32 +114,6 @@
   to {bottom: 110px;}
 }
 
-body {
-  position: relative; 
-}
-
-body::after {
-  content: '';
-  position: fixed;
-  animation: move 1.5s infinite;
-  right: 0px; 
-  top: 50%; /* Adjust the vertical positioning */
-  height: 14%; /* Adjust the height to fit the image */
-  width: 9%; /* Adjust the width to fit the image */
-  background-image: url('https://i.postimg.cc/6p2Byctt/Pngtree-cartoon-fingers-hand-tap-touch-5670496.png');
-  background-size: contain; /* Ensures the image is fully contained within the element */
-  background-repeat: no-repeat;
-  background-position: center;
-  transform: translateY(140px) rotate(222deg); /* Move 35px down and rotate 222 degrees */
-}
-
-/* Optional: Keyframes for animation */
-@keyframes move {
-  0% { top: 45%; }
-  50% { top: 55%; }
-  100% { top: 45%; }
-}
-
 @layer base {
   .woot-widget-bubble {
     right: 100px !important; 

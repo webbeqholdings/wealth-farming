@@ -147,7 +147,7 @@ export default function WithdrawPage() {
     const fetchPaymentTransfer = async () => {
       try {
         const paymentTransfer = await getPaymentTransfer();
-        setWithdrawalExchangeRate(paymentTransfer.usd_to_vnd_withdrawal);
+        setWithdrawalExchangeRate(paymentTransfer.usdToVndWithdrawal);
       } catch (error) {
         console.error('Error fetching payment transfer:', error);
       }
@@ -298,7 +298,7 @@ export default function WithdrawPage() {
                       <AlertDescription>
                         Withdrawal Exchange Rate:
                         {currency == 'USD' && (
-                          <> (1 USD = {`${withdrawalExchangeRate.toLocaleString('en-US')} VND`}) </>
+                          <> (1 USD = {`${withdrawalExchangeRate?.toLocaleString('en-US')} VND`}) </>
                         )}</AlertDescription>
                     </Alert>
 
