@@ -31,9 +31,9 @@ jobs:
     container:
       image: dev-wealthfarming
       volumes:
-        - './development/.env:/.env'
+        - '/root/wealthfarming/development/.env:/.env'
     steps:
       - name: Deploy Service
         run: |
-          docker compose -f ./apps/docker-compose.yml up -d --force-recreate dev-wealthfarming
+          docker compose -f /root/wealthfarming/apps/docker-compose.yml up -d --force-recreate dev-wealthfarming
           docker image prune -f
