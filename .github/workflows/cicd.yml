@@ -25,13 +25,10 @@ jobs:
   deploy:
     needs: build-image
     runs-on: dev-wealthfarming
-    # This declares a GitHub deployment environment named 'dev-wealthfarming'
-    environment: dev-wealthfarming
-    # Running the deploy job inside a container to mount volumes
     container:
       image: dev-wealthfarming
       volumes:
-        - '/root/wealthfarming/development/.env'
+        - '/root/wealthfarming/development/.env:/.env'
     steps:
       - name: Deploy Service
         run: |
