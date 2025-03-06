@@ -11,26 +11,26 @@ on:
       - '**.md'
 
 env:
-  SERVICE: dev-wealthfarming
+  SERVICE: dev-wf
 
 jobs:
   build-image:
     if: contains(github.event.head_commit.message, '[cd-skip]') == false
-    runs-on: dev-wealthfarming
+    runs-on: dev-wf
     steps:
       - uses: actions/checkout@v4
       - name: Build Docker Image
-        run: docker build . --file Dockerfile --tag dev-wealthfarming:latest
+        run: docker build . --file Dockerfile --tag dev-wf:latest
 
   deploy:
     needs: build-image
-    runs-on: dev-wealthfarming
+    runs-on: dev-wf
     container:
-      image: dev-wealthfarming
+      image: dev-wf
       volumes:
-        - '/root/wealthfarming/development/.env:/.env'
+        - '/root/wealth-farming/development/.env:/.env'
     steps:
       - name: Deploy Service
         run: |
-          docker compose -f /root/wealthfarming/apps/docker-compose.yml up -d --force-recreate dev-wealthfarming
+          docker compose -f /root/wealth-farming/apps/docker-compose.yml up -d --force-recreate dev-wf
           docker image prune -f
