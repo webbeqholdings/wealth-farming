@@ -22,7 +22,6 @@ jobs:
       - name: Check out repo
         run: docker build . --file Dockerfile --tag dev-wealthfarming:latest
   deploy:
-  deploy:
     environment: development
     needs:
       - build-image
