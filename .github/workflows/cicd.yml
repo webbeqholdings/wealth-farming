@@ -31,7 +31,7 @@ jobs:
     container:
       image: dev-wealthfarming
       volumes:
-        - '/root/wealthfarming/development/.env:/.env'
+        - '/root/wealthfarming/development/.env'
     steps:
       - name: Deploy Service
         run: |
