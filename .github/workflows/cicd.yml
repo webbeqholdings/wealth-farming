@@ -19,14 +19,21 @@ jobs:
     runs-on: dev-wealthfarming
     steps:
       - uses: actions/checkout@v4
-      - name: Check out repo
+      - name: Build Docker Image
         run: docker build . --file Dockerfile --tag dev-wealthfarming:latest
+
   deploy:
-    environment: development
-    needs:
-      - build-image
+    needs: build-image
     runs-on: dev-wealthfarming
+    # This declares a GitHub deployment environment named 'dev-wealthfarming'
+    environment: dev-wealthfarming
+    # Running the deploy job inside a container to mount volumes
+    container:
+      image: dev-wealthfarming
+      volumes:
+        - './development/.env:/.env'
     steps:
-      - run: |
-          docker compose -f /root/wealthfarming/apps/docker-compose.yml up -d --force-recreate dev-wealthfarming
+      - name: Deploy Service
+        run: |
+          docker compose -f ./apps/docker-compose.yml up -d --force-recreate dev-wealthfarming
           docker image prune -f
