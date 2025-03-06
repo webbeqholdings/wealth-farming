@@ -28,7 +28,7 @@ jobs:
     container:
       image: dev-wf
       volumes:
-        - '/root/wealth-farming/development/.env:/.env'
+        - '/root/wealth-farming/development/.env:/root/wealth-farming/apps/.env'
     steps:
       - name: Deploy Service
         run: |
