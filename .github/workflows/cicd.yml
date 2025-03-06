@@ -1,0 +1,31 @@
+name: CICD
+
+on:
+  push:
+    branches:
+      - development
+    paths-ignore:
+      - '.vscode/**'
+      - '.env*'
+      - 'docs/**'
+      - '**.md'
+
+env:
+  SERVICE: wealth-farming
+
+jobs:
+  build-image:
+    if: contains(github.event.head_commit.message, '[cd-skip]') == false
+    runs-on: wealth-farming
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check out repo
+        run: docker build . --file Dockerfile --tag wealth-farming:latest
+  deploy:
+    needs:
+      - build-image
+    runs-on: wealth-farming
+    steps:
+      - run: |
+          docker compose -f /root/wealthfarming/apps/docker-compose.yml up -d --force-recreate wealth-farming
+          docker image prune -f
