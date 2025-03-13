@@ -321,3 +321,31 @@ export const getTransactionsWithDateByUser = async (
     return { docs: [], totalPages: 0, totalDocs: 0 }
   }
 }
+
+export const getTotalBonusByUser = async (
+  userId: number,
+) => {
+  try {
+    const payload = await getPayload({
+      config,
+    })
+    // Construct the where condition dynamically
+    const whereCondition: any = {
+      user: { equals: userId },
+    }
+    whereCondition.type = { equals: 'bonus' }
+
+    // Make a single call to payload.find
+    const response = await payload.find({
+      collection: 'transactions',
+      where: whereCondition
+    })
+    const transactions = response.docs
+    const totalBonus = transactions.reduce((sum, inv) => sum + inv.amount, 0)
+    return totalBonus
+  } catch (error) {
+    console.error('Total bonus error:', error)
+    return 0
+  }
+}
+

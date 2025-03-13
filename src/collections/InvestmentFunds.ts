@@ -1,4 +1,5 @@
 // investmentFunds.collection.js
+import { isAdmin } from '@/access/isAdmin'
 import { CollectionConfig } from 'payload'
 
 const InvestmentFunds: CollectionConfig = {
@@ -8,7 +9,7 @@ const InvestmentFunds: CollectionConfig = {
     listSearchableFields: ['name', 'category', 'fund_manager.email'],
   },
   access: {
-    read: () => true, // Publicly readable
+    read: isAdmin, // Publicly readable
   },
   fields: [
     {

@@ -60,6 +60,7 @@ import {
   getContractsWithDateByUser,
   getWithdrawalsByUser,
   getWithdrawalsWithDateByUser,
+  getTotalBonusByUser
 } from '@/lib/admin-only-view'
 import { TrendingUp } from 'lucide-react'
 import { CartesianGrid, Line, LineChart, XAxis } from 'recharts'
@@ -117,6 +118,7 @@ export default function CustomUserDetails({ params }: { params: Promise<{ slug: 
   const [loading, setLoading] = useState(true)
   const [startDateTransactions, setStartDateTransactions] = useState<Date>()
   const [endDateTransactions, setEndDateTransactions] = useState<Date>()
+  const [totalBonus, setTotalBonus] = useState(0)
   const getMessage = useGetMessage()
 
   //Contracts
@@ -145,6 +147,10 @@ export default function CustomUserDetails({ params }: { params: Promise<{ slug: 
           10,
           activeTabTransactions,
         )
+
+        //fetch total Bonus
+        const _totalBonus = await getTotalBonusByUser(userId)
+        setTotalBonus(_totalBonus)
 
         setTransactions(docs) // Store the accounts in state
         setTotalPagesTransactions(totalPages)
@@ -378,10 +384,12 @@ export default function CustomUserDetails({ params }: { params: Promise<{ slug: 
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-500">
-                {transactions &&
+                {/* {transactions &&
                   formatCurrency(transactions.filter(t => t.type == 'bonus')
                   .reduce((sum, inv) => sum + inv.amount, 0))
-                }
+                } */}
+
+                {formatCurrency(totalBonus)}
               </div>
             </CardContent>
           </Card>
@@ -612,8 +620,8 @@ export default function CustomUserDetails({ params }: { params: Promise<{ slug: 
                         ) : (
                           ''
                         )}
-                        {activeTabTransactions === 'deposit' ||
-                        activeTabTransactions === 'bonus' ? (
+                        {activeTabTransactions === 'deposit' ? (
+                        //|| activeTabTransactions === 'bonus' ? (
                           <TableCell>{t(transaction.account_from)}</TableCell>
                         ) : (
                           <TableCell>{t(transaction.account)}</TableCell>

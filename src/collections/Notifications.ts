@@ -4,7 +4,7 @@ import { sendEventNotification, sendOtherNotification } from '@/lib/users';
 const Notifications: CollectionConfig = {
   slug: 'notifications',
   access: {
-    read: () => true,
+    read: isAdmin,
     create: isAdmin,
   },
   admin: {

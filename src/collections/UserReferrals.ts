@@ -1,3 +1,4 @@
+import { isIndividualOrAdmin } from '@/access/isIndividualOrAdmin';
 import type { CollectionConfig } from 'payload'
 
 const UserReferrals: CollectionConfig = {
@@ -9,7 +10,7 @@ const UserReferrals: CollectionConfig = {
   },
   access: {
     create: () => true,
-    read: () => true,
+    read: isIndividualOrAdmin,
     update: () => true,
     delete: () => true,
   },
