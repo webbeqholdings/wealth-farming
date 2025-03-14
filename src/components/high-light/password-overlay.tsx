@@ -53,7 +53,7 @@ export function LogoutButton() {
 
   const handleLogout = () => {
     logout()
-    router.push('/dashboard')
+    router.push('/high-light')
   }
 
   return (

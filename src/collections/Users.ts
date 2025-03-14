@@ -31,8 +31,8 @@ export const Users: CollectionConfig = {
     listSearchableFields: ['email', 'first_name', 'last_name', 'phone_contact', 'referral_code'],
   },
   access: {
-    // read: () => true,
-    read: isAdminViewOnlyOrAdmin,
+    read: () => true,
+    // read: isAdminViewOnlyOrAdmin,
     create: () => true,
     update: ({ req: { user }, id }) => {
       // Allow if user is admin or updating their own record

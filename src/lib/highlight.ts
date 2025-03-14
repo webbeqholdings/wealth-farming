@@ -10,6 +10,7 @@ export const getUsers = async (): Promise<{ docs: any }> => {
     })
     const response = await payload.find({
       collection: 'users',
+      limit: 0,
       where: {
         role: { not_equals: "admin" },
       }
@@ -24,7 +25,7 @@ export const getUsers = async (): Promise<{ docs: any }> => {
         companyName: user.company_name,
         phone: user.phone_contact,
         email: user.email,
-        createdAt: user.created_at
+        createdAt: user.createdAt
         
       }))
     }
@@ -35,7 +36,7 @@ export const getUsers = async (): Promise<{ docs: any }> => {
   }
 }
 
-export const getUserById = async (userId: number): Promise<{ docs: any }> => {
+export const getUser = async (userId: number): Promise<{ docs: any }> => {
   try {
     const payload = await getPayload({
       config,
@@ -64,6 +65,75 @@ export const getUserById = async (userId: number): Promise<{ docs: any }> => {
   }
 }
 
+// export const getUserByContract = async (contractId: number): Promise<{ docs: any }> => {
+//   try {
+//     const payload = await getPayload({
+//       config,
+//     })
+//     const response = await payload.find({
+//       collection: 'users',
+//       where: {
+//         user: { equals: }
+//       }
+//     })
+//     const user = response
+//     return {
+//       docs: {
+//         id: user.id,
+//         role: user.role,
+//         firstName: user.first_name,
+//         lastName: user.last_name,
+//         companyName: user.company_name,
+//         phone: user.phone_contact,
+//         email: user.email,
+//         createdAt: user.createdAt
+//       }
+//     }
+//   } catch (error) {
+//     console.error('User error:', error)
+
+//     return { docs: null}
+//   }
+// }
+
+export const getContracts = async (): Promise<{ docs: any }> => {
+  try {
+    const payload = await getPayload({
+      config,
+    })
+    const response = await payload.find({
+      collection: 'contracts',
+      limit: 0,
+    })
+    const contracts = response.docs
+    return {
+      docs: contracts.map((contract: any) => ({
+        id: contract.id,
+        userId: contract.user.id,
+        minInvestment: contract?.product_log?.min_investment,
+        productName: contract?.product_log?.data?.product_name,
+        investedAmount: contract.amount,
+        expectedReturn: contract.expected_return,
+        availableBalance: Number(contract.balance),
+        term: contract.term,
+        periods: contract.periods,
+        profit: contract.profit,
+        rateOfReturn: contract?.product_log?.data?.rate_of_return,
+        startDate: contract.start_date,
+        endDate: contract.end_date,
+        status: contract.status,
+        extendContract: contract.extend_contract,
+        setting: contract.config_log,
+        lastWithdrawal: contract.updatedAt || null,
+      }))
+    }
+  } catch (error) {
+    console.error('Contract error:', error)
+
+    return { docs: [] }
+  }
+}
+
 export const getContractsByUser = async (
   userId: number
 ): Promise<{ docs: any }> => {
@@ -73,6 +143,7 @@ export const getContractsByUser = async (
     })
     const response = await payload.find({
       collection: 'contracts',
+      limit: 0,
       where: {
         user: { equals: userId },
       }
@@ -106,7 +177,7 @@ export const getContractsByUser = async (
   }
 }
 
-export const getContractById = async (
+export const getContract = async (
   contractId: number
 ): Promise<{ docs: any }> => {
   try {
@@ -164,6 +235,7 @@ export const getTransactionsByUser = async (
     // Make a single call to payload.find
     const response = await payload.find({
       collection: 'transactions',
+      limit: 0,
       where: whereCondition
     })
     const transactions = response.docs
@@ -190,6 +262,49 @@ export const getTransactionsByUser = async (
   }
 }
 
+export const getTotalInvestment = async () => {
+  try {
+    const { docs } = await getContracts()
+    const totalInvestment = docs.reduce((sum: number, inv: any) => sum + inv.investedAmount, 0)
+    return totalInvestment
+  } catch (error) {
+    console.error('Total Invesment error:', error)
+    return 0
+  }
+}
+
+export const getUsersCount = async () => {
+  try {
+    const { docs } = await getUsers()
+    const usersCount = docs.length
+    return usersCount
+  } catch (error) {
+    console.error('User Count error:', error)
+    return 0
+  }
+}
+
+export const getActiveContractsCount = async () => {
+  try {
+    const payload = await getPayload({
+      config,
+    })
+    const response = await payload.find({
+      collection: 'contracts',
+      limit: 0,
+      where: {
+        status: { equals: "active" }
+      }
+    })
+    const contracts = response.docs
+    const contractsCount = contracts.length
+    return contractsCount
+  } catch (error) {
+    console.error('Contracts Count error:', error)
+    return 0
+  }
+}
+
 export const getTotalBonusByUser = async (
   userId: number,
 ) => {
@@ -206,6 +321,7 @@ export const getTotalBonusByUser = async (
     // Make a single call to payload.find
     const response = await payload.find({
       collection: 'transactions',
+      limit: 0,
       where: whereCondition
     })
     const transactions = response.docs

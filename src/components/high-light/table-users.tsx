@@ -167,9 +167,6 @@ export default function TableUsers({ users }: TableUsersProps) {
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead className="text-right">Last Active</TableHead>
               <TableHead className="w-[50px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -185,21 +182,6 @@ export default function TableUsers({ users }: TableUsersProps) {
                 <TableRow key={user.id}>
                   <TableCell className="font-medium">{user.name}</TableCell>
                   <TableCell>{user.email}</TableCell>
-                  <TableCell>
-                    <div
-                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                        user.status === 'Active'
-                          ? 'bg-emerald-100/10 text-emerald-500'
-                          : user.status === 'Inactive'
-                            ? 'bg-yellow-100/10 text-yellow-500'
-                            : 'bg-red-100/10 text-red-500'
-                      }`}
-                    >
-                      {user.status}
-                    </div>
-                  </TableCell>
-                  <TableCell>{user.role}</TableCell>
-                  <TableCell className="text-right">{user.lastActive}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

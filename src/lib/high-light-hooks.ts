@@ -1,3 +1,5 @@
+import { getContracts, getContractsByUser, getActiveContractsCount, getTotalBonusByUser, getTotalInvestment, getUsers, getUsersCount, getUser, getTransactionsByUser, getContract} from "@/lib/highlight"
+
 // Types for our data models
 import {
   buildProfitLogsAnnualy,
@@ -76,16 +78,21 @@ export interface DashboardData {
 export async function getDashboardData(): Promise<DashboardData> {
   // In a real app, you would fetch this from Payload CMS
   // Example: const response = await fetch('https://your-payload-cms.com/api/dashboard')
+  const users = await getAllUsers()
+  const contracts = await getAllContracts()
+  const totalRevenue = await getTotalInvestment()
+  const activeUsers = await getUsersCount()
+  const activeContracts = await getActiveContractsCount()
 
   // For now, we'll return mock data
   return {
-    users: sampleUsers,
-    contracts: sampleContracts,
+    users: users,
+    contracts: contracts,
     transactions: sampleTransactions,
     metrics: {
-      totalRevenue: 45231.89,
-      activeUsers: 2350,
-      activeContracts: 573,
+      totalRevenue: totalRevenue,
+      activeUsers: activeUsers,
+      activeContracts: activeContracts,
       avgResponseTime: '1.2h',
       revenueChange: 20.1,
       userChange: 180,
@@ -101,17 +108,46 @@ export async function getUserById(id: string): Promise<User | null> {
   // Example: const response = await fetch(`https://your-payload-cms.com/api/users/${id}`)
 
   // For now, we'll return mock data
-  const user = sampleUsers.find((user) => user.id === id)
-  return user || null
+  const { docs } = await getUser(Number(id))
+  const user = {
+    id: docs.id,
+    name: `${docs.firstName} ${docs.lastName}`,
+    email: docs.email,
+    status: "",
+    role: docs.role,
+    lastActive: "",
+    phone: docs.phone || "No Updated",
+    address: "No update",
+    joinDate: docs.createdAt,
+    bio: "",
+  };
+  return user
 }
 
 // Fetch all users
 export async function getAllUsers(): Promise<User[]> {
   // In a real app, you would fetch this from Payload CMS
   // Example: const response = await fetch('https://your-payload-cms.com/api/users')
+  const { docs } = await getUsers()
+  const users = docs.map((user: any) => {
+    // Convert createdAt (Date) to a string
+    // const joinDate = new Date(user.createdAt).toISOString(); // Convert Date to string
 
+    return {
+      id: user.id,
+      name: `${user.firstName} ${user.lastName}`,
+      email: user.email,
+      status: "",
+      role: user.role,
+      lastActive: "",
+      phone: user.phone || "No Updated",
+      address: "No update",
+      joinDate: user.createdAt,
+      bio: "",
+    };
+  });
   // For now, we'll return mock data
-  return sampleUsers
+  return users
 }
 
 // Fetch a specific contract by ID
@@ -119,9 +155,25 @@ export async function getContractById(id: string): Promise<Contract | null> {
   // In a real app, you would fetch this from Payload CMS
   // Example: const response = await fetch(`https://your-payload-cms.com/api/contracts/${id}`)
 
+  const { docs } = await getContract(Number(id))
+  const contract = {
+      id: docs.id,
+      userId: docs.userId,
+      title: docs?.productName || "",
+      value: docs.investedAmount,
+      startDate: format(docs.startDate, 'PP'),
+      endDate: format(docs.endDate, 'PP'),
+      status: docs.status,
+      description: "No Update",
+      client: docs?.productName,
+      contactPerson: "No Update",
+      contactEmail: "No Update",
+      contactPhone: "No Update",
+      terms: docs.term,
+      renewalOption: false,
+    };
   // For now, we'll return mock data
-  const contract = sampleContracts.find((contract) => contract.id === id)
-  return contract || null
+  return contract
 }
 
 // Fetch transactions for a specific contract
@@ -135,7 +187,18 @@ export async function getTransactionsByContractId(contractId: string): Promise<T
 
 // Fetch transactions for a specific user
 export async function getTransactionsByUserId(userId: number): Promise<Transaction[]> {
-  return sampleTransactions.filter((transaction) => transaction.userId === userId)
+  const { docs } = await getTransactionsByUser(userId)
+  const transactions= docs.map((transaction: any) => {
+    return {
+      id: transaction.id,
+      contractId: "",
+      userId: "",
+      date: transaction.date,
+      amount: transaction.amount,
+      type: transaction.type,
+      description: transaction.note || "No Update",
+    }})
+  return transactions
 }
 
 // Fetch financial data for a user
@@ -160,10 +223,16 @@ export async function getUserEquityData(userId: string) {
 
 // Fetch equity data for a contract
 export async function getContractEquityData(contractId: string) {
+  const contract = await getContractById(contractId)
   // find Contract infomation
-  let contract_amount = 5000 // contract.amount
-  let start_date = new Date('2024-01-01')
-  let end_date = new Date(new Date().setDate(new Date().getDate() - 1)) // Yesterday
+  let contract_amount = contract.value // contract.amount
+  let start_date = new Date(contract.startDate)
+  let end_date
+  if (contract.status == "active")
+  {
+    end_date = new Date(contract.endDate)
+  }
+  else end_date = new Date(new Date().setDate(new Date().getDate() - 1)) // Yesterday
 
   // if term == annualy
   // ...
@@ -180,13 +249,65 @@ export async function getContractEquityData(contractId: string) {
 }
 
 // Fetch contracts for a specific user
+export async function getAllContracts(): Promise<Contract[]> {
+  // In a real app, you would fetch this from Payload CMS
+  // Example: const response = await fetch(`https://your-payload-cms.com/api/contracts?userId=${userId}`)
+
+  const { docs } = await getContracts()
+  const contracts = docs.map((contract: any) => {
+
+    return {
+        id: contract.id,
+        userId: contract.userId,
+        title: contract?.productName,
+        value: contract.investedAmount,
+        startDate: format(contract.startDate, 'PP'),
+        endDate: contract.endDate ? format(contract.endDate, 'PP') : "",
+        status: contract.status,
+        description: "No Update",
+        client: contract?.productName,
+        contactPerson: "No Update",
+        contactEmail: "No Update",
+        contactPhone: "No Update",
+        terms: contract.term,
+        renewalOption: "No Update",
+    };
+  });
+  // For now, we'll return mock data
+  return contracts
+}
+
+// Fetch contracts for a specific user
 export async function getContractsByUserId(userId: string): Promise<Contract[]> {
   // In a real app, you would fetch this from Payload CMS
   // Example: const response = await fetch(`https://your-payload-cms.com/api/contracts?userId=${userId}`)
 
+  const { docs } = await getContractsByUser(Number(userId))
+  const contracts = docs.map((contract: any) => {
+
+    return {
+      id: contract.id,
+      userId: contract.userId,
+      title: contract?.productName,
+      value: contract.investedAmount,
+      startDate: format(contract.startDate, 'PP'),
+      endDate: format(contract.endDate, 'PP'),
+      status: contract.status,
+      description: "No Update",
+      client: contract?.productName,
+      contactPerson: "No Update",
+      contactEmail: "No Update",
+      contactPhone: "No Update",
+      terms: contract.term,
+      renewalOption: "No Update",
+    };
+  });
   // For now, we'll return mock data
-  return sampleContracts.filter((contract) => contract.userId === userId)
+  return contracts
 }
+
+
+
 
 // Sample data - in a real app, this would come from Payload CMS
 const sampleUsers: User[] = [

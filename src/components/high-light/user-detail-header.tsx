@@ -38,11 +38,8 @@ export default function UserDetailHeader({ user }: UserDetailHeaderProps) {
                   <Badge variant={user.status === 'Active' ? 'success' : 'destructive'}>
                     {user.status}
                   </Badge>
-                  <span>•</span>
-                  <span>{user.role}</span>
                 </div>
               </div>
-              <div className="text-sm text-muted-foreground">Last active: {user.lastActive}</div>
             </div>
 
             <p className="text-muted-foreground">{user.bio}</p>
