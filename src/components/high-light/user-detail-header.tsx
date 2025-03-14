@@ -1,20 +1,10 @@
+'use client'
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Mail, Phone, MapPin, Calendar } from 'lucide-react'
-
-interface User {
-  id: number
-  name: string
-  email: string
-  status: string
-  role: string
-  lastActive: string
-  phone: string
-  address: string
-  joinDate: string
-  bio: string
-}
+import type { User } from '@/lib/high-light-hooks'
 
 interface UserDetailHeaderProps {
   user: User

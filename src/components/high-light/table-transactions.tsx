@@ -1,6 +1,7 @@
 'use client'
-import { Button } from '@/components/ui/button'
+
 import { useState, useMemo } from 'react'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -9,7 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-
 import {
   Table,
   TableBody,
@@ -18,12 +18,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { format, isAfter, isBefore, isValid, parse } from 'date-fns'
 import TablePagination from '@/components/high-light/table-pagination'
-import { Badge } from '@/components/ui/badge'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { CalendarIcon, Filter, X } from 'lucide-react'
+import { format, isAfter, isBefore, isValid, parse } from 'date-fns'
 import { Calendar } from '@/components/ui/calendar'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Badge } from '@/components/ui/badge'
 import {
   Select,
   SelectContent,
@@ -31,8 +31,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import type { Transaction } from '@/lib/high-light-hooks'
 
-export default function TableTransactions() {
+interface TableTransactionsProps {
+  transactions: Transaction[]
+}
+
+export default function TableTransactions({ transactions }: TableTransactionsProps) {
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
 
@@ -61,7 +66,7 @@ export default function TableTransactions() {
       }
 
       // Check category filter
-      if (categoryFilter && transaction.category !== categoryFilter) return false
+      if (categoryFilter && transaction.type !== categoryFilter) return false
 
       return true
     })
@@ -101,7 +106,7 @@ export default function TableTransactions() {
 
   // Get unique categories for the filter
   const uniqueCategories = useMemo(() => {
-    return Array.from(new Set(transactions.map((transaction) => transaction.category)))
+    return Array.from(new Set(transactions.map((transaction) => transaction.type)))
   }, [transactions])
 
   return (
@@ -147,7 +152,7 @@ export default function TableTransactions() {
               <SelectContent>
                 {uniqueCategories.map((category) => (
                   <SelectItem key={category} value={category}>
-                    {category}
+                    {category.charAt(0).toUpperCase() + category.slice(1)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -185,7 +190,7 @@ export default function TableTransactions() {
             )}
             {categoryFilter && (
               <Badge variant="outline" className="text-xs">
-                Category: {categoryFilter}
+                Category: {categoryFilter.charAt(0).toUpperCase() + categoryFilter.slice(1)}
               </Badge>
             )}
           </div>
@@ -215,11 +220,23 @@ export default function TableTransactions() {
                   <TableCell className="font-medium">{transaction.id}</TableCell>
                   <TableCell>{transaction.description}</TableCell>
                   <TableCell>{transaction.date}</TableCell>
-                  <TableCell>{transaction.category}</TableCell>
+                  <TableCell>
+                    <div
+                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                        transaction.type === 'investment'
+                          ? 'bg-emerald-100/10 text-emerald-500'
+                          : transaction.type === 'withdraw'
+                            ? 'bg-red-100/10 text-red-500'
+                            : 'bg-yellow-100/10 text-yellow-500'
+                      }`}
+                    >
+                      {transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
+                    </div>
+                  </TableCell>
                   <TableCell
-                    className={`text-right ${transaction.amount > 0 ? 'text-emerald-500' : 'text-red-500'}`}
+                    className={`text-right ${transaction.type === 'withdraw' ? 'text-red-500' : 'text-emerald-500'}`}
                   >
-                    {transaction.amount > 0 ? '+' : ''}
+                    {transaction.type === 'withdraw' ? '-' : '+'}
                     {transaction.amount.toLocaleString('en-US', {
                       style: 'currency',
                       currency: 'USD',
@@ -244,182 +261,3 @@ export default function TableTransactions() {
     </Card>
   )
 }
-
-// Sample data - expanded to show pagination better
-const transactions = [
-  {
-    id: 'TRX-001',
-    description: 'Payment from Client A',
-    date: 'Mar 15, 2023',
-    category: 'Income',
-    amount: 5250.0,
-  },
-  {
-    id: 'TRX-002',
-    description: 'Office Supplies',
-    date: 'Mar 14, 2023',
-    category: 'Expense',
-    amount: -125.5,
-  },
-  {
-    id: 'TRX-003',
-    description: 'Software Subscription',
-    date: 'Mar 13, 2023',
-    category: 'Expense',
-    amount: -49.99,
-  },
-  {
-    id: 'TRX-004',
-    description: 'Payment from Client B',
-    date: 'Mar 12, 2023',
-    category: 'Income',
-    amount: 3200.0,
-  },
-  {
-    id: 'TRX-005',
-    description: 'Server Hosting',
-    date: 'Mar 10, 2023',
-    category: 'Expense',
-    amount: -299.0,
-  },
-  {
-    id: 'TRX-006',
-    description: 'Employee Payroll',
-    date: 'Mar 5, 2023',
-    category: 'Expense',
-    amount: -8500.0,
-  },
-  {
-    id: 'TRX-007',
-    description: 'Payment from Client C',
-    date: 'Mar 3, 2023',
-    category: 'Income',
-    amount: 4750.0,
-  },
-  {
-    id: 'TRX-008',
-    description: 'Marketing Campaign',
-    date: 'Mar 2, 2023',
-    category: 'Expense',
-    amount: -1200.0,
-  },
-  {
-    id: 'TRX-009',
-    description: 'Office Rent',
-    date: 'Mar 1, 2023',
-    category: 'Expense',
-    amount: -2000.0,
-  },
-  {
-    id: 'TRX-010',
-    description: 'Consulting Services',
-    date: 'Feb 28, 2023',
-    category: 'Income',
-    amount: 1800.0,
-  },
-  {
-    id: 'TRX-011',
-    description: 'Hardware Purchase',
-    date: 'Feb 25, 2023',
-    category: 'Expense',
-    amount: -3500.0,
-  },
-  {
-    id: 'TRX-012',
-    description: 'Cloud Services',
-    date: 'Feb 23, 2023',
-    category: 'Expense',
-    amount: -450.0,
-  },
-  {
-    id: 'TRX-013',
-    description: 'Payment from Client D',
-    date: 'Feb 20, 2023',
-    category: 'Income',
-    amount: 6200.0,
-  },
-  {
-    id: 'TRX-014',
-    description: 'Internet Bill',
-    date: 'Feb 18, 2023',
-    category: 'Expense',
-    amount: -120.0,
-  },
-  {
-    id: 'TRX-015',
-    description: 'Team Lunch',
-    date: 'Feb 15, 2023',
-    category: 'Expense',
-    amount: -350.0,
-  },
-  {
-    id: 'TRX-016',
-    description: 'Contract Extension Fee',
-    date: 'Feb 12, 2023',
-    category: 'Income',
-    amount: 1500.0,
-  },
-  {
-    id: 'TRX-017',
-    description: 'Training Workshop',
-    date: 'Feb 10, 2023',
-    category: 'Expense',
-    amount: -2000.0,
-  },
-  {
-    id: 'TRX-018',
-    description: 'Client Refund',
-    date: 'Feb 8, 2023',
-    category: 'Expense',
-    amount: -750.0,
-  },
-  {
-    id: 'TRX-019',
-    description: 'Annual License Renewal',
-    date: 'Feb 5, 2023',
-    category: 'Expense',
-    amount: -1200.0,
-  },
-  {
-    id: 'TRX-020',
-    description: 'Payment from Client E',
-    date: 'Feb 3, 2023',
-    category: 'Income',
-    amount: 4800.0,
-  },
-  {
-    id: 'TRX-021',
-    description: 'Data Recovery Services',
-    date: 'Feb 1, 2023',
-    category: 'Expense',
-    amount: -800.0,
-  },
-  {
-    id: 'TRX-022',
-    description: 'Conference Ticket',
-    date: 'Jan 28, 2023',
-    category: 'Expense',
-    amount: -1500.0,
-  },
-  {
-    id: 'TRX-023',
-    description: 'Payment from Client F',
-    date: 'Jan 25, 2023',
-    category: 'Income',
-    amount: 3250.0,
-  },
-  {
-    id: 'TRX-024',
-    description: 'Office Equipment',
-    date: 'Jan 20, 2023',
-    category: 'Expense',
-    amount: -980.0,
-  },
-  {
-    id: 'TRX-025',
-    description: 'Quarterly Tax Payment',
-    date: 'Jan 15, 2023',
-    category: 'Expense',
-    amount: -5600.0,
-  },
-]

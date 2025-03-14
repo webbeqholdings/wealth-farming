@@ -11,14 +11,63 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts'
+import { useEffect, useState } from 'react'
+import { getUserEquityData } from '@/lib/high-light-hooks'
 
 interface UserEquityChartProps {
-  userId: number
+  userId: string
 }
 
 export default function UserEquityChart({ userId }: UserEquityChartProps) {
-  // In a real app, you would fetch this data based on the userId
-  const userData = userEquityData.find((data) => data.userId === userId)?.data || []
+  const [chartData, setChartData] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchEquityData() {
+      try {
+        const data = await getUserEquityData(userId)
+        setChartData(data)
+      } catch (error) {
+        console.error('Error fetching equity data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchEquityData()
+  }, [userId])
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Equity Performance</CardTitle>
+          <CardDescription>Loading equity data...</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[400px] flex items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (chartData.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Equity Performance</CardTitle>
+          <CardDescription>No equity data available for this user.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[400px] flex items-center justify-center text-muted-foreground">
+            No data to display
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
 
   return (
     <Card>
@@ -30,7 +79,7 @@ export default function UserEquityChart({ userId }: UserEquityChartProps) {
         <div className="h-[400px]">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
-              data={userData}
+              data={chartData}
               margin={{
                 top: 20,
                 right: 30,
@@ -94,42 +143,3 @@ export default function UserEquityChart({ userId }: UserEquityChartProps) {
     </Card>
   )
 }
-
-// Sample data - in a real app, this would come from a database
-const userEquityData = [
-  {
-    userId: 1,
-    data: [
-      { month: 'Apr', equity: 67000, investments: 45000 },
-      { month: 'May', equity: 75800, investments: 48000 },
-      { month: 'Jun', equity: 93400, investments: 52000 },
-      { month: 'Jul', equity: 102500, investments: 55000 },
-      { month: 'Aug', equity: 108700, investments: 58000 },
-      { month: 'Sep', equity: 120000, investments: 62000 },
-      { month: 'Oct', equity: 135800, investments: 68000 },
-      { month: 'Nov', equity: 147200, investments: 72000 },
-      { month: 'Dec', equity: 160500, investments: 76000 },
-      { month: 'Jan', equity: 169300, investments: 80000 },
-      { month: 'Feb', equity: 180100, investments: 85000 },
-      { month: 'Mar', equity: 192800, investments: 90000 },
-    ],
-  },
-  {
-    userId: 2,
-    data: [
-      { month: 'Apr', equity: 42000, investments: 30000 },
-      { month: 'May', equity: 48500, investments: 32000 },
-      { month: 'Jun', equity: 55200, investments: 35000 },
-      { month: 'Jul', equity: 63800, investments: 38000 },
-      { month: 'Aug', equity: 72100, investments: 42000 },
-      { month: 'Sep', equity: 79500, investments: 45000 },
-      { month: 'Oct', equity: 88200, investments: 48000 },
-      { month: 'Nov', equity: 95700, investments: 50000 },
-      { month: 'Dec', equity: 104300, investments: 53000 },
-      { month: 'Jan', equity: 112800, investments: 56000 },
-      { month: 'Feb', equity: 121500, investments: 59000 },
-      { month: 'Mar', equity: 130200, investments: 62000 },
-    ],
-  },
-  // Other user equity data...
-]

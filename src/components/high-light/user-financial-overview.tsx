@@ -1,20 +1,64 @@
+'use client'
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ArrowDown, ArrowUp, DollarSign, TrendingUp } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { getUserFinancialData, type FinancialData } from '@/lib/high-light-hooks'
 
 interface UserFinancialOverviewProps {
-  userId: number
+  userId: string
 }
 
 export default function UserFinancialOverview({ userId }: UserFinancialOverviewProps) {
-  // In a real app, you would fetch this data based on the userId
-  const financialData = userFinancialData.find((data) => data.userId === userId) || {
-    userId: 0,
-    totalInvestment: 0,
-    totalWithdraw: 0,
-    totalEarnings: 0,
-    investmentChange: 0,
-    withdrawChange: 0,
-    earningsChange: 0,
+  const [financialData, setFinancialData] = useState<FinancialData | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchFinancialData() {
+      try {
+        const data = await getUserFinancialData(userId)
+        setFinancialData(data)
+      } catch (error) {
+        console.error('Error fetching financial data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchFinancialData()
+  }, [userId])
+
+  if (loading) {
+    return (
+      <div className="grid gap-4 md:grid-cols-3 mb-6">
+        {Array(3)
+          .fill(0)
+          .map((_, i) => (
+            <Card key={i}>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium">Loading...</CardTitle>
+                <div className="h-4 w-4 animate-pulse bg-muted rounded-full" />
+              </CardHeader>
+              <CardContent>
+                <div className="h-8 w-24 animate-pulse bg-muted rounded-md mb-2" />
+                <div className="h-4 w-32 animate-pulse bg-muted rounded-md" />
+              </CardContent>
+            </Card>
+          ))}
+      </div>
+    )
+  }
+
+  if (!financialData) {
+    return (
+      <div className="grid gap-4 md:grid-cols-3 mb-6">
+        <Card>
+          <CardContent className="p-6 text-center text-muted-foreground">
+            No financial data available for this user.
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   return (
@@ -95,26 +139,3 @@ export default function UserFinancialOverview({ userId }: UserFinancialOverviewP
     </div>
   )
 }
-
-// Sample data - in a real app, this would come from a database
-const userFinancialData = [
-  {
-    userId: 1,
-    totalInvestment: 125000,
-    totalWithdraw: 45000,
-    totalEarnings: 32500,
-    investmentChange: 12.5,
-    withdrawChange: -5.2,
-    earningsChange: 8.7,
-  },
-  {
-    userId: 2,
-    totalInvestment: 87500,
-    totalWithdraw: 23000,
-    totalEarnings: 18200,
-    investmentChange: 5.8,
-    withdrawChange: 3.2,
-    earningsChange: 10.5,
-  },
-  // Other user financial data...
-]

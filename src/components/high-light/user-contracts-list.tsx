@@ -1,37 +1,67 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ChevronDown, ChevronUp, ExternalLink, FileText } from 'lucide-react'
 import Link from 'next/link'
-
-interface Contract {
-  id: string
-  title: string
-  value: number
-  startDate: string
-  endDate: string
-  status: string
-  description: string
-}
+import { getContractsByUserId, type Contract } from '@/lib/high-light-hooks'
 
 interface UserContractsListProps {
-  userId: number
+  userId: string
 }
 
 export default function UserContractsList({ userId }: UserContractsListProps) {
-  // In a real app, you would fetch this data based on the userId
-  const userContracts = contractsData.filter((contract) => contract.userId === userId)
-
+  const [userContracts, setUserContracts] = useState<Contract[]>([])
+  const [loading, setLoading] = useState(true)
   const [expandedContracts, setExpandedContracts] = useState<Record<string, boolean>>({})
+
+  useEffect(() => {
+    async function fetchContracts() {
+      try {
+        const contracts = await getContractsByUserId(userId)
+        setUserContracts(contracts)
+      } catch (error) {
+        console.error('Error fetching contracts:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchContracts()
+  }, [userId])
 
   const toggleContract = (contractId: string) => {
     setExpandedContracts((prev) => ({
       ...prev,
       [contractId]: !prev[contractId],
     }))
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        {Array(3)
+          .fill(0)
+          .map((_, i) => (
+            <Card key={i} className="overflow-hidden">
+              <CardHeader className="p-4 pb-0">
+                <div className="flex items-center justify-between">
+                  <div className="h-6 w-48 animate-pulse bg-muted rounded-md" />
+                  <div className="h-6 w-20 animate-pulse bg-muted rounded-full" />
+                </div>
+                <CardDescription className="mt-2">
+                  <div className="h-4 w-full animate-pulse bg-muted rounded-md mt-2" />
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-4">
+                <div className="h-4 w-32 animate-pulse bg-muted rounded-md" />
+              </CardContent>
+            </Card>
+          ))}
+      </div>
+    )
   }
 
   return (
@@ -95,7 +125,7 @@ export default function UserContractsList({ userId }: UserContractsListProps) {
                     )}
                   </Button>
                   <Button variant="outline" size="sm" className="h-8" asChild>
-                    <Link href={`/high-light/contracts/${contract.id}`}>
+                    <Link href={`/contracts/${contract.id}`}>
                       <ExternalLink className="h-4 w-4 mr-1" />
                       See Detail
                     </Link>
@@ -140,52 +170,3 @@ export default function UserContractsList({ userId }: UserContractsListProps) {
     </div>
   )
 }
-
-// Sample data - in a real app, this would come from a database
-const contractsData = [
-  {
-    userId: 1,
-    id: 'CTR-7890',
-    title: 'Enterprise Software Development',
-    value: 125000,
-    startDate: 'Jan 15, 2023',
-    endDate: 'Jan 14, 2024',
-    status: 'Active',
-    description:
-      'Development of custom enterprise resource planning software with integrated modules for inventory management, human resources, and financial reporting. Includes ongoing maintenance and support for the duration of the contract.',
-  },
-  {
-    userId: 1,
-    id: 'CTR-7891',
-    title: 'Mobile App Development',
-    value: 85000,
-    startDate: 'Feb 1, 2023',
-    endDate: 'Jan 31, 2024',
-    status: 'Active',
-    description:
-      'Design and development of cross-platform mobile applications for iOS and Android. Includes user authentication, push notifications, and integration with existing backend systems.',
-  },
-  {
-    userId: 1,
-    id: 'CTR-7892',
-    title: 'Cloud Migration Services',
-    value: 65000,
-    startDate: 'Mar 10, 2023',
-    endDate: 'Mar 9, 2024',
-    status: 'Pending',
-    description:
-      'Migration of on-premises infrastructure to cloud-based solutions. Includes assessment, planning, migration execution, and post-migration support to ensure minimal disruption to business operations.',
-  },
-  {
-    userId: 2,
-    id: 'CTR-7893',
-    title: 'Digital Marketing Campaign',
-    value: 45000,
-    startDate: 'Apr 5, 2023',
-    endDate: 'Apr 4, 2024',
-    status: 'Active',
-    description:
-      'Comprehensive digital marketing campaign including SEO optimization, content creation, social media management, and performance analytics. Monthly reporting and strategy adjustments based on campaign performance.',
-  },
-  // Other contracts...
-]

@@ -1,40 +1,12 @@
+'use client'
+
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Calendar, DollarSign, FileText, Mail, Phone, User } from 'lucide-react'
-
-interface ContractUser {
-  id: number
-  name: string
-  email: string
-  status: string
-  role: string
-  lastActive: string
-  phone: string
-  address: string
-  joinDate: string
-  bio: string
-}
-
-interface Contract {
-  id: string
-  userId: number
-  title: string
-  value: number
-  startDate: string
-  endDate: string
-  status: string
-  description: string
-  client: string
-  contactPerson: string
-  contactEmail: string
-  contactPhone: string
-  terms: string
-  renewalOption: boolean
-}
-
+import type { Contract, User as ContractUser } from '@/lib/high-light-hooks'
 interface ContractDetailHeaderProps {
   contract: Contract
-  user?: ContractUser
+  user?: ContractUser | null
 }
 
 export default function ContractDetailHeader({ contract, user }: ContractDetailHeaderProps) {
