@@ -11,7 +11,7 @@ const Posts: CollectionConfig = {
     listSearchableFields: ['title', 'author.email'],
   },
   access: {
-    read: () => true,
+    read: isAdmin,
     create: isAdmin,
     update: isAdminOrAuthor,
     delete: isAdmin,

@@ -142,7 +142,7 @@ export interface User {
   telegram?: (number | null) | Telegram;
   first_name?: string | null;
   last_name?: string | null;
-  role: 'admin' | 'individual' | 'company';
+  role: 'admin' | 'individual' | 'company' | 'ad-viewonly';
   company_name?: string | null;
   registration_number?: string | null;
   phone_contact?: string | null;

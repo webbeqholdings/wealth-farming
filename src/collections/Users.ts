@@ -1,5 +1,7 @@
+import { isAdminViewOnlyOrAdmin } from './../access/isAdminViewOnlyOrAdmin';
 import type { CollectionConfig } from 'payload'
 import { isAdmin } from '../access/isAdmin'
+
 import { sendEmail } from '@/utilities/emailSender'
 import { authenticator } from 'otplib'
 import { generateReferralCode } from '@/utilities/referralCode'
@@ -10,11 +12,27 @@ export const Users: CollectionConfig = {
     maxLoginAttempts: 0, // Automatically lock a user out after X amount of failed logins
   },
   admin: {
+    components: {
+      views: {
+        edit: {
+          details: {
+            Component: '/components/CustomUserDetails',
+            path: '/details',
+            tab: {
+              label: 'Details',
+              href: '/details',
+            }, 
+          }
+        },
+      },
+    },
+    
     useAsTitle: 'email',
     listSearchableFields: ['email', 'first_name', 'last_name', 'phone_contact', 'referral_code'],
   },
   access: {
     read: () => true,
+    // read: isAdminViewOnlyOrAdmin,
     create: () => true,
     update: ({ req: { user }, id }) => {
       // Allow if user is admin or updating their own record
@@ -63,6 +81,10 @@ export const Users: CollectionConfig = {
         {
           label: 'Company Investor',
           value: 'company',
+        },
+        {
+          label: 'Admin View Only',
+          value: 'ad-viewonly',
         },
       ],
       defaultValue: 'individual',

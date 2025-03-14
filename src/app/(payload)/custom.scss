@@ -1,0 +1,38 @@
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 37 0% 95%;
+  --foreground: 37 0% 3%;
+  --card: 37 0% 90%;
+  --card-foreground: 37 0% 10%;
+  --popover: 37 0% 95%;
+  --popover-foreground: 37 95% 3%;
+  --primary: 37 75.7% 64.5%;
+  --primary-foreground: 0 0% 0%;
+  --secondary: 37 10% 70%;
+  --secondary-foreground: 0 0% 0%;
+  --muted: -1 10% 85%;
+  --muted-foreground: 37 0% 35%;
+  --accent: -1 10% 80%;
+  --accent-foreground: 37 0% 10%;
+  --destructive: 0 50% 30%;
+  --destructive-foreground: 37 0% 90%;
+  --border: 37 20% 50%;
+  --input: 37 20% 18%;
+  --ring: 37 75.7% 64.5%;
+  --radius: 0.5rem;
+  --chart-1: 12 76% 61%; /* Main chart color 1 */
+  --chart-2: 173 58% 39%; /* Main chart color 2 */
+  --chart-3: 197 37% 24%; /* Main chart color 3 */
+  --chart-4: 43 74% 66%; /* Main chart color 4 */
+  --chart-5: 27 87% 67%; /* Main chart color 5 */
+  --sidebar-background: 0 0% 98%; /* Sidebar background */
+  --sidebar-foreground: 240 5.3% 26.1%; /* Sidebar text */
+  --sidebar-primary: 37 75.7% 64.5%; /* Sidebar primary */
+  --sidebar-primary-foreground: 0 0% 98%; /* Sidebar primary foreground */
+  --sidebar-accent: 37 10% 78%; /* Sidebar accent */
+  --sidebar-accent-foreground: 37 3% 10%; /* Sidebar accent foreground */
+  --sidebar-border: 37 20% 78%; /* Sidebar border */
+  --sidebar-ring: 37 75.7% 64.5%; /* Sidebar ring */
+}

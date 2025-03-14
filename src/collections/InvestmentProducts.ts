@@ -1,10 +1,11 @@
 // investmentProducts.collection.js
+import { isAdmin } from '@/access/isAdmin'
 import type { CollectionConfig } from 'payload'
 
 const InvestmentProducts: CollectionConfig = {
   slug: 'investment-products',
   access: {
-    read: () => true, // Publicly readable
+    read: isAdmin, // Publicly readable
   },
   admin: {
     useAsTitle: 'product_name',

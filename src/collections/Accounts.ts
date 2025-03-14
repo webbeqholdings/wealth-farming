@@ -1,3 +1,4 @@
+import { isAdmin } from '@/access/isAdmin'
 import type { CollectionConfig } from 'payload'
 
 const Accounts: CollectionConfig = {
@@ -7,7 +8,7 @@ const Accounts: CollectionConfig = {
     listSearchableFields: ['account_name', 'account_number', 'amount', 'user.email']
   },
   access: {
-    read: () => true,
+    read: isAdmin,
   },
   fields: [
     {
