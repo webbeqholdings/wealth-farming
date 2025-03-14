@@ -82,10 +82,6 @@ export const Users: CollectionConfig = {
           label: 'Company Investor',
           value: 'company',
         },
-        {
-          label: 'Admin View Only',
-          value: 'ad-viewonly',
-        },
       ],
       defaultValue: 'individual',
       access: {
