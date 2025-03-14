@@ -113,7 +113,7 @@ export default buildConfig({
   ],
   globals: [SiteSettings, MainMenu, GcPaymentTransfer, GcBeQDynamicFund, Header, Footer],
   editor: lexicalEditor(),
-  secret: '954bfc716bd0c78333154536',
+  secret: process.env.PAYLOAD_SECRET,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
