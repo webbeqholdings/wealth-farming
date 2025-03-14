@@ -4,11 +4,13 @@ import ContractEquityChart from '@/components/high-light/contract-equity-chart'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { use } from 'react'
 import PasswordOverlay, { LogoutButton } from '@/components/high-light/password-overlay'
 
-export default function ContractDetailPage({ params }: { params: { id: string } }) {
+export default function ContractDetailPage({ params }: { params: Promise<{ id: string }> }) {
   // In a real app, you would fetch the contract data based on the ID
-  const contractId = params.id
+  const { id } = use(params)
+  const contractId = id
   const contract = contractsData.find((contract) => contract.id === contractId)
 
   // Find the user associated with this contract
@@ -21,7 +23,7 @@ export default function ContractDetailPage({ params }: { params: { id: string } 
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center">
               <Button variant="outline" size="sm" asChild className="mr-4">
-                <Link href={user ? `/users/${user.id}` : '/dashboard'}>
+                <Link href={user ? `/high-light/users/${user.id}` : '/high-light'}>
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   {user ? `Back to ${user.name}'s Profile` : 'Back to Dashboard'}
                 </Link>

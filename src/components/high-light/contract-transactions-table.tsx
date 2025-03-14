@@ -86,10 +86,6 @@ export default function ContractTransactionsTable({ contractId }: ContractTransa
               <ArrowDownUp className="h-4 w-4 mr-2" />
               Filter
             </Button>
-            <Button size="sm">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Transaction
-            </Button>
           </div>
         </div>
       </CardHeader>
