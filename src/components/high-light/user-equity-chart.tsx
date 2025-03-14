@@ -122,12 +122,12 @@ export default function UserEquityChart({ userId }: UserEquityChartProps) {
                 type="monotone"
                 dataKey="equity"
                 name="Total Equity"
-                stroke="#8884d8"
+                stroke="#f5c842"
                 strokeWidth={2}
                 dot={{ r: 4, strokeWidth: 2 }}
-                activeDot={{ r: 6, strokeWidth: 2 }}
+                activeDot={{ r: 1, strokeWidth: 1 }}
               />
-              <Line
+              {/* <Line
                 type="monotone"
                 dataKey="investments"
                 name="Investments"
@@ -135,7 +135,7 @@ export default function UserEquityChart({ userId }: UserEquityChartProps) {
                 strokeWidth={2}
                 dot={{ r: 4, strokeWidth: 2 }}
                 activeDot={{ r: 6, strokeWidth: 2 }}
-              />
+              /> */}
             </LineChart>
           </ResponsiveContainer>
         </div>

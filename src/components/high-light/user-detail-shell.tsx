@@ -15,6 +15,7 @@ import UserDetailHeader from '@/components/high-light/user-detail-header'
 import UserFinancialOverview from '@/components/high-light/user-financial-overview'
 import UserContractsList from '@/components/high-light/user-contracts-list'
 import UserEquityChart from '@/components/high-light/user-equity-chart'
+import UserTransactionsTable from '@/components/high-light/user-transactions-table'
 import PasswordOverlay, { LogoutButton } from '@/components/high-light/password-overlay'
 import type { User } from '@/lib/high-light-hooks'
 
@@ -39,7 +40,7 @@ export default function UserDetailShell({ user, allUsers }: UserDetailShellProps
               <Button variant="outline" size="sm" asChild>
                 <Link href="/high-light">
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Dashboard
+                  Back to High Light
                 </Link>
               </Button>
               <h1 className="text-3xl font-bold tracking-tight">User Details</h1>
@@ -74,11 +75,16 @@ export default function UserDetailShell({ user, allUsers }: UserDetailShellProps
             <UserContractsList userId={user.id} />
           </div>
 
-          {/* Equity Chart */}
           <div className="mt-8">
+            <h2 className="text-xl font-semibold mb-4">Transactions</h2>
+            <UserTransactionsTable userId={Number(user.id)} />
+          </div>
+
+          {/* Equity Chart */}
+          {/* <div className="mt-8">
             <h2 className="text-xl font-semibold mb-4">Equity Performance</h2>
             <UserEquityChart userId={user.id} />
-          </div>
+          </div> */}
         </main>
       </div>
     </PasswordOverlay>

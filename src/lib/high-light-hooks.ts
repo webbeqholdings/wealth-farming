@@ -1,4 +1,11 @@
 // Types for our data models
+import {
+  buildProfitLogsAnnualy,
+  buildProfitLogsSemester,
+  buildProfitLogsQuarterly,
+  buildProfitLogsMonthly,
+} from '@/lib/investment-products/dynamicFund'
+import { format } from 'date-fns'
 export interface User {
   id: string
   name: string
@@ -32,9 +39,10 @@ export interface Contract {
 export interface Transaction {
   id: string
   contractId: string
+  userId?: number
   date: string
   amount: number
-  type: 'bonus' | 'withdraw' | 'investment'
+  type: 'bonus' | 'withdraw' | 'investment' | 'deposit'
   description: string
 }
 
@@ -125,6 +133,11 @@ export async function getTransactionsByContractId(contractId: string): Promise<T
   return sampleTransactions.filter((transaction) => transaction.contractId === contractId)
 }
 
+// Fetch transactions for a specific user
+export async function getTransactionsByUserId(userId: number): Promise<Transaction[]> {
+  return sampleTransactions.filter((transaction) => transaction.userId === userId)
+}
+
 // Fetch financial data for a user
 export async function getUserFinancialData(userId: string): Promise<FinancialData | null> {
   // In a real app, you would fetch this from Payload CMS
@@ -147,12 +160,23 @@ export async function getUserEquityData(userId: string) {
 
 // Fetch equity data for a contract
 export async function getContractEquityData(contractId: string) {
-  // In a real app, you would fetch this from Payload CMS
-  // Example: const response = await fetch(`https://your-payload-cms.com/api/equity?contractId=${contractId}`)
+  // find Contract infomation
+  let contract_amount = 5000 // contract.amount
+  let start_date = new Date('2024-01-01')
+  let end_date = new Date(new Date().setDate(new Date().getDate() - 1)) // Yesterday
 
-  // For now, we'll return mock data
-  const contractData = contractEquityData.find((data) => data.contractId === contractId)
-  return contractData?.data || []
+  // if term == annualy
+  // ...
+  const logs = await buildProfitLogsAnnualy(contract_amount, start_date, end_date)
+  const chartData = logs.profitLogs.map((item: any) => {
+    return {
+      month: format(item.toDate, 'PP'),
+      value: item.balance,
+    }
+  })
+
+  // const contractData = contractEquityData.find((data) => data.contractId === contractId)
+  return chartData || []
 }
 
 // Fetch contracts for a specific user
@@ -887,6 +911,7 @@ const sampleTransactions: Transaction[] = [
     amount: 37500,
     type: 'investment',
     description: 'Initial payment (30%)',
+    userId: 1,
   },
   {
     id: 'TRX-002',
@@ -895,6 +920,7 @@ const sampleTransactions: Transaction[] = [
     amount: 37500,
     type: 'investment',
     description: 'Milestone payment (30%)',
+    userId: 1,
   },
   {
     id: 'TRX-003',
@@ -903,6 +929,7 @@ const sampleTransactions: Transaction[] = [
     amount: 5000,
     type: 'withdraw',
     description: 'Resource allocation',
+    userId: 1,
   },
   {
     id: 'TRX-004',
@@ -911,6 +938,7 @@ const sampleTransactions: Transaction[] = [
     amount: 7500,
     type: 'bonus',
     description: 'Early delivery bonus',
+    userId: 1,
   },
   {
     id: 'TRX-005',
@@ -919,6 +947,7 @@ const sampleTransactions: Transaction[] = [
     amount: 12000,
     type: 'withdraw',
     description: 'Development costs',
+    userId: 1,
   },
   {
     id: 'TRX-006',
@@ -927,6 +956,7 @@ const sampleTransactions: Transaction[] = [
     amount: 8000,
     type: 'withdraw',
     description: 'Testing resources',
+    userId: 1,
   },
   {
     id: 'TRX-007',
@@ -935,6 +965,7 @@ const sampleTransactions: Transaction[] = [
     amount: 50000,
     type: 'investment',
     description: 'Final payment (40%)',
+    userId: 1,
   },
   {
     id: 'TRX-008',
@@ -943,6 +974,7 @@ const sampleTransactions: Transaction[] = [
     amount: 25500,
     type: 'investment',
     description: 'Initial payment (30%)',
+    userId: 1,
   },
   {
     id: 'TRX-009',
@@ -951,6 +983,7 @@ const sampleTransactions: Transaction[] = [
     amount: 25500,
     type: 'investment',
     description: 'Milestone payment (30%)',
+    userId: 2,
   },
   {
     id: 'TRX-010',
@@ -959,6 +992,7 @@ const sampleTransactions: Transaction[] = [
     amount: 4500,
     type: 'withdraw',
     description: 'UI/UX design costs',
+    userId: 1,
   },
   {
     id: 'TRX-011',
@@ -967,6 +1001,7 @@ const sampleTransactions: Transaction[] = [
     amount: 6000,
     type: 'withdraw',
     description: 'Development resources',
+    userId: 2,
   },
   {
     id: 'TRX-012',
@@ -975,6 +1010,7 @@ const sampleTransactions: Transaction[] = [
     amount: 5000,
     type: 'bonus',
     description: 'Performance optimization bonus',
+    userId: 2,
   },
   {
     id: 'TRX-013',
@@ -983,6 +1019,7 @@ const sampleTransactions: Transaction[] = [
     amount: 19500,
     type: 'investment',
     description: 'Initial payment (30%)',
+    userId: 1,
   },
   {
     id: 'TRX-014',
@@ -991,6 +1028,7 @@ const sampleTransactions: Transaction[] = [
     amount: 13500,
     type: 'investment',
     description: 'Initial payment (30%)',
+    userId: 1,
   },
   {
     id: 'TRX-015',
@@ -999,6 +1037,7 @@ const sampleTransactions: Transaction[] = [
     amount: 4500,
     type: 'withdraw',
     description: 'Support and maintenance',
+    userId: 1,
   },
   {
     id: 'TRX-016',
@@ -1007,6 +1046,7 @@ const sampleTransactions: Transaction[] = [
     amount: 6000,
     type: 'bonus',
     description: 'Year-end performance bonus',
+    userId: 1,
   },
   {
     id: 'TRX-017',
@@ -1015,6 +1055,7 @@ const sampleTransactions: Transaction[] = [
     amount: 10500,
     type: 'investment',
     description: 'Initial payment (30%)',
+    userId: 1,
   },
   {
     id: 'TRX-018',

@@ -121,13 +121,13 @@ export default function ContractEquityChart({ contractId }: ContractEquityChartP
               <Line
                 type="monotone"
                 dataKey="value"
-                name="Contract Value"
-                stroke="#8884d8"
+                name="Equity"
+                stroke="#f5c842"
                 strokeWidth={2}
                 dot={{ r: 4, strokeWidth: 2 }}
-                activeDot={{ r: 6, strokeWidth: 2 }}
+                activeDot={{ r: 1, strokeWidth: 1 }}
               />
-              <Line
+              {/* <Line
                 type="monotone"
                 dataKey="cost"
                 name="Operational Cost"
@@ -144,7 +144,7 @@ export default function ContractEquityChart({ contractId }: ContractEquityChartP
                 strokeWidth={2}
                 dot={{ r: 4, strokeWidth: 2 }}
                 activeDot={{ r: 6, strokeWidth: 2 }}
-              />
+              /> */}
             </LineChart>
           </ResponsiveContainer>
         </div>
