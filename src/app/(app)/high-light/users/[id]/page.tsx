@@ -17,8 +17,16 @@ import {
 } from '@/components/ui/select'
 
 import { useRouter } from 'next/navigation'
-import { useState, useEffect } from 'react'
 import PasswordOverlay, { LogoutButton } from '@/components/high-light/password-overlay'
+import {
+  getTotalBonusByUser,
+  getUserById,
+  getUsers,
+  getContractsByUser,
+  getContractById,
+} from '@/lib/highlight'
+import { useEffect, useState } from 'react'
+import Spinner from '@/components/Spinner'
 
 export default function UserDetailPage({ params }: { params: Promise<{ id: string }> }) {
   // In a real app, you would fetch the user data based on the ID
@@ -26,6 +34,27 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
   const userId = Number.parseInt(id)
   const user = users.find((user) => user.id === userId)
 
+  const [loading, setLoading] = useState(true)
+  // const [totalBonus, setTotalBonus] = useState(0)
+
+  useEffect(() => {
+    fetchUser(userId)
+    setLoading(false)
+  }, [loading])
+
+  const fetchUser = async (userId: number) => {
+    try {
+      const { docs } = await getUserById(userId)
+      console.log(docs)
+    } catch (error) {
+      console.error('Failed to fetch accounts:', error)
+    }
+  }
+
+  // If still loading, show a loading indicator (or spinner)
+  if (loading) {
+    return <Spinner /> // You can replace this with a loading spinner component if desired
+  }
   return (
     <PasswordOverlay>
       <div className="flex min-h-screen flex-col bg-background">
