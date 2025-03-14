@@ -1,4 +1,6 @@
+'use client'
 import { Button } from '@/components/ui/button'
+import { useState, useMemo } from 'react'
 import {
   Card,
   CardContent,
@@ -7,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+
 import {
   Table,
   TableBody,
@@ -16,7 +19,29 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
+import TablePagination from '@/components/high-light/table-pagination'
+
 export default function TableTransactions() {
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+
+  // Calculate pagination
+  const paginatedTransactions = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize
+    return transactions.slice(startIndex, startIndex + pageSize)
+  }, [currentPage, pageSize])
+
+  const totalPages = Math.ceil(transactions.length / pageSize)
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+  }
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size)
+    setCurrentPage(1) // Reset to first page when changing page size
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -35,7 +60,7 @@ export default function TableTransactions() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {transactions.map((transaction) => (
+            {paginatedTransactions.map((transaction) => (
               <TableRow key={transaction.id}>
                 <TableCell className="font-medium">{transaction.id}</TableCell>
                 <TableCell>{transaction.description}</TableCell>
@@ -55,24 +80,21 @@ export default function TableTransactions() {
           </TableBody>
         </Table>
       </CardContent>
-      <CardFooter className="flex items-center justify-between">
-        <div className="text-xs text-muted-foreground">
-          Showing <strong>1-10</strong> of <strong>156</strong> transactions
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" size="sm" disabled>
-            Previous
-          </Button>
-          <Button variant="outline" size="sm">
-            Next
-          </Button>
-        </div>
+      <CardFooter>
+        <TablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={transactions.length}
+          pageSize={pageSize}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+        />
       </CardFooter>
     </Card>
   )
 }
 
-// Sample data
+// Sample data - expanded to show pagination better
 const transactions = [
   {
     id: 'TRX-001',
@@ -143,5 +165,110 @@ const transactions = [
     date: 'Feb 28, 2023',
     category: 'Income',
     amount: 1800.0,
+  },
+  {
+    id: 'TRX-011',
+    description: 'Hardware Purchase',
+    date: 'Feb 25, 2023',
+    category: 'Expense',
+    amount: -3500.0,
+  },
+  {
+    id: 'TRX-012',
+    description: 'Cloud Services',
+    date: 'Feb 23, 2023',
+    category: 'Expense',
+    amount: -450.0,
+  },
+  {
+    id: 'TRX-013',
+    description: 'Payment from Client D',
+    date: 'Feb 20, 2023',
+    category: 'Income',
+    amount: 6200.0,
+  },
+  {
+    id: 'TRX-014',
+    description: 'Internet Bill',
+    date: 'Feb 18, 2023',
+    category: 'Expense',
+    amount: -120.0,
+  },
+  {
+    id: 'TRX-015',
+    description: 'Team Lunch',
+    date: 'Feb 15, 2023',
+    category: 'Expense',
+    amount: -350.0,
+  },
+  {
+    id: 'TRX-016',
+    description: 'Contract Extension Fee',
+    date: 'Feb 12, 2023',
+    category: 'Income',
+    amount: 1500.0,
+  },
+  {
+    id: 'TRX-017',
+    description: 'Training Workshop',
+    date: 'Feb 10, 2023',
+    category: 'Expense',
+    amount: -2000.0,
+  },
+  {
+    id: 'TRX-018',
+    description: 'Client Refund',
+    date: 'Feb 8, 2023',
+    category: 'Expense',
+    amount: -750.0,
+  },
+  {
+    id: 'TRX-019',
+    description: 'Annual License Renewal',
+    date: 'Feb 5, 2023',
+    category: 'Expense',
+    amount: -1200.0,
+  },
+  {
+    id: 'TRX-020',
+    description: 'Payment from Client E',
+    date: 'Feb 3, 2023',
+    category: 'Income',
+    amount: 4800.0,
+  },
+  {
+    id: 'TRX-021',
+    description: 'Data Recovery Services',
+    date: 'Feb 1, 2023',
+    category: 'Expense',
+    amount: -800.0,
+  },
+  {
+    id: 'TRX-022',
+    description: 'Conference Ticket',
+    date: 'Jan 28, 2023',
+    category: 'Expense',
+    amount: -1500.0,
+  },
+  {
+    id: 'TRX-023',
+    description: 'Payment from Client F',
+    date: 'Jan 25, 2023',
+    category: 'Income',
+    amount: 3250.0,
+  },
+  {
+    id: 'TRX-024',
+    description: 'Office Equipment',
+    date: 'Jan 20, 2023',
+    category: 'Expense',
+    amount: -980.0,
+  },
+  {
+    id: 'TRX-025',
+    description: 'Quarterly Tax Payment',
+    date: 'Jan 15, 2023',
+    category: 'Expense',
+    amount: -5600.0,
   },
 ]

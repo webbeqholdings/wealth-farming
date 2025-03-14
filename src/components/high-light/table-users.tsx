@@ -1,3 +1,5 @@
+'use client'
+import { useState, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -25,7 +27,29 @@ import {
 import { MoreHorizontal } from 'lucide-react'
 import Link from 'next/link'
 
+import TablePagination from '@/components/high-light/table-pagination'
+
 export default function TableUsers() {
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+
+  // Calculate pagination
+  const paginatedUsers = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize
+    return users.slice(startIndex, startIndex + pageSize)
+  }, [currentPage, pageSize])
+
+  const totalPages = Math.ceil(users.length / pageSize)
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+  }
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size)
+    setCurrentPage(1) // Reset to first page when changing page size
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -45,7 +69,7 @@ export default function TableUsers() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users.map((user) => (
+            {paginatedUsers.map((user) => (
               <TableRow key={user.id}>
                 <TableCell className="font-medium">{user.name}</TableCell>
                 <TableCell>{user.email}</TableCell>
@@ -76,9 +100,6 @@ export default function TableUsers() {
                       <DropdownMenuItem asChild>
                         <Link href={`/users/${user.id}`}>View Details</Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem>Edit User</DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-red-500">Delete User</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
@@ -87,24 +108,21 @@ export default function TableUsers() {
           </TableBody>
         </Table>
       </CardContent>
-      <CardFooter className="flex items-center justify-between">
-        <div className="text-xs text-muted-foreground">
-          Showing <strong>1-10</strong> of <strong>42</strong> users
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" size="sm" disabled>
-            Previous
-          </Button>
-          <Button variant="outline" size="sm">
-            Next
-          </Button>
-        </div>
+      <CardFooter>
+        <TablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={users.length}
+          pageSize={pageSize}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+        />
       </CardFooter>
     </Card>
   )
 }
 
-// Sample data
+// Sample data - expanded to show pagination better
 const users = [
   {
     id: 1,
@@ -185,5 +203,101 @@ const users = [
     status: 'Active',
     role: 'User',
     lastActive: 'Just now',
+  },
+  {
+    id: 11,
+    name: 'Richard Harris',
+    email: 'richard.harris@example.com',
+    status: 'Active',
+    role: 'User',
+    lastActive: '3 days ago',
+  },
+  {
+    id: 12,
+    name: 'Patricia Martin',
+    email: 'patricia.martin@example.com',
+    status: 'Inactive',
+    role: 'User',
+    lastActive: '1 week ago',
+  },
+  {
+    id: 13,
+    name: 'Thomas Jackson',
+    email: 'thomas.jackson@example.com',
+    status: 'Active',
+    role: 'Manager',
+    lastActive: '12 hours ago',
+  },
+  {
+    id: 14,
+    name: 'Barbara White',
+    email: 'barbara.white@example.com',
+    status: 'Suspended',
+    role: 'User',
+    lastActive: '3 weeks ago',
+  },
+  {
+    id: 15,
+    name: 'Charles Lee',
+    email: 'charles.lee@example.com',
+    status: 'Active',
+    role: 'Admin',
+    lastActive: '2 days ago',
+  },
+  {
+    id: 16,
+    name: 'Susan Walker',
+    email: 'susan.walker@example.com',
+    status: 'Active',
+    role: 'User',
+    lastActive: '6 hours ago',
+  },
+  {
+    id: 17,
+    name: 'Joseph Hall',
+    email: 'joseph.hall@example.com',
+    status: 'Inactive',
+    role: 'User',
+    lastActive: '5 days ago',
+  },
+  {
+    id: 18,
+    name: 'Jessica Allen',
+    email: 'jessica.allen@example.com',
+    status: 'Active',
+    role: 'Manager',
+    lastActive: 'Yesterday',
+  },
+  {
+    id: 19,
+    name: 'Christopher Young',
+    email: 'christopher.young@example.com',
+    status: 'Active',
+    role: 'User',
+    lastActive: '4 days ago',
+  },
+  {
+    id: 20,
+    name: 'Margaret King',
+    email: 'margaret.king@example.com',
+    status: 'Active',
+    role: 'User',
+    lastActive: 'Today',
+  },
+  {
+    id: 21,
+    name: 'Daniel Wright',
+    email: 'daniel.wright@example.com',
+    status: 'Active',
+    role: 'User',
+    lastActive: '2 hours ago',
+  },
+  {
+    id: 22,
+    name: 'Amanda Scott',
+    email: 'amanda.scott@example.com',
+    status: 'Suspended',
+    role: 'User',
+    lastActive: '1 month ago',
   },
 ]

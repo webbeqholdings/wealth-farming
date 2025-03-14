@@ -1,3 +1,5 @@
+'use client'
+import { useState, useMemo } from 'react'
 import {
   Card,
   CardContent,
@@ -16,6 +18,7 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { ArrowDownUp, ArrowUp, Plus } from 'lucide-react'
+import TablePagination from '@/components/high-light/table-pagination'
 
 interface Transaction {
   id: string
@@ -31,10 +34,29 @@ interface ContractTransactionsTableProps {
 }
 
 export default function ContractTransactionsTable({ contractId }: ContractTransactionsTableProps) {
-  // In a real app, you would fetch this data based on the contractId
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(5)
+
+  // Filter and paginate transactions
   const contractTransactions = transactionsData.filter(
     (transaction) => transaction.contractId === contractId,
   )
+
+  const paginatedTransactions = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize
+    return contractTransactions.slice(startIndex, startIndex + pageSize)
+  }, [contractTransactions, currentPage, pageSize])
+
+  const totalPages = Math.ceil(contractTransactions.length / pageSize)
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+  }
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size)
+    setCurrentPage(1) // Reset to first page when changing page size
+  }
 
   // Calculate totals by type
   const totals = contractTransactions.reduce(
@@ -119,14 +141,14 @@ export default function ContractTransactionsTable({ contractId }: ContractTransa
             </TableRow>
           </TableHeader>
           <TableBody>
-            {contractTransactions.length === 0 ? (
+            {paginatedTransactions.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                   No transactions found for this contract.
                 </TableCell>
               </TableRow>
             ) : (
-              contractTransactions.map((transaction) => (
+              paginatedTransactions.map((transaction) => (
                 <TableRow key={transaction.id}>
                   <TableCell className="font-medium">{transaction.id}</TableCell>
                   <TableCell>{transaction.date}</TableCell>
@@ -156,18 +178,15 @@ export default function ContractTransactionsTable({ contractId }: ContractTransa
           </TableBody>
         </Table>
       </CardContent>
-      <CardFooter className="flex items-center justify-between">
-        <div className="text-xs text-muted-foreground">
-          Showing <strong>{contractTransactions.length}</strong> transactions
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" size="sm" disabled>
-            Previous
-          </Button>
-          <Button variant="outline" size="sm" disabled={contractTransactions.length < 10}>
-            Next
-          </Button>
-        </div>
+      <CardFooter>
+        <TablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={contractTransactions.length}
+          pageSize={pageSize}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+        />
       </CardFooter>
     </Card>
   )
@@ -286,5 +305,21 @@ const transactionsData: Transaction[] = [
     amount: 13500,
     type: 'investment',
     description: 'Initial payment (30%)',
+  },
+  {
+    id: 'TRX-015',
+    contractId: 'CTR-7890',
+    date: 'Nov 15, 2023',
+    amount: 4500,
+    type: 'withdraw',
+    description: 'Support and maintenance',
+  },
+  {
+    id: 'TRX-016',
+    contractId: 'CTR-7890',
+    date: 'Dec 20, 2023',
+    amount: 6000,
+    type: 'bonus',
+    description: 'Year-end performance bonus',
   },
 ]

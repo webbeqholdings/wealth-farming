@@ -1,3 +1,6 @@
+'use client'
+import { useState, useMemo } from 'react'
+
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -16,7 +19,29 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
+import TablePagination from '@/components/high-light/table-pagination'
+
 export default function TableContracts() {
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+
+  // Calculate pagination
+  const paginatedContracts = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize
+    return contracts.slice(startIndex, startIndex + pageSize)
+  }, [currentPage, pageSize])
+
+  const totalPages = Math.ceil(contracts.length / pageSize)
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+  }
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size)
+    setCurrentPage(1) // Reset to first page when changing page size
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -36,7 +61,7 @@ export default function TableContracts() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {contracts.map((contract) => (
+            {paginatedContracts.map((contract) => (
               <TableRow key={contract.id}>
                 <TableCell className="font-medium">{contract.id}</TableCell>
                 <TableCell>{contract.client}</TableCell>
@@ -61,24 +86,21 @@ export default function TableContracts() {
           </TableBody>
         </Table>
       </CardContent>
-      <CardFooter className="flex items-center justify-between">
-        <div className="text-xs text-muted-foreground">
-          Showing <strong>1-10</strong> of <strong>28</strong> contracts
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" size="sm" disabled>
-            Previous
-          </Button>
-          <Button variant="outline" size="sm">
-            Next
-          </Button>
-        </div>
+      <CardFooter>
+        <TablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={contracts.length}
+          pageSize={pageSize}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+        />
       </CardFooter>
     </Card>
   )
 }
 
-// Sample data
+// Sample data - expanded to show pagination better
 const contracts = [
   {
     id: 'CTR-7890',
@@ -159,5 +181,45 @@ const contracts = [
     startDate: 'Oct 1, 2023',
     endDate: 'Sep 30, 2024',
     status: 'Active',
+  },
+  {
+    id: 'CTR-7900',
+    client: 'Soylent Corp',
+    value: 85000,
+    startDate: 'Nov 10, 2023',
+    endDate: 'Nov 9, 2024',
+    status: 'Active',
+  },
+  {
+    id: 'CTR-7901',
+    client: 'Weyland-Yutani',
+    value: 195000,
+    startDate: 'Dec 5, 2023',
+    endDate: 'Dec 4, 2024',
+    status: 'Pending',
+  },
+  {
+    id: 'CTR-7902',
+    client: 'InGen',
+    value: 220000,
+    startDate: 'Jan 20, 2024',
+    endDate: 'Jan 19, 2025',
+    status: 'Active',
+  },
+  {
+    id: 'CTR-7903',
+    client: 'Aperture Science',
+    value: 75000,
+    startDate: 'Feb 15, 2024',
+    endDate: 'Feb 14, 2025',
+    status: 'Active',
+  },
+  {
+    id: 'CTR-7904',
+    client: 'Blue Sun Corp',
+    value: 130000,
+    startDate: 'Mar 1, 2024',
+    endDate: 'Feb 28, 2025',
+    status: 'Pending',
   },
 ]
