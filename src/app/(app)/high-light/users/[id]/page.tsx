@@ -4,9 +4,10 @@ import UserDetailShell from '@/components/high-light/user-detail-shell'
 import SkeletonDashboard from '@/components/high-light/skeleton-dashboard'
 import { notFound } from 'next/navigation'
 
-export default async function UserDetailPage({ params }: { params: { id: string } }) {
+export default async function UserDetailPage({ params }: { params: Promise<{ id: string }> }) {
   // Fetch user data from Payload CMS
-  const userId = params.id
+  const { id } = await params
+  const userId = id
   const userData = await getUserById(userId)
 
   // Fetch all users for the selector

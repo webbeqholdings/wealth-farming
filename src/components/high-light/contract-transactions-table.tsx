@@ -104,16 +104,6 @@ export default function ContractTransactionsTable({ contractId }: ContractTransa
             <CardTitle>Transactions</CardTitle>
             <CardDescription>All financial transactions for this contract.</CardDescription>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm">
-              <ArrowDownUp className="h-4 w-4 mr-2" />
-              Filter
-            </Button>
-            <Button size="sm">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Transaction
-            </Button>
-          </div>
         </div>
       </CardHeader>
       <CardContent>

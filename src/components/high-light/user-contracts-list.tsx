@@ -125,7 +125,7 @@ export default function UserContractsList({ userId }: UserContractsListProps) {
                     )}
                   </Button>
                   <Button variant="outline" size="sm" className="h-8" asChild>
-                    <Link href={`/contracts/${contract.id}`}>
+                    <Link href={`/high-light/contracts/${contract.id}`}>
                       <ExternalLink className="h-4 w-4 mr-1" />
                       See Detail
                     </Link>

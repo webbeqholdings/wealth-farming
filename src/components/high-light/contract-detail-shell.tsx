@@ -22,7 +22,7 @@ export default function ContractDetailShell({ contract, user }: ContractDetailSh
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center">
               <Button variant="outline" size="sm" asChild className="mr-4">
-                <Link href={user ? `/users/${user.id}` : '/dashboard'}>
+                <Link href={user ? `/high-light/users/${user.id}` : '/dashboard'}>
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   {user ? `Back to ${user.name}'s Profile` : 'Back to Dashboard'}
                 </Link>

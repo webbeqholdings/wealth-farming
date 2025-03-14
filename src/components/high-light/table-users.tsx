@@ -210,11 +210,8 @@ export default function TableUsers({ users }: TableUsersProps) {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem asChild>
-                          <Link href={`/users/${user.id}`}>View Details</Link>
+                          <Link href={`/high-light/users/${user.id}`}>View Details</Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem>Edit User</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-red-500">Delete User</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

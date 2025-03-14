@@ -1,12 +1,13 @@
-import { Suspense } from 'react'
+import { Suspense, use } from 'react'
 import { getContractById, getUserById } from '@/lib/high-light-hooks'
 import ContractDetailShell from '@/components/high-light/contract-detail-shell'
 import SkeletonDashboard from '@/components/high-light/skeleton-dashboard'
 import { notFound } from 'next/navigation'
 
-export default async function ContractDetailPage({ params }: { params: { id: string } }) {
+export default async function ContractDetailPage({ params }: { params: Promise<{ id: string }> }) {
   // Fetch contract data from Payload CMS
-  const contractId = params.id
+  const { id } = await params
+  const contractId = id
   const contractData = await getContractById(contractId)
 
   // If contract not found, show 404

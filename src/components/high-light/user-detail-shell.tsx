@@ -37,7 +37,7 @@ export default function UserDetailShell({ user, allUsers }: UserDetailShellProps
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-4">
               <Button variant="outline" size="sm" asChild>
-                <Link href="/dashboard">
+                <Link href="/high-light">
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Back to Dashboard
                 </Link>
