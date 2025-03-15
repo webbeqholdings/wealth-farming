@@ -21,7 +21,7 @@ export default function ContractDetailHeader({ contract, user }: ContractDetailH
                 <h2 className="text-2xl font-bold">{contract.title}</h2>
               </div>
               <div className="flex items-center gap-2 mt-2">
-                <Badge variant={contract.status === 'Active' ? 'success' : 'destructive'}>
+                <Badge variant={contract.status === 'active' ? 'success' : 'destructive'}>
                   {contract.status}
                 </Badge>
                 <span className="text-muted-foreground">•</span>
@@ -53,11 +53,12 @@ export default function ContractDetailHeader({ contract, user }: ContractDetailH
                   <DollarSign className="h-4 w-4 text-muted-foreground mt-0.5" />
                   <div>
                     <div className="font-medium">Payment Schedule</div>
-                    <div className="text-sm text-muted-foreground">
+                    {/* <div className="text-sm text-muted-foreground">
                       Initial: ${(contract.value * 0.3).toLocaleString()} • Milestone: $
                       {(contract.value * 0.3).toLocaleString()} • Final: $
                       {(contract.value * 0.4).toLocaleString()}
-                    </div>
+                    </div> */}
+                    <div className="text-sm text-muted-foreground">No Update</div>
                   </div>
                 </div>
                 <div className="flex items-start gap-2">

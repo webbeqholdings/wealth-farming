@@ -3,6 +3,33 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import { formatDateTime } from '@/utilities/formatDateTime'
 
+interface ProductLogData {
+  term: string;
+  product_name: string;
+  min_investment: number;
+  rate_of_return: number;
+  // other properties...
+}
+
+interface ProductLog {
+  data: ProductLogData;
+  // other properties...
+}
+
+interface Contract {
+  id: number;
+  user: number ;
+  amount: number;
+  status: string;
+  balance: number;
+  profit: number;
+  expectedReturn: number;
+  term: string;
+  periods: number;
+  product_log: ProductLog;
+
+}
+
 export const getUsers = async (): Promise<{ docs: any }> => {
   try {
     const payload = await getPayload({
@@ -64,37 +91,6 @@ export const getUser = async (userId: number): Promise<{ docs: any }> => {
     return { docs: null}
   }
 }
-
-// export const getUserByContract = async (contractId: number): Promise<{ docs: any }> => {
-//   try {
-//     const payload = await getPayload({
-//       config,
-//     })
-//     const response = await payload.find({
-//       collection: 'users',
-//       where: {
-//         user: { equals: }
-//       }
-//     })
-//     const user = response
-//     return {
-//       docs: {
-//         id: user.id,
-//         role: user.role,
-//         firstName: user.first_name,
-//         lastName: user.last_name,
-//         companyName: user.company_name,
-//         phone: user.phone_contact,
-//         email: user.email,
-//         createdAt: user.createdAt
-//       }
-//     }
-//   } catch (error) {
-//     console.error('User error:', error)
-
-//     return { docs: null}
-//   }
-// }
 
 export const getContracts = async (): Promise<{ docs: any }> => {
   try {
@@ -192,9 +188,10 @@ export const getContract = async (
     return {
       docs: {
         id: contract.id,
-        // userId: contract.user.id,
+        userId: (contract?.user as any)?.id,
         // minInvestment: contract?.product_log?.min_investment,
         // productName: contract?.product_log?.data?.product_name,
+        productName: (contract?.product_log as any)?.data?.product_name,
         investedAmount: contract.amount,
         expectedReturn: contract.expected_return,
         availableBalance: Number(contract.balance),
@@ -214,6 +211,19 @@ export const getContract = async (
     console.error('Contract error:', error)
 
     return { docs: null }
+  }
+}
+
+export const getContractsCountByUser = async (userId: number) => {
+  try {
+   
+    const { docs } = await getContractsByUser(userId)
+
+    return docs.length
+  } catch (error) {
+    console.error('Contract error:', error)
+
+    return 0
   }
 }
 
@@ -273,6 +283,43 @@ export const getTotalInvestment = async () => {
   }
 }
 
+export const getTotalInvestmentByUser = async (userId: number) => {
+  try {
+    const { docs } = await getContractsByUser(userId)
+    const totalInvestmentByUser = docs.reduce((sum: number, inv: any) => sum + inv.investedAmount, 0)
+    return totalInvestmentByUser
+  } catch (error) {
+    console.error('Total Invesment By User error:', error)
+    return 0
+  }
+}
+
+export const getTotalWithdrawByUser = async (userId: number) => {
+  try {
+    const payload = await getPayload({
+      config,
+    })
+    // Construct the where condition dynamically
+    const whereCondition: any = {
+      user: { equals: userId },
+      type: { equals: "withdraw" }
+    }
+
+    // Make a single call to payload.find
+    const response = await payload.find({
+      collection: 'transactions',
+      limit: 0,
+      where: whereCondition
+    })
+    const transactions = response.docs
+    const totalWithdrawByUser = transactions.reduce((sum: number, inv: any) => sum + inv.amount, 0)
+    return totalWithdrawByUser
+  } catch (error) {
+    console.error('Total Invesment By User error:', error)
+    return 0
+  }
+}
+
 export const getUsersCount = async () => {
   try {
     const { docs } = await getUsers()
@@ -325,8 +372,8 @@ export const getTotalBonusByUser = async (
       where: whereCondition
     })
     const transactions = response.docs
-    const totalBonus = transactions.reduce((sum, inv) => sum + inv.amount, 0)
-    return totalBonus
+    const totalBonusByUser = transactions.reduce((sum, inv) => sum + inv.amount, 0)
+    return totalBonusByUser
   } catch (error) {
     console.error('Total bonus error:', error)
     return 0

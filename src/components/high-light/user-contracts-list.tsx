@@ -83,9 +83,9 @@ export default function UserContractsList({ userId }: UserContractsListProps) {
                 </div>
                 <Badge
                   className={`${
-                    contract.status === 'Active'
+                    contract.status === 'active'
                       ? 'bg-emerald-100/10 text-emerald-500 hover:bg-emerald-100/20'
-                      : contract.status === 'Pending'
+                      : contract.status === 'pending'
                         ? 'bg-yellow-100/10 text-yellow-500 hover:bg-yellow-100/20'
                         : 'bg-red-100/10 text-red-500 hover:bg-red-100/20'
                   }`}
@@ -139,7 +139,7 @@ export default function UserContractsList({ userId }: UserContractsListProps) {
                   <p className="text-muted-foreground">{contract.description}</p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                    <div>
+                    {/* <div>
                       <h5 className="text-xs font-medium text-muted-foreground mb-1">
                         Payment Schedule
                       </h5>
@@ -159,7 +159,7 @@ export default function UserContractsList({ userId }: UserContractsListProps) {
                         <li>Testing and deployment</li>
                         <li>Maintenance support</li>
                       </ul>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               )}

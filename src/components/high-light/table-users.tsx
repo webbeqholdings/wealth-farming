@@ -167,6 +167,8 @@ export default function TableUsers({ users }: TableUsersProps) {
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
+              <TableHead>Total Invesment</TableHead>
+              <TableHead>Number of Contracts</TableHead>
               <TableHead className="w-[50px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -182,6 +184,8 @@ export default function TableUsers({ users }: TableUsersProps) {
                 <TableRow key={user.id}>
                   <TableCell className="font-medium">{user.name}</TableCell>
                   <TableCell>{user.email}</TableCell>
+                  <TableCell className='font-bold'>${user.totalInvestment.toLocaleString()}</TableCell>
+                  <TableCell className='font-bold'>{user.contractsCount}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

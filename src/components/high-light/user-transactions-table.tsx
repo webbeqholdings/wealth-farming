@@ -168,7 +168,7 @@ export default function UserTransactionsTable({ userId }: UserTransactionsTableP
                   <TableCell>
                     <div
                       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                        transaction.type === 'investment'
+                        transaction.type === 'investment' || transaction.type === 'bonus'
                           ? 'bg-emerald-100/10 text-emerald-500'
                           : transaction.type === 'withdraw'
                             ? 'bg-red-100/10 text-red-500'

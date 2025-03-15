@@ -73,7 +73,7 @@ export default function UserFinancialOverview({ userId }: UserFinancialOverviewP
             ${financialData.totalInvestment.toLocaleString()}
           </div>
           <div className="flex items-center text-xs text-muted-foreground">
-            {financialData.investmentChange > 0 ? (
+            {financialData.investmentChange >= 0 ? (
               <>
                 <ArrowUp className="mr-1 h-4 w-4 text-emerald-500" />
                 <span className="text-emerald-500">+{financialData.investmentChange}%</span>
@@ -97,7 +97,7 @@ export default function UserFinancialOverview({ userId }: UserFinancialOverviewP
         <CardContent>
           <div className="text-2xl font-bold">${financialData.totalWithdraw.toLocaleString()}</div>
           <div className="flex items-center text-xs text-muted-foreground">
-            {financialData.withdrawChange > 0 ? (
+            {financialData.withdrawChange >= 0 ? (
               <>
                 <ArrowUp className="mr-1 h-4 w-4 text-emerald-500" />
                 <span className="text-emerald-500">+{financialData.withdrawChange}%</span>
@@ -121,7 +121,7 @@ export default function UserFinancialOverview({ userId }: UserFinancialOverviewP
         <CardContent>
           <div className="text-2xl font-bold">${financialData.totalEarnings.toLocaleString()}</div>
           <div className="flex items-center text-xs text-muted-foreground">
-            {financialData.earningsChange > 0 ? (
+            {financialData.earningsChange >= 0 ? (
               <>
                 <ArrowUp className="mr-1 h-4 w-4 text-emerald-500" />
                 <span className="text-emerald-500">+{financialData.earningsChange}%</span>

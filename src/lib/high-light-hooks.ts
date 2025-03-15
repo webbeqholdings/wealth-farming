@@ -1,4 +1,18 @@
-import { getContracts, getContractsByUser, getActiveContractsCount, getTotalBonusByUser, getTotalInvestment, getUsers, getUsersCount, getUser, getTransactionsByUser, getContract} from "@/lib/highlight"
+import {
+  getContracts,
+  getContractsByUser,
+  getActiveContractsCount,
+  getTotalBonusByUser,
+  getTotalInvestment,
+  getUsers,
+  getUsersCount,
+  getUser,
+  getTransactionsByUser,
+  getContract,
+  getTotalInvestmentByUser,
+  getTotalWithdrawByUser,
+  getContractsCountByUser
+} from '@/lib/highlight'
 
 // Types for our data models
 import {
@@ -19,6 +33,8 @@ export interface User {
   address: string
   joinDate: string
   bio: string
+  totalInvestment: number
+  contractsCount: number
 }
 
 export interface Contract {
@@ -94,9 +110,9 @@ export async function getDashboardData(): Promise<DashboardData> {
       activeUsers: activeUsers,
       activeContracts: activeContracts,
       avgResponseTime: '1.2h',
-      revenueChange: 20.1,
-      userChange: 180,
-      contractChange: -12,
+      revenueChange: 0,
+      userChange: 0,
+      contractChange: 0,
       responseTimeChange: -0.5,
     },
   }
@@ -113,14 +129,16 @@ export async function getUserById(id: string): Promise<User | null> {
     id: docs.id,
     name: `${docs.firstName} ${docs.lastName}`,
     email: docs.email,
-    status: "",
+    status: 'Active',
     role: docs.role,
-    lastActive: "",
-    phone: docs.phone || "No Updated",
-    address: "No update",
-    joinDate: docs.createdAt,
-    bio: "",
-  };
+    lastActive: '',
+    phone: docs.phone || 'No Update',
+    address: 'No update',
+    joinDate: format(docs.createdAt, 'PP'),
+    bio: '',
+    totalInvestment: 0,
+    contractsCount: 0
+  }
   return user
 }
 
@@ -129,23 +147,27 @@ export async function getAllUsers(): Promise<User[]> {
   // In a real app, you would fetch this from Payload CMS
   // Example: const response = await fetch('https://your-payload-cms.com/api/users')
   const { docs } = await getUsers()
-  const users = docs.map((user: any) => {
-    // Convert createdAt (Date) to a string
-    // const joinDate = new Date(user.createdAt).toISOString(); // Convert Date to string
+  // Use Promise.all to handle all async operations in parallel
+  const users = await Promise.all(docs.map(async (user: any) => {
+    // Await the async functions
+    const contractsCount = await getContractsCountByUser(user.id)
+    const totalInvestment = await getTotalInvestmentByUser(user.id)
 
     return {
       id: user.id,
       name: `${user.firstName} ${user.lastName}`,
       email: user.email,
-      status: "",
+      status: 'Active',
       role: user.role,
-      lastActive: "",
-      phone: user.phone || "No Updated",
-      address: "No update",
-      joinDate: user.createdAt,
-      bio: "",
-    };
-  });
+      lastActive: '',
+      phone: user.phone || 'No Update',
+      address: 'No update',
+      joinDate: format(user.createdAt, 'PP'),
+      bio: '',
+      totalInvestment: totalInvestment,
+      contractsCount: contractsCount
+    }
+  }))
   // For now, we'll return mock data
   return users
 }
@@ -156,22 +178,23 @@ export async function getContractById(id: string): Promise<Contract | null> {
   // Example: const response = await fetch(`https://your-payload-cms.com/api/contracts/${id}`)
 
   const { docs } = await getContract(Number(id))
+  const user = await getUserById(docs.userId)
   const contract = {
-      id: docs.id,
-      userId: docs.userId,
-      title: docs?.productName || "",
-      value: docs.investedAmount,
-      startDate: format(docs.startDate, 'PP'),
-      endDate: format(docs.endDate, 'PP'),
-      status: docs.status,
-      description: "No Update",
-      client: docs?.productName,
-      contactPerson: "No Update",
-      contactEmail: "No Update",
-      contactPhone: "No Update",
-      terms: docs.term,
-      renewalOption: false,
-    };
+    id: docs.id,
+    userId: docs.userId,
+    title: docs?.productName || '',
+    value: docs.investedAmount,
+    startDate: format(docs.startDate, 'PP'),
+    endDate: format(docs.endDate, 'PP'),
+    status: docs.status,
+    description: 'No Update',
+    client: user?.name, 
+    contactPerson: user?.name || 'No Update',
+    contactEmail: user?.email || 'No Update',
+    contactPhone: user?.phone || 'No Update',
+    terms: docs.term,
+    renewalOption: false,
+  }
   // For now, we'll return mock data
   return contract
 }
@@ -188,16 +211,17 @@ export async function getTransactionsByContractId(contractId: string): Promise<T
 // Fetch transactions for a specific user
 export async function getTransactionsByUserId(userId: number): Promise<Transaction[]> {
   const { docs } = await getTransactionsByUser(userId)
-  const transactions= docs.map((transaction: any) => {
+  const transactions = docs.map((transaction: any) => {
     return {
       id: transaction.id,
-      contractId: "",
-      userId: "",
+      contractId: '',
+      userId: '',
       date: transaction.date,
       amount: transaction.amount,
       type: transaction.type,
-      description: transaction.note || "No Update",
-    }})
+      description: transaction.note || 'No Update',
+    }
+  })
   return transactions
 }
 
@@ -206,9 +230,18 @@ export async function getUserFinancialData(userId: string): Promise<FinancialDat
   // In a real app, you would fetch this from Payload CMS
   // Example: const response = await fetch(`https://your-payload-cms.com/api/financial?userId=${userId}`)
 
-  // For now, we'll return mock data
-  const data = userFinancialData.find((data) => data.userId === userId)
-  return data || null
+  const totalInvestmentByUser = await getTotalInvestmentByUser(Number(userId))
+  const totalWithdrawByUser = await getTotalWithdrawByUser(Number(userId))
+  const totalBonusByUser = await getTotalBonusByUser(Number(userId))
+  return {
+    userId: userId,
+    totalInvestment: totalInvestmentByUser,
+    totalWithdraw: totalWithdrawByUser,
+    totalEarnings: totalBonusByUser,
+    investmentChange: 0,
+    withdrawChange: 0,
+    earningsChange: 0,
+  }
 }
 
 // Fetch equity data for a user
@@ -228,16 +261,30 @@ export async function getContractEquityData(contractId: string) {
   let contract_amount = contract.value // contract.amount
   let start_date = new Date(contract.startDate)
   let end_date
-  if (contract.status == "active")
-  {
-    end_date = new Date(contract.endDate)
-  }
-  else end_date = new Date(new Date().setDate(new Date().getDate() - 1)) // Yesterday
+  if (contract.status == 'active') {
+    end_date = new Date(new Date().setDate(new Date().getDate() - 1)) // Yesterday
+  } else end_date = new Date(contract.endDate)
+  
+  let profitData 
 
-  // if term == annualy
-  // ...
-  const logs = await buildProfitLogsAnnualy(contract_amount, start_date, end_date)
-  const chartData = logs.profitLogs.map((item: any) => {
+  if (contract.terms == 'annually') {
+    profitData = await buildProfitLogsAnnualy(contract_amount, start_date, end_date)
+  }
+
+  if (contract.terms == 'semester') {
+    profitData = await buildProfitLogsSemester(contract_amount, start_date, end_date)
+  }
+
+  if (contract.terms == 'quarterly') {
+    profitData = await buildProfitLogsQuarterly(contract_amount, start_date, end_date)
+  }
+
+  if (contract.terms == 'monthly') {
+    profitData = await buildProfitLogsMonthly(contract_amount, start_date, end_date)
+  }
+
+  // const logs = await buildProfitLogsAnnualy(contract_amount, start_date, end_date)
+  const chartData = profitData.profitLogs.map((item: any) => {
     return {
       month: format(item.toDate, 'PP'),
       value: item.balance,
@@ -255,24 +302,23 @@ export async function getAllContracts(): Promise<Contract[]> {
 
   const { docs } = await getContracts()
   const contracts = docs.map((contract: any) => {
-
     return {
-        id: contract.id,
-        userId: contract.userId,
-        title: contract?.productName,
-        value: contract.investedAmount,
-        startDate: format(contract.startDate, 'PP'),
-        endDate: contract.endDate ? format(contract.endDate, 'PP') : "",
-        status: contract.status,
-        description: "No Update",
-        client: contract?.productName,
-        contactPerson: "No Update",
-        contactEmail: "No Update",
-        contactPhone: "No Update",
-        terms: contract.term,
-        renewalOption: "No Update",
-    };
-  });
+      id: contract.id,
+      userId: contract.userId,
+      title: contract?.productName,
+      value: contract.investedAmount,
+      startDate: format(contract.startDate, 'PP'),
+      endDate: contract.endDate ? format(contract.endDate, 'PP') : '',
+      status: contract.status,
+      description: 'No Update',
+      client: contract?.productName,
+      contactPerson: 'No Update',
+      contactEmail: 'No Update',
+      contactPhone: 'No Update',
+      terms: contract.term,
+      renewalOption: 'No Update',
+    }
+  })
   // For now, we'll return mock data
   return contracts
 }
@@ -284,7 +330,6 @@ export async function getContractsByUserId(userId: string): Promise<Contract[]> 
 
   const { docs } = await getContractsByUser(Number(userId))
   const contracts = docs.map((contract: any) => {
-
     return {
       id: contract.id,
       userId: contract.userId,
@@ -293,385 +338,382 @@ export async function getContractsByUserId(userId: string): Promise<Contract[]> 
       startDate: format(contract.startDate, 'PP'),
       endDate: format(contract.endDate, 'PP'),
       status: contract.status,
-      description: "No Update",
+      description: 'No Update',
       client: contract?.productName,
-      contactPerson: "No Update",
-      contactEmail: "No Update",
-      contactPhone: "No Update",
+      contactPerson: 'No Update',
+      contactEmail: 'No Update',
+      contactPhone: 'No Update',
       terms: contract.term,
-      renewalOption: "No Update",
-    };
-  });
+      renewalOption: 'No Update',
+    }
+  })
   // For now, we'll return mock data
   return contracts
 }
 
-
-
-
-// Sample data - in a real app, this would come from Payload CMS
-const sampleUsers: User[] = [
-  {
-    id: '1',
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    status: 'Active',
-    role: 'Admin',
-    lastActive: 'Just now',
-    phone: '+1 (555) 123-4567',
-    address: '123 Main St, New York, NY 10001',
-    joinDate: 'Jan 15, 2022',
-    bio: 'Senior administrator with expertise in system management and team leadership.',
-  },
-  {
-    id: '2',
-    name: 'Jane Smith',
-    email: 'jane.smith@example.com',
-    status: 'Active',
-    role: 'User',
-    lastActive: '5 min ago',
-    phone: '+1 (555) 987-6543',
-    address: '456 Park Ave, Boston, MA 02108',
-    joinDate: 'Mar 22, 2022',
-    bio: 'Marketing specialist with a focus on digital campaigns and brand development.',
-  },
-  {
-    id: '3',
-    name: 'Robert Johnson',
-    email: 'robert.johnson@example.com',
-    status: 'Inactive',
-    role: 'User',
-    lastActive: '3 hours ago',
-    phone: '+1 (555) 234-5678',
-    address: '789 Oak St, Chicago, IL 60601',
-    joinDate: 'Apr 10, 2022',
-    bio: 'Product development expert with experience in agile methodologies.',
-  },
-  {
-    id: '4',
-    name: 'Emily Davis',
-    email: 'emily.davis@example.com',
-    status: 'Active',
-    role: 'Manager',
-    lastActive: '1 day ago',
-    phone: '+1 (555) 345-6789',
-    address: '321 Pine St, San Francisco, CA 94101',
-    joinDate: 'May 5, 2022',
-    bio: 'Team manager with a track record of successful project deliveries.',
-  },
-  {
-    id: '5',
-    name: 'Michael Wilson',
-    email: 'michael.wilson@example.com',
-    status: 'Suspended',
-    role: 'User',
-    lastActive: '1 week ago',
-    phone: '+1 (555) 456-7890',
-    address: '654 Maple St, Seattle, WA 98101',
-    joinDate: 'Jun 15, 2022',
-    bio: 'Technical specialist focusing on infrastructure and cloud solutions.',
-  },
-  {
-    id: '6',
-    name: 'Sarah Brown',
-    email: 'sarah.brown@example.com',
-    status: 'Active',
-    role: 'User',
-    lastActive: '2 days ago',
-    phone: '+1 (555) 567-8901',
-    address: '987 Cedar St, Austin, TX 78701',
-    joinDate: 'Jul 3, 2022',
-    bio: 'Content strategist with expertise in SEO and digital marketing.',
-  },
-  {
-    id: '7',
-    name: 'David Miller',
-    email: 'david.miller@example.com',
-    status: 'Active',
-    role: 'Admin',
-    lastActive: '4 hours ago',
-    phone: '+1 (555) 678-9012',
-    address: '246 Elm St, Denver, CO 80202',
-    joinDate: 'Aug 12, 2022',
-    bio: 'Systems administrator with a focus on network security and cloud infrastructure.',
-  },
-  {
-    id: '8',
-    name: 'Lisa Taylor',
-    email: 'lisa.taylor@example.com',
-    status: 'Inactive',
-    role: 'User',
-    lastActive: '2 weeks ago',
-    phone: '+1 (555) 789-0123',
-    address: '135 Birch St, Portland, OR 97201',
-    joinDate: 'Sep 8, 2022',
-    bio: 'UX designer specializing in user research and interface design.',
-  },
-  {
-    id: '9',
-    name: 'James Anderson',
-    email: 'james.anderson@example.com',
-    status: 'Active',
-    role: 'Manager',
-    lastActive: 'Yesterday',
-    phone: '+1 (555) 890-1234',
-    address: '864 Pine St, Miami, FL 33101',
-    joinDate: 'Oct 20, 2022',
-    bio: 'Project manager with expertise in agile methodologies and team leadership.',
-  },
-  {
-    id: '10',
-    name: 'Jennifer Thomas',
-    email: 'jennifer.thomas@example.com',
-    status: 'Active',
-    role: 'User',
-    lastActive: 'Just now',
-    phone: '+1 (555) 901-2345',
-    address: '753 Oak St, Atlanta, GA 30303',
-    joinDate: 'Nov 15, 2022',
-    bio: 'Content creator specializing in video production and social media strategy.',
-  },
-  {
-    id: '11',
-    name: 'Richard Harris',
-    email: 'richard.harris@example.com',
-    status: 'Active',
-    role: 'User',
-    lastActive: '3 days ago',
-    phone: '+1 (555) 012-3456',
-    address: '642 Maple St, Phoenix, AZ 85001',
-    joinDate: 'Dec 5, 2022',
-    bio: 'Data analyst with expertise in business intelligence and data visualization.',
-  },
-  {
-    id: '12',
-    name: 'Patricia Martin',
-    email: 'patricia.martin@example.com',
-    status: 'Inactive',
-    role: 'User',
-    lastActive: '1 week ago',
-    phone: '+1 (555) 123-4567',
-    address: '531 Cedar St, Philadelphia, PA 19102',
-    joinDate: 'Jan 10, 2023',
-    bio: 'HR specialist focusing on employee engagement and talent acquisition.',
-  },
-  {
-    id: '13',
-    name: 'Thomas Jackson',
-    email: 'thomas.jackson@example.com',
-    status: 'Active',
-    role: 'Manager',
-    lastActive: '12 hours ago',
-    phone: '+1 (555) 234-5678',
-    address: '420 Elm St, Las Vegas, NV 89101',
-    joinDate: 'Feb 18, 2023',
-    bio: 'Operations manager with experience in process optimization and team coordination.',
-  },
-  {
-    id: '14',
-    name: 'Barbara White',
-    email: 'barbara.white@example.com',
-    status: 'Suspended',
-    role: 'User',
-    lastActive: '3 weeks ago',
-    phone: '+1 (555) 345-6789',
-    address: '319 Birch St, Nashville, TN 37201',
-    joinDate: 'Mar 25, 2023',
-    bio: 'Financial analyst specializing in budget planning and financial forecasting.',
-  },
-  {
-    id: '15',
-    name: 'Charles Lee',
-    email: 'charles.lee@example.com',
-    status: 'Active',
-    role: 'Admin',
-    lastActive: '2 days ago',
-    phone: '+1 (555) 456-7890',
-    address: '208 Pine St, San Diego, CA 92101',
-    joinDate: 'Apr 12, 2023',
-    bio: 'IT security specialist with expertise in cybersecurity and risk management.',
-  },
-  {
-    id: '16',
-    name: 'Susan Walker',
-    email: 'susan.walker@example.com',
-    status: 'Active',
-    role: 'User',
-    lastActive: '6 hours ago',
-    phone: '+1 (555) 567-8901',
-    address: '197 Oak St, Charlotte, NC 28202',
-    joinDate: 'May 8, 2023',
-    bio: 'Marketing coordinator with experience in campaign management and analytics.',
-  },
-  {
-    id: '17',
-    name: 'Joseph Hall',
-    email: 'joseph.hall@example.com',
-    status: 'Inactive',
-    role: 'User',
-    lastActive: '5 days ago',
-    phone: '+1 (555) 678-9012',
-    address: '186 Maple St, Indianapolis, IN 46204',
-    joinDate: 'Jun 15, 2023',
-    bio: 'Sales representative with a track record of exceeding targets and building client relationships.',
-  },
-  {
-    id: '18',
-    name: 'Jessica Allen',
-    email: 'jessica.allen@example.com',
-    status: 'Active',
-    role: 'Manager',
-    lastActive: 'Yesterday',
-    phone: '+1 (555) 789-0123',
-    address: '175 Cedar St, Columbus, OH 43215',
-    joinDate: 'Jul 22, 2023',
-    bio: 'Product manager specializing in software development and user experience design.',
-  },
-  {
-    id: '19',
-    name: 'Christopher Young',
-    email: 'christopher.young@example.com',
-    status: 'Active',
-    role: 'User',
-    lastActive: '4 days ago',
-    phone: '+1 (555) 890-1234',
-    address: '164 Elm St, Detroit, MI 48226',
-    joinDate: 'Aug 10, 2023',
-    bio: 'Customer support specialist with expertise in client satisfaction and problem resolution.',
-  },
-  {
-    id: '20',
-    name: 'Margaret King',
-    email: 'margaret.king@example.com',
-    status: 'Active',
-    role: 'User',
-    lastActive: 'Today',
-    phone: '+1 (555) 901-2345',
-    address: '153 Birch St, Baltimore, MD 21202',
-    joinDate: 'Sep 5, 2023',
-    bio: 'Content writer specializing in technical documentation and blog articles.',
-  },
-  {
-    id: '21',
-    name: 'Daniel Wright',
-    email: 'daniel.wright@example.com',
-    status: 'Active',
-    role: 'User',
-    lastActive: '2 hours ago',
-    phone: '+1 (555) 012-3456',
-    address: '142 Pine St, Albuquerque, NM 87102',
-    joinDate: 'Oct 18, 2023',
-    bio: 'Web developer with expertise in front-end technologies and responsive design.',
-  },
-  {
-    id: '22',
-    name: 'Amanda Scott',
-    email: 'amanda.scott@example.com',
-    status: 'Suspended',
-    role: 'User',
-    lastActive: '1 month ago',
-    phone: '+1 (555) 123-4567',
-    address: '131 Oak St, Kansas City, MO 64105',
-    joinDate: 'Nov 25, 2023',
-    bio: 'Graphic designer specializing in brand identity and visual communication.',
-  },
-  {
-    id: '23',
-    name: 'Kevin Rodriguez',
-    email: 'kevin.rodriguez@example.com',
-    status: 'Active',
-    role: 'User',
-    lastActive: '3 hours ago',
-    phone: '+1 (555) 234-5678',
-    address: '120 Maple St, Tucson, AZ 85701',
-    joinDate: 'Dec 10, 2023',
-    bio: 'Software engineer with expertise in backend development and database design.',
-  },
-  {
-    id: '24',
-    name: 'Laura Martinez',
-    email: 'laura.martinez@example.com',
-    status: 'Active',
-    role: 'Manager',
-    lastActive: '5 hours ago',
-    phone: '+1 (555) 345-6789',
-    address: '109 Cedar St, Fresno, CA 93721',
-    joinDate: 'Jan 5, 2024',
-    bio: 'HR manager with experience in employee development and organizational culture.',
-  },
-  {
-    id: '25',
-    name: 'Steven Lewis',
-    email: 'steven.lewis@example.com',
-    status: 'Inactive',
-    role: 'User',
-    lastActive: '2 weeks ago',
-    phone: '+1 (555) 456-7890',
-    address: '98 Elm St, Sacramento, CA 95814',
-    joinDate: 'Feb 15, 2024',
-    bio: 'Financial advisor specializing in investment strategies and retirement planning.',
-  },
-  {
-    id: '26',
-    name: 'Michelle Clark',
-    email: 'michelle.clark@example.com',
-    status: 'Active',
-    role: 'Admin',
-    lastActive: '1 day ago',
-    phone: '+1 (555) 567-8901',
-    address: '87 Birch St, Long Beach, CA 90802',
-    joinDate: 'Mar 8, 2024',
-    bio: 'Systems administrator with expertise in cloud infrastructure and network security.',
-  },
-  {
-    id: '27',
-    name: 'Edward Walker',
-    email: 'edward.walker@example.com',
-    status: 'Active',
-    role: 'User',
-    lastActive: '7 hours ago',
-    phone: '+1 (555) 678-9012',
-    address: '76 Pine St, Oakland, CA 94607',
-    joinDate: 'Mar 20, 2024',
-    bio: 'Digital marketer specializing in SEO and content strategy.',
-  },
-  {
-    id: '28',
-    name: 'Nancy Hall',
-    email: 'nancy.hall@example.com',
-    status: 'Active',
-    role: 'User',
-    lastActive: '8 hours ago',
-    phone: '+1 (555) 789-0123',
-    address: '65 Oak St, Minneapolis, MN 55401',
-    joinDate: 'Mar 25, 2024',
-    bio: 'Project coordinator with experience in event planning and team management.',
-  },
-  {
-    id: '29',
-    name: 'George Allen',
-    email: 'george.allen@example.com',
-    status: 'Active',
-    role: 'Manager',
-    lastActive: '9 hours ago',
-    phone: '+1 (555) 890-1234',
-    address: '54 Maple St, Tulsa, OK 74103',
-    joinDate: 'Mar 28, 2024',
-    bio: 'Operations director with expertise in process optimization and strategic planning.',
-  },
-  {
-    id: '30',
-    name: 'Carol Young',
-    email: 'carol.young@example.com',
-    status: 'Active',
-    role: 'User',
-    lastActive: '10 hours ago',
-    phone: '+1 (555) 901-2345',
-    address: '43 Cedar St, Cleveland, OH 44113',
-    joinDate: 'Mar 30, 2024',
-    bio: 'Customer experience specialist focusing on service excellence and client retention.',
-  },
-]
+// // Sample data - in a real app, this would come from Payload CMS
+// const sampleUsers: User[] = [
+//   {
+//     id: '1',
+//     name: 'John Doe',
+//     email: 'john.doe@example.com',
+//     status: 'Active',
+//     role: 'Admin',
+//     lastActive: 'Just now',
+//     phone: '+1 (555) 123-4567',
+//     address: '123 Main St, New York, NY 10001',
+//     joinDate: 'Jan 15, 2022',
+//     bio: 'Senior administrator with expertise in system management and team leadership.',
+//   },
+//   {
+//     id: '2',
+//     name: 'Jane Smith',
+//     email: 'jane.smith@example.com',
+//     status: 'Active',
+//     role: 'User',
+//     lastActive: '5 min ago',
+//     phone: '+1 (555) 987-6543',
+//     address: '456 Park Ave, Boston, MA 02108',
+//     joinDate: 'Mar 22, 2022',
+//     bio: 'Marketing specialist with a focus on digital campaigns and brand development.',
+//   },
+//   {
+//     id: '3',
+//     name: 'Robert Johnson',
+//     email: 'robert.johnson@example.com',
+//     status: 'Inactive',
+//     role: 'User',
+//     lastActive: '3 hours ago',
+//     phone: '+1 (555) 234-5678',
+//     address: '789 Oak St, Chicago, IL 60601',
+//     joinDate: 'Apr 10, 2022',
+//     bio: 'Product development expert with experience in agile methodologies.',
+//   },
+//   {
+//     id: '4',
+//     name: 'Emily Davis',
+//     email: 'emily.davis@example.com',
+//     status: 'Active',
+//     role: 'Manager',
+//     lastActive: '1 day ago',
+//     phone: '+1 (555) 345-6789',
+//     address: '321 Pine St, San Francisco, CA 94101',
+//     joinDate: 'May 5, 2022',
+//     bio: 'Team manager with a track record of successful project deliveries.',
+//   },
+//   {
+//     id: '5',
+//     name: 'Michael Wilson',
+//     email: 'michael.wilson@example.com',
+//     status: 'Suspended',
+//     role: 'User',
+//     lastActive: '1 week ago',
+//     phone: '+1 (555) 456-7890',
+//     address: '654 Maple St, Seattle, WA 98101',
+//     joinDate: 'Jun 15, 2022',
+//     bio: 'Technical specialist focusing on infrastructure and cloud solutions.',
+//   },
+//   {
+//     id: '6',
+//     name: 'Sarah Brown',
+//     email: 'sarah.brown@example.com',
+//     status: 'Active',
+//     role: 'User',
+//     lastActive: '2 days ago',
+//     phone: '+1 (555) 567-8901',
+//     address: '987 Cedar St, Austin, TX 78701',
+//     joinDate: 'Jul 3, 2022',
+//     bio: 'Content strategist with expertise in SEO and digital marketing.',
+//   },
+//   {
+//     id: '7',
+//     name: 'David Miller',
+//     email: 'david.miller@example.com',
+//     status: 'Active',
+//     role: 'Admin',
+//     lastActive: '4 hours ago',
+//     phone: '+1 (555) 678-9012',
+//     address: '246 Elm St, Denver, CO 80202',
+//     joinDate: 'Aug 12, 2022',
+//     bio: 'Systems administrator with a focus on network security and cloud infrastructure.',
+//   },
+//   {
+//     id: '8',
+//     name: 'Lisa Taylor',
+//     email: 'lisa.taylor@example.com',
+//     status: 'Inactive',
+//     role: 'User',
+//     lastActive: '2 weeks ago',
+//     phone: '+1 (555) 789-0123',
+//     address: '135 Birch St, Portland, OR 97201',
+//     joinDate: 'Sep 8, 2022',
+//     bio: 'UX designer specializing in user research and interface design.',
+//   },
+//   {
+//     id: '9',
+//     name: 'James Anderson',
+//     email: 'james.anderson@example.com',
+//     status: 'Active',
+//     role: 'Manager',
+//     lastActive: 'Yesterday',
+//     phone: '+1 (555) 890-1234',
+//     address: '864 Pine St, Miami, FL 33101',
+//     joinDate: 'Oct 20, 2022',
+//     bio: 'Project manager with expertise in agile methodologies and team leadership.',
+//   },
+//   {
+//     id: '10',
+//     name: 'Jennifer Thomas',
+//     email: 'jennifer.thomas@example.com',
+//     status: 'Active',
+//     role: 'User',
+//     lastActive: 'Just now',
+//     phone: '+1 (555) 901-2345',
+//     address: '753 Oak St, Atlanta, GA 30303',
+//     joinDate: 'Nov 15, 2022',
+//     bio: 'Content creator specializing in video production and social media strategy.',
+//   },
+//   {
+//     id: '11',
+//     name: 'Richard Harris',
+//     email: 'richard.harris@example.com',
+//     status: 'Active',
+//     role: 'User',
+//     lastActive: '3 days ago',
+//     phone: '+1 (555) 012-3456',
+//     address: '642 Maple St, Phoenix, AZ 85001',
+//     joinDate: 'Dec 5, 2022',
+//     bio: 'Data analyst with expertise in business intelligence and data visualization.',
+//   },
+//   {
+//     id: '12',
+//     name: 'Patricia Martin',
+//     email: 'patricia.martin@example.com',
+//     status: 'Inactive',
+//     role: 'User',
+//     lastActive: '1 week ago',
+//     phone: '+1 (555) 123-4567',
+//     address: '531 Cedar St, Philadelphia, PA 19102',
+//     joinDate: 'Jan 10, 2023',
+//     bio: 'HR specialist focusing on employee engagement and talent acquisition.',
+//   },
+//   {
+//     id: '13',
+//     name: 'Thomas Jackson',
+//     email: 'thomas.jackson@example.com',
+//     status: 'Active',
+//     role: 'Manager',
+//     lastActive: '12 hours ago',
+//     phone: '+1 (555) 234-5678',
+//     address: '420 Elm St, Las Vegas, NV 89101',
+//     joinDate: 'Feb 18, 2023',
+//     bio: 'Operations manager with experience in process optimization and team coordination.',
+//   },
+//   {
+//     id: '14',
+//     name: 'Barbara White',
+//     email: 'barbara.white@example.com',
+//     status: 'Suspended',
+//     role: 'User',
+//     lastActive: '3 weeks ago',
+//     phone: '+1 (555) 345-6789',
+//     address: '319 Birch St, Nashville, TN 37201',
+//     joinDate: 'Mar 25, 2023',
+//     bio: 'Financial analyst specializing in budget planning and financial forecasting.',
+//   },
+//   {
+//     id: '15',
+//     name: 'Charles Lee',
+//     email: 'charles.lee@example.com',
+//     status: 'Active',
+//     role: 'Admin',
+//     lastActive: '2 days ago',
+//     phone: '+1 (555) 456-7890',
+//     address: '208 Pine St, San Diego, CA 92101',
+//     joinDate: 'Apr 12, 2023',
+//     bio: 'IT security specialist with expertise in cybersecurity and risk management.',
+//   },
+//   {
+//     id: '16',
+//     name: 'Susan Walker',
+//     email: 'susan.walker@example.com',
+//     status: 'Active',
+//     role: 'User',
+//     lastActive: '6 hours ago',
+//     phone: '+1 (555) 567-8901',
+//     address: '197 Oak St, Charlotte, NC 28202',
+//     joinDate: 'May 8, 2023',
+//     bio: 'Marketing coordinator with experience in campaign management and analytics.',
+//   },
+//   {
+//     id: '17',
+//     name: 'Joseph Hall',
+//     email: 'joseph.hall@example.com',
+//     status: 'Inactive',
+//     role: 'User',
+//     lastActive: '5 days ago',
+//     phone: '+1 (555) 678-9012',
+//     address: '186 Maple St, Indianapolis, IN 46204',
+//     joinDate: 'Jun 15, 2023',
+//     bio: 'Sales representative with a track record of exceeding targets and building client relationships.',
+//   },
+//   {
+//     id: '18',
+//     name: 'Jessica Allen',
+//     email: 'jessica.allen@example.com',
+//     status: 'Active',
+//     role: 'Manager',
+//     lastActive: 'Yesterday',
+//     phone: '+1 (555) 789-0123',
+//     address: '175 Cedar St, Columbus, OH 43215',
+//     joinDate: 'Jul 22, 2023',
+//     bio: 'Product manager specializing in software development and user experience design.',
+//   },
+//   {
+//     id: '19',
+//     name: 'Christopher Young',
+//     email: 'christopher.young@example.com',
+//     status: 'Active',
+//     role: 'User',
+//     lastActive: '4 days ago',
+//     phone: '+1 (555) 890-1234',
+//     address: '164 Elm St, Detroit, MI 48226',
+//     joinDate: 'Aug 10, 2023',
+//     bio: 'Customer support specialist with expertise in client satisfaction and problem resolution.',
+//   },
+//   {
+//     id: '20',
+//     name: 'Margaret King',
+//     email: 'margaret.king@example.com',
+//     status: 'Active',
+//     role: 'User',
+//     lastActive: 'Today',
+//     phone: '+1 (555) 901-2345',
+//     address: '153 Birch St, Baltimore, MD 21202',
+//     joinDate: 'Sep 5, 2023',
+//     bio: 'Content writer specializing in technical documentation and blog articles.',
+//   },
+//   {
+//     id: '21',
+//     name: 'Daniel Wright',
+//     email: 'daniel.wright@example.com',
+//     status: 'Active',
+//     role: 'User',
+//     lastActive: '2 hours ago',
+//     phone: '+1 (555) 012-3456',
+//     address: '142 Pine St, Albuquerque, NM 87102',
+//     joinDate: 'Oct 18, 2023',
+//     bio: 'Web developer with expertise in front-end technologies and responsive design.',
+//   },
+//   {
+//     id: '22',
+//     name: 'Amanda Scott',
+//     email: 'amanda.scott@example.com',
+//     status: 'Suspended',
+//     role: 'User',
+//     lastActive: '1 month ago',
+//     phone: '+1 (555) 123-4567',
+//     address: '131 Oak St, Kansas City, MO 64105',
+//     joinDate: 'Nov 25, 2023',
+//     bio: 'Graphic designer specializing in brand identity and visual communication.',
+//   },
+//   {
+//     id: '23',
+//     name: 'Kevin Rodriguez',
+//     email: 'kevin.rodriguez@example.com',
+//     status: 'Active',
+//     role: 'User',
+//     lastActive: '3 hours ago',
+//     phone: '+1 (555) 234-5678',
+//     address: '120 Maple St, Tucson, AZ 85701',
+//     joinDate: 'Dec 10, 2023',
+//     bio: 'Software engineer with expertise in backend development and database design.',
+//   },
+//   {
+//     id: '24',
+//     name: 'Laura Martinez',
+//     email: 'laura.martinez@example.com',
+//     status: 'Active',
+//     role: 'Manager',
+//     lastActive: '5 hours ago',
+//     phone: '+1 (555) 345-6789',
+//     address: '109 Cedar St, Fresno, CA 93721',
+//     joinDate: 'Jan 5, 2024',
+//     bio: 'HR manager with experience in employee development and organizational culture.',
+//   },
+//   {
+//     id: '25',
+//     name: 'Steven Lewis',
+//     email: 'steven.lewis@example.com',
+//     status: 'Inactive',
+//     role: 'User',
+//     lastActive: '2 weeks ago',
+//     phone: '+1 (555) 456-7890',
+//     address: '98 Elm St, Sacramento, CA 95814',
+//     joinDate: 'Feb 15, 2024',
+//     bio: 'Financial advisor specializing in investment strategies and retirement planning.',
+//   },
+//   {
+//     id: '26',
+//     name: 'Michelle Clark',
+//     email: 'michelle.clark@example.com',
+//     status: 'Active',
+//     role: 'Admin',
+//     lastActive: '1 day ago',
+//     phone: '+1 (555) 567-8901',
+//     address: '87 Birch St, Long Beach, CA 90802',
+//     joinDate: 'Mar 8, 2024',
+//     bio: 'Systems administrator with expertise in cloud infrastructure and network security.',
+//   },
+//   {
+//     id: '27',
+//     name: 'Edward Walker',
+//     email: 'edward.walker@example.com',
+//     status: 'Active',
+//     role: 'User',
+//     lastActive: '7 hours ago',
+//     phone: '+1 (555) 678-9012',
+//     address: '76 Pine St, Oakland, CA 94607',
+//     joinDate: 'Mar 20, 2024',
+//     bio: 'Digital marketer specializing in SEO and content strategy.',
+//   },
+//   {
+//     id: '28',
+//     name: 'Nancy Hall',
+//     email: 'nancy.hall@example.com',
+//     status: 'Active',
+//     role: 'User',
+//     lastActive: '8 hours ago',
+//     phone: '+1 (555) 789-0123',
+//     address: '65 Oak St, Minneapolis, MN 55401',
+//     joinDate: 'Mar 25, 2024',
+//     bio: 'Project coordinator with experience in event planning and team management.',
+//   },
+//   {
+//     id: '29',
+//     name: 'George Allen',
+//     email: 'george.allen@example.com',
+//     status: 'Active',
+//     role: 'Manager',
+//     lastActive: '9 hours ago',
+//     phone: '+1 (555) 890-1234',
+//     address: '54 Maple St, Tulsa, OK 74103',
+//     joinDate: 'Mar 28, 2024',
+//     bio: 'Operations director with expertise in process optimization and strategic planning.',
+//   },
+//   {
+//     id: '30',
+//     name: 'Carol Young',
+//     email: 'carol.young@example.com',
+//     status: 'Active',
+//     role: 'User',
+//     lastActive: '10 hours ago',
+//     phone: '+1 (555) 901-2345',
+//     address: '43 Cedar St, Cleveland, OH 44113',
+//     joinDate: 'Mar 30, 2024',
+//     bio: 'Customer experience specialist focusing on service excellence and client retention.',
+//   },
+// ]
 
 const sampleContracts: Contract[] = [
   {

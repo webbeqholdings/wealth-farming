@@ -22,9 +22,9 @@ export default function ContractDetailShell({ contract, user }: ContractDetailSh
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center">
               <Button variant="outline" size="sm" asChild className="mr-4">
-                <Link href={user ? `/high-light/users/${user.id}` : '/dashboard'}>
+                <Link href={user ? `/high-light/users/${user.id}` : '/high-light'}>
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  {user ? `Back to ${user.name}'s Profile` : 'Back to Dashboard'}
+                  {user ? `Back to ${user.name}'s Profile` : 'Back to High Light'}
                 </Link>
               </Button>
               <h1 className="text-3xl font-bold tracking-tight">Contract Details</h1>
@@ -35,11 +35,11 @@ export default function ContractDetailShell({ contract, user }: ContractDetailSh
           {/* Contract Information */}
           <ContractDetailHeader contract={contract} user={user} />
 
-          {/* Transactions Table */}
+          {/* Transactions Table
           <div className="mt-8">
             <h2 className="text-xl font-semibold mb-4">Transactions</h2>
             <ContractTransactionsTable contractId={contract.id} />
-          </div>
+          </div> */}
 
           {/* Equity Chart */}
           <div className="mt-8">

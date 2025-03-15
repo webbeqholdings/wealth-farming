@@ -228,9 +228,9 @@ export default function TableContracts({ contracts }: TableContractsProps) {
                   <TableCell className="text-right">
                     <div
                       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                        contract.status === 'Active'
+                        contract.status === 'active'
                           ? 'bg-emerald-100/10 text-emerald-500'
-                          : contract.status === 'Pending'
+                          : contract.status === 'pending'
                             ? 'bg-yellow-100/10 text-yellow-500'
                             : 'bg-red-100/10 text-red-500'
                       }`}
