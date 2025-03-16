@@ -26,7 +26,6 @@ import { MetaTitleComponent as MetaTitleComponent_a8a977ebc872c5d5ea7ee689724c08
 import { MetaDescriptionComponent as MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { MetaImageComponent as MetaImageComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
-import { default as default_5bc5d237c7ad23ce74a120212f225fa9 } from 'src/components/CustomUserDetails'
 import { Icon as Icon_9fdad4af80370aada0e2c21ec48e4c70 } from 'src/graphics/Icon'
 import { Logo as Logo_d90c735eee50c28b024b50ad94a64ff8 } from 'src/graphics/Logo'
 
@@ -59,7 +58,6 @@ export const importMap = {
   "@payloadcms/plugin-seo/client#MetaDescriptionComponent": MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@payloadcms/plugin-seo/client#MetaImageComponent": MetaImageComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@payloadcms/plugin-seo/client#PreviewComponent": PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860,
-  "/components/CustomUserDetails#default": default_5bc5d237c7ad23ce74a120212f225fa9,
   "./graphics/Icon#Icon": Icon_9fdad4af80370aada0e2c21ec48e4c70,
   "./graphics/Logo#Logo": Logo_d90c735eee50c28b024b50ad94a64ff8
 }
