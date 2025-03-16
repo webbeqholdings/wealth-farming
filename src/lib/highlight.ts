@@ -3,33 +3,6 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import { formatDateTime } from '@/utilities/formatDateTime'
 
-interface ProductLogData {
-  term: string;
-  product_name: string;
-  min_investment: number;
-  rate_of_return: number;
-  // other properties...
-}
-
-interface ProductLog {
-  data: ProductLogData;
-  // other properties...
-}
-
-interface Contract {
-  id: number;
-  user: number ;
-  amount: number;
-  status: string;
-  balance: number;
-  profit: number;
-  expectedReturn: number;
-  term: string;
-  periods: number;
-  product_log: ProductLog;
-
-}
-
 export const getUsers = async (): Promise<{ docs: any }> => {
   try {
     const payload = await getPayload({
