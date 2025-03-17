@@ -4,8 +4,8 @@ import { isAdmin } from '@/access/isAdmin';
 const EconomicCalendar: CollectionConfig = {
   slug: 'economic-calendar',
   access: {
-    read: isAdmin,
-    create: isAdmin,
+    read: () => true,
+    create: () => true,
   },
   admin: {
     listSearchableFields:['title', 'impact'],  

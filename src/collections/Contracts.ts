@@ -9,7 +9,7 @@ const Contracts: CollectionConfig = {
     listSearchableFields: ['user.email', 'amount', 'term'],
   },
   access: {
-      read: isAdmin,
+      read: () => true,
     },
   fields: [
     {

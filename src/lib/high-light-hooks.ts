@@ -261,7 +261,11 @@ export async function getContractEquityData(contractId: string) {
   let contract_amount = contract.value // contract.amount
   let start_date = new Date(contract.startDate)
   let end_date
-  if (contract.status == 'active') {
+  if (contract.status == "inactive" || contract.status == "pending")
+  {
+    return []
+  }
+  else if (contract.status == 'active') {
     end_date = new Date(new Date().setDate(new Date().getDate() - 1)) // Yesterday
   } else end_date = new Date(contract.endDate)
   
@@ -311,7 +315,7 @@ export async function getAllContracts(): Promise<Contract[]> {
       endDate: contract.endDate ? format(contract.endDate, 'PP') : '',
       status: contract.status,
       description: 'No Update',
-      client: contract?.productName,
+      client: '',
       contactPerson: 'No Update',
       contactEmail: 'No Update',
       contactPhone: 'No Update',
@@ -339,13 +343,14 @@ export async function getContractsByUserId(userId: string): Promise<Contract[]> 
       endDate: format(contract.endDate, 'PP'),
       status: contract.status,
       description: 'No Update',
-      client: contract?.productName,
+      client: '',
       contactPerson: 'No Update',
       contactEmail: 'No Update',
       contactPhone: 'No Update',
       terms: contract.term,
       renewalOption: 'No Update',
     }
+
   })
   // For now, we'll return mock data
   return contracts

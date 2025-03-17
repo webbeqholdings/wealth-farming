@@ -8,7 +8,7 @@ const PostCategories: CollectionConfig = {
     defaultColumns: ['name', 'slug'],
   },
   access: {
-    read: isAdmin,
+    read: () => true,
     create: isAdmin,
     update: isAdmin,
     delete: isAdmin,

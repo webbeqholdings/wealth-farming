@@ -5,7 +5,7 @@ import { isAdmin } from '@/access/isAdmin';
 export const Media: CollectionConfig = {
   slug: 'media',
   access: {
-    read: isAdmin,
+    read: () => true,
     create: isAdmin,
   },
   fields: [

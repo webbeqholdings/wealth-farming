@@ -8,7 +8,7 @@ const Accounts: CollectionConfig = {
     listSearchableFields: ['account_name', 'account_number', 'amount', 'user.email']
   },
   access: {
-    read: isAdmin,
+    read: () => true,
   },
   fields: [
     {

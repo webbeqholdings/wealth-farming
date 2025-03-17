@@ -8,7 +8,7 @@ const Companies: CollectionConfig = {
     listSearchableFields: ['name', 'registration_number', 'address', 'contact_person'],
   },
   access: {
-      read: isAdmin,
+      read: () => true,
   },
   fields: [
     {

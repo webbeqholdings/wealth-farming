@@ -4,7 +4,7 @@ import type { CollectionConfig } from 'payload';
 const Units: CollectionConfig = {
   slug: 'units',
   access: {
-    read: isIndividualOrAdmin, // Publicly readable
+    read: () => true, // Publicly readable
     create: ({ req: { user } }) => user?.role === 'admin', // Only admins can create
     update: ({ req: { user } }) => user?.role === 'admin', // Only admins can update
     delete: ({ req: { user } }) => user?.role === 'admin', // Only admins can delete

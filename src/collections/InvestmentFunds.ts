@@ -9,7 +9,7 @@ const InvestmentFunds: CollectionConfig = {
     listSearchableFields: ['name', 'category', 'fund_manager.email'],
   },
   access: {
-    read: isAdmin, // Publicly readable
+    read: () => true, // Publicly readable
   },
   fields: [
     {
