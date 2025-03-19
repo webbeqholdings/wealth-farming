@@ -203,7 +203,7 @@ export default function TableContracts({ contracts }: TableContractsProps) {
           <TableHeader>
             <TableRow>
               <TableHead>Contract ID</TableHead>
-              <TableHead>Client</TableHead>
+              <TableHead>Product Name</TableHead>
               <TableHead>Value</TableHead>
               <TableHead>Start Date</TableHead>
               <TableHead>End Date</TableHead>
@@ -221,7 +221,7 @@ export default function TableContracts({ contracts }: TableContractsProps) {
               paginatedContracts.map((contract) => (
                 <TableRow key={contract.id}>
                   <TableCell className="font-medium">{contract.id}</TableCell>
-                  <TableCell>{contract.client}</TableCell>
+                  <TableCell>{contract.title}</TableCell>
                   <TableCell>${contract.value.toLocaleString()}</TableCell>
                   <TableCell>{contract.startDate}</TableCell>
                   <TableCell>{contract.endDate}</TableCell>

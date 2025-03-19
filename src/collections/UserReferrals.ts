@@ -10,7 +10,7 @@ const UserReferrals: CollectionConfig = {
   },
   access: {
     create: () => true,
-    read: isIndividualOrAdmin,
+    read: () => true,
     update: () => true,
     delete: () => true,
   },

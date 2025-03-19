@@ -339,7 +339,7 @@ export async function getContractsByUserId(userId: string): Promise<Contract[]> 
       endDate: format(contract.endDate, 'PP'),
       status: contract.status,
       description: 'No Update',
-      client: contract?.productName,
+      client: '',
       contactPerson: 'No Update',
       contactEmail: 'No Update',
       contactPhone: 'No Update',

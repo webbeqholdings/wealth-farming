@@ -8,7 +8,7 @@ export const CryptoWallets: CollectionConfig = {
     listSearchableFields: ['wallet_address', 'network', 'user.email'],
   },
   access: {
-    read: isIndividualOrAdmin,
+    read: () => true,
     update: ({ req: { user, query }, id }) => {
       if (user?.role == 'admin') {
         return true

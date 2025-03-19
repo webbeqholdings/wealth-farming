@@ -1,5 +1,4 @@
 // contracts.collection.js
-import { isAdmin } from '@/access/isAdmin'
 import type { CollectionConfig } from 'payload'
 
 const Contracts: CollectionConfig = {
@@ -8,9 +7,6 @@ const Contracts: CollectionConfig = {
     group: 'BeQ Dynamic Fund',
     listSearchableFields: ['user.email', 'amount', 'term'],
   },
-  access: {
-      read: isAdmin,
-    },
   fields: [
     {
       name: 'user',

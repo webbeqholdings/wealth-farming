@@ -13,9 +13,6 @@ const Withdrawals: CollectionConfig = {
     admin: {
         listSearchableFields: ['user.email', 'amount'],
     },
-    access: {
-        read: isAdmin
-    },
     fields: [
         {
             name: 'contract',
