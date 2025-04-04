@@ -1,3 +1,4 @@
+import { isIndividualOrAdmin } from '@/access/isIndividualOrAdmin';
 import type { CollectionConfig } from 'payload';
 
 const Units: CollectionConfig = {

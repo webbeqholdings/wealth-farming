@@ -1,4 +1,5 @@
 // investmentFunds.collection.js
+import { isAdmin } from '@/access/isAdmin'
 import { CollectionConfig } from 'payload'
 
 const InvestmentFunds: CollectionConfig = {
