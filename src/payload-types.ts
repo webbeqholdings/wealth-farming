@@ -142,7 +142,7 @@ export interface User {
   telegram?: (number | null) | Telegram;
   first_name?: string | null;
   last_name?: string | null;
-  role: 'admin' | 'individual' | 'company' | 'ad-viewonly';
+  role: 'admin' | 'individual' | 'company';
   company_name?: string | null;
   registration_number?: string | null;
   phone_contact?: string | null;
@@ -1204,6 +1204,7 @@ export interface SiteSetting {
   support_email: string;
   support_phone?: string | null;
   contact_address?: string | null;
+  description?: string | null;
   'qr-codes'?: (number | null) | Media;
   social_links?:
     | {
@@ -1341,6 +1342,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   support_email?: T;
   support_phone?: T;
   contact_address?: T;
+  description?: T;
   'qr-codes'?: T;
   social_links?:
     | T
