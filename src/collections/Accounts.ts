@@ -1,3 +1,4 @@
+import { isAdmin } from '@/access/isAdmin'
 import type { CollectionConfig } from 'payload'
 
 const Accounts: CollectionConfig = {

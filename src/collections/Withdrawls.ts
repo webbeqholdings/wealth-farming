@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload';
 import { getPayload } from 'payload';
 import config from '@payload-config';
 import { sendEmailContractWithdraw } from '@/utilities/emailContractWithdraw'
+import { isAdmin } from '@/access/isAdmin';
 
 const Withdrawals: CollectionConfig = {
     slug: 'withdrawals', // Collection slug
@@ -11,6 +12,9 @@ const Withdrawals: CollectionConfig = {
     },
     admin: {
         listSearchableFields: ['user.email', 'amount'],
+    },
+    access: {
+        read: () => true
     },
     fields: [
         {

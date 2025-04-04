@@ -4,48 +4,54 @@ import { Open_Sans } from 'next/font/google'
 import { siteConfig } from '@/config/site'
 import { cn } from '@/lib/utils'
 import RootProvider from './provider'
-export const metadata: Metadata = {
-  title: {
-    default: siteConfig.name,
-    template: `%s - ${siteConfig.name}`,
-  },
-  metadataBase: new URL(siteConfig.url),
-  description: siteConfig.description,
-  keywords: ['Wealth Farming Fund', 'Capital Fund', 'Digital Asset'],
-  authors: [
-    {
-      name: 'Wealth Farming Fund',
-      url: 'https://wealthfarmingcap.net',
+import { getSiteSettings } from '@/lib/site-settings'
+
+export async function generateMetadata(): Promise<Metadata> {
+  const siteSetting = await getSiteSettings()
+
+  return {
+    title: {
+      default: siteConfig.name,
+      template: `%s - ${siteConfig.name}`,
     },
-  ],
-  creator: 'wealthFarming',
-  openGraph: {
-    type: 'website',
-    locale: 'en_US',
-    url: siteConfig.url,
-    title: siteConfig.name,
-    description: siteConfig.description,
-    siteName: siteConfig.name,
-    images: [
+    metadataBase: new URL(siteConfig.url),
+    description: siteSetting.description,
+    keywords: ['Wealth Farming Fund', 'Capital Fund', 'Digital Asset'],
+    authors: [
       {
-        url: siteConfig.ogImage,
-        width: 1200,
-        height: 630,
-        alt: siteConfig.name,
+        name: 'Wealth Farming Fund',
+        url: 'https://wealthfarmingcap.net',
       },
     ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: siteConfig.name,
-    description: siteConfig.description,
-    images: [siteConfig.ogImage],
-    creator: '@shadcn',
-  },
-  manifest: `${siteConfig.url}/site.webmanifest`,
-  icons: {
-    icon: 'https://i.postimg.cc/0NV32J1w/favicon-32x32.png',
-  },
+    creator: 'wealthFarming',
+    openGraph: {
+      type: 'website',
+      locale: 'en_US',
+      url: siteConfig.url,
+      title: siteConfig.name,
+      description: siteConfig.description,
+      siteName: siteConfig.name,
+      images: [
+        {
+          url: siteConfig.ogImage,
+          width: 1200,
+          height: 630,
+          alt: siteConfig.name,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: siteConfig.name,
+      description: siteConfig.description,
+      images: [siteConfig.ogImage],
+      creator: '@shadcn',
+    },
+    manifest: `${siteConfig.url}/site.webmanifest`,
+    icons: {
+      icon: 'https://i.postimg.cc/0NV32J1w/favicon-32x32.png',
+    },
+  }
 }
 
 export const viewport: Viewport = {
@@ -72,9 +78,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
           suppressHydrationWarning
           className={cn('min-h-screen bg-background', openSans.className)}
         >
-          <RootProvider>
-            {children}
-          </RootProvider>
+          <RootProvider>{children}</RootProvider>
         </body>
       </html>
     </>

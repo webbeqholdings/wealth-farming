@@ -32,6 +32,11 @@ const SiteSettings: GlobalConfig = {
       label: 'Contact Address',
     },
     {
+      name: 'description',
+      type: 'textarea',
+      label: 'Description',
+    },
+    {
       name: 'qr-codes',
       type: 'upload',
       relationTo: 'media', // Assuming you have a media collection set up for uploads

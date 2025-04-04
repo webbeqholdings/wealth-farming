@@ -22,7 +22,7 @@ const Transactions: CollectionConfig = {
     group: 'BeQ Dynamic Fund',
   },
   access: {
-    read: () => true,
+    read: isIndividualOrAdmin,
     create: isIndividualOrAdmin,
     update: isAdmin,
     delete: isAdmin,
