@@ -35,6 +35,7 @@ import UserReferrals from './collections/UserReferrals'
 import Withdrawals from './collections/Withdrawls'
 import GcBeQDynamicFund from './global-configs/beq-dynamic-fund'
 import GcPaymentTransfer from './global-configs/payment-transfer'
+import GcGoogleSheet from './global-configs/google-sheet'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -111,7 +112,7 @@ export default buildConfig({
     Media,
     Withdrawals,
   ],
-  globals: [SiteSettings, MainMenu, GcPaymentTransfer, GcBeQDynamicFund, Header, Footer],
+  globals: [SiteSettings, MainMenu, GcPaymentTransfer, GcBeQDynamicFund, GcGoogleSheet, Header, Footer],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET,
   typescript: {
@@ -147,6 +148,6 @@ export default buildConfig({
   ],
   localization: {
     locales: ['en', 'vi'],
-    defaultLocale: 'en', 
+    defaultLocale: 'en',
   },
 })
