@@ -72,6 +72,7 @@ export interface Config {
     'main-menu': MainMenu;
     'gc-payment-transfer': GcPaymentTransfer;
     'gc-beq-dynamic-fund': GcBeqDynamicFund;
+    'gc-google-sheet': GcGoogleSheet;
     header: Header;
     footer: Footer;
   };
@@ -80,6 +81,7 @@ export interface Config {
     'main-menu': MainMenuSelect<false> | MainMenuSelect<true>;
     'gc-payment-transfer': GcPaymentTransferSelect<false> | GcPaymentTransferSelect<true>;
     'gc-beq-dynamic-fund': GcBeqDynamicFundSelect<false> | GcBeqDynamicFundSelect<true>;
+    'gc-google-sheet': GcGoogleSheetSelect<false> | GcGoogleSheetSelect<true>;
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
   };
@@ -1289,6 +1291,20 @@ export interface GcBeqDynamicFund {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gc-google-sheet".
+ */
+export interface GcGoogleSheet {
+  id: number;
+  appscript_url: string;
+  sheet_list_user: string;
+  sheet_list_contract: string;
+  sheet_list_transaction: string;
+  sheet_highlight_overview: string;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header".
  */
 export interface Header {
@@ -1414,6 +1430,20 @@ export interface GcBeqDynamicFundSelect<T extends boolean = true> {
   referral_products?: T;
   standard_days?: T;
   referral_config_rates?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gc-google-sheet_select".
+ */
+export interface GcGoogleSheetSelect<T extends boolean = true> {
+  appscript_url?: T;
+  sheet_list_user?: T;
+  sheet_list_contract?: T;
+  sheet_list_transaction?: T;
+  sheet_highlight_overview?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
