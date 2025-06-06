@@ -36,6 +36,7 @@ import Withdrawals from './collections/Withdrawls'
 import GcBeQDynamicFund from './global-configs/beq-dynamic-fund'
 import GcPaymentTransfer from './global-configs/payment-transfer'
 import GcGoogleSheet from './global-configs/google-sheet'
+import { s3Storage } from '@payloadcms/storage-s3'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -144,6 +145,21 @@ export default buildConfig({
       generateTitle: ({ doc }) => `Wealthfarming.org — ${doc.title}`,
       generateDescription: ({ doc }) => doc.title,
       generateURL: ({ doc, collectionSlug }) => process.env.BASE_URL + `/${doc.slug}`, // recommend env
+    }),
+    s3Storage({
+      collections:{
+        media: true,
+      },
+      bucket: process.env.S3_BUCKET_NAME as string,
+      config: {
+        credentials: {
+          accessKeyId: process.env.S3_ACCESS_KEY as string,
+          secretAccessKey: process.env.S3_SECRET_KEY as string,
+        },
+        region: process.env.S3_REGION,
+        endpoint: process.env.S3_ENDPOINT,
+        forcePathStyle: true,
+      }
     })
   ],
   localization: {
