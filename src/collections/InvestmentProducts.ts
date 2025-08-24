@@ -58,6 +58,18 @@ const InvestmentProducts: CollectionConfig = {
       type: 'number',
       label: 'Rate of Return (%)',
     },
+    {
+      name: 'createdAt',
+      type: 'date',
+      label: 'Created At',
+      hooks: {
+        beforeChange: [
+          () => {
+            return new Date()
+          },
+        ],
+      },
+    },
   ],
 }
 

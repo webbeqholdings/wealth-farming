@@ -517,4 +517,5 @@ export const vi = {
     enter_phone: "Nhập số điện thoại của bạn",
     refer_code: "Mã giới thiệu",
     birth_date: 'Ngày sinh nhật',
+    total_withdrawl: 'Tổng Rút Tiền',
 }

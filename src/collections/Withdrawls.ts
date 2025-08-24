@@ -69,6 +69,18 @@ const Withdrawals: CollectionConfig = {
             type: 'upload',
             relationTo: 'media',
         },
+        {
+            name: 'createdAt',
+            type: 'date',
+            label: 'Created At',
+            hooks: {
+              beforeChange: [
+                () => {
+                  return new Date()
+                },
+              ],
+            },
+          },
     ],
     timestamps: true, // Automatically adds createdAt and updatedAt fields
     hooks: {

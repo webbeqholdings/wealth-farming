@@ -95,9 +95,41 @@ export function InvestmentContracts() {
     const [startDate, setStartDate] = useState<Date>()
     const [endDate, setEndDate] = useState<Date>()
     const [terminatedAvaibility, setTerminatedAvaibility] = useState(false)
+    
+    // New state for total statistics
+    const [totalStats, setTotalStats] = useState({
+        totalInvested: 0,
+        totalAvailableBalance: 0,
+        activeContracts: 0,
+        totalWithdrawal: 0
+    });
+    
     const { t } = useTranslation();
 
     const getMessage = useGetMessage()
+
+    // Function to fetch total statistics (without pagination)
+    const fetchTotalStats = useCallback(async () => {
+        try {
+            // Fetch all contracts for statistics (no pagination)
+            const { docs: allContracts } = await getContracts(1, 1000); // Large limit to get all
+            const { docs: allWithdrawals } = await getWithdrawals(1, 1000); // Large limit to get all
+            
+            const totalInvested = allContracts.reduce((sum: number, inv: Investment) => sum + inv.investedAmount, 0);
+            const totalAvailableBalance = allContracts.reduce((sum: number, inv: Investment) => sum + inv.availableBalance, 0);
+            const activeContracts = allContracts.filter((inv: Investment) => inv.status === 'active').length;
+            const totalWithdrawal = allWithdrawals.reduce((sum: number, withdrawal: Withdrawal) => sum + withdrawal.amount, 0);
+            
+            setTotalStats({
+                totalInvested,
+                totalAvailableBalance,
+                activeContracts,
+                totalWithdrawal
+            });
+        } catch (error) {
+            console.error('Failed to fetch total statistics:', error);
+        }
+    }, []);
 
     useEffect(() => {
         async function fetchTerminateAvaibility() {
@@ -108,6 +140,11 @@ export function InvestmentContracts() {
         }
         fetchTerminateAvaibility()
     }, [loading])
+
+    // Fetch total statistics when component mounts or when activeTab changes
+    useEffect(() => {
+        fetchTotalStats();
+    }, [fetchTotalStats]);
 
     const fetchData = useCallback(async () => {
         if (activeTab === 'investment') {
@@ -187,6 +224,9 @@ export function InvestmentContracts() {
           setWithdrawals(docs)
           setTotalPagesWithdrawl(totalPages)
         }
+        
+        // Also fetch total statistics for the filtered date range
+        await fetchTotalStats();
       } catch (error) {
         console.error('Failed to fetch contracts:', error)
       }
@@ -331,9 +371,7 @@ export function InvestmentContracts() {
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold ">
-                                {investments && formatCurrency(
-                                    investments.reduce((sum, inv) => sum + inv.investedAmount, 0)
-                                )}
+                                {formatCurrency(totalStats.totalInvested)}
                             </div>
                         </CardContent>
                     </Card>
@@ -345,9 +383,7 @@ export function InvestmentContracts() {
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold text-green-500">
-                                {investments && formatCurrency(
-                                    investments.reduce((sum, inv) => sum + inv.availableBalance, 0)
-                                )}
+                                {formatCurrency(totalStats.totalAvailableBalance)}
                             </div>
                         </CardContent>
                     </Card>
@@ -359,19 +395,19 @@ export function InvestmentContracts() {
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold ">
-                                {investments && investments.filter((inv) => inv.status === 'active').length}
+                                {totalStats.activeContracts}
                             </div>
                         </CardContent>
                     </Card>
                     <Card className="  shadow-sm">
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm font-medium ">
-                                {t("portfolio_cell_4")}
+                                {t('total_withdrawl')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold text-green-500">
-                                {investments ? `${calculateROI().toFixed(2)}%` : '0.00%'}
+                                {formatCurrency(totalStats.totalWithdrawal)}
                             </div>
                         </CardContent>
                     </Card>

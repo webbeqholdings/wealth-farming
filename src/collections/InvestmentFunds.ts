@@ -74,6 +74,18 @@ const InvestmentFunds: CollectionConfig = {
       label: 'Status',
       required: true,
     },
+    {
+      name: 'createdAt',
+      type: 'date',
+      label: 'Created At',
+      hooks: {
+        beforeChange: [
+          () => {
+            return new Date()
+          },
+        ],
+      },
+    },
   ],
 }
 

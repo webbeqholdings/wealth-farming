@@ -172,6 +172,18 @@ const Transactions: CollectionConfig = {
         },
       ],
     },
+    {
+      name: 'createdAt',
+      type: 'date',
+      label: 'Created At',
+      hooks: {
+        beforeChange: [
+          () => {
+            return new Date()
+          },
+        ],
+      },
+    },
   ],
   hooks: {
     afterChange: [

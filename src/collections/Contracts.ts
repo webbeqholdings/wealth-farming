@@ -92,6 +92,18 @@ const Contracts: CollectionConfig = {
       type: 'json',
       label: 'Config Log',
     },
+    {
+      name: 'createdAt',
+      type: 'date',
+      label: 'Created At',
+      hooks: {
+        beforeChange: [
+          () => {
+            return new Date()
+          },
+        ],
+      },
+    },
   ],
 }
 

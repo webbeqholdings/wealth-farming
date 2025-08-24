@@ -522,4 +522,5 @@ export const en = {
     enter_phone: 'Enter your phone',
     refer_code: 'Referral Code',
     birth_date: 'Date of Birth',
+    total_withdrawl: 'Total Withdrawl',
 }
